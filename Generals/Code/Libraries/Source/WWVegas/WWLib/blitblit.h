@@ -454,6 +454,7 @@ class BlitTransLucent75 : public Blitter {
 
 inline void BlitTrans<unsigned char>::BlitForward(void * dest, void const * source, int len) const
 {
+#if defined(WIN32)
 	__asm {
 		mov	esi,[source]
 		mov	edi,[dest]
@@ -474,11 +475,13 @@ again:
 		jmp	again
 	}
 fini:;
+#endif
 }
 
 
 inline void BlitTransXlat<unsigned short>::BlitForward(void * dest, void const * source, int len) const
 {
+#if defined(WIN32)
 	unsigned short const * xlator = TranslateTable;
 
 	__asm {
@@ -504,11 +507,13 @@ again:
 		jmp	again
 	}
 over:;
+#endif
 }
 
 
 inline void BlitTransRemapXlat<unsigned short>::BlitForward(void * dest, void const * source, int len) const
 {
+#if defined(WIN32)
 	unsigned short const * translator = TranslateTable;
 	unsigned char const * remapper = RemapTable;
 
@@ -541,11 +546,13 @@ again:
 		jmp	again
 	}
 over:;
+#endif
 }
 
 
 inline void BlitTransZRemapXlat<unsigned short>::BlitForward(void * dest, void const * source, int len) const
 {
+#if defined(WIN32)
 	unsigned short const * translator = TranslateTable;
 	unsigned char const * remapper = *RemapTable;
 
@@ -578,11 +585,13 @@ again:
 		jmp	again
 	}
 over:;
+#endif
 }
 
 
 inline void BlitPlainXlat<unsigned short>::BlitForward(void * dest, void const * source, int len) const
 {
+#if defined(WIN32)
 	unsigned short const * remapper = TranslateTable;
 	__asm {
 		mov	ebx,[remapper]
@@ -605,6 +614,7 @@ again:
 		dec	ecx
 		jnz	again
 	}
+#endif
 }
 
 

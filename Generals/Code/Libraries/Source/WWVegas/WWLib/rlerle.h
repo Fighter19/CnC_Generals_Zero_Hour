@@ -457,6 +457,7 @@ class RLEBlitTransLucent75 : public RLEBlitter {
 #if defined(_MSC_VER)
 void RLEBlitTransZRemapXlat<unsigned short>::Blit(void * dest, void const * source, int len, int leadskip) const
 {
+#if defined(WIN32) && !defined(_WIN64)
 	unsigned char const * remapper = *RemapTable;
 	unsigned short const * transtable = TranslateTable;
 
@@ -536,11 +537,13 @@ transparent:
 	}
 
 fini:;
+#endif
 }
 
 
 void RLEBlitTransRemapXlat<unsigned short>::Blit(void * dest, void const * source, int len, int leadskip) const
 {
+#if defined(WIN32) && !defined(_WIN64)
 	unsigned char const * remapper = RemapTable;
 	unsigned short const * transtable = TranslateTable;
 
@@ -620,11 +623,13 @@ transparent:
 	}
 
 fini:;
+#endif
 }
 
 
 void RLEBlitTransXlat<unsigned short>::Blit(void * dest, void const * source, int len, int leadskip) const
 {
+#if defined(WIN32) && !defined(_WIN64)
 	unsigned short const * transtable = TranslateTable;
 
 	/*
@@ -701,6 +706,7 @@ transparent:
 	}
 
 fini:;
+#endif
 }
 
 #endif

@@ -134,7 +134,7 @@ static unsigned Calculate_Processor_Speed(__int64& ticks_per_second)
 		unsigned timer1_l;
 	} Time;
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(_WIN64)
    __asm {
       ASM_RDTSC;
       mov Time.timer0_h, eax
@@ -149,7 +149,7 @@ static unsigned Calculate_Processor_Speed(__int64& ticks_per_second)
 	unsigned start=TIMEGETTIME();
 	unsigned elapsed;
 	while ((elapsed=TIMEGETTIME()-start)<200) {
-#ifdef WIN32
+#if defined(WIN32) && !defined(_WIN64)
       __asm {
          ASM_RDTSC;
          mov Time.timer1_h, eax
@@ -826,7 +826,7 @@ void CPUDetectClass::Init_CPUID_Instruction()
    // because CodeWarrior seems to have problems with
    // the command (huh?)
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(_WIN64)
    __asm
    {
       mov cpuid_available, 0	// clear flag
@@ -946,7 +946,7 @@ bool CPUDetectClass::CPUID(
 	unsigned u_ecx;
 	unsigned u_edx;
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(_WIN64)
    __asm
    {
       pushad

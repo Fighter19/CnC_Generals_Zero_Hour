@@ -178,10 +178,14 @@ __forceinline long fast_float2long_round(float f)
 {
 	long i;
 
+#if defined(WIN32) && !defined(_WIN64)
 	__asm {
 		fld [f]
 		fistp [i]
 	}
+#else
+	i = (long)f;
+#endif
 
 	return i;
 }

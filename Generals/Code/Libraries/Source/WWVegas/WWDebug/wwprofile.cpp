@@ -71,7 +71,7 @@
  *=============================================================================================*/
 inline void WWProfile_Get_Ticks(_int64 * ticks)
 {
-#ifdef _UNIX
+#if defined(_UNIX) || defined(_WIN64)
 	*ticks = 0;
 #else 
 	__asm
