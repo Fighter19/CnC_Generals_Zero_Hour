@@ -22,9 +22,7 @@
 
 #include "Common/AsciiString.h"
 #include "Common/GameAudio.h"
-#include "mss/mss.h"
-
-#include <mutex>
+#include <AL/al.h>
 
 class AudioEventRTS;
 
@@ -53,10 +51,33 @@ enum PlayingWhich
 	PW_INVALID
 };
 
+struct PlayingAudio
+{
+	ALuint m_source;
+    ALuint m_buffer;
+
+	PlayingAudioType m_type;
+	volatile PlayingStatus m_status;	// This member is adjusted by another running thread.
+	AudioEventRTS *m_audioEventRTS;
+	void *m_file;		// The file that was opened to play this
+	Bool m_requestStop;
+	Bool m_cleanupAudioEventRTS;
+	Int m_framesFaded;
+	
+	PlayingAudio() : 
+		m_type(PAT_INVALID), 
+		m_audioEventRTS(NULL), 
+		m_requestStop(false), 
+		m_cleanupAudioEventRTS(true),
+		m_source(0), 
+		m_buffer(0),
+		m_framesFaded(0)
+	{ }
+};
+
 struct ProviderInfo
 {
   AsciiString name;
-  HPROVIDER id;
 	Bool m_isValid;
 };
 
@@ -73,8 +94,39 @@ struct OpenAudioFile
 	const AudioEventInfo *m_eventInfo;	// Not mutable, unlike the one on AudioEventRTS.
 };
 
-struct PlayingAudio;
-struct AudioFileCache;
+typedef std::unordered_map< AsciiString, OpenAudioFile, rts::hash<AsciiString>, rts::equal_to<AsciiString> > OpenFilesHash;
+typedef OpenFilesHash::iterator OpenFilesHashIt;
+
+class AudioFileCache
+{
+	public:
+		AudioFileCache();
+		
+		// Protected by mutex
+		virtual ~AudioFileCache();
+		void *openFile( AudioEventRTS *eventToOpenFrom );
+		void closeFile( void *fileToClose );
+		void setMaxSize( UnsignedInt size );
+		// End Protected by mutex
+
+		// Note: These functions should be used for informational purposes only. For speed reasons,
+		// they are not protected by the mutex, so they are not guarenteed to be valid if called from
+		// outside the audio cache. They should be used as a rough estimate only.
+		UnsignedInt getCurrentlyUsedSize() const { return m_currentlyUsedSize; }
+		UnsignedInt getMaxSize() const { return m_maxSize; }
+
+	protected:
+		void releaseOpenAudioFile( OpenAudioFile *fileToRelease );
+
+		// This function will return TRUE if it was able to free enough space, and FALSE otherwise.
+		Bool freeEnoughSpaceForSample(const OpenAudioFile& sampleThatNeedsSpace);
+		
+		OpenFilesHash m_openFiles;
+		UnsignedInt m_currentlyUsedSize;
+		UnsignedInt m_maxSize;
+		HANDLE m_mutex;
+		const char *m_mutexName;
+};
 
 class MilesAudioManager : public AudioManager
 {

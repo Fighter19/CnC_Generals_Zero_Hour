@@ -7,6 +7,7 @@ project(
 # Required for filesystem
 set(CMAKE_CXX_STANDARD 17)
 
+include(CMakeDependentOption)
 option(SAGE_BUILD_GENERALS "Build the C&C Generals game" OFF)
 option(SAGE_BUILD_ZEROHOUR "Build the C&C Generals Zero Hour game" ON)
 option(SAGE_BUILD_TOOLS "Build the tools" ON)
@@ -15,7 +16,8 @@ option(SAGE_USE_MILES "Use Miles Sound System" ON)
 option(SAGE_USE_ZLIB "Use ZLib" ON)
 option(SAGE_USE_LZHL "Use LZH-Light" ON)
 option(SAGE_USE_GLM "Use GLM math library" OFF)
-include(CMakeDependentOption)
+option(SAGE_USE_FFMPEG "Use FFmpeg" ON)
+cmake_dependent_option(SAGE_USE_OPENAL "Use OpenAL" OFF "NOT SAGE_USE_FFMPEG" OFF)
 cmake_dependent_option(SAGE_USE_BINK "Use Bink Video Library" ON "WIN32" OFF)
 cmake_dependent_option(SAGE_USE_DX8 "Use DirectX 8" ON "WIN32" OFF)
 

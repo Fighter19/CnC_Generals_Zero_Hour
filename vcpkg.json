@@ -7,5 +7,7 @@
     "zlib",
     "glm",
     "gli"
+    "openal-soft", 
+    "ffmpeg"
   ]
 }
