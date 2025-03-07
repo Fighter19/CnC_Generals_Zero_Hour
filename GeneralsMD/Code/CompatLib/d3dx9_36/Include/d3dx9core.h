@@ -92,6 +92,20 @@ DECLARE_INTERFACE_(ID3DXBuffer, IUnknown)
 #define ID3DXBuffer_GetBufferSize(p)      (p)->GetBufferSize()
 #endif
 
+#ifdef STANDALONE
+#define LF_FACESIZE 256
+//#define STDAPI
+
+# define DECL_WINELIB_TYPE_AW(type)  /* nothing */
+
+typedef struct _TEXTMETRICA TEXTMETRICA;
+typedef struct _TEXTMETRICW TEXTMETRICW;
+typedef struct _GLYPHMETRICSFLOAT GLYPHMETRICSFLOAT;
+
+typedef uint64_t ULONG64;
+
+#endif // BREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEee
+
 typedef struct _D3DXFONT_DESCA
 {
     INT Height;

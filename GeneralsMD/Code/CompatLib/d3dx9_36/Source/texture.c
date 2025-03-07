@@ -791,9 +791,11 @@ HRESULT WINAPI D3DXCreateTextureFromFileExA(struct IDirect3DDevice9 *device, con
     if (!device || !srcfile || !texture)
         return D3DERR_INVALIDCALL;
 
-    len = MultiByteToWideChar(CP_ACP, 0, srcfile, -1, NULL, 0);
+    //len = MultiByteToWideChar(CP_ACP, 0, srcfile, -1, NULL, 0);
+    len = mbstowcs(NULL, srcfile, 0) + 1;
     widename = malloc(len * sizeof(*widename));
-    MultiByteToWideChar(CP_ACP, 0, srcfile, -1, widename, len);
+    //MultiByteToWideChar(CP_ACP, 0, srcfile, -1, widename, len);
+    mbstowcs(widename, srcfile, len);
 
     hr = D3DXCreateTextureFromFileExW(device, widename, width, height, miplevels,
                                       usage, format, pool, filter, mipfilter,
@@ -861,9 +863,11 @@ HRESULT WINAPI D3DXCreateTextureFromResourceExA(struct IDirect3DDevice9 *device,
     if (!device || !texture)
         return D3DERR_INVALIDCALL;
 
+#ifndef STANDALONE
     if (!(resinfo = FindResourceA(srcmodule, resource, (const char *)RT_RCDATA))
             /* Try loading the resource as bitmap data (which is in DIB format D3DXIFF_DIB) */
             && !(resinfo = FindResourceA(srcmodule, resource, (const char *)RT_BITMAP)))
+#endif
         return D3DXERR_INVALIDDATA;
 
     if (FAILED(load_resource_into_memory(srcmodule, resinfo, &buffer, &size)))
@@ -890,9 +894,11 @@ HRESULT WINAPI D3DXCreateTextureFromResourceExW(struct IDirect3DDevice9 *device,
     if (!device || !texture)
         return D3DERR_INVALIDCALL;
 
+#ifndef STANDALONE
     if (!(resinfo = FindResourceW(srcmodule, resource, (const WCHAR *)RT_RCDATA))
             /* Try loading the resource as bitmap data (which is in DIB format D3DXIFF_DIB) */
             && !(resinfo = FindResourceW(srcmodule, resource, (const WCHAR *)RT_BITMAP)))
+#endif
         return D3DXERR_INVALIDDATA;
 
     if (FAILED(load_resource_into_memory(srcmodule, resinfo, &buffer, &size)))
@@ -971,10 +977,12 @@ HRESULT WINAPI D3DXCreateVolumeTextureFromFileA(IDirect3DDevice9 *device,
 
     if (!filename) return D3DERR_INVALIDCALL;
 
-    len = MultiByteToWideChar(CP_ACP, 0, filename, -1, NULL, 0);
+    //len = MultiByteToWideChar(CP_ACP, 0, filename, -1, NULL, 0);
+    len = mbstowcs(NULL, filename, 0);
     filenameW = malloc(len * sizeof(WCHAR));
     if (!filenameW) return E_OUTOFMEMORY;
-    MultiByteToWideChar(CP_ACP, 0, filename, -1, filenameW, len);
+    //MultiByteToWideChar(CP_ACP, 0, filename, -1, filenameW, len);
+    mbstowcs(filenameW, filename, len);
 
     hr = map_view_of_file(filenameW, &data, &data_size);
     free(filenameW);
@@ -1039,10 +1047,12 @@ HRESULT WINAPI D3DXCreateVolumeTextureFromFileExA(IDirect3DDevice9 *device,
 
     if (!filename) return D3DERR_INVALIDCALL;
 
-    len = MultiByteToWideChar(CP_ACP, 0, filename, -1, NULL, 0);
+    //len = MultiByteToWideChar(CP_ACP, 0, filename, -1, NULL, 0);
+    len = mbstowcs(NULL, filename, 0);
     filenameW = malloc(len * sizeof(WCHAR));
     if (!filenameW) return E_OUTOFMEMORY;
-    MultiByteToWideChar(CP_ACP, 0, filename, -1, filenameW, len);
+    //MultiByteToWideChar(CP_ACP, 0, filename, -1, filenameW, len);
+    mbstowcs(filenameW, filename, len);
 
     hr = map_view_of_file(filenameW, &data, &data_size);
     free(filenameW);
@@ -1520,10 +1530,12 @@ HRESULT WINAPI D3DXCreateCubeTextureFromFileA(IDirect3DDevice9 *device,
 
     if (!src_filename) return D3DERR_INVALIDCALL;
 
-    len = MultiByteToWideChar(CP_ACP, 0, src_filename, -1, NULL, 0);
+    //len = MultiByteToWideChar(CP_ACP, 0, src_filename, -1, NULL, 0);
+    len = mbstowcs(NULL, src_filename, 0);
     filename = malloc(len * sizeof(WCHAR));
     if (!filename) return E_OUTOFMEMORY;
-    MultiByteToWideChar(CP_ACP, 0, src_filename, -1, filename, len);
+    //MultiByteToWideChar(CP_ACP, 0, src_filename, -1, filename, len);
+    mbstowcs(filename, src_filename, len);
 
     hr = map_view_of_file(filename, &data, &data_size);
     if (FAILED(hr))
@@ -1578,10 +1590,12 @@ HRESULT WINAPI D3DXCreateCubeTextureFromFileExA(IDirect3DDevice9 *device, const 
 
     if (!src_filename) return D3DERR_INVALIDCALL;
 
-    len = MultiByteToWideChar(CP_ACP, 0, src_filename, -1, NULL, 0);
+    //len = MultiByteToWideChar(CP_ACP, 0, src_filename, -1, NULL, 0);
+    len = mbstowcs(NULL, src_filename, 0);
     filename = malloc(len * sizeof(WCHAR));
     if (!filename) return E_OUTOFMEMORY;
-    MultiByteToWideChar(CP_ACP, 0, src_filename, -1, filename, len);
+    //MultiByteToWideChar(CP_ACP, 0, src_filename, -1, filename, len);
+    mbstowcs(filename, src_filename, len);
 
     hr = map_view_of_file(filename, &data, &data_size);
     if (FAILED(hr))
@@ -1816,10 +1830,12 @@ HRESULT WINAPI D3DXSaveTextureToFileA(const char *dst_filename, D3DXIMAGE_FILEFO
 
     if (!dst_filename) return D3DERR_INVALIDCALL;
 
-    len = MultiByteToWideChar(CP_ACP, 0, dst_filename, -1, NULL, 0);
+    //len = MultiByteToWideChar(CP_ACP, 0, dst_filename, -1, NULL, 0);
+    len = mbstowcs(NULL, dst_filename, 0);
     filename = malloc(len * sizeof(WCHAR));
     if (!filename) return E_OUTOFMEMORY;
-    MultiByteToWideChar(CP_ACP, 0, dst_filename, -1, filename, len);
+    //MultiByteToWideChar(CP_ACP, 0, dst_filename, -1, filename, len);
+    mbstowcs(filename, dst_filename, len);
 
     hr = D3DXSaveTextureToFileInMemory(&buffer, file_format, src_texture, src_palette);
     if (SUCCEEDED(hr))

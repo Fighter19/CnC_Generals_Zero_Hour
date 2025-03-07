@@ -24,7 +24,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#define STANDALONE
+#include <GL/gl.h>
 #include "txc_dxtn.h"
+
 
 /* weights used for error function, basically weights (unsquared 2/4/1) according to rgb->luminance conversion
    not sure if this really reflects visual perception */

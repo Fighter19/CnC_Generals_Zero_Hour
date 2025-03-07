@@ -210,6 +210,7 @@ enum d3dx_pixel_format_id d3dx_pixel_format_id_from_d3dformat(D3DFORMAT format)
  */
 HRESULT map_view_of_file(const WCHAR *filename, void **buffer, DWORD *length)
 {
+#ifndef STANDALONE
     HANDLE hfile, hmapping = NULL;
 
     hfile = CreateFileW(filename, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
@@ -226,15 +227,41 @@ HRESULT map_view_of_file(const WCHAR *filename, void **buffer, DWORD *length)
 
     CloseHandle(hmapping);
     CloseHandle(hfile);
+#else
+    // Copy file into buffer
+    FILE *file = fopen(filename, "rb");
+    if (file == NULL)
+        return -1;
+
+    fseek(file, 0, SEEK_END);
+    *length = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    *buffer = malloc(*length);
+    if (*buffer == NULL)
+        return -1;
+    
+    if (fread(*buffer, 1, *length, file) != *length)
+    {
+        free(*buffer);
+        *buffer = NULL;
+        fclose(file);
+        return -1;
+    }
+
+    fclose(file);
+
+#endif
 
     return S_OK;
-
+#ifndef STANDALONE
 error:
     if (hmapping)
         CloseHandle(hmapping);
     if (hfile != INVALID_HANDLE_VALUE)
         CloseHandle(hfile);
     return HRESULT_FROM_WIN32(GetLastError());
+#endif
 }
 
 /************************************************************
@@ -260,6 +287,9 @@ error:
  */
 HRESULT load_resource_into_memory(HMODULE module, HRSRC resinfo, void **buffer, DWORD *length)
 {
+#ifdef STANDALONE
+    return S_FALSE;
+#else
     HGLOBAL resource;
 
     *length = SizeofResource(module, resinfo);
@@ -272,6 +302,7 @@ HRESULT load_resource_into_memory(HMODULE module, HRSRC resinfo, void **buffer, 
     if(*buffer == NULL) return HRESULT_FROM_WIN32(GetLastError());
 
     return S_OK;
+#endif
 }
 
 HRESULT write_buffer_to_file(const WCHAR *dst_filename, ID3DXBuffer *buffer)
@@ -280,17 +311,33 @@ HRESULT write_buffer_to_file(const WCHAR *dst_filename, ID3DXBuffer *buffer)
     void *buffer_pointer;
     DWORD buffer_size;
     DWORD bytes_written;
+#ifndef STANDALONE
     HANDLE file = CreateFileW(dst_filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (file == INVALID_HANDLE_VALUE)
         return HRESULT_FROM_WIN32(GetLastError());
+#else
+    // Convert string to char
+    char *dst_filename_char = NULL;
+    int dst_filename_char_size = wcstombs(NULL, dst_filename, 0);
+    dst_filename_char = malloc(dst_filename_char_size + 1);
+    wcstombs(dst_filename_char, dst_filename, dst_filename_char_size + 1);
+    FILE *file = fopen(dst_filename_char, "wb");
+    if (file == NULL)
+        return -1;
+#endif
 
     buffer_pointer = ID3DXBuffer_GetBufferPointer(buffer);
     buffer_size = ID3DXBuffer_GetBufferSize(buffer);
 
+#ifndef STANDALONE
     if (!WriteFile(file, buffer_pointer, buffer_size, &bytes_written, NULL))
         hr = HRESULT_FROM_WIN32(GetLastError());
 
     CloseHandle(file);
+#else
+    if (fwrite(buffer_pointer, 1, buffer_size, file) != buffer_size)
+        hr = -1;
+#endif
     return hr;
 }
 

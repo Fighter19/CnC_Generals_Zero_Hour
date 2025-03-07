@@ -23,8 +23,10 @@
 
 #include "d3dx9_private.h"
 #include "d3dcompiler.h"
+#ifndef STANDALONE
 #include "winternl.h"
 #include "wine/list.h"
+#endif
 
 /* Constants for special INT/FLOAT conversation */
 #define INT_FLOAT_MULTI 255.0f
@@ -4295,6 +4297,7 @@ static HRESULT WINAPI d3dx_effect_DeleteParameterBlock(ID3DXEffect *iface, D3DXH
     if (!block)
         return D3DERR_INVALIDCALL;
 
+#ifndef STANDALONE
     LIST_FOR_EACH_ENTRY(b, &effect->parameter_block_list, struct d3dx_parameter_block, entry)
     {
         if (b == block)
@@ -4304,6 +4307,7 @@ static HRESULT WINAPI d3dx_effect_DeleteParameterBlock(ID3DXEffect *iface, D3DXH
             return D3D_OK;
         }
     }
+#endif
 
     WARN("Block is not found in issued block list, not freeing memory.\n");
     return D3DERR_INVALIDCALL;
@@ -5415,7 +5419,9 @@ static void add_param_to_tree(struct d3dx_effect *effect, struct d3dx_parameter 
         }
     }
     TRACE("Full name is %s.\n", param->full_name);
+#ifndef STANDALONE
     wine_rb_put(&effect->params.tree, param->full_name, &param->rb_entry);
+#endif
 
     if (is_top_level_parameter(param))
         for (i = 0; i < param->top_level_param->annotation_count; ++i)
@@ -7001,8 +7007,10 @@ HRESULT WINAPI D3DXCreateEffectFromResourceExW(struct IDirect3DDevice9 *device, 
     if (!device)
         return D3DERR_INVALIDCALL;
 
+#ifndef STANDALONE
     if (!(resinfo = FindResourceW(srcmodule, srcresource, (const WCHAR *)RT_RCDATA)))
         return D3DXERR_INVALIDDATA;
+#endif
 
     if (FAILED(load_resource_into_memory(srcmodule, resinfo, &buffer, &size)))
         return D3DXERR_INVALIDDATA;
@@ -7093,9 +7101,11 @@ HRESULT WINAPI D3DXCreateEffectCompilerFromFileA(const char *srcfile, const D3DX
     if (!srcfile)
         return D3DERR_INVALIDCALL;
 
-    len = MultiByteToWideChar(CP_ACP, 0, srcfile, -1, NULL, 0);
+    //len = MultiByteToWideChar(CP_ACP, 0, srcfile, -1, NULL, 0);
+    len = mbtowc(NULL, srcfile, 0);
     srcfileW = malloc(len * sizeof(*srcfileW));
-    MultiByteToWideChar(CP_ACP, 0, srcfile, -1, srcfileW, len);
+    //MultiByteToWideChar(CP_ACP, 0, srcfile, -1, srcfileW, len);
+    mbtowc(srcfileW, srcfile, len);
 
     ret = D3DXCreateEffectCompilerFromFileW(srcfileW, defines, include, flags, compiler, messages);
     free(srcfileW);
@@ -7114,8 +7124,10 @@ HRESULT WINAPI D3DXCreateEffectCompilerFromResourceA(HMODULE srcmodule, const ch
     TRACE("srcmodule %p, srcresource %s, defines %p, include %p, flags %#lx, compiler %p, messages %p.\n",
             srcmodule, debugstr_a(srcresource), defines, include, flags, compiler, messages);
 
+#ifndef STANDALONE
     if (!(resinfo = FindResourceA(srcmodule, srcresource, (const char *)RT_RCDATA)))
         return D3DXERR_INVALIDDATA;
+#endif
 
     if (FAILED(load_resource_into_memory(srcmodule, resinfo, &buffer, &size)))
         return D3DXERR_INVALIDDATA;
@@ -7134,8 +7146,10 @@ HRESULT WINAPI D3DXCreateEffectCompilerFromResourceW(HMODULE srcmodule, const WC
     TRACE("srcmodule %p, srcresource %s, defines %p, include %p, flags %#lx, compiler %p, messages %p.\n",
             srcmodule, debugstr_w(srcresource), defines, include, flags, compiler, messages);
 
+#ifndef STANDALONE
     if (!(resinfo = FindResourceW(srcmodule, srcresource, (const WCHAR *)RT_RCDATA)))
         return D3DXERR_INVALIDDATA;
+#endif
 
     if (FAILED(load_resource_into_memory(srcmodule, resinfo, &buffer, &size)))
         return D3DXERR_INVALIDDATA;

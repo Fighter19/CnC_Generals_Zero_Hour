@@ -21,16 +21,124 @@
 
 #include "d3dx9_private.h"
 
+#ifndef STANDALONE
 #include "initguid.h"
 #include "ole2.h"
 #include "wincodec.h"
+#else
+#include <GL/gl.h>
+DEFINE_GUID(GUID_WICPixelFormatDontCare, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x00);
+#define GUID_WICPixelFormatUndefined GUID_WICPixelFormatDontCare
+DEFINE_GUID(GUID_WICPixelFormat1bppIndexed, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x01);
+DEFINE_GUID(GUID_WICPixelFormat2bppIndexed, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x02);
+DEFINE_GUID(GUID_WICPixelFormat4bppIndexed, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x03);
+DEFINE_GUID(GUID_WICPixelFormat8bppIndexed, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x04);
+DEFINE_GUID(GUID_WICPixelFormatBlackWhite, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x05);
+DEFINE_GUID(GUID_WICPixelFormat2bppGray, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x06);
+DEFINE_GUID(GUID_WICPixelFormat4bppGray, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x07);
+DEFINE_GUID(GUID_WICPixelFormat8bppGray, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x08);
+DEFINE_GUID(GUID_WICPixelFormat16bppGray, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x0b);
+DEFINE_GUID(GUID_WICPixelFormat8bppAlpha, 0xe6cd0116,0xeeba,0x4161,0xaa,0x85,0x27,0xdd,0x9f,0xb3,0xa8,0x95);
+DEFINE_GUID(GUID_WICPixelFormat16bppBGR555, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x09);
+DEFINE_GUID(GUID_WICPixelFormat16bppBGR565, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x0a);
+DEFINE_GUID(GUID_WICPixelFormat16bppBGRA5551, 0x05ec7c2b,0xf1e6,0x4961,0xad,0x46,0xe1,0xcc,0x81,0x0a,0x87,0xd2);
+DEFINE_GUID(GUID_WICPixelFormat24bppBGR, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x0c);
+DEFINE_GUID(GUID_WICPixelFormat24bppRGB, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x0d);
+DEFINE_GUID(GUID_WICPixelFormat32bppBGR, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x0e);
+DEFINE_GUID(GUID_WICPixelFormat32bppBGRA, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x0f);
+DEFINE_GUID(GUID_WICPixelFormat32bppPBGRA, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x10);
+DEFINE_GUID(GUID_WICPixelFormat32bppRGB, 0xd98c6b95,0x3efe,0x47d6,0xbb,0x25,0xeb,0x17,0x48,0xab,0x0c,0xf1);
+DEFINE_GUID(GUID_WICPixelFormat32bppRGBA, 0xf5c7ad2d,0x6a8d,0x43dd,0xa7,0xa8,0xa2,0x99,0x35,0x26,0x1a,0xe9);
+DEFINE_GUID(GUID_WICPixelFormat32bppPRGBA, 0x3cc4a650,0xa527,0x4d37,0xa9,0x16,0x31,0x42,0xc7,0xeb,0xed,0xba);
+DEFINE_GUID(GUID_WICPixelFormat32bppGrayFloat, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x11);
+DEFINE_GUID(GUID_WICPixelFormat48bppRGB, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x15);
+DEFINE_GUID(GUID_WICPixelFormat48bppBGR, 0xe605a384,0xb468,0x46ce,0xbb,0x2e,0x36,0xf1,0x80,0xe6,0x43,0x13);
+DEFINE_GUID(GUID_WICPixelFormat64bppRGB, 0xa1182111,0x186d,0x4d42,0xbc,0x6a,0x9c,0x83,0x03,0xa8,0xdf,0xf9);
+DEFINE_GUID(GUID_WICPixelFormat64bppRGBA, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x16);
+DEFINE_GUID(GUID_WICPixelFormat64bppBGRA, 0x1562ff7c,0xd352,0x46f9,0x97,0x9e,0x42,0x97,0x6b,0x79,0x22,0x46);
+DEFINE_GUID(GUID_WICPixelFormat64bppPRGBA, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x17);
+DEFINE_GUID(GUID_WICPixelFormat64bppPBGRA, 0x8c518e8e,0xa4ec,0x468b,0xae,0x70,0xc9,0xa3,0x5a,0x9c,0x55,0x30);
+DEFINE_GUID(GUID_WICPixelFormat16bppGrayFixedPoint, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x13);
+DEFINE_GUID(GUID_WICPixelFormat32bppBGR101010, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x14);
+DEFINE_GUID(GUID_WICPixelFormat48bppRGBFixedPoint, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x12);
+DEFINE_GUID(GUID_WICPixelFormat48bppBGRFixedPoint, 0x49ca140e,0xcab6,0x493b,0x9d,0xdf,0x60,0x18,0x7c,0x37,0x53,0x2a);
+DEFINE_GUID(GUID_WICPixelFormat96bppRGBFixedPoint, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x18);
+DEFINE_GUID(GUID_WICPixelFormat96bppRGBFloat, 0xe3fed78f,0xe8db,0x4acf,0x84,0xc1,0xe9,0x7f,0x61,0x36,0xb3,0x27);
+DEFINE_GUID(GUID_WICPixelFormat128bppRGBAFloat, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x19);
+DEFINE_GUID(GUID_WICPixelFormat128bppPRGBAFloat, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x1a);
+DEFINE_GUID(GUID_WICPixelFormat128bppRGBFloat, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x1b);
+DEFINE_GUID(GUID_WICPixelFormat32bppCMYK, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x1c);
+DEFINE_GUID(GUID_WICPixelFormat64bppRGBAFixedPoint, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x1d);
+DEFINE_GUID(GUID_WICPixelFormat64bppBGRAFixedPoint, 0x356de33c,0x54d2,0x4a23,0xbb,0x4,0x9b,0x7b,0xf9,0xb1,0xd4,0x2d);
+DEFINE_GUID(GUID_WICPixelFormat64bppRGBFixedPoint, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x40);
+DEFINE_GUID(GUID_WICPixelFormat128bppRGBAFixedPoint, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x1e);
+DEFINE_GUID(GUID_WICPixelFormat128bppRGBFixedPoint, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x41);
+DEFINE_GUID(GUID_WICPixelFormat64bppRGBAHalf, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x3a);
+DEFINE_GUID(GUID_WICPixelFormat64bppPRGBAHalf, 0x58ad26c2,0xc623,0x4d9d,0xb3,0x20,0x38,0x7e,0x49,0xf8,0xc4,0x42);
+DEFINE_GUID(GUID_WICPixelFormat64bppRGBHalf, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x42);
+DEFINE_GUID(GUID_WICPixelFormat48bppRGBHalf, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x3b);
+DEFINE_GUID(GUID_WICPixelFormat32bppRGBE, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x3d);
+DEFINE_GUID(GUID_WICPixelFormat16bppGrayHalf, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x3e);
+DEFINE_GUID(GUID_WICPixelFormat32bppGrayFixedPoint, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x3f);
+DEFINE_GUID(GUID_WICPixelFormat32bppRGBA1010102, 0x25238d72,0xfcf9,0x4522,0xb5,0x14,0x55,0x78,0xe5,0xad,0x55,0xe0);
+DEFINE_GUID(GUID_WICPixelFormat32bppRGBA1010102XR, 0x00de6b9a,0xc101,0x434b,0xb5,0x02,0xd0,0x16,0x5e,0xe1,0x12,0x2c);
+DEFINE_GUID(GUID_WICPixelFormat32bppR10G10B10A2, 0x604e1bb5,0x8a3c,0x4b65,0xb1,0x1c,0xbc,0x0b,0x8d,0xd7,0x5b,0x7f);
+DEFINE_GUID(GUID_WICPixelFormat32bppR10G10B10A2HDR10, 0x9c215c5d,0x1acc,0x4f0e,0xa4,0xbc,0x70,0xfb,0x3a,0xe8,0xfd,0x28);
+DEFINE_GUID(GUID_WICPixelFormat64bppCMYK, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x1f);
+DEFINE_GUID(GUID_WICPixelFormat24bpp3Channels, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x20);
+DEFINE_GUID(GUID_WICPixelFormat32bpp4Channels, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x21);
+DEFINE_GUID(GUID_WICPixelFormat40bpp5Channels, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x22);
+DEFINE_GUID(GUID_WICPixelFormat48bpp6Channels, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x23);
+DEFINE_GUID(GUID_WICPixelFormat56bpp7Channels, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x24);
+DEFINE_GUID(GUID_WICPixelFormat64bpp8Channels, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x25);
+DEFINE_GUID(GUID_WICPixelFormat48bpp3Channels, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x26);
+DEFINE_GUID(GUID_WICPixelFormat64bpp4Channels, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x27);
+DEFINE_GUID(GUID_WICPixelFormat80bpp5Channels, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x28);
+DEFINE_GUID(GUID_WICPixelFormat96bpp6Channels, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x29);
+DEFINE_GUID(GUID_WICPixelFormat112bpp7Channels, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x2a);
+DEFINE_GUID(GUID_WICPixelFormat128bpp8Channels, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x2b);
+DEFINE_GUID(GUID_WICPixelFormat40bppCMYKAlpha, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x2c);
+DEFINE_GUID(GUID_WICPixelFormat80bppCMYKAlpha, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x2d);
+DEFINE_GUID(GUID_WICPixelFormat32bpp3ChannelsAlpha, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x2e);
+DEFINE_GUID(GUID_WICPixelFormat40bpp4ChannelsAlpha, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x2f);
+DEFINE_GUID(GUID_WICPixelFormat48bpp5ChannelsAlpha, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x30);
+DEFINE_GUID(GUID_WICPixelFormat56bpp6ChannelsAlpha, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x31);
+DEFINE_GUID(GUID_WICPixelFormat64bpp7ChannelsAlpha, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x32);
+DEFINE_GUID(GUID_WICPixelFormat72bpp8ChannelsAlpha, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x33);
+DEFINE_GUID(GUID_WICPixelFormat64bpp3ChannelsAlpha, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x34);
+DEFINE_GUID(GUID_WICPixelFormat80bpp4ChannelsAlpha, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x35);
+DEFINE_GUID(GUID_WICPixelFormat96bpp5ChannelsAlpha, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x36);
+DEFINE_GUID(GUID_WICPixelFormat112bpp6ChannelsAlpha, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x37);
+DEFINE_GUID(GUID_WICPixelFormat128bpp7ChannelsAlpha, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x38);
+DEFINE_GUID(GUID_WICPixelFormat144bpp8ChannelsAlpha, 0x6fddc324,0x4e03,0x4bfe,0xb1,0x85,0x3d,0x77,0x76,0x8d,0xc9,0x39);
+DEFINE_GUID(GUID_WICPixelFormat8bppY, 0x91b4db54,0x2df9,0x42f0,0xb4,0x49,0x29,0x09,0xbb,0x3d,0xf8,0x8e);
+DEFINE_GUID(GUID_WICPixelFormat8bppCb, 0x1339f224,0x6bfe,0x4c3e,0x93,0x02,0xe4,0xf3,0xa6,0xd0,0xca,0x2a);
+DEFINE_GUID(GUID_WICPixelFormat8bppCr, 0xb8145053,0x2116,0x49f0,0x88,0x35,0xed,0x84,0x4b,0x20,0x5c,0x51);
+DEFINE_GUID(GUID_WICPixelFormat16bppCbCr, 0xff95ba6e,0x11e0,0x4263,0xbb,0x45,0x01,0x72,0x1f,0x34,0x60,0xa4);
+DEFINE_GUID(GUID_WICPixelFormat16bppYQuantizedDctCoefficients, 0xa355f433,0x48e8,0x4a42,0x84,0xd8,0xe2,0xaa,0x26,0xca,0x80,0xa4);
+DEFINE_GUID(GUID_WICPixelFormat16bppCbQuantizedDctCoefficients, 0xd2c4ff61,0x56a5,0x49c2,0x8b,0x5c,0x4c,0x19,0x25,0x96,0x48,0x37);
+DEFINE_GUID(GUID_WICPixelFormat16bppCrQuantizedDctCoefficients, 0x2fe354f0,0x1680,0x42d8,0x92,0x31,0xe7,0x3c,0x05,0x65,0xbf,0xc1);
+
+DEFINE_GUID(GUID_ContainerFormatBmp, 0x0af1d87e,0xfcfe,0x4188,0xbd,0xeb,0xa7,0x90,0x64,0x71,0xcb,0xe3);
+DEFINE_GUID(GUID_ContainerFormatPng, 0x1b7cfaf4,0x713f,0x473c,0xbb,0xcd,0x61,0x37,0x42,0x5f,0xae,0xaf);
+DEFINE_GUID(GUID_ContainerFormatIco, 0xa3a860c4,0x338f,0x4c17,0x91,0x9a,0xfb,0xa4,0xb5,0x62,0x8f,0x21);
+DEFINE_GUID(GUID_ContainerFormatJpeg, 0x19e4a5aa,0x5662,0x4fc5,0xa0,0xc0,0x17,0x58,0x02,0x8e,0x10,0x57);
+DEFINE_GUID(GUID_ContainerFormatTiff, 0x163bcc30,0xe2e9,0x4f0b,0x96,0x1d,0xa3,0xe9,0xfd,0xb7,0x88,0xa3);
+DEFINE_GUID(GUID_ContainerFormatGif, 0x1f8a5601,0x7d4d,0x4cbd,0x9c,0x82,0x1b,0xc8,0xd4,0xee,0xb9,0xa5);
+DEFINE_GUID(GUID_ContainerFormatWmp, 0x57a37caa,0x367a,0x4540,0x91,0x6b,0xf1,0x83,0xc5,0x09,0x3a,0x4b);
+DEFINE_GUID(GUID_ContainerFormatDds, 0x9967cb95,0x2e85,0x4ac8,0x8c,0xa2,0x83,0xd7,0xcc,0xd4,0x25,0xc9);
+DEFINE_GUID(GUID_ContainerFormatAdng, 0xf3ff6d0d,0x38c0,0x41c4,0xb1,0xfe,0x1f,0x38,0x24,0xf1,0x7b,0x84);
+DEFINE_GUID(GUID_ContainerFormatHeif, 0xe1e62521,0x6787,0x405b,0xa3,0x39,0x50,0x07,0x15,0xb5,0x76,0x3f);
+DEFINE_GUID(GUID_ContainerFormatWebp, 0xe094b0e2,0x67f2,0x45b3,0xb0,0xea,0x11,0x53,0x37,0xca,0x7c,0xf3);
+DEFINE_GUID(GUID_ContainerFormatRaw,  0xfe99ce60,0xf19c,0x433c,0xa3,0xae,0x00,0xac,0xef,0xa9,0xca,0x21);
+#endif
 
 #include "txc_dxtn.h"
 #include <assert.h>
 
 WINE_DEFAULT_DEBUG_CHANNEL(d3dx);
 
-HRESULT WINAPI WICCreateImagingFactory_Proxy(UINT, IWICImagingFactory**);
+//HRESULT WINAPI WICCreateImagingFactory_Proxy(UINT, IWICImagingFactory**);
 
 static const struct
 {
@@ -161,7 +269,7 @@ struct dds_header
 #define TGA_IMAGE_RIGHTTOLEFT 0x10
 #define TGA_IMAGE_TOPTOBOTTOM 0x20
 
-#include "pshpack1.h"
+//#include "pshpack1.h"
 struct tga_header
 {
     uint8_t  id_length;
@@ -499,7 +607,7 @@ static HRESULT d3dx_init_dds_header(struct dds_header *header, D3DRESOURCETYPE r
     memset(header, 0, sizeof(*header));
     header->signature = MAKEFOURCC('D','D','S',' ');
     /* The signature is not really part of the DDS header. */
-    header->size = sizeof(*header) - FIELD_OFFSET(struct dds_header, size);
+    header->size = sizeof(*header) - offsetof(struct dds_header, size);
     hr = dds_pixel_format_from_d3dx_pixel_format_id(&header->pixel_format, format);
     if (FAILED(hr))
         return hr;
@@ -530,11 +638,133 @@ static const GUID *wic_container_guid_from_d3dx_file_format(D3DXIMAGE_FILEFORMAT
     }
 }
 
+#ifdef STANDALONE
+typedef struct IStream IStream;
+typedef struct
+{
+    WORD    bfType;
+    DWORD   bfSize;
+    WORD    bfReserved1;
+    WORD    bfReserved2;
+    DWORD   bfOffBits;
+} BITMAPFILEHEADER;
+
+typedef struct
+{
+    DWORD 	biSize;
+    LONG  	biWidth;
+    LONG  	biHeight;
+    WORD 	biPlanes;
+    WORD 	biBitCount;
+    DWORD 	biCompression;
+    DWORD 	biSizeImage;
+    LONG  	biXPelsPerMeter;
+    LONG  	biYPelsPerMeter;
+    DWORD 	biClrUsed;
+    DWORD 	biClrImportant;
+} BITMAPINFOHEADER;
+
+
+typedef LONG FXPT2DOT30;
+
+typedef struct tagCIEXYZ
+{
+  FXPT2DOT30 ciexyzX;
+  FXPT2DOT30 ciexyzY;
+  FXPT2DOT30 ciexyzZ;
+} CIEXYZ, *LPCIEXYZ;
+
+typedef struct tagCIEXYZTRIPLE
+{
+  CIEXYZ ciexyzRed;
+  CIEXYZ ciexyzGreen;
+  CIEXYZ ciexyzBlue;
+} CIEXYZTRIPLE;
+
+typedef struct
+{
+    DWORD        bV4Size;
+    LONG         bV4Width;
+    LONG         bV4Height;
+    WORD         bV4Planes;
+    WORD         bV4BitCount;
+    DWORD        bV4V4Compression;
+    DWORD        bV4SizeImage;
+    LONG         bV4XPelsPerMeter;
+    LONG         bV4YPelsPerMeter;
+    DWORD        bV4ClrUsed;
+    DWORD        bV4ClrImportant;
+    DWORD        bV4RedMask;
+    DWORD        bV4GreenMask;
+    DWORD        bV4BlueMask;
+    DWORD        bV4AlphaMask;
+    DWORD        bV4CSType;
+    CIEXYZTRIPLE bV4Endpoints;
+    DWORD        bV4GammaRed;
+    DWORD        bV4GammaGreen;
+    DWORD        bV4GammaBlue;
+} BITMAPV4HEADER;
+
+typedef struct {
+    DWORD        bV5Size;
+    LONG         bV5Width;
+    LONG         bV5Height;
+    WORD         bV5Planes;
+    WORD         bV5BitCount;
+    DWORD        bV5Compression;
+    DWORD        bV5SizeImage;
+    LONG         bV5XPelsPerMeter;
+    LONG         bV5YPelsPerMeter;
+    DWORD        bV5ClrUsed;
+    DWORD        bV5ClrImportant;
+    DWORD        bV5RedMask;
+    DWORD        bV5GreenMask;
+    DWORD        bV5BlueMask;
+    DWORD        bV5AlphaMask;
+    DWORD        bV5CSType;
+    CIEXYZTRIPLE bV5Endpoints;
+    DWORD        bV5GammaRed;
+    DWORD        bV5GammaGreen;
+    DWORD        bV5GammaBlue;
+    DWORD        bV5Intent;
+    DWORD        bV5ProfileData;
+    DWORD        bV5ProfileSize;
+    DWORD        bV5Reserved;
+} BITMAPV5HEADER;
+
+#define BI_BITFIELDS     3
+
+typedef struct
+{
+    DWORD   bcSize;
+    WORD    bcWidth;
+    WORD    bcHeight;
+    WORD    bcPlanes;
+    WORD    bcBitCount;
+} BITMAPCOREHEADER, *PBITMAPCOREHEADER, *LPBITMAPCOREHEADER;
+
+typedef struct
+{
+    BYTE    rgbBlue;
+    BYTE    rgbGreen;
+    BYTE    rgbRed;
+    BYTE    rgbReserved;
+} RGBQUAD;
+
+typedef struct
+{
+    BYTE    rgbtBlue;
+    BYTE    rgbtGreen;
+    BYTE    rgbtRed;
+} RGBTRIPLE;
+#endif
+
 static HRESULT d3dx_pixels_save_wic(struct d3dx_pixels *pixels, const struct pixel_format_desc *fmt_desc,
         D3DXIMAGE_FILEFORMAT image_file_format, IStream **wic_file, uint32_t *wic_file_size)
 {
     const GUID *container_format = wic_container_guid_from_d3dx_file_format(image_file_format);
     const GUID *pixel_format_guid = wic_guid_from_d3dx_pixel_format_id(fmt_desc->format);
+#ifndef STANDALONE
     IWICBitmapFrameEncode *wic_frame = NULL;
     IPropertyBag2 *encoder_options = NULL;
     IWICBitmapEncoder *wic_encoder = NULL;
@@ -544,13 +774,15 @@ static HRESULT d3dx_pixels_save_wic(struct d3dx_pixels *pixels, const struct pix
     IWICPalette *wic_palette = NULL;
     IStream *stream = NULL;
     STATSTG stream_stats;
+#endif
     HRESULT hr;
 
     assert(container_format && pixel_format_guid);
-    hr = WICCreateImagingFactory_Proxy(WINCODEC_SDK_VERSION, &wic_factory);
-    if (FAILED(hr))
+    //hr = WICCreateImagingFactory_Proxy(WINCODEC_SDK_VERSION, &wic_factory);
+    //if (FAILED(hr))
         return D3DERR_INVALIDCALL;
 
+#ifndef STANDALONE
     hr = IWICImagingFactory_CreateEncoder(wic_factory, container_format, NULL, &wic_encoder);
     if (FAILED(hr))
     {
@@ -668,6 +900,7 @@ exit:
         IWICBitmapEncoder_Release(wic_encoder);
 
     return hr;
+#endif
 }
 
 static const enum d3dx_pixel_format_id tga_save_pixel_formats[] =
@@ -1191,10 +1424,17 @@ static BOOL convert_dib_to_bmp(const void **data, unsigned int *size)
     return TRUE;
 }
 
+#ifdef STANDALONE
+typedef struct IWICBitmapFrameDecode IWICBitmapFrameDecode;
+#endif
+
 /* windowscodecs always returns xRGB, but we should return ARGB if and only if
  * at least one pixel has a non-zero alpha component. */
 static BOOL image_is_argb(IWICBitmapFrameDecode *frame, struct d3dx_image *image)
 {
+#ifdef STANDALONE
+    return FALSE;
+#else
     unsigned int size, i;
     BYTE *buffer;
     HRESULT hr;
@@ -1224,6 +1464,7 @@ static BOOL image_is_argb(IWICBitmapFrameDecode *frame, struct d3dx_image *image
 
     free(buffer);
     return FALSE;
+#endif
 }
 
 static const char *debug_d3dx_image_file_format(D3DXIMAGE_FILEFORMAT format)
@@ -1246,9 +1487,17 @@ static const char *debug_d3dx_image_file_format(D3DXIMAGE_FILEFORMAT format)
     }
 }
 
+#ifdef STANDALONE
+typedef struct IWICImagingFactory IWICImagingFactory;
+typedef struct IWICBitmapFrameDecode IWICBitmapFrameDecode;
+#endif
+
 static HRESULT d3dx_image_wic_frame_decode(struct d3dx_image *image,
         IWICImagingFactory *wic_factory, IWICBitmapFrameDecode *bitmap_frame)
 {
+#ifdef STANDALONE
+    return -1;
+#else
     const struct pixel_format_desc *fmt_desc;
     uint32_t row_pitch, slice_pitch;
     IWICPalette *wic_palette = NULL;
@@ -1324,11 +1573,15 @@ exit:
         IWICPalette_Release(wic_palette);
 
     return hr;
+#endif
 }
 
 static HRESULT d3dx_initialize_image_from_wic(const void *src_data, uint32_t src_data_size,
         struct d3dx_image *image, D3DXIMAGE_FILEFORMAT d3dx_file_format, uint32_t flags)
 {
+#ifdef STANDALONE
+    return -1;
+#else
     const GUID *container_format_guid = wic_container_guid_from_d3dx_file_format(d3dx_file_format);
     IWICBitmapFrameDecode *bitmap_frame = NULL;
     IWICBitmapDecoder *bitmap_decoder = NULL;
@@ -1411,6 +1664,7 @@ exit:
     IWICImagingFactory_Release(wic_factory);
 
     return hr;
+#endif
 }
 
 static enum d3dx_pixel_format_id d3dx_get_tga_format_for_bpp(uint8_t bpp)
@@ -1845,9 +2099,11 @@ HRESULT WINAPI D3DXGetImageInfoFromFileA(const char *file, D3DXIMAGE_INFO *info)
 
     if( !file ) return D3DERR_INVALIDCALL;
 
-    strlength = MultiByteToWideChar(CP_ACP, 0, file, -1, NULL, 0);
+    //strlength = MultiByteToWideChar(CP_ACP, 0, file, -1, NULL, 0);
+    strlength = mbstowcs(NULL, file, 0);
     widename = malloc(strlength * sizeof(*widename));
-    MultiByteToWideChar(CP_ACP, 0, file, -1, widename, strlength);
+    //MultiByteToWideChar(CP_ACP, 0, file, -1, widename, strlength);
+    mbstowcs(widename, file, strlength);
 
     hr = D3DXGetImageInfoFromFileW(widename, info);
     free(widename);
@@ -1892,10 +2148,12 @@ HRESULT WINAPI D3DXGetImageInfoFromResourceA(HMODULE module, const char *resourc
 
     TRACE("module %p, resource %s, info %p.\n", module, debugstr_a(resource), info);
 
+#ifndef STANDALONE
     if (!(resinfo = FindResourceA(module, resource, (const char *)RT_RCDATA))
             /* Try loading the resource as bitmap data (which is in DIB format D3DXIFF_DIB) */
             && !(resinfo = FindResourceA(module, resource, (const char *)RT_BITMAP)))
         return D3DXERR_INVALIDDATA;
+#endif
 
     if (FAILED(load_resource_into_memory(module, resinfo, &buffer, &size)))
         return D3DXERR_INVALIDDATA;
@@ -1911,10 +2169,12 @@ HRESULT WINAPI D3DXGetImageInfoFromResourceW(HMODULE module, const WCHAR *resour
 
     TRACE("module %p, resource %s, info %p.\n", module, debugstr_w(resource), info);
 
+#ifndef STANDALONE
     if (!(resinfo = FindResourceW(module, resource, (const WCHAR *)RT_RCDATA))
             /* Try loading the resource as bitmap data (which is in DIB format D3DXIFF_DIB) */
             && !(resinfo = FindResourceW(module, resource, (const WCHAR *)RT_BITMAP)))
         return D3DXERR_INVALIDDATA;
+#endif
 
     if (FAILED(load_resource_into_memory(module, resinfo, &buffer, &size)))
         return D3DXERR_INVALIDDATA;
@@ -2073,9 +2333,11 @@ HRESULT WINAPI D3DXLoadSurfaceFromFileA(IDirect3DSurface9 *dst_surface,
     if (!src_file || !dst_surface)
         return D3DERR_INVALIDCALL;
 
-    strlength = MultiByteToWideChar(CP_ACP, 0, src_file, -1, NULL, 0);
+    //strlength = MultiByteToWideChar(CP_ACP, 0, src_file, -1, NULL, 0);
+    strlength = mbtowc(NULL, src_file, 0);
     src_file_w = malloc(strlength * sizeof(*src_file_w));
-    MultiByteToWideChar(CP_ACP, 0, src_file, -1, src_file_w, strlength);
+    //MultiByteToWideChar(CP_ACP, 0, src_file, -1, src_file_w, strlength);
+    mbstowcs(src_file_w, src_file, strlength);
 
     hr = D3DXLoadSurfaceFromFileW(dst_surface, dst_palette, dst_rect,
             src_file_w, src_rect, filter, color_key, src_info);
@@ -2125,11 +2387,12 @@ HRESULT WINAPI D3DXLoadSurfaceFromResourceA(IDirect3DSurface9 *dst_surface,
 
     if (!dst_surface)
         return D3DERR_INVALIDCALL;
-
+#ifndef STANDALONE
     if (!(resinfo = FindResourceA(src_module, resource, (const char *)RT_RCDATA))
             /* Try loading the resource as bitmap data (which is in DIB format D3DXIFF_DIB) */
             && !(resinfo = FindResourceA(src_module, resource, (const char *)RT_BITMAP)))
         return D3DXERR_INVALIDDATA;
+#endif
 
     if (FAILED(load_resource_into_memory(src_module, resinfo, &data, &data_size)))
         return D3DXERR_INVALIDDATA;
@@ -2154,10 +2417,12 @@ HRESULT WINAPI D3DXLoadSurfaceFromResourceW(IDirect3DSurface9 *dst_surface,
     if (!dst_surface)
         return D3DERR_INVALIDCALL;
 
+#ifndef STANDALONE
     if (!(resinfo = FindResourceW(src_module, resource, (const WCHAR *)RT_RCDATA))
             /* Try loading the resource as bitmap data (which is in DIB format D3DXIFF_DIB) */
             && !(resinfo = FindResourceW(src_module, resource, (const WCHAR *)RT_BITMAP)))
         return D3DXERR_INVALIDDATA;
+#endif
 
     if (FAILED(load_resource_into_memory(src_module, resinfo, &data, &data_size)))
         return D3DXERR_INVALIDDATA;
@@ -3226,10 +3491,12 @@ HRESULT WINAPI D3DXSaveSurfaceToFileA(const char *dst_filename, D3DXIMAGE_FILEFO
 
     if (!dst_filename) return D3DERR_INVALIDCALL;
 
-    len = MultiByteToWideChar(CP_ACP, 0, dst_filename, -1, NULL, 0);
+    //len = MultiByteToWideChar(CP_ACP, 0, dst_filename, -1, NULL, 0);
+    len = mbstowcs(NULL, dst_filename, 0);
     filename = malloc(len * sizeof(WCHAR));
     if (!filename) return E_OUTOFMEMORY;
-    MultiByteToWideChar(CP_ACP, 0, dst_filename, -1, filename, len);
+    //MultiByteToWideChar(CP_ACP, 0, dst_filename, -1, filename, len);
+    mbstowcs(filename, dst_filename, len);
 
     hr = D3DXSaveSurfaceToFileInMemory(&buffer, file_format, src_surface, src_palette, src_rect);
     if (SUCCEEDED(hr))

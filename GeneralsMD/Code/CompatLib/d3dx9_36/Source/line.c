@@ -22,7 +22,7 @@
 
 WINE_DEFAULT_DEBUG_CHANNEL(d3dx);
 
-struct d3dx9_line
+typedef struct d3dx9_line
 {
     ID3DXLine ID3DXLine_iface;
     LONG ref;
@@ -30,7 +30,7 @@ struct d3dx9_line
     IDirect3DDevice9 *device;
     IDirect3DStateBlock9 *state;
     float width;
-};
+} d3dx9_line;
 
 static inline struct d3dx9_line *impl_from_ID3DXLine(ID3DXLine *iface)
 {

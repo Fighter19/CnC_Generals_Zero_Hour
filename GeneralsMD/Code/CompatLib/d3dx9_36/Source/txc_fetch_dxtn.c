@@ -23,6 +23,8 @@
  */
 
 #include <stdio.h>
+#define STANDALONE
+#include <GL/gl.h>
 #include "txc_dxtn.h"
 
 #define EXP5TO8R(packedcol)					\

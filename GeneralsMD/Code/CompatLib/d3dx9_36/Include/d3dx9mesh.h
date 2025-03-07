@@ -422,7 +422,7 @@ DECLARE_INTERFACE_(ID3DXPMesh, ID3DXBaseMesh)
     STDMETHOD_(DWORD, GetMinFaces)(THIS) PURE;
     STDMETHOD_(DWORD, GetMaxVertices)(THIS) PURE;
     STDMETHOD_(DWORD, GetMinVertices)(THIS) PURE;
-    STDMETHOD(Save)(THIS_ IStream *stream, const D3DXMATERIAL *material,
+    STDMETHOD(Save)(THIS_ struct IStream *stream, const D3DXMATERIAL *material,
             const D3DXEFFECTINSTANCE *effect_instance, DWORD num_materials) PURE;
     STDMETHOD(Optimize)(THIS_ DWORD flags, DWORD *adjacency_out, DWORD *face_remap,
             ID3DXBuffer **vertex_remap, ID3DXMesh **opt_mesh) PURE;

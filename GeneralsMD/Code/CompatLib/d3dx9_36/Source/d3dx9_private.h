@@ -23,11 +23,123 @@
 #define __WINE_D3DX9_PRIVATE_H
 
 #include <stdint.h>
+#define STANDALONE
+
+#ifndef STANDALONE
 #include "wine/debug.h"
 #include "wine/rbtree.h"
+#endif
+
+// START OF MANUAL HEADER ADDITIONS
+// objbase.h
+#if defined(__cplusplus) && !defined(CINTERFACE)
+
+#ifdef COM_STDMETHOD_CAN_THROW
+# define COM_DECLSPEC_NOTHROW
+#else
+# define COM_DECLSPEC_NOTHROW DECLSPEC_NOTHROW
+#endif
+
+/* C++ interface */
+
+#define STDMETHOD(method)        virtual COM_DECLSPEC_NOTHROW HRESULT STDMETHODCALLTYPE method
+#define STDMETHOD_(type,method)  virtual COM_DECLSPEC_NOTHROW type STDMETHODCALLTYPE method
+#define STDMETHODV(method)       virtual COM_DECLSPEC_NOTHROW HRESULT STDMETHODVCALLTYPE method
+#define STDMETHODV_(type,method) virtual COM_DECLSPEC_NOTHROW type STDMETHODVCALLTYPE method
+
+#define PURE   = 0
+#define THIS_
+#define THIS   void
+
+#define interface struct
+#define DECLARE_INTERFACE(iface)        interface DECLSPEC_NOVTABLE iface
+#define DECLARE_INTERFACE_(iface,ibase) interface DECLSPEC_NOVTABLE iface : public ibase
+#define DECLARE_INTERFACE_IID_(iface, ibase, iid) interface DECLSPEC_UUID(iid) DECLSPEC_NOVTABLE iface : public ibase
+
+#define BEGIN_INTERFACE
+#define END_INTERFACE
+
+#else  /* __cplusplus && !CINTERFACE */
+
+/* C interface */
+
+#define STDMETHOD(method)        HRESULT (STDMETHODCALLTYPE *method)
+#define STDMETHOD_(type,method)  type (STDMETHODCALLTYPE *method)
+#define STDMETHODV(method)       HRESULT (STDMETHODVCALLTYPE *method)
+#define STDMETHODV_(type,method) type (STDMETHODVCALLTYPE *method)
+
+#define PURE
+#define THIS_ INTERFACE *This,
+#define THIS  INTERFACE *This
+
+#define interface struct
+
+#ifdef __WINESRC__
+#define CONST_VTABLE
+#endif
+
+#ifdef CONST_VTABLE
+#undef CONST_VTBL
+#define CONST_VTBL const
+#define DECLARE_INTERFACE(iface) \
+         typedef interface iface { const struct iface##Vtbl *lpVtbl; } iface; \
+         typedef struct iface##Vtbl iface##Vtbl; \
+         struct iface##Vtbl
+#else
+#undef CONST_VTBL
+#define CONST_VTBL
+#define DECLARE_INTERFACE(iface) \
+         typedef interface iface { struct iface##Vtbl *lpVtbl; } iface; \
+         typedef struct iface##Vtbl iface##Vtbl; \
+         struct iface##Vtbl
+#endif
+#define DECLARE_INTERFACE_(iface,ibase) DECLARE_INTERFACE(iface)
+#define DECLARE_INTERFACE_IID_(iface, ibase, iid) DECLARE_INTERFACE_(iface, ibase)
+
+#define BEGIN_INTERFACE
+#define END_INTERFACE
+
+#endif  /* __cplusplus && !CINTERFACE */
+// end of objbase.h
+
+typedef struct _CRITICAL_SECTION CRITICAL_SECTION;
+typedef void *HANDLE;
+typedef HANDLE HRSRC;
+
+#include <stdio.h>
+#define TRACE(msg, ...)
+#define WARN(msg, ...) fprintf(stderr, msg, ##__VA_ARGS__)
+#define FIXME(msg, ...) fprintf(stderr, msg, ##__VA_ARGS__)
+#define ERR(msg, ...) fprintf(stderr, msg, ##__VA_ARGS__)
+#define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))
+
+#define WINE_DEFAULT_DEBUG_CHANNEL(x)
+
+#define CONTAINING_RECORD(address, type, field) \
+  ((type *)((PCHAR)(address) - offsetof(type, field)))
+
+#define PCHAR char *
+
+#define offsetof(type, member)  __builtin_offsetof (type, member)
+
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+
+#define TRACE_ON(d) 0
+
+#define debugstr_a(x) x
+// END OF CUSTOM HEADER ADDITIONS
 
 #define COBJMACROS
 #include "d3dx9.h"
+
+static inline BOOL BitScanReverse(DWORD *index, DWORD mask)
+{
+    unsigned int r = 31;
+    while (r > 0 && !(mask & (1 << r))) r--;
+    *index = r;
+    return mask != 0;
+}
 
 #define ULONG64_MAX (~(ULONG64)0)
 
@@ -498,12 +610,14 @@ struct d3dx_param_eval
     ULONG64 *version_counter;
 };
 
+#ifndef STANDALONE
 struct param_rb_entry
 {
     struct wine_rb_entry entry;
     char *full_name;
     struct d3dx_parameter *param;
 };
+#endif
 
 struct d3dx_shared_data;
 struct d3dx_top_level_parameter;
@@ -529,7 +643,9 @@ struct d3dx_parameter
     char *semantic;
 
     char *full_name;
+#ifndef STANDALONE
     struct wine_rb_entry rb_entry;
+#endif
 };
 
 struct d3dx_top_level_parameter
@@ -585,7 +701,9 @@ static inline BOOL is_param_dirty(struct d3dx_parameter *param, ULONG64 update_v
 
 struct d3dx_parameters_store
 {
+#ifndef STANDALONE
     struct wine_rb_tree tree;
+#endif
     struct d3dx_top_level_parameter *parameters;
     unsigned int count;
 

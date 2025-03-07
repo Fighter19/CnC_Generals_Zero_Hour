@@ -25,8 +25,10 @@
 #ifndef _TXC_DXTN_H
 #define _TXC_DXTN_H
 
+#ifndef STANDALONE
 #include "winternl.h"
 #include "wine/wgl.h"
+#endif
 
 typedef GLubyte GLchan;
 #define UBYTE_TO_CHAN(b)  (b)

@@ -20,8 +20,9 @@
  *
  */
 
-
+#ifndef STANDALONE
 #include "initguid.h"
+#endif
 #include "d3dx9_private.h"
 
 WINE_DEFAULT_DEBUG_CHANNEL(d3dx);

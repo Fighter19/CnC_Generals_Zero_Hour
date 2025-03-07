@@ -188,6 +188,10 @@ HRESULT WINAPI D3DXFindShaderComment(const DWORD *byte_code, DWORD fourcc, const
     return S_FALSE;
 }
 
+#ifdef STANDALONE
+typedef struct INIT_ONCE INIT_ONCE;
+#endif
+
 static BOOL WINAPI load_d3dassemble_once(INIT_ONCE *once, void *param, void **context)
 {
     /* FIXME: This assumes that d3dcompiler.h and dlls/d3dcompiler_XX/Makefile.in stay
@@ -210,13 +214,25 @@ HRESULT WINAPI D3DXAssembleShader(const char *data, UINT data_len, const D3DXMAC
     static HRESULT (WINAPI *pD3DAssemble)(const void *data, SIZE_T datasize, const char *filename,
             const D3D_SHADER_MACRO * defines, ID3DInclude * include, UINT flags,
             ID3DBlob * *shader, ID3DBlob * *error_messages);
+#ifndef STANDALONE
     static INIT_ONCE init_once = INIT_ONCE_STATIC_INIT;
+#else
+    static _Atomic BOOL init_once = FALSE;
+#endif
     HRESULT hr;
 
     TRACE("data %p, data_len %u, defines %p, include %p, flags %#lx, shader %p, error_messages %p.\n",
           data, data_len, defines, include, flags, shader, error_messages);
 
+#ifndef STANDALONE
     InitOnceExecuteOnce(&init_once, load_d3dassemble_once, &pD3DAssemble, NULL);
+#else
+    if (!init_once)
+    {
+        init_once = 1;
+        load_d3dassemble_once(NULL, &pD3DAssemble, NULL);
+    }
+#endif
 
     /* Forward to d3dcompiler: the parameter types aren't really different,
        the actual data types are equivalent */
@@ -285,6 +301,12 @@ static HRESULT WINAPI d3dx_include_from_file_open(ID3DXInclude *iface, D3DXINCLU
         ++ptr;
     }
 
+#ifdef STANDALONE
+    free(pathname);
+    free(buffer);
+    return E_FAIL;
+#else
+
     file = CreateFileA(pathname, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
     if(file == INVALID_HANDLE_VALUE)
         goto error;
@@ -314,6 +336,7 @@ error:
     free(pathname);
     free(buffer);
     return HRESULT_FROM_WIN32(GetLastError());
+#endif
 }
 
 static HRESULT WINAPI d3dx_include_from_file_close(ID3DXInclude *iface, const void *data)
