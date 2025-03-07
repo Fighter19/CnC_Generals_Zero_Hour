@@ -47,13 +47,11 @@
 #include "definition.h"
 #include "definitionmgr.h"
 #include "definitionclassids.h"
-#include "wwaudio.h"
 #include "AudibleSound.h"
 #include "htree.h"
 #include "hanim.h"
 #include "soundlibrarybridge.h"
 
-#include "WWDebug.h"
 
 //////////////////////////////////////////////////////////////////////
 //	Static member initialization

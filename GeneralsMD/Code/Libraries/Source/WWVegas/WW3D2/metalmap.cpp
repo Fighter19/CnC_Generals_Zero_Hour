@@ -51,7 +51,7 @@
 #include "ww3dformat.h"
 #include "ww3d.h"
 #include <vp.h>
-#include <ini.h>
+#include "INI.H"
 #include <point.h>
 #include <stdio.h>
 #include <hashtemplate.h>

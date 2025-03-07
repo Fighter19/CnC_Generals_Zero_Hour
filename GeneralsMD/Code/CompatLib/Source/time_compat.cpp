@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: MIT OR GPL-2.0-or-later */
+#include "types_compat.h"
 #include "time_compat.h"
 
 #include <time.h>

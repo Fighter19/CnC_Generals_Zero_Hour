@@ -111,10 +111,10 @@
 #include "dx8renderer.h"
 #include "metalmap.h"
 #include "w3dexclusionlist.h"
-#include <ini.h>
+#include "INI.H"
 #include <windows.h>
 #include <stdio.h>
-#include <D3dx8core.h>
+#include <d3dx8core.h>
 #include "texture.h"
 #include "wwprofile.h"
 #include "assetstatus.h"
@@ -810,8 +810,8 @@ RenderObjClass * WW3DAssetManager::Create_Render_Obj(const char * name)
 		char filename [MAX_PATH];
 		const char *mesh_name = ::strchr (name, '.');
 		if (mesh_name != NULL) {
-			::lstrcpyn (filename, name, ((int)mesh_name) - ((int)name) + 1);
-			::lstrcat (filename, ".w3d");
+			::strncpy (filename, name, ((uintptr_t)mesh_name) - ((uintptr_t)name) + 1);
+			::strcat (filename, ".w3d");
 		} else {
 			sprintf( filename, "%s.w3d", name);
 		}

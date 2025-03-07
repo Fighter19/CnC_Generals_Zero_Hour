@@ -29,6 +29,7 @@
 #else
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include "windows_compat.h"
 #endif
 #include "stdio.h"
 

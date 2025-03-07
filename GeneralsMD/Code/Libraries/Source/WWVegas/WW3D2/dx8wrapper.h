@@ -1001,9 +1001,10 @@ WWINLINE unsigned int DX8Wrapper::Convert_Color(const Vector4& color)
 // Note: Color vector needs to be clamped to [0...1] range!
 //
 // ----------------------------------------------------------------------------
-
+#include <fenv.h>
 WWINLINE unsigned int DX8Wrapper::Convert_Color(const Vector3& color,float alpha)
 {
+#ifdef _WIN32
 	const float scale = 255.0;
 	unsigned int col;
 
@@ -1070,6 +1071,26 @@ not_changed:
 		mov	col,eax
 	}
 	return col;
+#else
+	// Save the current rounding mode.
+	int old_round = fegetround();
+	// Set the rounding mode to truncate (round toward zero).
+	fesetround(FE_TOWARDZERO);
+
+	const float scale = 255.0f;
+	unsigned int a = static_cast<unsigned int>(alpha * scale);
+	unsigned int r = static_cast<unsigned int>(color.X * scale);
+	unsigned int g = static_cast<unsigned int>(color.Y * scale);
+	unsigned int b = static_cast<unsigned int>(color.Z * scale);
+
+	// Pack into a 32-bit integer: AAAAAAAARRRRRRRRGGGGGGGGBBBBBBBB.
+	unsigned int col = (a << 24) | (r << 16) | (g << 8) | b;
+
+	// Restore the original rounding mode.
+	fesetround(old_round);
+
+	return col;
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -1080,7 +1101,11 @@ not_changed:
 
 WWINLINE void DX8Wrapper::Clamp_Color(Vector4& color)
 {
+#ifdef _WIN32
 	if (!CPUDetectClass::Has_CMOV_Instruction()) {
+#else
+	if (1) {
+#endif
 		for (int i=0;i<4;++i) {
 			float f=(color[i]<0.0f) ? 0.0f : color[i];
 			color[i]=(f>1.0f) ? 1.0f : f;
@@ -1088,6 +1113,7 @@ WWINLINE void DX8Wrapper::Clamp_Color(Vector4& color)
 		return;
 	}
 
+#ifdef _WIN32
 	__asm
 	{
 		mov	esi,dword ptr color
@@ -1130,6 +1156,7 @@ WWINLINE void DX8Wrapper::Clamp_Color(Vector4& color)
 		cmovnb edi,edx
 		mov dword ptr[esi+12],edi
 	}
+#endif
 }
 
 // ----------------------------------------------------------------------------

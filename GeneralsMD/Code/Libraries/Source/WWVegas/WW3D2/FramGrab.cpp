@@ -22,7 +22,9 @@
 
 #include "framgrab.h"
 #include <stdio.h>
+#ifdef _WIN32
 #include <io.h>
+#endif
 //#include <errno.h>
 
 //////////////////////////////////////////////////////////////////////
@@ -31,6 +33,7 @@
 
 FrameGrabClass::FrameGrabClass(const char *filename, MODE mode, int width, int height, int bitcount, float framerate)
 {
+#ifdef _WIN32
 	HRESULT          hr; 
 	
 	Mode = mode;
@@ -111,6 +114,7 @@ FrameGrabClass::FrameGrabClass(const char *filename, MODE mode, int width, int h
 	}  
 
     Bitmap = (long *) GlobalAllocPtr(GMEM_MOVEABLE, BitmapInfoHeader.biSizeImage); 
+#endif
 }
 
 FrameGrabClass::~FrameGrabClass()
@@ -121,16 +125,19 @@ FrameGrabClass::~FrameGrabClass()
 }
 
 void FrameGrabClass::CleanupAVI() {
+#ifdef _WIN32
 	if(Bitmap != 0) { GlobalFreePtr(Bitmap); Bitmap = 0; }
 	if(Stream != 0) { AVIStreamRelease(Stream); Stream = 0; }
 	if(AVIFile != 0) { AVIFileRelease(AVIFile); AVIFile = 0; }
 	
 	AVIFileExit();
 	Mode = RAW;
+#endif
 }
 
 void FrameGrabClass::GrabAVI(void *BitmapPointer)
 {
+#ifdef _WIN32
     // CompressDIB(&bi, lpOld, &biNew, lpNew);  
 
     // Save the compressed data using AVIStreamWrite. 
@@ -139,7 +146,8 @@ void FrameGrabClass::GrabAVI(void *BitmapPointer)
 		char buf[256];
 		sprintf(buf, "avi write error %x/%d\n", hr, hr);
 		OutputDebugString(buf);
-	} 
+	}
+#endif
 }
 
 void FrameGrabClass::GrabRawFrame(void * /*BitmapPointer*/)
@@ -151,7 +159,9 @@ void FrameGrabClass::GrabRawFrame(void * /*BitmapPointer*/)
 void FrameGrabClass::ConvertGrab(void *BitmapPointer) 
 {
 	ConvertFrame(BitmapPointer);
+#ifdef _WIN32
 	Grab( Bitmap );
+#endif
 }
 
 
@@ -166,7 +176,7 @@ void FrameGrabClass::Grab(void *BitmapPointer)
 
 void FrameGrabClass::ConvertFrame(void *BitmapPointer) 
 {
-
+#ifdef _WIN32
 	int width = BitmapInfoHeader.biWidth;
 	int height = BitmapInfoHeader.biHeight;
 	long *image = (long *) BitmapPointer;
@@ -188,4 +198,5 @@ void FrameGrabClass::ConvertFrame(void *BitmapPointer)
 			c[3] = 0;
 		}
 	}
+#endif
 }

@@ -27,15 +27,19 @@
 #include <sys/types.h>
 #include <sys/timeb.h>
 #include <stdlib.h>
+#ifdef _WIN32
 #include <process.h>
-#include <sys/stat.h>
 #include <io.h>
+#include "winsock.h"
+#include <direct.h>
+#else
+#include "windows_compat.h"
+#endif
+#include <sys/stat.h>
 #include <time.h>
 #include "assert.h"
 #include "ftp.h"
-#include "winsock.h"
 #include <time.h>
-#include <direct.h>
 #include <errno.h>
 //#include "wlib/wstring.h"
 

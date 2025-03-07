@@ -19,12 +19,22 @@
 // Download.cpp : Implementation of CDownload
 #include "DownloadDebug.h"
 #include "Download.h"
-#include <mmsystem.h>
+
 #include <assert.h>
-#include <direct.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/stat.h>
+
+#ifdef _WIN32
+#include <mmsystem.h>
+#include <direct.h>
+#else
+#include <string.h>
+#define SEVERITY_ERROR 1
+#define FACILITY_ITF 2
+
+#define E_FAIL 0x80004005
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 // CDownload
@@ -66,7 +76,11 @@ HRESULT CDownload::DownloadFile(LPCSTR server, LPCSTR username, LPCSTR password,
 	}
 
 	// Make sure we have a download directory
+#ifdef _WIN32
 	_mkdir("download");
+#else
+	mkdir("download", 0777);
+#endif
 
 	// Copy parameters to member variables.
 	strncpy( m_Server, server, sizeof( m_Server ) );
@@ -276,8 +290,8 @@ HRESULT CDownload::PumpMessages()
 			//   never ever change so this is not a concern.
 			//
 			// We identify patches because they are written into the patches folder.
-			struct _stat statdata;
-			if (	(_stat(m_LocalFile, &statdata) == 0) && 
+			struct stat statdata;
+			if (	(stat(m_LocalFile, &statdata) == 0) && 
 					(statdata.st_size == m_FileSize) && 
 					(_strnicmp(m_LocalFile, "patches\\", strlen("patches\\"))==0)) {
 				// OK, no need to download this again....
@@ -364,7 +378,11 @@ HRESULT CDownload::PumpMessages()
 		{
 			// Not the first read.
 			int predictionIndex = ( m_predictions++ ) & 0x7;
+#ifdef _WIN32
 			m_predictionTimes[ predictionIndex ] = MulDiv( timetaken, (m_FileSize - m_BytesRead), (m_BytesRead - m_StartPosition) );
+#else
+			m_predictionTimes[ predictionIndex ] = (int64_t)timetaken * (int64_t)(m_FileSize - m_BytesRead) / (int64_t)(m_BytesRead - m_StartPosition);
+#endif
 			//__int64 numerator = ( m_FileSize - m_BytesRead )  * timetaken;
 			//__int64 denominator = ( m_BytesRead - m_StartPosition );
 			//m_predictionTimes[ predictionIndex ] = numerator/denominator;

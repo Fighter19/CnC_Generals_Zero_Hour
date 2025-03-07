@@ -47,7 +47,7 @@
 #include "rendobj.h"
 #include "bittype.h"
 #include "w3derr.h"
-#include "LightEnvironment.h"	//added for 'Generals'
+#include "lightenvironment.h"
 
 class MeshBuilderClass;
 class HModelClass;

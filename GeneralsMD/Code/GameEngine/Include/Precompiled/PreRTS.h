@@ -97,10 +97,6 @@ class STLSpecialAlloc;
 #include <dinput.h>
 #endif
 
-#ifndef _MAX_PATH
-#define _MAX_PATH 1024
-#endif
-
 //------------------------------------------------------------------------------------ STL Includes
 // srj sez: no, include STLTypesdefs below, instead, thanks
 //#include <algorithm>

@@ -20,7 +20,15 @@ typedef wchar_t WCHAR;
 
 #define _vsnprintf vsnprintf
 #define _snprintf snprintf
-#define strupr(s) for(int i=0; i<strlen(s); i++) s[i]=toupper(s[i])
+
+static char *strupr(char *str)
+{
+    for (int i = 0; i < strlen(str); i++)
+        str[i] = toupper(str[i]);
+
+    return str;
+}
+
 static char *strrev(char *str)
 {
     if (!str || ! *str)

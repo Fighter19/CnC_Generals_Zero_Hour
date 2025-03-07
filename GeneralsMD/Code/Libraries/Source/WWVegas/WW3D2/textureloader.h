@@ -108,6 +108,8 @@ private:
 	static int	TextureInactiveOverrideTime;
 };
 
+class TextureLoadTaskListClass;
+
 class TextureLoadTaskListNodeClass
 {
 	friend class TextureLoadTaskListClass;

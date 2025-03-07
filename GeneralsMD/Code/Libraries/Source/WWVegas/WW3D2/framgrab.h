@@ -50,6 +50,7 @@
 #pragma warning (push, 3)	// (gth) system headers complain at warning level 4...
 #endif
 
+#if _WIN32
 #ifndef _WINDOWS_
 #include "windows.h"
 #endif
@@ -60,6 +61,9 @@
 
 #ifndef _INC_VFW
 #include "vfw.h"
+#endif
+#else
+#include "windows_compat.h"
 #endif
 
 #if defined (_MSC_VER)
@@ -86,7 +90,11 @@ public:
 	void ConvertGrab(void *BitmapPointer);
 	void Grab(void *BitmapPointer);
 
+#ifdef _WIN32
 	long * GetBuffer()			{ return Bitmap; }
+#else
+	void * GetBuffer()			{ return NULL; }
+#endif
 	float	GetFrameRate()			{ return FrameRate; }
 
 protected:
@@ -99,12 +107,14 @@ protected:
 	void GrabAVI(void *BitmapPointer);
 	void GrabRawFrame(void *BitmapPointer);
 
+#ifdef _WIN32
 	// avi settings
 	PAVIFILE				AVIFile;  
 	long					*Bitmap;
 	PAVISTREAM			Stream;     
 	AVISTREAMINFO		AVIStreamInfo;
 	BITMAPINFOHEADER	BitmapInfoHeader; 
+#endif
 
 	// general purpose cleanup routine
 	void CleanupAVI();

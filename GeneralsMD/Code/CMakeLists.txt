@@ -10,6 +10,14 @@ add_subdirectory(GameEngineDevice)
 if(WIN32)
     add_executable(RTS WIN32 Main/WinMain.cpp)
     target_link_libraries(RTS GameEngine GameEngineDevice winmm)
+else()
+    add_executable(RTS Main/SDLMain.cpp)
+
+    target_include_directories(RTS PRIVATE
+        ${CMAKE_SOURCE_DIR}/extern/dxvk-native/usr/include/dxvk
+    )
+
+    target_link_libraries(RTS GameEngine GameEngineDevice SDL2)
 endif()
 
 if(SAGE_BUILD_TOOLS)

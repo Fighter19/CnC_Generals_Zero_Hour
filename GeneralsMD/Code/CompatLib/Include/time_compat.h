@@ -22,7 +22,6 @@ static MMRESULT timeEndPeriod(int) { return TIMERR_NOERROR; }
 
 // Same as in windows_base.h of DXVK-Native
 // Consider using that instead, but for now, we don't want this as a constant dependency
-typedef uint32_t DWORD;
 DWORD timeGetTime(void);
 DWORD GetTickCount(void);
 

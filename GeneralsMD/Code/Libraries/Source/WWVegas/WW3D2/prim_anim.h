@@ -344,31 +344,31 @@ PrimitiveAnimationChannelClass<T>::Load_Variables (ChunkLoadClass &cload)
 template<class T> T
 LERPAnimationChannelClass<T>::Evaluate (float time)
 {
-	int key_count	= m_Data.Count ();
-	T value			= m_Data[key_count - 1].Get_Value ();
+	int key_count	= this->m_Data.Count ();
+	T value			= this->m_Data[key_count - 1].Get_Value ();
 
 	//
 	//	Don't interpolate past the last keyframe
 	//
-	if (time < m_Data[key_count - 1].Get_Time ()) {
+	if (time < this->m_Data[key_count - 1].Get_Time ()) {
 
 		// Check to see if the last key index is valid
-		if (time < m_Data[m_LastIndex].Get_Time ()) {
-			m_LastIndex = 0;
+		if (time < this->m_Data[this->m_LastIndex].Get_Time ()) {
+			this->m_LastIndex = 0;
 		}
 
-		KeyClass *key1 = &m_Data[m_LastIndex];
-		KeyClass *key2 = &m_Data[key_count - 1];
+		typename PrimitiveAnimationChannelClass<T>::KeyClass *key1 = &this->m_Data[this->m_LastIndex];
+		typename PrimitiveAnimationChannelClass<T>::KeyClass *key2 = &this->m_Data[key_count - 1];
 
 		//
 		// Search, using last_key as our starting point
 		//
-		for (int keyidx = m_LastIndex; keyidx < (key_count - 1); keyidx ++) {
+		for (int keyidx = this->m_LastIndex; keyidx < (key_count - 1); keyidx ++) {
 
-			if (time < m_Data[keyidx+1].Get_Time ()) {
-				key1 = &m_Data[keyidx];
-				key2 = &m_Data[keyidx+1];
-				m_LastIndex = keyidx;
+			if (time < this->m_Data[keyidx+1].Get_Time ()) {
+				key1 = &this->m_Data[keyidx];
+				key2 = &this->m_Data[keyidx+1];
+				this->m_LastIndex = keyidx;
 				break;
 			}
 		}
