@@ -60,19 +60,6 @@ struct ProviderInfo
 	Bool m_isValid;
 };
 
-struct OpenAudioFile
-{
-	AILSOUNDINFO m_soundInfo;
-	void *m_file;
-	UnsignedInt m_openCount;
-	UnsignedInt m_fileSize;
-
-	Bool m_compressed;	// if the file was compressed, then we need to free it with a miles function.
-	
-	// Note: OpenAudioFile does not own this m_eventInfo, and should not delete it.
-	const AudioEventInfo *m_eventInfo;	// Not mutable, unlike the one on AudioEventRTS.
-};
-
 struct PlayingAudio;
 struct AudioFileCache;
 
