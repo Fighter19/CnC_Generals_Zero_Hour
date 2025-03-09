@@ -19,7 +19,7 @@
 // FILE: MilesAudioManager.h //////////////////////////////////////////////////////////////////////////
 // MilesAudioManager implementation
 // Author: John K. McDonald, July 2002
-
+#pragma once
 #include "Common/AsciiString.h"
 #include "Common/GameAudio.h"
 #include "mss/mss.h"
