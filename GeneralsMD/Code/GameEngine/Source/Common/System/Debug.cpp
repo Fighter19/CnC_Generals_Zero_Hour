@@ -683,13 +683,14 @@ void ReleaseCrash(const char *reason)
 	if (theReleaseCrashLogFile)
 	{
 		fprintf(theReleaseCrashLogFile, "Release Crash at %s; Reason %s\n", getCurrentTimeString(), reason);
+#if defined(DEBUG_STACKTRACE) || defined(IG_DEBUG_STACKTRACE)
 		fprintf(theReleaseCrashLogFile, "\nLast error:\n%s\n\nCurrent stack:\n", g_LastErrorDump.str());
 		const int STACKTRACE_SIZE	= 12;
 		const int STACKTRACE_SKIP = 6;
 		void* stacktrace[STACKTRACE_SIZE];
 		::FillStackAddresses(stacktrace, STACKTRACE_SIZE, STACKTRACE_SKIP);
 		::StackDumpFromAddresses(stacktrace, STACKTRACE_SIZE, releaseCrashLogOutput);
-
+#endif
 		fflush(theReleaseCrashLogFile);
 		fclose(theReleaseCrashLogFile);
 		theReleaseCrashLogFile = NULL;
@@ -772,13 +773,13 @@ void ReleaseCrashLocalized(const AsciiString& p, const AsciiString& m)
 	if (theReleaseCrashLogFile)
 	{
 		fprintf(theReleaseCrashLogFile, "Release Crash at %s; Reason %s\n", getCurrentTimeString(), mesg.str());
-
+#if defined(DEBUG_STACKTRACE) || defined(IG_DEBUG_STACKTRACE)
 		const int STACKTRACE_SIZE	= 12;
 		const int STACKTRACE_SKIP = 6;
 		void* stacktrace[STACKTRACE_SIZE];
 		::FillStackAddresses(stacktrace, STACKTRACE_SIZE, STACKTRACE_SKIP);
 		::StackDumpFromAddresses(stacktrace, STACKTRACE_SIZE, releaseCrashLogOutput);
-
+#endif
 		fflush(theReleaseCrashLogFile);
 		fclose(theReleaseCrashLogFile);
 		theReleaseCrashLogFile = NULL;

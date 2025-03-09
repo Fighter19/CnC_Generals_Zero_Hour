@@ -647,5 +647,23 @@ void DumpExceptionInfo( unsigned int u, EXCEPTION_POINTERS* e_info )
 
 #pragma pack(pop)
 
+#else
+
+void StackDumpFromAddresses(void** addresses, unsigned int count, void (*callback)(const char*))
+{
+}
+
+void FillStackAddresses(void** addresses, unsigned int count, unsigned int skip)
+{
+}
+
+void DumpExceptionInfo( unsigned int u, EXCEPTION_POINTERS* e_info )
+{
+}
+
+void GetFunctionDetails(void *pointer, char*name, char*filename, unsigned int* linenumber, unsigned int* address)
+{
+}
+
 #endif
 
