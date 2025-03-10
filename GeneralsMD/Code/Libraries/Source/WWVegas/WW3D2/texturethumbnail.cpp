@@ -30,6 +30,10 @@
 #include "wwprofile.h"
 #include <windows.h>
 
+#ifndef _WIN32
+#include <filesystem>
+#endif
+
 static DLListClass<ThumbnailManagerClass> ThumbnailManagerList;
 static ThumbnailManagerClass* GlobalThumbnailManager;
 static bool message_box_displayed=false;
@@ -717,6 +721,7 @@ void ThumbnailManagerClass::Pre_Init(bool display_message_box)
 	// Collect all mix file names
 	DynamicVectorClass<StringClass> mix_names;
 
+#ifdef _WIN32
 	char cur_dir[256];
 	GetCurrentDirectory(sizeof(cur_dir),cur_dir);
 	StringClass new_dir(cur_dir,true);
@@ -737,6 +742,16 @@ void ThumbnailManagerClass::Pre_Init(bool display_message_box)
 		}
 	}
 	SetCurrentDirectory(cur_dir);
+#else
+	std::filesystem::path path = std::filesystem::current_path();
+	path /= "Data";
+	std::filesystem::directory_iterator it(path);
+	for (const auto& entry : it) {
+		if (entry.is_regular_file() && entry.path().extension() == ".mix") {
+			mix_names.Add(entry.path().filename().string().c_str());
+		}
+	}
+#endif
 
 	// First generate thumbnails for always.dat
 	Update_Thumbnail_File("always.dat",display_message_box);
