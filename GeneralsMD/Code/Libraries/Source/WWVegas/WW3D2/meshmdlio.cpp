@@ -93,7 +93,7 @@
 #include <stdio.h>
 
 #ifdef _UNIX
-#include "osdep/osdep.h"
+#include "osdep.h"
 #endif
 
 #define MESH_SINGLE_MATERIAL_HACK		0		// (gth) forces all multi-material meshes to use their first material only. (NOT RECOMMENDED, TESTING ONLY!)

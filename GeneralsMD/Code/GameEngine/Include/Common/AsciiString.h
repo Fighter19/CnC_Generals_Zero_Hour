@@ -48,6 +48,7 @@
 #ifndef ASCIISTRING_H
 #define ASCIISTRING_H
 
+#include "always.h"
 #include <atomic>
 #include <stdarg.h>
 #include <stdio.h>

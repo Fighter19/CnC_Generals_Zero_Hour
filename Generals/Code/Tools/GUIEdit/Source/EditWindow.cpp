@@ -59,7 +59,7 @@
 #include "HierarchyView.h"
 #include "Properties.h"
 #include "WW3D2/WW3D.h"
-#include "WW3D2/Render2D.h"
+#include "WW3D2/render2d.h"
 
 // DEFINES ////////////////////////////////////////////////////////////////////
 

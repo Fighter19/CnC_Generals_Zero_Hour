@@ -487,11 +487,11 @@ WW3DErrorType HLodDefClass::Save_Header(ChunkSaveClass &csave)
 		header.LodCount = LodCount;
 		
 		// Copy the name to the header
-		::lstrcpyn (header.Name, Name, sizeof (header.Name));
+		::strncpy (header.Name, Name, sizeof (header.Name));
 		header.Name[sizeof (header.Name) - 1] = 0;
 
 		// Copy the hierarchy tree name to the header
-		::lstrcpyn (header.HierarchyName, HierarchyTreeName, sizeof (header.HierarchyName));
+		::strncpy (header.HierarchyName, HierarchyTreeName, sizeof (header.HierarchyName));
 		header.HierarchyName[sizeof (header.HierarchyName) - 1] = 0;		
 
 		// Write the header out to the chunk
@@ -883,7 +883,7 @@ bool HLodDefClass::SubObjectArrayClass::Save_W3D(ChunkSaveClass &csave)
 					info.BoneIndex = BoneIndex[index];
 					
 					// Copy this model name into the structure
-					::lstrcpyn (info.Name, ModelName[index], sizeof (info.Name));
+					::strncpy (info.Name, ModelName[index], sizeof (info.Name));
 					info.Name[sizeof (info.Name) - 1] = 0;
 
 					// Write the LOD sub-obj structure out to the chunk

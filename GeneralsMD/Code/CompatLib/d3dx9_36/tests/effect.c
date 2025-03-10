@@ -8253,8 +8253,8 @@ static void test_create_effect_from_file(void)
     create_file("include\\include2.h", include2, sizeof(include2) - 1, NULL);
     create_file("include1.h", include1_wrong, sizeof(include1_wrong) - 1, NULL);
 
-    lstrcpyW(filename_w, effect_path_w);
-    lstrcatW(filename_w, L"effect1.fx");
+    strcpyW(filename_w, effect_path_w);
+    strcatW(filename_w, L"effect1.fx");
     effect = NULL;
     messages = NULL;
     hr = D3DXCreateEffectFromFileExW(device, filename_w, NULL, NULL, NULL,
@@ -8268,8 +8268,8 @@ static void test_create_effect_from_file(void)
     if (effect)
         effect->lpVtbl->Release(effect);
 
-    lstrcpyW(filename_w, effect_path_w);
-    lstrcatW(filename_w, L"effect2.fx");
+    strcpyW(filename_w, effect_path_w);
+    strcatW(filename_w, L"effect2.fx");
     effect = NULL;
     messages = NULL;
     /* This is apparently broken on native, it ends up using the wrong include. */
@@ -8289,7 +8289,7 @@ static void test_create_effect_from_file(void)
     delete_file("include2.h");
     delete_directory("include");
 
-    lstrcpyW(filename_w, L"effect2.fx");
+    strcpyW(filename_w, L"effect2.fx");
     effect = NULL;
     messages = NULL;
     include.ID3DXInclude_iface.lpVtbl = &d3dxinclude_vtbl;

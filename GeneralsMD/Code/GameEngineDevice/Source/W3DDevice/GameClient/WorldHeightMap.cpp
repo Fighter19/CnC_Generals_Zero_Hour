@@ -52,7 +52,7 @@
 #include "W3DDevice/GameClient/TerrainTex.h"
 #include "W3DDevice/GameClient/W3DShadow.h"
 
-#include "Common/file.h"
+#include "Common/File.h"
 
 #ifdef _INTERNAL
 // for occasional debugging...

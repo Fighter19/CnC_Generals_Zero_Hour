@@ -33,8 +33,8 @@
 #define WorldHeightMap_H
 
 #include "Lib/BaseType.h"
-#include "WWLib/RefCount.h"
-#include "WWMath/Vector3.h"
+#include "WWLib/refcount.h"
+#include "WWMath/vector3.h"
 #include "W3DDevice/GameClient/TileData.h"
 #include "../../gameengine/include/common/MapObject.h"
 

@@ -36,7 +36,9 @@ static void drawFramerateBar(void);
 // SYSTEM INCLUDES ////////////////////////////////////////////////////////////
 #include <stdlib.h>
 #include <windows.h>
+#ifdef _WIN32
 #include <io.h>
+#endif
 #include <time.h>
 
 // USER INCLUDES //////////////////////////////////////////////////////////////
@@ -80,23 +82,23 @@ static void drawFramerateBar(void);
 #include "W3DDevice/GameClient/W3DDebugDisplay.h"
 #include "W3DDevice/GameClient/W3DProjectedShadow.h"
 #include "W3DDevice/GameClient/W3DShroud.h"
-#include "WWMath/WWMath.h"
-#include "WWLib/Registry.h"
+#include "WWMath/wwmath.h"
+#include "WWLib/registry.h"
 #include "WW3D2/ww3d.h"
-#include "WW3D2/PredLod.h"
-#include "WW3D2/Part_Emt.h"
-#include "WW3D2/Part_Ldr.h"
-#include "WW3D2/DX8Caps.h"
-#include "WW3D2/WW3DFormat.h"
+#include "WW3D2/predlod.h"
+#include "WW3D2/part_emt.h"
+#include "WW3D2/part_ldr.h"
+#include "WW3D2/dx8caps.h"
+#include "WW3D2/ww3dformat.h"
 #include "WW3D2/agg_def.h"
 #include "WW3D2/Render2DSentence.h"
-#include "WW3D2/SortingRenderer.h"
-#include "WW3D2/Textureloader.h"
-#include "WW3D2/DX8WebBrowser.h"
-#include "WW3D2/Mesh.h"
-#include "WW3D2/HLOD.h"
-#include "WW3D2/Meshmatdesc.h"
-#include "WW3D2/Meshmdl.h"
+#include "WW3D2/sortingrenderer.h"
+#include "WW3D2/textureloader.h"
+#include "WW3D2/dx8webbrowser.h"
+#include "WW3D2/mesh.h"
+#include "WW3D2/hlod.h"
+#include "WW3D2/meshmatdesc.h"
+#include "WW3D2/meshmdl.h"
 #include "WW3D2/rddesc.h"
 #include "targa.h"
 #include "Lib/BaseType.h"
@@ -108,6 +110,19 @@ static void drawFramerateBar(void);
 #endif
 
 #include "WinMain.h"
+
+
+#ifndef _WIN32
+// To be implemented in wnd_compat.cpp
+void GetCursorPos(POINT *ptCursor);
+void ScreenToClient(HWND hWnd, POINT *ptCursor);
+void ClientToScreen(HWND hWnd, POINT *ptCursor);
+static bool IsIconic(HWND hWnd)
+{
+	return false;
+}
+#define D3DCURSOR_IMMEDIATE_UPDATE 0x00000001
+#endif
 
 #ifdef _INTERNAL
 // for occasional debugging...
@@ -377,14 +392,22 @@ W3DAssetManager *W3DDisplay::m_assetManager = NULL;
 inline Int64 getPerformanceCounter()
 {
 	Int64 tmp;
+#ifdef _WIN32
 	QueryPerformanceCounter((LARGE_INTEGER*)&tmp);
+#else
+	tmp = timeGetTime();
+#endif
 	return tmp;
 }
 
 inline Int64 getPerformanceCounterFrequency()
 {
 	Int64 tmp;
+#ifdef _WIN32
 	QueryPerformanceFrequency((LARGE_INTEGER*)&tmp);
+#else
+	tmp = 1000;
+#endif
 	return tmp;
 }
 
@@ -557,6 +580,7 @@ void Reset_D3D_Device(bool active)
 		{	
 			//switch back to desired mode when user alt-tabs back into game
 			WW3D::Set_Render_Device( WW3D::Get_Render_Device(),TheDisplay->getWidth(),TheDisplay->getHeight(),TheDisplay->getBitDepth(),TheDisplay->getWindowed(),true, true);
+#ifdef _WIN32
 			OSVERSIONINFO	osvi;
 			osvi.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
 			if (GetVersionEx(&osvi))
@@ -567,6 +591,7 @@ void Reset_D3D_Device(bool active)
 						WW3D::_Invalidate_Textures();
 				}
 			}
+#endif
 		}
 		else
 		{
@@ -1561,6 +1586,23 @@ void W3DDisplay::drawCurrentDebugDisplay( void )
 		}
 	}
 }  // end drawCurrentDebugDisplay
+
+#ifndef _WIN32
+static void OutputDebugString(const char *str)
+{
+	printf("%s",str);
+}
+
+static void QueryPerformanceCounter(LARGE_INTEGER *li)
+{
+	li->QuadPart = 0;
+}
+
+static void QueryPerformanceFrequency(LARGE_INTEGER *li)
+{
+	li->QuadPart = 0;
+}
+#endif
 
 // W3DDisplay::calculateTerrainLOD =================================================
 /** Calculates an adequately speedy terrain Level Of Detail. */
@@ -2696,10 +2738,10 @@ void W3DDisplay::drawImage( const Image *image, Int startX, Int startY,
 				//	Clip the polygons to the specified area
 				//
 				
-				clipped_rect.Left		= __max (screen_rect.Left, m_clipRegion.lo.x);
-				clipped_rect.Right	= __min (screen_rect.Right, m_clipRegion.hi.x);
-				clipped_rect.Top		= __max (screen_rect.Top, m_clipRegion.lo.y);
-				clipped_rect.Bottom	= __min (screen_rect.Bottom, m_clipRegion.hi.y);
+				clipped_rect.Left		= max (screen_rect.Left, (float)m_clipRegion.lo.x);
+				clipped_rect.Right	= min (screen_rect.Right, (float)m_clipRegion.hi.x);
+				clipped_rect.Top		= max (screen_rect.Top, (float)m_clipRegion.lo.y);
+				clipped_rect.Bottom	= min (screen_rect.Bottom, (float)m_clipRegion.hi.y);
 
 				//
 				//	Clip the texture to the specified area
@@ -2725,10 +2767,10 @@ void W3DDisplay::drawImage( const Image *image, Int startX, Int startY,
 				//	Clip the polygons to the specified area
 				//
 				
-				clipped_rect.Left		= __max (screen_rect.Left, m_clipRegion.lo.x);
-				clipped_rect.Right	= __min (screen_rect.Right, m_clipRegion.hi.x);
-				clipped_rect.Top		= __max (screen_rect.Top, m_clipRegion.lo.y);
-				clipped_rect.Bottom	= __min (screen_rect.Bottom, m_clipRegion.hi.y);
+				clipped_rect.Left		= max (screen_rect.Left, (float)m_clipRegion.lo.x);
+				clipped_rect.Right	= min (screen_rect.Right, (float)m_clipRegion.hi.x);
+				clipped_rect.Top		= max (screen_rect.Top, (float)m_clipRegion.lo.y);
+				clipped_rect.Bottom	= min (screen_rect.Bottom, (float)m_clipRegion.hi.y);
 
 				//
 				//	Clip the texture to the specified area
@@ -2919,6 +2961,7 @@ void W3DDisplay::setShroudLevel( Int x, Int y, CellShroudStatus setting )
 ///Utility function to dump data into a .BMP file
 static void CreateBMPFile(LPTSTR pszFile, char *image, Int width, Int height)
 { 
+#ifdef _WIN32
      HANDLE hf;                 // file handle 
     BITMAPFILEHEADER hdr;       // bitmap file-header 
     PBITMAPINFOHEADER pbih;     // bitmap info-header 
@@ -2988,6 +3031,9 @@ static void CreateBMPFile(LPTSTR pszFile, char *image, Int width, Int height)
 
     // Free memory. 
 	LocalFree( (HLOCAL) pbmi);
+#else
+#pragma message("CreateBMPFile not implemented for this platform")
+#endif
 }
 
 ///Save Screen Capture to a file
@@ -3007,7 +3053,7 @@ void W3DDisplay::takeScreenShot(void)
 #endif
 		strcpy(pathname, TheGlobalData->getPath_UserData().str());
 		strcat(pathname, leafname);
-		if (_access( pathname, 0 ) == -1)
+		if (access( pathname, 0 ) == -1)
 			done = true;
 	}
 

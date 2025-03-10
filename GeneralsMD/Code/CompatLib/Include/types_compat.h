@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stddef.h>
 
 typedef void *HANDLE;
 typedef HANDLE HWND;
@@ -20,6 +21,10 @@ typedef uint32_t ULONG;
 typedef uint32_t DWORD;
 
 typedef uint32_t UINT;
+
+
+typedef int32_t *LPARAM;
+typedef size_t WPARAM;
 
 #define FALSE 0
 #define TRUE 1

@@ -25,7 +25,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-#include "streakrender.h"
+#include "streakRender.h"
 #include "ww3d.h"
 #include "rinfo.h"
 #include "dx8wrapper.h"

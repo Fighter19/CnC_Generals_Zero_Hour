@@ -60,7 +60,7 @@
 *
 ****************************************************************************/
 
-#include "TARGA.H"
+#include "targa.h"
 #ifndef TGA_USES_WWLIB_FILE_CLASSES
 #include <stdio.h>
 #endif

@@ -61,7 +61,7 @@
 #include "WW3D2/Light.h"
 #include "WW3D2/matpass.h"
 #include "WW3D2/shader.h"
-#include "WW3D2/DX8Caps.h"
+#include "WW3D2/dx8caps.h"
 #include "WW3D2/colorspace.h"
 
 #ifdef _INTERNAL

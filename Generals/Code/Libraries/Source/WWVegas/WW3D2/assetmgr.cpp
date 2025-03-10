@@ -109,7 +109,7 @@
 #include <ini.h>
 #include <windows.h>
 #include <stdio.h>
-#include <D3dx8core.h>
+#include <d3dx8core.h>
 
 #include "texture.h"
 #include "wwprofile.h"
@@ -792,8 +792,8 @@ RenderObjClass * WW3DAssetManager::Create_Render_Obj(const char * name)
 		char filename [MAX_PATH];
 		char *mesh_name = ::strchr (name, '.');
 		if (mesh_name != NULL) {
-			::lstrcpyn (filename, name, ((int)mesh_name) - ((int)name) + 1);
-			::lstrcat (filename, ".w3d");
+			::strncpy (filename, name, ((int)mesh_name) - ((int)name) + 1);
+			::strcat (filename, ".w3d");
 		} else {
 			sprintf( filename, "%s.w3d", name);
 		}

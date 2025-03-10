@@ -90,7 +90,7 @@
 #include "hanimmgr.h"
 #include "texture.h"
 #include "font3d.h"
-#include "render2dsentence.h"		// for FontCharsClass
+#include "Render2DSentence.h"		// for FontCharsClass
 #include "proto.h"
 #include "hanim.h"
 #include "hcanim.h"

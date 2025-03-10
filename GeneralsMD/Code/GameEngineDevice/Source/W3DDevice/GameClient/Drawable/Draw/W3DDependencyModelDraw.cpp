@@ -32,6 +32,7 @@
 // draw after he draws.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "always.h"
 #include "Common/Xfer.h"
 #include "GameClient/Drawable.h"
 #include "GameLogic/Object.h"

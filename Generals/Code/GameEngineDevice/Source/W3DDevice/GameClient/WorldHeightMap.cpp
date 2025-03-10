@@ -52,7 +52,7 @@
 #include "W3DDevice/GameClient/TerrainTex.h"
 #include "W3DDevice/GameClient/W3DShadow.h"
 
-#include "Common/file.h"
+#include "Common/File.h"
 
 #define K_OBSOLETE_HEIGHT_MAP_VERSION 8
 

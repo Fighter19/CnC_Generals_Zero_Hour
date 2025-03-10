@@ -37,8 +37,9 @@
 /* Revision History:                                                         */
 /*		7/18/2002 : Initial creation                                           */
 /*---------------------------------------------------------------------------*/
-
+#ifdef _WIN32
 #include <dsound.h>
+#endif
 #include "Lib/BaseType.h"
 #include "MilesAudioDevice/MilesAudioManager.h"
 
@@ -940,7 +941,7 @@ void MilesAudioManager::stopAudioEvent( AudioHandle handle )
 		if (audio->m_audioEventRTS->getPlayingHandle() == handle) {
 			// found it
 			audio->m_requestStop = true;
-			notifyOfAudioCompletion((UnsignedInt)(audio->m_stream), PAT_Stream);
+			notifyOfAudioCompletion((uintptr_t)(audio->m_stream), PAT_Stream);
 			break;
 		}
 	}
@@ -1676,9 +1677,10 @@ void MilesAudioManager::selectProvider( UnsignedInt providerNdx )
 		unselectProvider();
 	}
 
+	Bool useDolby = FALSE;
+#ifdef _WIN32
 	LPDIRECTSOUND lpDirectSoundInfo;
 	AIL_get_DirectSound_info( NULL, (void**)&lpDirectSoundInfo, NULL );
-	Bool useDolby = FALSE;
 	if( lpDirectSoundInfo )
 	{
 		DWORD speakerConfig;
@@ -1716,6 +1718,10 @@ void MilesAudioManager::selectProvider( UnsignedInt providerNdx )
 				break;
 		}
 	}
+#else
+	m_selectedSpeakerType = AIL_3D_2_SPEAKER;
+	#pragma message("Need to implement speaker type selection for non-Windows platforms")
+#endif
 
 	Bool success = FALSE;
 	if( useDolby )
@@ -3046,19 +3052,19 @@ void MilesAudioManager::friend_forcePlayAudioEventRTS(const AudioEventRTS* event
 //-------------------------------------------------------------------------------------------------
 void AILCALLBACK setSampleCompleted( HSAMPLE sampleCompleted )
 {
-	TheAudio->notifyOfAudioCompletion((UnsignedInt) sampleCompleted, PAT_Sample);
+	TheAudio->notifyOfAudioCompletion((uintptr_t) sampleCompleted, PAT_Sample);
 }
 
 //-------------------------------------------------------------------------------------------------
 void AILCALLBACK set3DSampleCompleted( H3DSAMPLE sample3DCompleted )
 {
-	TheAudio->notifyOfAudioCompletion((UnsignedInt) sample3DCompleted, PAT_3DSample);
+	TheAudio->notifyOfAudioCompletion((uintptr_t) sample3DCompleted, PAT_3DSample);
 }
 
 //-------------------------------------------------------------------------------------------------
 void AILCALLBACK setStreamCompleted( HSTREAM streamCompleted )
 {
-	TheAudio->notifyOfAudioCompletion((UnsignedInt) streamCompleted, PAT_Stream);
+	TheAudio->notifyOfAudioCompletion((uintptr_t) streamCompleted, PAT_Stream);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -3097,14 +3103,14 @@ U32 AILCALLBACK streamingFileRead(U32 file_handle, void *buffer, U32 bytes)
 //-------------------------------------------------------------------------------------------------
 AudioFileCache::AudioFileCache() : m_maxSize(0), m_currentlyUsedSize(0), m_mutexName("AudioFileCacheMutex")
 {
-	m_mutex = CreateMutex(NULL, FALSE, m_mutexName);
+	
 }
 
 //-------------------------------------------------------------------------------------------------
 AudioFileCache::~AudioFileCache()
 {
 	{
-		ScopedMutex mut(m_mutex);
+		std::lock_guard<std::mutex> lock(m_mutex);
 
 		// Free all the samples that are open.
 		OpenFilesHashIt it;
@@ -3118,15 +3124,13 @@ AudioFileCache::~AudioFileCache()
 			// we're about to go away anyways.
 		}
 	}
-
-	CloseHandle(m_mutex);
 }
 
 //-------------------------------------------------------------------------------------------------
 void *AudioFileCache::openFile( AudioEventRTS *eventToOpenFrom )
 {
 	// Protect the entire openFile function
-	ScopedMutex mut(m_mutex);
+	std::lock_guard<std::mutex> lock(m_mutex);
 
 	AsciiString strToFind;
 	switch (eventToOpenFrom->getNextPlayPortion())
@@ -3221,7 +3225,7 @@ void AudioFileCache::closeFile( void *fileToClose )
 	}
 
 	// Protect the entire closeFile function
-	ScopedMutex mut(m_mutex);
+	std::lock_guard<std::mutex> lock(m_mutex);
 
 	OpenFilesHash::iterator it;
 	for ( it = m_openFiles.begin(); it != m_openFiles.end(); ++it ) {
@@ -3236,7 +3240,7 @@ void AudioFileCache::closeFile( void *fileToClose )
 void AudioFileCache::setMaxSize( UnsignedInt size )
 {
 	// Protect the function, in case we're trying to use this value elsewhere.
-	ScopedMutex mut(m_mutex);
+	std::lock_guard<std::mutex> lock(m_mutex);
 
 	m_maxSize = size;
 }

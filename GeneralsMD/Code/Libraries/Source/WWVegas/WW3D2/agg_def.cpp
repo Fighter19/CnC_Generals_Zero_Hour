@@ -359,13 +359,13 @@ AggregateDefClass::Load_Assets (const char *passet_name)
 		::GetCurrentDirectory (sizeof (path), path);
 
 		// Ensure the path is directory delimited
-		if (path[::lstrlen(path)-1] != '\\') {
-			::lstrcat (path, "\\");
+		if (path[::strlen(path)-1] != '\\') {
+			::strcat (path, "\\");
 		}
 
 		// Assume the filename is simply the "asset name" + the w3d extension
-		::lstrcat (path, passet_name);
-		::lstrcat (path, ".w3d");
+		::strcat (path, passet_name);
+		::strcat (path, ".w3d");
 
 		// If the file exists, then load it into the asset manager.
 		if (::GetFileAttributes (path) != 0xFFFFFFFF) {

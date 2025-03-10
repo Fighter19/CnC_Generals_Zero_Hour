@@ -44,7 +44,7 @@ class Locomotor;
 class LocomotorTemplate;
 class INI;
 class PhysicsBehavior;
-enum BodyDamageType;
+enum BodyDamageType : int;
 enum PhysicsTurningType;
 
 // if we ever re-enable jets circling for landing, we need this. so keep in around just in case. (srj)

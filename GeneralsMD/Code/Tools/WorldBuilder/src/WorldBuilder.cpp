@@ -34,7 +34,7 @@
 
 //#include <wsys/StdFileSystem.h>
 #include "W3DDevice/GameClient/W3DFileSystem.h"
-#include "common/GlobalData.h"
+#include "Common/GlobalData.h"
 #include "WHeightMapEdit.h"
 //#include "Common/GameFileSystem.h"
 #include "Common/FileSystem.h"

@@ -48,6 +48,7 @@
 #ifndef UNICODESTRING_H
 #define UNICODESTRING_H
 
+#include "always.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>

@@ -50,7 +50,11 @@
 //----------------------------------------------------------------------------
 
 #include "GameClient/VideoPlayer.h"
+#ifdef _WIN32
 #include "bink.h"
+#else
+typedef struct BINK *HBINK;
+#endif
 
 //----------------------------------------------------------------------------
 //           Forward References

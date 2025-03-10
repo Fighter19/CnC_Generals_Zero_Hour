@@ -34,7 +34,7 @@
  * Functions:                                                                                  *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-#include "render2dsentence.h"
+#include "Render2DSentence.h"
 #include "surfaceclass.h"
 #include "texture.h"
 #include "wwprofile.h"

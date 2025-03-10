@@ -145,7 +145,7 @@ BOOL InitSymbolInfo()
 	sprintf(pathname, "%s:\\%s", drive, directory);
 
 	// append the current directory to build a search path for SymInit
-	::lstrcat(pathname, ";.;");
+	::strcat(pathname, ";.;");
 
 	if(::SymInitialize(process, pathname, FALSE))
 	{
@@ -612,7 +612,7 @@ void DumpExceptionInfo( unsigned int u, EXCEPTION_POINTERS* e_info )
 	{
 		if (IsBadReadPtr(eip_ptr, 1))
 		{
-			lstrcat (scrap, "?? ");
+			strcat (scrap, "?? ");
 		}
 		else
 		{

@@ -40,7 +40,7 @@
 #include "lightenvironment.h"
 #include "matrix3d.h"
 #include "camera.h"
-#include "light.h"
+#include "Light.h"
 #include "colorspace.h"
 
 /*

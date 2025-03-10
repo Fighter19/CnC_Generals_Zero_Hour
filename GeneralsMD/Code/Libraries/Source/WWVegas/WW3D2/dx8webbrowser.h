@@ -52,6 +52,10 @@
 
 struct IDirect3DDevice8;
 
+#ifndef _WIN32
+typedef struct DISPATCH *LPDISPATCH;
+#endif
+
 /**
 ** DX8WebBrowser
 **

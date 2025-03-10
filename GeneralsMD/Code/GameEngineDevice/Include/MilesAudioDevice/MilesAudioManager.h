@@ -22,7 +22,7 @@
 
 #include "Common/AsciiString.h"
 #include "Common/GameAudio.h"
-#include "MSS/MSS.h"
+#include "mss/mss.h"
 
 class AudioEventRTS;
 
@@ -103,6 +103,8 @@ struct OpenAudioFile
 typedef std::unordered_map< AsciiString, OpenAudioFile, rts::hash<AsciiString>, rts::equal_to<AsciiString> > OpenFilesHash;
 typedef OpenFilesHash::iterator OpenFilesHashIt;
 
+#include <mutex>
+
 class AudioFileCache
 {
 	public:
@@ -130,7 +132,7 @@ class AudioFileCache
 		OpenFilesHash m_openFiles;
 		UnsignedInt m_currentlyUsedSize;
 		UnsignedInt m_maxSize;
-		HANDLE m_mutex;
+		std::mutex m_mutex;
 		const char *m_mutexName;
 };
 

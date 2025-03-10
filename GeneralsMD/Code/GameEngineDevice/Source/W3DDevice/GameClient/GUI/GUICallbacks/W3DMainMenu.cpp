@@ -48,7 +48,9 @@
 //-----------------------------------------------------------------------------
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#ifdef _WIN32
 #include <mmsystem.h>
+#endif
 #include <time.h>
 //-----------------------------------------------------------------------------
 // USER INCLUDES //////////////////////////////////////////////////////////////
@@ -75,7 +77,7 @@
 // DEFINES ////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 
-void drawText( GameWindow *window, WinInstanceData *instData );
+static void drawText( GameWindow *window, WinInstanceData *instData );
 static Color BrownishColor = GameMakeColor(167,134,94,255);
 static IRegion2D clipRegion;
 //-----------------------------------------------------------------------------
@@ -172,19 +174,19 @@ void W3DMainMenuDraw( GameWindow *window, WinInstanceData *instData )
 	IRegion2D	topHorizontal1 ={pos.x, pos.y, pos.x + size.x, pos.y	};
 	IRegion2D	topHorizontal1drop ={pos.x, pos.y+1, pos.x + size.x, pos.y+1	};
 
-	IRegion2D	topHorizontal2 ={pos.x, pos.y + (size.y * .1) , pos.x + size.x, pos.y + (size.y * .1)	};
-	IRegion2D	topHorizontal2drop ={pos.x, pos.y + (size.y * .12) , pos.x + size.x, pos.y + (size.y * .12)	};
+	IRegion2D	topHorizontal2 ={pos.x, pos.y + (Int)(size.y * .1) , pos.x + size.x, pos.y + (Int)(size.y * .1)	};
+	IRegion2D	topHorizontal2drop ={pos.x, pos.y + (Int)(size.y * .12) , pos.x + size.x, pos.y + (Int)(size.y * .12)	};
 
-	IRegion2D	bottomHorizontal1={pos.x, pos.y + (size.y * .9), pos.x + size.x, pos.y + (size.y * .9)	};
-	IRegion2D	bottomHorizontal1drop={pos.x, pos.y + (size.y * .92), pos.x + size.x, pos.y + (size.y * .92)	};
+	IRegion2D	bottomHorizontal1={pos.x, pos.y + (Int)(size.y * .9), pos.x + size.x, pos.y + (Int)(size.y * .9)	};
+	IRegion2D	bottomHorizontal1drop={pos.x, pos.y + (Int)(size.y * .92), pos.x + size.x, pos.y + (Int)(size.y * .92)	};
 
 	IRegion2D	bottomHorizontal2= {pos.x, pos.y + size.y, pos.x + size.x, pos.y + size.y 	};
 	IRegion2D	bottomHorizontal2drop= {pos.x, pos.y + size.y + 1, pos.x + size.x, pos.y + size.y + 1	};
 
-	IRegion2D	verticle1 ={pos.x + (size.x * .225), pos.y , pos.x + (size.x * .225), height 	};
-	IRegion2D	verticle2 ={pos.x + (size.x * .445), pos.y, pos.x + (size.x * .445), height 	};
-	IRegion2D	verticle3 ={pos.x + (size.x * .6662), pos.y, pos.x + (size.x * .6662), height 	};
-	IRegion2D	verticle4 ={pos.x + (size.x * .885), pos.y , pos.x + (size.x * .885), height 	};
+	IRegion2D	verticle1 ={pos.x + (Int)(size.x * .225), pos.y , pos.x + (Int)(size.x * .225), height 	};
+	IRegion2D	verticle2 ={pos.x + (Int)(size.x * .445), pos.y, pos.x + (Int)(size.x * .445), height 	};
+	IRegion2D	verticle3 ={pos.x + (Int)(size.x * .6662), pos.y, pos.x + (Int)(size.x * .6662), height 	};
+	IRegion2D	verticle4 ={pos.x + (Int)(size.x * .885), pos.y , pos.x + (Int)(size.x * .885), height 	};
 //	static IRegion2D	verticle5 ={pos.x + (size.x * .7250), pos.y + (size.y * .12), pos.x + (size.x * .7250), pos.y + (size.y * .86) 	};
 //	static IRegion2D	verticle6 ={pos.x + (size.x * .9062), pos.y + (size.y * .12), pos.x + (size.x * .9062), pos.y + (size.y * .86) 	};
 
@@ -236,19 +238,19 @@ void W3DMainMenuFourDraw( GameWindow *window, WinInstanceData *instData )
 	IRegion2D	topHorizontal1 ={pos.x, pos.y, pos.x + size.x, pos.y	};
 	IRegion2D	topHorizontal1drop ={pos.x, pos.y+1, pos.x + size.x, pos.y+1	};
 
-	IRegion2D	topHorizontal2 ={pos.x, pos.y + (size.y * .1) , pos.x + size.x, pos.y + (size.y * .1)	};
-	IRegion2D	topHorizontal2drop ={pos.x, pos.y + (size.y * .12) , pos.x + size.x, pos.y + (size.y * .12)	};
+	IRegion2D	topHorizontal2 ={pos.x, pos.y + (Int)(size.y * .1) , pos.x + size.x, pos.y + (Int)(size.y * .1)	};
+	IRegion2D	topHorizontal2drop ={pos.x, pos.y + (Int)(size.y * .12) , pos.x + size.x, pos.y + (Int)(size.y * .12)	};
 
-	IRegion2D	bottomHorizontal1={pos.x, pos.y + (size.y * .9), pos.x + size.x, pos.y + (size.y * .9)	};
-	IRegion2D	bottomHorizontal1drop={pos.x, pos.y + (size.y * .92), pos.x + size.x, pos.y + (size.y * .92)	};
+	IRegion2D	bottomHorizontal1={pos.x, pos.y + (Int)(size.y * .9), pos.x + size.x, pos.y + (Int)(size.y * .9)	};
+	IRegion2D	bottomHorizontal1drop={pos.x, pos.y + (Int)(size.y * .92), pos.x + size.x, pos.y + (Int)(size.y * .92)	};
 
 	IRegion2D	bottomHorizontal2= {pos.x, pos.y + size.y, pos.x + size.x, pos.y + size.y 	};
 	IRegion2D	bottomHorizontal2drop= {pos.x, pos.y + size.y + 1, pos.x + size.x, pos.y + size.y + 1	};
 
-	IRegion2D	verticle1 ={pos.x + (size.x * .295), pos.y , pos.x + (size.x * .295), height 	};
-	IRegion2D	verticle2 ={pos.x + (size.x * .59), pos.y, pos.x + (size.x * .59), height 	};
+	IRegion2D	verticle1 ={pos.x + (Int)(size.x * .295), pos.y , pos.x + (Int)(size.x * .295), height 	};
+	IRegion2D	verticle2 ={pos.x + (Int)(size.x * .59), pos.y, pos.x + (Int)(size.x * .59), height 	};
 	//IRegion2D	verticle3 ={pos.x + (size.x * .6662), pos.y, pos.x + (size.x * .6662), height 	};
-	IRegion2D	verticle4 ={pos.x + (size.x * .885), pos.y , pos.x + (size.x * .885), height 	};
+	IRegion2D	verticle4 ={pos.x + (Int)(size.x * .885), pos.y , pos.x + (Int)(size.x * .885), height 	};
 //	static IRegion2D	verticle5 ={pos.x + (size.x * .7250), pos.y + (size.y * .12), pos.x + (size.x * .7250), pos.y + (size.y * .86) 	};
 //	static IRegion2D	verticle6 ={pos.x + (size.x * .9062), pos.y + (size.y * .12), pos.x + (size.x * .9062), pos.y + (size.y * .86) 	};
 

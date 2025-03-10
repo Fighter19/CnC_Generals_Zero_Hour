@@ -28,6 +28,8 @@ message(STATUS "Using DirectX 8: ${SAGE_USE_DX8}")
 message(STATUS "Using ZLib: ${SAGE_USE_ZLIB}")
 message(STATUS "Using LZH-Light: ${SAGE_USE_LZHL}")
 
+include_directories(${CMAKE_SOURCE_DIR}/extern/dxvk-native/usr/include/dxvk)
+
 include(FetchContent)
 if(SAGE_USE_BINK)
   FetchContent_Declare(

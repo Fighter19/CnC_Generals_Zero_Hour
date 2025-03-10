@@ -684,7 +684,7 @@ SoundRenderObjDefClass::Write_Header (ChunkSaveClass &csave)
 		W3dSoundRObjHeaderStruct header = { 0 };
 		header.Version	= W3D_CURRENT_AGGREGATE_VERSION;
 		header.Flags	= Flags;
-		::lstrcpyn (header.Name, (const char *)Name, sizeof (header.Name));
+		::strncpy (header.Name, (const char *)Name, sizeof (header.Name));
 		header.Name[sizeof (header.Name) - 1] = 0;
 
 		//

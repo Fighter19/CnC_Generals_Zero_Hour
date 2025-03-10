@@ -6251,7 +6251,7 @@ HRESULT WINAPI D3DXCreateTextW(struct IDirect3DDevice9 *device, HDC hdc, const W
     }
     oldfont = SelectObject(hdc, font);
 
-    textlen = lstrlenW(text);
+    textlen = strlenW(text);
     for (i = 0; i < textlen; i++)
     {
         int datasize = GetGlyphOutlineW(hdc, text[i], GGO_NATIVE, &gm, 0, NULL, &identity);

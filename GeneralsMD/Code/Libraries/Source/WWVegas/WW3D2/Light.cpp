@@ -56,7 +56,7 @@
  *   LightImpClass::Process_Pop -- exposes the "pop" process for an srLight                    *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-#include "light.h"
+#include "Light.h"
 #include "ww3d.h"
 #include "ww3dids.h"
 #include "w3d_file.h"

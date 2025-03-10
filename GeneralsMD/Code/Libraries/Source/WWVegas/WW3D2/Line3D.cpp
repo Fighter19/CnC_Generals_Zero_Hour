@@ -47,7 +47,7 @@
  *   Line3DClass::Render -- render the 3d line                             *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-#include "line3d.h"
+#include "Line3D.h"
 #include "vertmaterial.h"
 #include "shader.h"
 #include "wwdebug.h"

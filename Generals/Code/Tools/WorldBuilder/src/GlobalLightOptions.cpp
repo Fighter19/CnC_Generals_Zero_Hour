@@ -24,7 +24,7 @@
 #include "Lib\BaseType.h"
 #include "GlobalLightOptions.h"
 #include "WorldBuilderDoc.h"
-#include "common/GlobalData.h"
+#include "Common/GlobalData.h"
 #include "WbView3D.h"
 
 /////////////////////////////////////////////////////////////////////////////

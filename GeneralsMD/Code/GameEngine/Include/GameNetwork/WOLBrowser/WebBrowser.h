@@ -131,7 +131,9 @@ extern CComObject<WebBrowser> *TheWebBrowser;
 #else
 #pragma message("WebBrowser is stubbed on this platform!")
 
+#include "Common/AsciiString.h"
 class GameWindow;
+struct FieldParse;
 
 class WebBrowserURL
 {

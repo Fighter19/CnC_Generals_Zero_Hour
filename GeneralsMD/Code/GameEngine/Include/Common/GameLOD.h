@@ -63,7 +63,7 @@ enum DynamicGameLODLevel : int
 };
 
 //Make sure this stays in sync with CPUNames[] in gamelod.cpp
-enum CpuType
+enum CpuType : int
 {
 	XX,	//unknown type
 	P3,
@@ -72,7 +72,7 @@ enum CpuType
 };
 
 //Keep this in sync with VideoNames in Gamelod.cpp
-enum ChipsetType
+enum ChipsetType : int
 {	DC_UNKNOWN,
 	DC_VOODOO2,
 	DC_VOODOO3,

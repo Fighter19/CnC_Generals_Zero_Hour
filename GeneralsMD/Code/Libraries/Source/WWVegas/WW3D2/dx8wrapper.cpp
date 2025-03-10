@@ -65,13 +65,13 @@
 #include "render2d.h"
 #include "sortingrenderer.h"
 #include "shattersystem.h"
-#include "light.h"
+#include "Light.h"
 #include "assetmgr.h"
 #include "textureloader.h"
 #include "missingtexture.h"
 #include "thread.h"
 #include <stdio.h>
-#include <D3dx8core.h>
+#include <d3dx8core.h>
 #include "pot.h"
 #include "wwprofile.h"
 #include "ffactory.h"
@@ -2059,7 +2059,7 @@ void DX8Wrapper::Draw(
 
 #ifdef MESH_RENDER_SNAPSHOT_ENABLED
 	if (WW3D::Is_Snapshot_Activated()) {
-		unsigned long passes=0;
+		DWORD passes=0;
 		SNAPSHOT_SAY(("ValidateDevice: "));
 		HRESULT res=D3DDevice->ValidateDevice(&passes);
 		switch (res) {

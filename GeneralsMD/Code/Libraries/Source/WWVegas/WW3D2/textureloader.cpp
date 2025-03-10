@@ -53,7 +53,7 @@
 #include "dx8caps.h"
 #include "missingtexture.h"
 #include "targa.h"
-#include <D3dx8tex.h>
+#include <d3dx8tex.h>
 #include <cstdio>
 #include "wwmemlog.h"
 #include "texture.h"
@@ -836,7 +836,9 @@ void TextureLoader::Flush_Pending_Load_Tasks(void)
 
 // Nework update macro for texture loader.
 #pragma warning(disable:4201) // warning C4201: nonstandard extension used : nameless struct/union
+#ifdef _WIN32
 #include <mmsystem.h>
+#endif
 #define UPDATE_NETWORK 											\
 	if (network_callback) {                            \
 		unsigned long time2 = timeGetTime();            \

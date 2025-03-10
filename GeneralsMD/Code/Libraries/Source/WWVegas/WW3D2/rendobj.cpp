@@ -114,7 +114,7 @@ Filename_From_Asset_Name (const char *asset_name)
 		//
 		// Copy the model name into a new filename buffer
 		//
-		::lstrcpy (filename.Get_Buffer (::lstrlen (asset_name) + 5), asset_name);
+		::strcpy (filename.Get_Buffer (::strlen (asset_name) + 5), asset_name);
 		
 		//
 		// Do we need to strip off the model's suffix?

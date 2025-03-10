@@ -40,7 +40,7 @@
 //         Includes                                                      
 //-----------------------------------------------------------------------------
 #include "WBheightmap.h"
-#include "common/GlobalData.h"
+#include "Common/GlobalData.h"
 #include <tri.h>
 #include <colmath.h>
 #include <coltest.h>

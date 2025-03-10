@@ -26,7 +26,7 @@
 
 #include "lib/BaseType.h"
 #include "Tool.h"
-#include "common/MapObject.h"
+#include "Common/MapObject.h"
 class WorldHeightMapEdit;
 
 /*************************************************************************/

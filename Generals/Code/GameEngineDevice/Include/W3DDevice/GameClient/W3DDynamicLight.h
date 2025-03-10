@@ -32,7 +32,7 @@
 #define W3D_DYNAMIC_LIGHT_H
 
 #include "WW3D2/Light.h"
-#include "lib/baseType.h"
+#include "Lib/BaseType.h"
 class HeightMapRenderObjClass;
 
 /*************************************************************************

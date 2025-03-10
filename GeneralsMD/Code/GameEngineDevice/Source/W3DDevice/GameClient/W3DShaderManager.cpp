@@ -63,16 +63,15 @@
 #include "W3DDevice/GameClient/HeightMap.h"
 #include "W3DDevice/GameClient/W3DCustomScene.h"
 #include "W3DDevice/GameClient/W3DSmudge.h"
-#include "GameClient/view.h"
+#include "GameClient/View.h"
 #include "GameClient/CommandXlat.h"
-#include "GameClient/display.h"
+#include "GameClient/Display.h"
 #include "GameClient/Water.h"
 #include "GameLogic/GameLogic.h"
-#include "common/GlobalData.h"
-#include "common/GameLOD.h"
+#include "Common/GlobalData.h"
+#include "Common/GameLOD.h"
 #include "d3dx8tex.h"
 #include "dx8caps.h"
-#include "common/gamelod.h"
 //#include "Benchmark.h"
 
 #ifdef _INTERNAL
@@ -113,7 +112,7 @@ FilterTypes W3DShaderManager::m_currentFilter=FT_NULL_FILTER; ///< Last filter t
 Int W3DShaderManager::m_currentShaderPass;
 ChipsetType W3DShaderManager::m_currentChipset;
 GraphicsVenderID W3DShaderManager::m_currentVendor;
-__int64 W3DShaderManager::m_driverVersion;
+Int64 W3DShaderManager::m_driverVersion;
 
 Bool W3DShaderManager::m_renderingToTexture = false;
 IDirect3DSurface8 *W3DShaderManager::m_oldRenderSurface=NULL;	///<previous render target
@@ -2904,7 +2903,7 @@ IDirect3DTexture8 *W3DShaderManager::getRenderTexture(void)
 	return m_renderTexture;
 }
 
-enum GraphicsVenderID
+enum GraphicsVenderID : int
 {
 	DC_NVIDIA_VENDOR_ID	= 0x10DE,
 	DC_3DFX_VENDOR_ID	= 0x121A,
@@ -3004,6 +3003,23 @@ ChipsetType W3DShaderManager::getChipset( void )
 	return chip;
 }
 
+#ifndef _WIN32
+static void OutputDebugString(const char *str)
+{
+	printf("%s",str);
+}
+
+static void QueryPerformanceCounter(LARGE_INTEGER *li)
+{
+	li->QuadPart = 0;
+}
+
+static void QueryPerformanceFrequency(LARGE_INTEGER *li)
+{
+	li->QuadPart = 0;
+}
+#endif
+
 //=============================================================================
 // WaterRenderObjClass::LoadAndCreateShader
 //=============================================================================
@@ -3030,7 +3046,11 @@ HRESULT W3DShaderManager::LoadAndCreateD3DShader(char* strFilePath, const DWORD*
 		TheFileSystem->getFileInfo(AsciiString(strFilePath), &fileInfo);
 		DWORD dwFileSize = fileInfo.sizeLow;
 
+#ifdef _WIN32
 		const DWORD* pShader = (DWORD*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, dwFileSize);
+#else
+		const DWORD* pShader = new DWORD[dwFileSize];
+#endif
 		if (!pShader)
 		{
 			OutputDebugString( "Failed to allocate memory to load shader\n " );
@@ -3051,7 +3071,11 @@ HRESULT W3DShaderManager::LoadAndCreateD3DShader(char* strFilePath, const DWORD*
 			hr = DX8Wrapper::_Get_D3D_Device8()->CreatePixelShader(pShader, pHandle);
 		}
 
+#ifdef _WIN32
 		HeapFree(GetProcessHeap(), 0, (void*)pShader);
+#else
+		delete[] pShader;
+#endif
 
 		if (FAILED(hr))
 		{
@@ -3151,7 +3175,7 @@ Real W3DShaderManager::GetCPUBenchTime(void)
 	float ztot, yran, ymult, ymod, x, y, z, pi, prod;
     long int low, ixran, itot, j, iprod;
 
-  	__int64 endTime64,freq64,startTime64;
+  	Int64 endTime64,freq64,startTime64;
 	QueryPerformanceFrequency((LARGE_INTEGER *)&freq64);
 	QueryPerformanceCounter((LARGE_INTEGER *)&startTime64);
 

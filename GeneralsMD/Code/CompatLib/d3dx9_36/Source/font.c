@@ -464,7 +464,7 @@ static HRESULT WINAPI ID3DXFontImpl_PreloadTextW(ID3DXFont *iface, const WCHAR *
         return D3DERR_INVALIDCALL;
 
     if (count < 0)
-        count = lstrlenW(string);
+        count = strlenW(string);
 
     indices = malloc(count * sizeof(*indices));
     if (!indices)
@@ -665,7 +665,7 @@ static INT WINAPI ID3DXFontImpl_DrawTextW(ID3DXFont *iface, ID3DXSprite *sprite,
     if (!string)
         return 0;
 
-    count = in_count < 0 ? lstrlenW(string) : in_count;
+    count = in_count < 0 ? strlenW(string) : in_count;
 
     if (!count)
         return 0;
@@ -861,7 +861,7 @@ HRESULT WINAPI D3DXCreateFontA(struct IDirect3DDevice9 *device, INT height, UINT
     desc.OutputPrecision=precision;
     desc.Quality=quality;
     desc.PitchAndFamily=pitchandfamily;
-    if(facename != NULL) lstrcpyA(desc.FaceName, facename);
+    if(facename != NULL) strcpyA(desc.FaceName, facename);
     else desc.FaceName[0] = '\0';
 
     return D3DXCreateFontIndirectA(device, &desc, font);
@@ -883,7 +883,7 @@ HRESULT WINAPI D3DXCreateFontW(IDirect3DDevice9 *device, INT height, UINT width,
     desc.OutputPrecision=precision;
     desc.Quality=quality;
     desc.PitchAndFamily=pitchandfamily;
-    if(facename != NULL) lstrcpyW(desc.FaceName, facename);
+    if(facename != NULL) strcpyW(desc.FaceName, facename);
     else desc.FaceName[0] = '\0';
 
     return D3DXCreateFontIndirectW(device, &desc, font);

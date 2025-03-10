@@ -769,13 +769,13 @@ RenderObjClass * W3DAssetManager::Create_Render_Obj(
 		char *mesh_name = ::strchr (name, '.');
 		if (mesh_name != NULL) 
 		{
-			::lstrcpyn(filename, name, ((int)mesh_name) - ((int)name) + 1);
+			::strncpy(filename, name, ((int)mesh_name) - ((int)name) + 1);
 #ifdef	INCLUDE_GRANNY_IN_BUILD
 			if (isGranny)
-				::lstrcat(filename, ".gr2");
+				::strcat(filename, ".gr2");
 			else
 #endif
-				::lstrcat(filename, ".w3d");
+				::strcat(filename, ".w3d");
 		} else {
 			sprintf( filename, "%s.w3d", name);
 		}
@@ -788,7 +788,7 @@ RenderObjClass * W3DAssetManager::Create_Render_Obj(
 			{
 #ifdef	INCLUDE_GRANNY_IN_BUILD
 				char *mesh_name = ::strchr (filename, '.');
-				::lstrcpyn (mesh_name, ".gr2",5);
+				::strncpy (mesh_name, ".gr2",5);
 				Load_3D_Assets( filename );
 				isGranny=true;
 #endif
@@ -1465,11 +1465,11 @@ RenderObjClass * W3DAssetManager::Create_Render_Obj(const char * name,float scal
 		char filename [MAX_PATH];
 		char *mesh_name = ::strchr (name, '.');
 		if (mesh_name != NULL) {
-			::lstrcpyn (filename, name, ((int)mesh_name) - ((int)name) + 1);
+			::strncpy (filename, name, ((int)mesh_name) - ((int)name) + 1);
 			if (isGranny)
-				::lstrcat (filename, ".gr2");
+				::strcat (filename, ".gr2");
 			else
-				::lstrcat (filename, ".w3d");
+				::strcat (filename, ".w3d");
 		} else {
 			sprintf( filename, "%s.w3d", name);
 		}
@@ -1480,7 +1480,7 @@ RenderObjClass * W3DAssetManager::Create_Render_Obj(const char * name,float scal
 			if (Load_3D_Assets( new_filename ) == false)
 			{
 				char *mesh_name = ::strchr (filename, '.');
-				::lstrcpyn (mesh_name, ".gr2",5);
+				::strncpy (mesh_name, ".gr2",5);
 				Load_3D_Assets( filename );
 				isGranny=true;
 			}

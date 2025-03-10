@@ -58,7 +58,7 @@
 #include "shader.h"
 #include "vertmaterial.h"
 #include "Lib/BaseType.h"
-#include "common/GameType.h"
+#include "Common/GameType.h"
 #include "Common/Dict.h"
 #include "Common/AsciiString.h"
 
@@ -78,6 +78,8 @@ typedef enum {
 	FIXED_BRIDGE = 0, 
 	SECTIONAL_BRIDGE = 1 
 } TBridgeType;
+
+enum BodyDamageType : int;
 
 class BridgeInfo;
 /// The individual data for a bridge.

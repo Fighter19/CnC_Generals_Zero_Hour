@@ -39,7 +39,7 @@
 #ifndef __W3DFILESYSTEM_H_
 #define __W3DFILESYSTEM_H_
 
-#include "WWLIB/ffactory.h"
+#include "WWLib/ffactory.h"
 #include "Common/File.h"
 
 //-------------------------------------------------------------------------------------------------

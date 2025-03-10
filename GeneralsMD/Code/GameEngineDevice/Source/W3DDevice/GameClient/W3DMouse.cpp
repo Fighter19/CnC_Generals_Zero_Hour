@@ -29,10 +29,10 @@
 
 
 #include "Common/GameMemory.h"
-#include "WW3D2/DX8Wrapper.h"
-#include "WW3D2/RendObj.h"
-#include "WW3D2/HAnim.h"
-#include "WW3D2/Camera.h"
+#include "WW3D2/dx8wrapper.h"
+#include "WW3D2/rendobj.h"
+#include "WW3D2/hanim.h"
+#include "WW3D2/camera.h"
 
 #include "assetmgr.h"
 
@@ -66,7 +66,7 @@ static class MouseThreadClass : public ThreadClass
 {
 
 public:
-	MouseThreadClass::MouseThreadClass() : ThreadClass() {}
+	MouseThreadClass() : ThreadClass() {}
 
 	void Thread_Function();
 
@@ -473,6 +473,14 @@ void W3DMouse::setCursor( MouseCursor cursor )
 }  // end setCursor
 
 extern HWND ApplicationHWnd;
+
+#ifndef _WIN32
+// To be implemented in wnd_compat.cpp
+void GetCursorPos(POINT *ptCursor);
+void ScreenToClient(HWND hWnd, POINT *ptCursor);
+void ClientToScreen(HWND hWnd, POINT *ptCursor);
+#define D3DCURSOR_IMMEDIATE_UPDATE 0x00000001
+#endif
 
 void W3DMouse::draw(void)
 {

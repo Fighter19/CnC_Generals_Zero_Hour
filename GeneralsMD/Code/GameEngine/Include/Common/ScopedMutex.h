@@ -26,6 +26,7 @@
 #ifndef __SCOPEDMUTEX_H__
 #define __SCOPEDMUTEX_H__
 
+#ifdef _WIN32
 class ScopedMutex
 {
 	private:
@@ -45,5 +46,6 @@ class ScopedMutex
 			ReleaseMutex(m_mutex);
 		}
 };
+#endif
 
 #endif /* __SCOPEDMUTEX_H__ */

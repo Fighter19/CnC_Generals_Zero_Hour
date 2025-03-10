@@ -29,7 +29,7 @@
 #include "../../gameengine/include/common/MapObject.h"
 #include "../../gameengine/include/common/GameCommon.h"
 #include "../../gameengine/include/GameLogic/SidesList.h"
-#include "RefCount.h"
+#include "refcount.h"
 #include <vector>
 
 class PolygonTrigger;

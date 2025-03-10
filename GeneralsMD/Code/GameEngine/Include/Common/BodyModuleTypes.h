@@ -1,6 +1,6 @@
 #pragma once
 
-enum BodyDamageType
+enum BodyDamageType : int
 {
 	BODY_PRISTINE,				///< unit should appear in pristine condition
 	BODY_DAMAGED,					///< unit has been damaged

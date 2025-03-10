@@ -48,7 +48,7 @@
 #include "W3DDevice/GameClient/W3DScene.h"
 #include "W3DDevice/Common/W3DConvert.h"
 #include "WW3D2/WW3D.h"
-#include "WW3D2/HAnim.h"
+#include "WW3D2/hanim.h"
 
 #include "Common/UnitTimings.h" //Contains the DO_UNIT_TIMINGS define jba.		 
 

@@ -1406,6 +1406,7 @@ void WW3D::Make_Screen_Shot( const char * filename_base , const float gamma, con
 		break;
 		case BMP:
 			{
+#ifdef _WIN32
 				BITMAPFILEHEADER fileheader;
 				BITMAPINFOHEADER header;
 				memset(&header, 0, sizeof(BITMAPINFOHEADER));
@@ -1450,6 +1451,9 @@ void WW3D::Make_Screen_Shot( const char * filename_base , const float gamma, con
 					file->Close();
 					_TheWritingFileFactory->Return_File( file );
 				}
+#else
+			#pragma message ("Writing BMP files not supported on this platform")
+#endif
 			}
 			break;
 	}

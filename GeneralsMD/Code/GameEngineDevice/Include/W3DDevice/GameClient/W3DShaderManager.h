@@ -36,13 +36,14 @@
 #ifndef __W3DSHADERMANAGER_H_
 #define __W3DSHADERMANAGER_H_
 
-#include "WW3D2/Texture.h"
+#include "WW3D2/texture.h"
 enum FilterTypes : int;
 enum CustomScenePassModes : int;
 enum StaticGameLODLevel : int;
 enum ChipsetType : int;
 enum CpuType : int;
 enum GraphicsVenderID : int;
+enum FilterModes : int;
 
 class TextureClass;	///forward reference
 /** System for managing complex rendering settings which are either not handled by
@@ -118,7 +119,7 @@ protected:
 	static TextureClass *m_Textures[8];	///textures assigned to each of the possible stages
 	static ChipsetType m_currentChipset;	///<last video card chipset that was detected.
 	static GraphicsVenderID m_currentVendor;	///<last video card vendor
-	static __int64 m_driverVersion;			///<driver version of last chipset.
+	static Int64 m_driverVersion;			///<driver version of last chipset.
 	static ShaderTypes m_currentShader;	///<last shader that was set.
 	static Int m_currentShaderPass;		///<pass of last shader that was set.
 

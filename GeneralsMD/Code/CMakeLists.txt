@@ -15,6 +15,7 @@ else()
 
     target_include_directories(RTS PRIVATE
         ${CMAKE_SOURCE_DIR}/extern/dxvk-native/usr/include/dxvk
+        /usr/include/SDL2
     )
 
     target_link_libraries(RTS GameEngine GameEngineDevice SDL2)

@@ -47,7 +47,7 @@
 #include "WorldBuilderDoc.h"
 #include "WorldBuilderView.h"
 #include "WHeightMapEdit.h"
-#include "common/GlobalData.h"
+#include "Common/GlobalData.h"
 #include "W3DDevice/GameClient/HeightMap.h"
 #include "W3DDevice/GameClient/W3DRoadBuffer.h"
 #include "CellWidth.h"
