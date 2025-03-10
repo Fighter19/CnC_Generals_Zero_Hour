@@ -24,7 +24,7 @@
 
 #ifndef __forceinline
 #if defined __has_attribute && __has_attribute(always_inline)
-#define __forceinline __attribute__((always_inline))
+#define __forceinline __attribute__((always_inline)) inline
 #else
 #define __forceinline inline
 #endif
@@ -52,8 +52,10 @@ static inline uint32_t _lrotl(uint32_t value, int shift)
 #endif
 
 // Copied from windows_base.h from DXVK-Native
+#ifndef MAKE_HRESULT
 #define MAKE_HRESULT(sev, fac, code) \
 	((HRESULT)(((unsigned long)(sev) << 31) | ((unsigned long)(fac) << 16) | ((unsigned long)(code))))
+#endif
 
 #ifndef _MAX_PATH
 #define _MAX_PATH 1024

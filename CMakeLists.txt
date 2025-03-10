@@ -43,8 +43,8 @@ if(SAGE_USE_GAMESPY)
   set(GS_OPENSSL FALSE)
   FetchContent_Declare(
       gamespy
-      GIT_REPOSITORY https://github.com/TheAssemblyArmada/GamespySDK.git
-      GIT_TAG        d7ec6d4fea1c11fc37173ea954fc1ec47202a931
+      GIT_REPOSITORY https://github.com/feliwir/GamespySDK.git
+      GIT_TAG        582c79105aa851c5aa847f638722f61195b79c9b
   )
   FetchContent_MakeAvailable(gamespy)
 endif()
@@ -52,8 +52,8 @@ endif()
 if(SAGE_USE_MILES)
   FetchContent_Declare(
     miles
-    GIT_REPOSITORY https://github.com/TheSuperHackers/miles-sdk-stub.git
-    GIT_TAG master)
+    GIT_REPOSITORY https://github.com/feliwir/miles-sdk-stub.git
+    GIT_TAG 680e6cb112cbf407d5a69bc984c40bfab032ada9)
   FetchContent_MakeAvailable(miles)
 endif()
 

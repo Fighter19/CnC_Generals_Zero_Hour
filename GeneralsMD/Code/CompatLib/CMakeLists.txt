@@ -18,6 +18,11 @@ target_include_directories(CompatLib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/Include
 )
 
+find_package(glm REQUIRED)
+target_link_libraries(CompatLib PRIVATE
+    glm::glm
+)
+
 # add_subdirectory(d3dx9_36)
 
 # set(SOURCE_DX_COMPAT
@@ -38,8 +43,9 @@ target_include_directories(CompatLib PUBLIC
 
 # Add an empty library and link it to libdxvk_d3d8.so.0
 add_library(d3d8lib INTERFACE)
+find_package(glm REQUIRED)
 target_link_libraries(d3d8lib INTERFACE
-    dxvk_d3d8
+    dxvk_d3d8 glm::glm
 )
 
 # Search library in dxvk-native folder

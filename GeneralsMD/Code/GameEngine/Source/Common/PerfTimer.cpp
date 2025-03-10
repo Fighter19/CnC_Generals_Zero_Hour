@@ -49,7 +49,7 @@ __forceinline void ProfileGetTime(int64_t &t)
     pop edx
     pop eax
   };
-#else
+#elif __has_builtin (__builtin_readcyclecounter)
 	// This is probably only supported by Clang, but is portable otherwise
 	t = __builtin_readcyclecounter();
 #endif

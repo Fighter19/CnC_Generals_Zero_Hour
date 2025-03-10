@@ -26,8 +26,13 @@ typedef uint32_t UINT;
 typedef int32_t *LPARAM;
 typedef size_t WPARAM;
 
+#ifndef FALSE
 #define FALSE 0
+#endif
+
+#ifndef TRUE
 #define TRUE 1
+#endif
 
 #define S_OK 0
 

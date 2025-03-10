@@ -70,6 +70,7 @@
 
 // USER INCLUDES //////////////////////////////////////////////////////////////
 
+#include "always.h"
 #include "Lib/BaseType.h"
 #include "Common/Debug.h"
 #include "Common/Errors.h"
