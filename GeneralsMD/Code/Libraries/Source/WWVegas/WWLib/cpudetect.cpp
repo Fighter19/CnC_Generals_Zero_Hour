@@ -135,7 +135,11 @@ static unsigned Calculate_Processor_Speed(int64_t& ticks_per_second)
 		unsigned timer1_l;
 	} Time;
 
-#ifdef WIN32
+#ifdef __clang__
+	uint64_t timer0 = __builtin_readcyclecounter();
+	Time.timer0_h = (unsigned)(timer0 >> 32);
+	Time.timer0_l = (unsigned)timer0;
+#elif defined(WIN32)
    __asm {
       ASM_RDTSC;
       mov Time.timer0_h, eax
@@ -150,7 +154,11 @@ static unsigned Calculate_Processor_Speed(int64_t& ticks_per_second)
 	unsigned start=TIMEGETTIME();
 	unsigned elapsed;
 	while ((elapsed=TIMEGETTIME()-start)<200) {
-#ifdef WIN32
+#ifdef __clang__
+		uint64_t timer1 = __builtin_readcyclecounter();
+		Time.timer1_h = (unsigned)(timer1 >> 32);
+		Time.timer1_l = (unsigned)timer1;
+#elif defined(WIN32)
       __asm {
          ASM_RDTSC;
          mov Time.timer1_h, eax
