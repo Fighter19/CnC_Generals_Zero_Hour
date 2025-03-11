@@ -105,7 +105,7 @@ void* AudioFileCache::openFile(AsciiString& filename)
 	// Couldn't find the file, so actually open it.
 	File* file = TheFileSystem->openFile(filename.str());
 	if (!file) {
-		DEBUG_ASSERTLOG(strToFind.isEmpty(), ("Missing Audio File: '%s'\n", strToFind.str()));
+		DEBUG_ASSERTLOG(filename.isEmpty(), ("Missing Audio File: '%s'\n", filename.str()));
 		return NULL;
 	}
 
@@ -182,7 +182,6 @@ void* AudioFileCache::openFile(AudioEventRTS* eventToOpenFrom)
 	}
 
 	UnsignedInt fileSize = file->size();
-	char* buffer = file->readEntireAndClose();
 
 	OpenAudioFile openedAudioFile;
 	openedAudioFile.m_file = static_cast<uint8_t*>(av_malloc(sizeof(WavHeader)));
@@ -199,7 +198,6 @@ void* AudioFileCache::openFile(AudioEventRTS* eventToOpenFrom)
 	if (eventToOpenFrom->isPositionalAudio()) {
 		if (openedAudioFile.m_ffmpegFile->getNumChannels() > 1) {
 			DEBUG_CRASH(("Requested Positional Play of audio '%s', but it is in stereo.", strToFind.str()));
-			delete[] buffer;
 			return NULL;
 		}
 	}

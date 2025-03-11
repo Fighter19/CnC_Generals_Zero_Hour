@@ -54,7 +54,6 @@
 #include "Common/GameSounds.h"
 #include "Common/CRCDebug.h"
 #include "Common/GlobalData.h"
-#include "Common/ScopedMutex.h"
 
 #include "GameClient/DebugDisplay.h"
 #include "GameClient/Drawable.h"
@@ -128,7 +127,7 @@ void OpenALAudioManager::audioDebugDisplay(DebugDisplayInterface* dd, void*, FIL
 
 	static char buffer[128] = { 0 };
 	if (buffer[0] == 0) {
-		AIL_MSS_version(buffer, 128);
+        strncpy(buffer, alGetString(AL_VERSION), sizeof(buffer));
 	}
 
 	Coord3D lookPos;
@@ -140,22 +139,13 @@ void OpenALAudioManager::audioDebugDisplay(DebugDisplayInterface* dd, void*, FIL
 
 	Int now = TheGameLogic->getFrame();
 	static Int lastCheck = now;
-	const Int frames = 60;
+	//const Int frames = 60;
 	static Int latency = 0;
 	static Int worstLatency = 0;
-	if (lastCheck + frames <= now)
-	{
-		latency = AIL_get_timer_highest_delay();
-		if (latency > worstLatency)
-		{
-			worstLatency = latency;
-		}
-		lastCheck = now;
-	}
 
 	if (dd)
 	{
-		dd->printf("Miles Sound System version: %s    ", buffer);
+		dd->printf("OpenAL version: %s    ", buffer);
 		dd->printf("Memory Usage : %d/%d\n", m_audioCache->getCurrentlyUsedSize(), m_audioCache->getMaxSize());
 		dd->printf("Sound: %s    ", (isOn(AudioAffect_Sound) ? "Yes" : "No"));
 		dd->printf("3DSound: %s    ", (isOn(AudioAffect_Sound3D) ? "Yes" : "No"));
@@ -164,7 +154,7 @@ void OpenALAudioManager::audioDebugDisplay(DebugDisplayInterface* dd, void*, FIL
 		dd->printf("Channels Available: ");
 		dd->printf("%d Sounds    ", m_sound->getAvailableSamples());
 
-		dd->printf("%d(%d) 3D Sounds\n", m_sound->getAvailable3DSamples(), m_available3DSamples.size());
+		dd->printf("%d 3D Sounds\n", m_sound->getAvailable3DSamples());
 		dd->printf("Volume: ");
 		dd->printf("Sound: %d    ", REAL_TO_INT(m_soundVolume * 100.0f));
 		dd->printf("3DSound: %d    ", REAL_TO_INT(m_sound3DVolume * 100.0f));
@@ -226,14 +216,6 @@ void OpenALAudioManager::audioDebugDisplay(DebugDisplayInterface* dd, void*, FIL
 	{
 		dd->printf("-----------------------------------------------------Sounds\n");
 		channelCount = TheAudio->getNum2DSamples();
-		for (it = m_playingSounds.begin(); it != m_playingSounds.end(); ++it) {
-			playing = *it;
-			if (!playing) {
-				continue;
-			}
-
-			playingArray[AIL_sample_user_data(playing->m_sample, 0)] = playing;
-		}
 
 		for (Int i = 1; i <= maxChannels && i <= channelCount; ++i) {
 			playing = playingArray[i];
@@ -287,14 +269,6 @@ void OpenALAudioManager::audioDebugDisplay(DebugDisplayInterface* dd, void*, FIL
 	{
 		dd->printf("--------------------------------------------------3D Sounds\n");
 		channelCount = TheAudio->getNum3DSamples();
-		for (it = m_playing3DSounds.begin(); it != m_playing3DSounds.end(); ++it) {
-			playing = *it;
-			if (!playing) {
-				continue;
-			}
-
-			playingArray[AIL_3D_user_data(playing->m_3DSample, 0)] = playing;
-		}
 
 		for (Int i = 1; i <= maxChannels && i <= channelCount; ++i)
 		{
@@ -442,7 +416,7 @@ Bool OpenALAudioManager::checkALError()
 	if (errorCode != 0) {
 #ifndef NDEBUG
 		auto errorMsg = alGetString(errorCode);
-		DEBUG_ASSERTLOG("OpenAL error: %s", errorMsg);
+		DEBUG_ASSERTLOG(("OpenAL error: %s", errorMsg));
 #endif
 		return false;
 	}
@@ -458,7 +432,7 @@ Bool OpenALAudioManager::checkALCError()
 	if (errorCode != 0) {
 #ifndef NDEBUG
 		auto errorMsg = alcGetString(m_alcDevice, errorCode);
-		DEBUG_ASSERTLOG("ALC error: %s", errorMsg);
+		DEBUG_ASSERTLOG(("ALC error: %s", errorMsg));
 #endif
 		return false;
 	}
@@ -480,7 +454,7 @@ ALenum OpenALAudioManager::getALFormat(uint8_t channels, uint8_t bitsPerSample)
 	if (channels == 2 && bitsPerSample == 32)
 		return AL_FORMAT_STEREO_FLOAT32;
 
-	DEBUG_LOG(("Unknown OpenAL format: %i channels, %i bits per sample", channels, bits_per_sample));
+	DEBUG_LOG(("Unknown OpenAL format: %i channels, %i bits per sample", channels, bitsPerSample));
 	return AL_FORMAT_MONO8;
 }
 
@@ -2810,9 +2784,9 @@ void* OpenALAudioManager::playSample(AudioEventRTS* event, PlayingAudio* audio)
 		AudioFileCache::getWaveData(fileBuffer, data, size, freq, channels, bitPerSample);
 #endif
 		alGenBuffers(1, &audio->m_buffer);
-		DEBUG_ASSERTLOG(Check_AL_Error(), "Failed to generate buffer");
+		DEBUG_ASSERTLOG(checkALError(), ("Failed to generate buffer"));
 		alBufferData(audio->m_buffer, getALFormat(channels, bitPerSample), data, size, freq);
-		DEBUG_ASSERTLOG(Check_AL_Error(), "Failed to buffer data");
+        DEBUG_ASSERTLOG(checkALError(), ("Failed to buffer data"));
 		alSourcei(audio->m_source, AL_BUFFER, audio->m_buffer);
 		alSourcePlay(audio->m_source);
 	}

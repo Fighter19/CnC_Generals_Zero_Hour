@@ -4,21 +4,19 @@
 #include "Common/AudioEventRTS.h"
 #include "Common/File.h"
 #include "Common/FileSystem.h"
-#include "Common/ScopedMutex.h"
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 AudioFileCache::AudioFileCache() : m_maxSize(0), m_currentlyUsedSize(0), m_mutexName("AudioFileCacheMutex")
 {
-	m_mutex = CreateMutex(NULL, FALSE, m_mutexName);
 }
 
 //-------------------------------------------------------------------------------------------------
 AudioFileCache::~AudioFileCache()
 {
 	{
-		ScopedMutex mut(m_mutex);
+		std::lock_guard mut(m_mutex);
 
 		// Free all the samples that are open.
 		OpenFilesHashIt it;
@@ -32,15 +30,13 @@ AudioFileCache::~AudioFileCache()
 			// we're about to go away anyways.
 		}
 	}
-
-	CloseHandle(m_mutex);
 }
 
 //-------------------------------------------------------------------------------------------------
 void *AudioFileCache::openFile( AudioEventRTS *eventToOpenFrom )
 {
 	// Protect the entire openFile function
-	ScopedMutex mut(m_mutex);
+	std::lock_guard mut(m_mutex);
 
 	AsciiString strToFind;
 	switch (eventToOpenFrom->getNextPlayPortion())
@@ -135,7 +131,7 @@ void AudioFileCache::closeFile( void *fileToClose )
 	}
 
 	// Protect the entire closeFile function
-	ScopedMutex mut(m_mutex);
+	std::lock_guard mut(m_mutex);
 
 	OpenFilesHash::iterator it;
 	for ( it = m_openFiles.begin(); it != m_openFiles.end(); ++it ) {
@@ -150,7 +146,7 @@ void AudioFileCache::closeFile( void *fileToClose )
 void AudioFileCache::setMaxSize( UnsignedInt size )
 {
 	// Protect the function, in case we're trying to use this value elsewhere.
-	ScopedMutex mut(m_mutex);
+	std::lock_guard mut(m_mutex);
 
 	m_maxSize = size;
 }
