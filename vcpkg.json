@@ -9,6 +9,7 @@
     "gli",
     "openal-soft",
     "ffmpeg",
-    "gtest"
+    "gtest",
+    "sdl3"
   ]
 }

@@ -6,6 +6,7 @@ project(
 
 # Required for filesystem
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(CMakeDependentOption)
 option(SAGE_BUILD_GENERALS "Build the C&C Generals game" OFF)
@@ -17,6 +18,7 @@ option(SAGE_USE_MILES "Use Miles Sound System" ON)
 option(SAGE_USE_ZLIB "Use ZLib" ON)
 option(SAGE_USE_LZHL "Use LZH-Light" ON)
 option(SAGE_USE_GLM "Use GLM math library" OFF)
+option(SAGE_USE_SDL3 "Use SDL3" OFF)
 option(SAGE_USE_FFMPEG "Use FFmpeg" ON)
 option(SAGE_USE_UBSAN "Use UBSan" OFF)
 option(SAGE_USE_ASAN "Use ASan" OFF)
@@ -39,6 +41,7 @@ message(STATUS "Using OpenAL: ${SAGE_USE_OPENAL}")
 message(STATUS "Using GLM: ${SAGE_USE_GLM}")
 message(STATUS "Using UBSan: ${SAGE_USE_UBSAN}")
 message(STATUS "Using ASan: ${SAGE_USE_ASAN}")
+message(STATUS "Using SDL3: ${SAGE_USE_SDL3}")
 
 if(SAGE_USE_ASAN)
   if(MSVC)

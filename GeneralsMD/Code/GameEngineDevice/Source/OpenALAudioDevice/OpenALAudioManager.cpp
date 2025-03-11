@@ -96,7 +96,7 @@ OpenALAudioManager::OpenALAudioManager() :
 //-------------------------------------------------------------------------------------------------
 OpenALAudioManager::~OpenALAudioManager()
 {
-	DEBUG_ASSERTCRASH(m_binkHandle == NULL, ("Leaked a Bink handle. Chuybregts"));
+	DEBUG_ASSERTCRASH(m_binkAudio == NULL, ("Leaked a Bink handle. Chuybregts"));
 	releaseHandleForBink();
 	closeDevice();
 	delete m_audioCache;

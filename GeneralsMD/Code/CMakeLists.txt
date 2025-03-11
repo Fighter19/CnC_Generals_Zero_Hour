@@ -25,6 +25,15 @@ if(WIN32)
             ".*system32/.*\.dll" # windows system dlls
         RUNTIME DESTINATION .
     )
+elseif(SAGE_USE_SDL3)
+    add_executable(RTS Main/SDL3Main.cpp)
+
+    target_include_directories(RTS PRIVATE
+        ${CMAKE_SOURCE_DIR}/extern/dxvk-native/usr/include/dxvk
+    )
+
+    find_package(SDL3 REQUIRED)
+    target_link_libraries(RTS GameEngine GameEngineDevice SDL3::SDL3)
 endif()
 
 if(SAGE_BUILD_TOOLS)
