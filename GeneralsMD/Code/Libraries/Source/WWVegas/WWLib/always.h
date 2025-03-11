@@ -42,6 +42,7 @@
 
 #include <assert.h>
 
+// New needs to be included first to avoid collision with headers when building with Clang
 #include <new>
 #ifndef _WIN32
 #include "windows_compat.h"

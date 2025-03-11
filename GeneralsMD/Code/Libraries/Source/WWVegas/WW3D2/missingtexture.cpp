@@ -61,7 +61,7 @@ void MissingTexture::_Init()
 {
 	WWASSERT(!_MissingTexture);
 
-#if defined(_WIN64) || defined(__x86_64__)
+#if defined (_WIN64) || defined(__LP64__)
 	static_assert(offsetof(D3DLOCKED_RECT, pBits) == 8, "D3DLOCKED_RECT_TEST and D3DLOCKED_RECT are not compatible");
 #else
 	static_assert(offsetof(D3DLOCKED_RECT, pBits) == 4, "D3DLOCKED_RECT_TEST and D3DLOCKED_RECT are not compatible");
