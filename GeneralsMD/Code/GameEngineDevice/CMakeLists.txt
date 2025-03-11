@@ -22,16 +22,16 @@ file(GLOB_RECURSE SOURCES_WIN32Device
 )
 endif()
 
-if(UNIX)
-    file(GLOB_RECURSE SOURCES_UNIXDevice
-        ${CMAKE_CURRENT_SOURCE_DIR}/Source/UnixDevice/*.cpp
+if(SAGE_USE_SDL3)
+    file(GLOB_RECURSE SOURCES_SDL3Device
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source/SDL3Device/*.cpp
     )
 endif()
 
 add_library(GameEngineDevice STATIC 
     ${SOURCES_W3DDevice} 
     ${SOURCES_WIN32Device}
-    ${SOURCES_UNIXDevice}
+    ${SOURCES_SDL3Device}
     ${SOURCES_MILES}
     ${SOURCES_BINK}
 )

@@ -6,6 +6,7 @@ project(
 
 # Required for filesystem
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(SAGE_BUILD_GENERALS "Build the C&C Generals game" OFF)
 option(SAGE_BUILD_ZEROHOUR "Build the C&C Generals Zero Hour game" ON)
@@ -15,6 +16,7 @@ option(SAGE_USE_MILES "Use Miles Sound System" ON)
 option(SAGE_USE_ZLIB "Use ZLib" ON)
 option(SAGE_USE_LZHL "Use LZH-Light" ON)
 option(SAGE_USE_GLM "Use GLM math library" OFF)
+option(SAGE_USE_SDL3 "Use SDL3" OFF)
 include(CMakeDependentOption)
 cmake_dependent_option(SAGE_USE_BINK "Use Bink Video Library" ON "WIN32" OFF)
 cmake_dependent_option(SAGE_USE_DX8 "Use DirectX 8" ON "WIN32" OFF)
@@ -27,6 +29,8 @@ message(STATUS "Using Miles: ${SAGE_USE_MILES}")
 message(STATUS "Using DirectX 8: ${SAGE_USE_DX8}")
 message(STATUS "Using ZLib: ${SAGE_USE_ZLIB}")
 message(STATUS "Using LZH-Light: ${SAGE_USE_LZHL}")
+message(STATUS "Using GLM: ${SAGE_USE_GLM}")
+message(STATUS "Using SDL3: ${SAGE_USE_SDL3}")
 
 include_directories(${CMAKE_SOURCE_DIR}/extern/dxvk-native/usr/include/dxvk)
 

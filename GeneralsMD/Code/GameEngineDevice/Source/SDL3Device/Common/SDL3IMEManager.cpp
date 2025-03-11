@@ -1,13 +1,13 @@
 #include "GameClient/IMEManager.h"
 
-class UnixIMEManager : public IMEManagerInterface
+class SDL3IMEManager : public IMEManagerInterface
 {
 public:
-  UnixIMEManager()
+  SDL3IMEManager()
   {
   }
 
-  virtual ~UnixIMEManager() override
+  virtual ~SDL3IMEManager() override
   {
   }
 
@@ -102,5 +102,5 @@ public:
 IMEManagerInterface *TheIMEManager = NULL;
 IMEManagerInterface *CreateIMEManagerInterface(void)
 {
-  return NEW UnixIMEManager;
+  return NEW SDL3IMEManager;
 }

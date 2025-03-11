@@ -2,20 +2,20 @@
 
 #include "Common/CDManager.h"
 
-class UnixCDDrive : public CDDrive
+class SDL3CDDrive : public CDDrive
 {
 public:
-  UnixCDDrive();
-  virtual ~UnixCDDrive() override;
+  SDL3CDDrive();
+  virtual ~SDL3CDDrive() override;
 
   virtual void refreshInfo(void) override;
 };
 
-class UnixCDManager : public CDManager
+class SDL3CDManager : public CDManager
 {
 public:
-  UnixCDManager();
-  virtual ~UnixCDManager() override;
+  SDL3CDManager();
+  virtual ~SDL3CDManager() override;
 
   // sub system operations
   virtual void init(void) override;

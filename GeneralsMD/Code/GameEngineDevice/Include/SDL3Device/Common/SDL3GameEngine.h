@@ -1,12 +1,22 @@
 #pragma once
 
 #include "Common/GameEngine.h"
+#include "GameLogic/GameLogic.h"
+#include "GameNetwork/NetworkInterface.h"
+#include "W3DDevice/Common/W3DModuleFactory.h"
+#include "W3DDevice/GameLogic/W3DGameLogic.h"
+#include "W3DDevice/GameClient/W3DGameClient.h"
+#include "W3DDevice/GameClient/W3DWebBrowser.h"
+#include "W3DDevice/Common/W3DFunctionLexicon.h"
+#include "W3DDevice/Common/W3DRadar.h"
+#include "W3DDevice/Common/W3DFunctionLexicon.h"
+#include "W3DDevice/Common/W3DThingFactory.h"
 
-class UnixGameEngine : public GameEngine
+class SDL3GameEngine : public GameEngine
 {
 public:
-  UnixGameEngine();
-  virtual ~UnixGameEngine() override;
+  SDL3GameEngine();
+  virtual ~SDL3GameEngine() override;
 
   virtual void init(void) override;
   virtual void reset(void) override;

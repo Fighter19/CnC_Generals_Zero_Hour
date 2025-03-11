@@ -1,4 +1,4 @@
-#include "UnixDevice/Common/UnixCDManager.h"
+#include "SDL3Device/Common/SDL3CDManager.h"
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <linux/cdrom.h>
@@ -6,19 +6,19 @@
 
 CDManagerInterface* CreateCDManager( void )
 {
-  return NEW UnixCDManager;
+  return NEW SDL3CDManager;
 }
 
 
-UnixCDDrive::UnixCDDrive()
+SDL3CDDrive::SDL3CDDrive()
 {
 }
 
-UnixCDDrive::~UnixCDDrive()
+SDL3CDDrive::~SDL3CDDrive()
 {
 }
 
-void UnixCDDrive::refreshInfo(void)
+void SDL3CDDrive::refreshInfo(void)
 {
   // For the given drive path, determine the disk name and ID
   m_disk = CD::NO_DISK;
@@ -35,14 +35,14 @@ void UnixCDDrive::refreshInfo(void)
 }
 
 
-UnixCDManager::UnixCDManager()
+SDL3CDManager::SDL3CDManager()
 {
 }
-UnixCDManager::~UnixCDManager()
+SDL3CDManager::~SDL3CDManager()
 {
 }
 
-void UnixCDManager::init(void)
+void SDL3CDManager::init(void)
 {
   CDManager::init();
   destroyAllDrives();
@@ -62,22 +62,22 @@ void UnixCDManager::init(void)
   refreshDrives();
 }
 
-void UnixCDManager::update(void)
+void SDL3CDManager::update(void)
 {
   CDManager::update();
 }
 
-void UnixCDManager::reset(void)
+void SDL3CDManager::reset(void)
 {
   CDManager::reset();
 }
 
-void UnixCDManager::refreshDrives(void)
+void SDL3CDManager::refreshDrives(void)
 {
   CDManager::refreshDrives();
 }
 
-CDDriveInterface* UnixCDManager::createDrive(void)
+CDDriveInterface* SDL3CDManager::createDrive(void)
 {
-  return NEW UnixCDDrive;
+  return NEW SDL3CDDrive;
 }

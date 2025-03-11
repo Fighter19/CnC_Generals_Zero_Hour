@@ -1098,7 +1098,6 @@ Int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	TheMemoryPoolCriticalSection = NULL;
 
 	return 0;
-
 }  // end WinMain
 
 // CreateGameEngine ===========================================================
