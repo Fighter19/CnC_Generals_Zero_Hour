@@ -100,7 +100,7 @@ ParticleEmitterClass::ParticleEmitterClass(float emit_rate, unsigned int burst_s
 	ParticlesLeft(max_particles),
 	MaxParticles(max_particles),
 	IsComplete(false),
-	NameString(::strdup ("ParticleEmitter")),
+	NameString(::_strdup ("ParticleEmitter")),
 	UserString(NULL),
 	RemoveOnComplete(DefaultRemoveOnComplete),
 	IsInScene(false),
@@ -146,8 +146,8 @@ ParticleEmitterClass::ParticleEmitterClass(const ParticleEmitterClass & src) :
 	ParticlesLeft(src.ParticlesLeft),
 	MaxParticles(src.MaxParticles),
 	IsComplete(false),
-	NameString(::strdup (src.NameString)),
-	UserString(::strdup (src.UserString)),
+	NameString(::_strdup (src.NameString)),
+	UserString(::_strdup (src.UserString)),
 	RemoveOnComplete(src.RemoveOnComplete),
 	IsInScene(false),
 	GroupID(0),
@@ -856,7 +856,7 @@ ParticleEmitterClass::Set_Name (const char *pname)
 	}
 
 	// Copy the provided name
-	NameString = ::strdup (pname);
+	NameString = ::_strdup (pname);
 	return ;
 }
 

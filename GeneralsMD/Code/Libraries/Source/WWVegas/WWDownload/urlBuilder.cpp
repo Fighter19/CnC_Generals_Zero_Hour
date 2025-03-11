@@ -37,13 +37,13 @@ void FormatURLFromRegistry( std::string& gamePatchURL, std::string& mapPatchURL,
 	GetUnsignedIntFromRegistry("", "MapPackVersion", mapVersion);
 
 	char buf[256];
-	snprintf(buf, 256, "%s%s-%d.txt", baseURL.c_str(), language.c_str(), version);
+	_snprintf(buf, 256, "%s%s-%d.txt", baseURL.c_str(), language.c_str(), version);
 	gamePatchURL = buf;
-	snprintf(buf, 256, "%smaps-%d.txt", baseURL.c_str(), mapVersion);
+	_snprintf(buf, 256, "%smaps-%d.txt", baseURL.c_str(), mapVersion);
 	mapPatchURL = buf;
-	snprintf(buf, 256, "%sconfig.txt", baseURL.c_str());
+	_snprintf(buf, 256, "%sconfig.txt", baseURL.c_str());
 	configURL = buf;
-	snprintf(buf, 256, "%sMOTD-%s.txt", baseURL.c_str(), language.c_str());
+	_snprintf(buf, 256, "%sMOTD-%s.txt", baseURL.c_str(), language.c_str());
 	motdURL = buf;
 }
 

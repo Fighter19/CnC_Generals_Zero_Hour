@@ -290,8 +290,8 @@ HRESULT CDownload::PumpMessages()
 			//   never ever change so this is not a concern.
 			//
 			// We identify patches because they are written into the patches folder.
-			struct stat statdata;
-			if (	(stat(m_LocalFile, &statdata) == 0) && 
+			struct _stat statdata;
+			if (	(_stat(m_LocalFile, &statdata) == 0) && 
 					(statdata.st_size == m_FileSize) && 
 					(_strnicmp(m_LocalFile, "patches\\", strlen("patches\\"))==0)) {
 				// OK, no need to download this again....

@@ -359,13 +359,13 @@ AggregateDefClass::Load_Assets (const char *passet_name)
 		::GetCurrentDirectory (sizeof (path), path);
 
 		// Ensure the path is directory delimited
-		if (path[::strlen(path)-1] != '\\') {
-			::strcat (path, "\\");
+		if (path[::lstrlen(path)-1] != '\\') {
+			::lstrcat (path, "\\");
 		}
 
 		// Assume the filename is simply the "asset name" + the w3d extension
-		::strcat (path, passet_name);
-		::strcat (path, ".w3d");
+		::lstrcat (path, passet_name);
+		::lstrcat (path, ".w3d");
 
 		// If the file exists, then load it into the asset manager.
 		if (::GetFileAttributes (path) != 0xFFFFFFFF) {
@@ -401,7 +401,7 @@ AggregateDefClass::Initialize (RenderObjClass &base_model)
 	orig_model_name = (orig_model_name == NULL) ? base_model.Get_Name () : orig_model_name;
 
 	// Record information about this base model
-	::strcpy (m_Info.BaseModelName, orig_model_name);
+	::lstrcpy (m_Info.BaseModelName, orig_model_name);
 	m_Info.SubobjectCount = 0;
 	m_MiscInfo.OriginalClassID = base_model.Class_ID ();
 	m_MiscInfo.Flags = 0;	
@@ -481,8 +481,8 @@ AggregateDefClass::Build_Subobject_List
 					 (Is_Object_In_List (prototype_name, orig_node_list) == false)) {
 					
 					// Add this subobject to our list
-					::strcpy (subobj_info.SubobjectName, prototype_name);
-					::strcpy (subobj_info.BoneName, pbone_name);
+					::lstrcpy (subobj_info.SubobjectName, prototype_name);
+					::lstrcpy (subobj_info.BoneName, pbone_name);
 					Add_Subobject (subobj_info);
 					m_Info.SubobjectCount ++;
 
@@ -607,7 +607,7 @@ AggregateDefClass::Read_Header (ChunkLoadClass &chunk_load)
 	if (chunk_load.Read (&header, sizeof (header)) == sizeof (header)) {
 
 		// Copy the name from the header structure
-		m_pName = ::strdup (header.Name);
+		m_pName = ::_strdup (header.Name);
 		m_Version = header.Version;
 
 		// Success!
@@ -686,8 +686,8 @@ AggregateDefClass::Add_Subobject (const W3dAggregateSubobjectStruct &subobj_info
 {
 	// Create a new structure and copy the contents of the src
 	W3dAggregateSubobjectStruct *pnew_entry = W3DNEW W3dAggregateSubobjectStruct;
-	::strcpy (pnew_entry->SubobjectName, subobj_info.SubobjectName);
-	::strcpy (pnew_entry->BoneName, subobj_info.BoneName);
+	::lstrcpy (pnew_entry->SubobjectName, subobj_info.SubobjectName);
+	::lstrcpy (pnew_entry->BoneName, subobj_info.BoneName);
 
 	// Add this new entry to the list
 	m_SubobjectList.Add (pnew_entry);
@@ -765,7 +765,7 @@ AggregateDefClass::Save_Header (ChunkSaveClass &chunk_save)
 		// Fill the header structure
 		W3dAggregateHeaderStruct header = { 0 };
 		header.Version = W3D_CURRENT_AGGREGATE_VERSION;
-		::strncpy (header.Name, m_pName, sizeof (header.Name));
+		::lstrcpyn (header.Name, m_pName, sizeof (header.Name));
 		header.Name[sizeof (header.Name) - 1] = 0;
 
 		// Write the header out to the chunk

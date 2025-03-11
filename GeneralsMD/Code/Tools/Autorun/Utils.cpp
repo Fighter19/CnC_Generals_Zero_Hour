@@ -104,7 +104,7 @@ void Fix_Single_Ampersands ( LPSTR pszString, bool upper_case )
 	char *	letter;
 	int		i = 0;
 
-	strcpy((LPSTR)pszOld, (LPSTR)pszString );
+	lstrcpy((LPSTR)pszOld, (LPSTR)pszString );
 	letter = pszOld;
 	memset ( pszTemp, '\0', MAX_PATH );
 
@@ -207,7 +207,7 @@ void Fix_Double_Ampersands ( LPSTR pszString, bool upper_case )
 	char *letter;
 	int  i = 0;
 
-	strcpy( (LPSTR)pszOld, (LPSTR)pszString );
+	lstrcpy( (LPSTR)pszOld, (LPSTR)pszString );
 	letter = pszOld;
 	memset ( pszTemp, '\0', MAX_PATH );
 
