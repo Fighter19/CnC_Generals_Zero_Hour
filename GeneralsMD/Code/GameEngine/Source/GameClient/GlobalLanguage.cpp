@@ -58,7 +58,7 @@
 #include "Common/FileSystem.h"
 
 #ifndef _WIN32
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #endif
 
 //-----------------------------------------------------------------------------
@@ -176,7 +176,7 @@ void GlobalLanguage::init( void )
 	}
 #else
 	INI ini;
-	boost::filesystem::path languageIni("Data");
+	std::filesystem::path languageIni("Data");
 	languageIni /= GetRegistryLanguage().str();
 	languageIni /= "Language.ini";
 	ini.load(languageIni.string().c_str(), INI_LOAD_OVERWRITE, NULL);

@@ -60,7 +60,7 @@
 #include "GameLogic/TerrainLogic.h"
 
 #ifndef _WIN32
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #endif
 
 #ifdef _INTERNAL
@@ -564,7 +564,7 @@ AsciiString GameState::findNextSaveFilename( UnicodeString desc )
 			if( _access( fullPath.str(), 0 ) == -1 )
 				return filename;
 #else
-			if( boost::filesystem::exists(fullPath.str()) == FALSE )
+			if( std::filesystem::exists(fullPath.str()) == FALSE )
 				return filename;
 #endif
 
@@ -615,7 +615,7 @@ SaveCode GameState::saveGame( AsciiString filename, UnicodeString desc,
 #ifdef _WIN32
 	CreateDirectory(getSaveDirectory().str(), NULL);
 #else
-	boost::filesystem::create_directory(getSaveDirectory().str());
+	std::filesystem::create_directory(getSaveDirectory().str());
 #endif
 
 	// construct path to file
@@ -1377,10 +1377,10 @@ void GameState::iterateSaveFiles( IterateSaveFileCallback callback, void *userDa
 	SetCurrentDirectory( currentDirectory );
 #else
 	// iterate all items in the directory
-	boost::filesystem::directory_iterator end_itr;
-	for (boost::filesystem::directory_iterator itr(getSaveDirectory().str()); itr != end_itr; ++itr)
+	std::filesystem::directory_iterator end_itr;
+	for (std::filesystem::directory_iterator itr(getSaveDirectory().str()); itr != end_itr; ++itr)
 	{
-		if (boost::filesystem::is_regular_file(itr->status()))
+		if (std::filesystem::is_regular_file(itr->status()))
 		{
 			// see if this is a file, and therefore a possible save file
 			AsciiString filename = itr->path().filename().c_str();

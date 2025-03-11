@@ -49,7 +49,7 @@
 #include "GameClient/GameWindowTransitions.h"
 
 #ifndef _WIN32
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #endif
 
 #ifdef _INTERNAL
@@ -643,12 +643,12 @@ void deleteReplay( void )
 		MessageBoxOk(TheGameText->fetch("GUI:Error"),errorStr, NULL);
 	}
 #else
-	boost::filesystem::path replayPath(filename.str());
+	std::filesystem::path replayPath(filename.str());
 	try
 	{
-		boost::filesystem::remove(replayPath);
+		std::filesystem::remove(replayPath);
 	}
-	catch (boost::filesystem::filesystem_error &e)
+	catch (std::filesystem::filesystem_error &e)
 	{
 		UnicodeString errorStr;
 		errorStr.translate(e.what());
@@ -696,22 +696,22 @@ void copyReplay( void )
 	}
 #else
 	// More or less defacto standard for implementors of the XDG standard
-	boost::filesystem::path newFilename;
+	std::filesystem::path newFilename;
 	const char *xdgDesktopDir = getenv("XDG_DESKTOP_DIR");
 	if (xdgDesktopDir)
 	{
-		newFilename = boost::filesystem::path(xdgDesktopDir);
+		newFilename = std::filesystem::path(xdgDesktopDir);
 	}
 	else
 	{
-		newFilename = boost::filesystem::path(getenv("HOME")) / "Desktop";
+		newFilename = std::filesystem::path(getenv("HOME")) / "Desktop";
 	}
 	newFilename /= translate.str();
 	try
 	{
-		boost::filesystem::copy_file(filename.str(), newFilename.string());
+		std::filesystem::copy_file(filename.str(), newFilename.string());
 	}
-	catch (boost::filesystem::filesystem_error &e)
+	catch (std::filesystem::filesystem_error &e)
 	{
 		UnicodeString errorStr;
 		errorStr.translate(e.what());

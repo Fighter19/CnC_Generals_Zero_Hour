@@ -43,7 +43,7 @@
 #include "GameNetwork/GameInfo.h"
 
 #ifndef _WIN32
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #endif
 
 // GLOBALS ////////////////////////////////////////////////////////////////////////////////////////
@@ -528,15 +528,15 @@ void GameStateMap::clearScratchPadMaps( void )
 	// restore our directory to the current directory
 	SetCurrentDirectory( currentDirectory );
 #else
-	boost::filesystem::path saveDir = TheGameState->getSaveDirectory().str();
-	boost::filesystem::directory_iterator end_itr;
-	for( boost::filesystem::directory_iterator itr( saveDir ); itr != end_itr; ++itr )
+	std::filesystem::path saveDir = TheGameState->getSaveDirectory().str();
+	std::filesystem::directory_iterator end_itr;
+	for( std::filesystem::directory_iterator itr( saveDir ); itr != end_itr; ++itr )
 	{
-		if( boost::filesystem::is_regular_file( *itr ) )
+		if( std::filesystem::is_regular_file( *itr ) )
 		{
-			if( boost::filesystem::extension( *itr ) == ".map" )
+			if( std::filesystem::path( *itr ).extension() == ".map" )
 			{
-				boost::filesystem::remove( *itr );
+				std::filesystem::remove( *itr );
 			}
 		}
 	}

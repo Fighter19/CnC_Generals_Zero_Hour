@@ -56,7 +56,7 @@
 #include "GameNetwork/FirewallHelper.h"
 
 #ifndef _WIN32
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #endif
 
 // PUBLIC DATA ////////////////////////////////////////////////////////////////////////////////////
@@ -1086,13 +1086,13 @@ GlobalData::GlobalData()
   }
 #else
 	// Get the user data directory according to the XDG Base Directory Specification
-	boost::filesystem::path userDataDir;
+	std::filesystem::path userDataDir;
 	const char* xdgDataHome = getenv("XDG_DATA_HOME");
 	if (xdgDataHome)
-		userDataDir = boost::filesystem::path(xdgDataHome);
+		userDataDir = std::filesystem::path(xdgDataHome);
 	else
-		userDataDir = boost::filesystem::path(getenv("HOME")) / ".local" / "share" / "generals_zh";
-	boost::filesystem::create_directories(userDataDir);
+		userDataDir = std::filesystem::path(getenv("HOME")) / ".local" / "share" / "generals_zh";
+	std::filesystem::create_directories(userDataDir);
 	m_userDataDir = userDataDir.string().c_str();
 #endif
 	

@@ -108,7 +108,7 @@
 #include "Common/Version.h"
 
 #ifndef _WIN32
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #endif
 
 #ifdef _INTERNAL
@@ -314,10 +314,10 @@ void GameEngine::init( int argc, char *argv[] )
 #ifdef _WIN32
 		DeleteFile( "Data\\INI\\INIZH.big" );
 #else
-		boost::filesystem::path p = "Data";
+		std::filesystem::path p = "Data";
 		p /= "INI";
 		p /= "INIZH.big";
-		boost::filesystem::remove( p );
+		std::filesystem::remove( p );
 #endif
 
 		// not part of the subsystem list, because it should normally never be reset!
