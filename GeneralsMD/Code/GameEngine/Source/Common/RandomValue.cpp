@@ -306,7 +306,7 @@ DEBUG_LOG(( "%d: GetGameLogicRandomValueReal = %f, %s line %d\n",
 //
 // Real valued random value
 //
-Real GetGameClientRandomValueReal( Real lo, Real hi, char *file, int line )
+Real GetGameClientRandomValueReal( Real lo, Real hi, const char *file, int line )
 {
 	Real delta = hi - lo;
 	Real rval;
@@ -330,7 +330,7 @@ DEBUG_LOG(( "%d: GetGameClientRandomValueReal = %f, %s line %d\n",
 //
 // Real valued random value
 //
-Real GetGameAudioRandomValueReal( Real lo, Real hi, char *file, int line )
+Real GetGameAudioRandomValueReal( Real lo, Real hi, const char *file, int line )
 {
 	Real delta = hi - lo;
 	Real rval;
