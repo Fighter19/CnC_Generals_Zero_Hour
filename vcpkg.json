@@ -5,6 +5,7 @@
   "builtin-baseline": "11be7f536538ace43f867c8efb3d624c43b6af54",
   "dependencies": [
     "zlib",
-    "glm"
+    "glm",
+    "gli"
   ]
 }
