@@ -6,13 +6,33 @@
 #define DXVK_WSI_SDL2 1
 #include <wsi/native_wsi.h>
 
-#include "Win32Device/Common/Win32GameEngine.h"
+#include "UnixDevice/Common/UnixGameEngine.h"
+
+HINSTANCE ApplicationHInstance = NULL;
+CComModule _Module;
+
+#include "GameNetwork/WOLBrowser/WebBrowser.h"
+WebBrowser *TheWebBrowser;
+
+AsciiString GetRegistryLanguage( void )
+{
+#pragma message("Support for multiple languages not yet implemented")
+
+	return "english";
+}
+
+UnsignedInt GetRegistryVersion( void )
+{
+#pragma message("Version is not being encoded in registry on this platform")
+
+	return 0;
+}
 
 GameEngine *CreateGameEngine( void )
 {
-	Win32GameEngine *engine;
+	UnixGameEngine *engine;
 
-	engine = NEW Win32GameEngine;
+	engine = NEW UnixGameEngine;
 	//game engine may not have existed when app got focus so make sure it
 	//knows about current focus state.
 	engine->setIsActive(true);

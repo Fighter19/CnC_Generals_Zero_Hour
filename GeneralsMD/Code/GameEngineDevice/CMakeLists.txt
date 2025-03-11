@@ -16,13 +16,22 @@ file(GLOB_RECURSE SOURCES_W3DDevice
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/W3DDevice/*.cpp
 )
 
+if(WIN32)
 file(GLOB_RECURSE SOURCES_WIN32Device
-    ${CMAKE_CURRENT_SOURCE_DIR}/Source/W3DDevice/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/Win32Device/*.cpp
 )
+endif()
+
+if(UNIX)
+    file(GLOB_RECURSE SOURCES_UNIXDevice
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source/UnixDevice/*.cpp
+    )
+endif()
 
 add_library(GameEngineDevice STATIC 
     ${SOURCES_W3DDevice} 
     ${SOURCES_WIN32Device}
+    ${SOURCES_UNIXDevice}
     ${SOURCES_MILES}
     ${SOURCES_BINK}
 )
