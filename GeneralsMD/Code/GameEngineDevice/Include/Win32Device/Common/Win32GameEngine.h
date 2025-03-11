@@ -38,7 +38,6 @@
 #include "Common/GameEngine.h"
 #include "GameLogic/GameLogic.h"
 #include "GameNetwork/NetworkInterface.h"
-#include "MilesAudioDevice/MilesAudioManager.h"
 #include "Win32Device/Common/Win32BIGFileSystem.h"
 #include "Win32Device/Common/Win32LocalFileSystem.h"
 #include "W3DDevice/Common/W3DModuleFactory.h"
@@ -49,8 +48,11 @@
 #include "W3DDevice/Common/W3DRadar.h"
 #include "W3DDevice/Common/W3DFunctionLexicon.h"
 #include "W3DDevice/Common/W3DThingFactory.h"
-
-
+#ifdef SAGE_USE_OPENAL
+#include "OpenALAudioDevice/OpenALAudioManager.h"
+#elif defined(SAGE_USE_MILES)
+#include "MilesAudioDevice/MilesAudioManager.h"
+#endif
 
 
 //-------------------------------------------------------------------------------------------------
@@ -100,6 +102,12 @@ inline ParticleSystemManager* Win32GameEngine::createParticleSystemManager( void
 
 inline NetworkInterface *Win32GameEngine::createNetwork( void ) { return NetworkInterface::createNetwork(); }
 inline Radar *Win32GameEngine::createRadar( void ) { return NEW W3DRadar; }
-inline AudioManager *Win32GameEngine::createAudioManager( void ) { return NEW MilesAudioManager; }
+#ifdef SAGE_USE_OPENAL
+inline AudioManager *Win32GameEngine::createAudioManager( void ) { return NEW OpenALAudioManager; }
+#elif defined(SAGE_USE_MILES)
+inline AudioManager* Win32GameEngine::createAudioManager(void) { return NEW MilesAudioManager; }
+#else
+inline AudioManager* Win32GameEngine::createAudioManager(void) { return NULL; }
+#endif
  
 #endif  // end __WIN32GAMEENGINE_H_

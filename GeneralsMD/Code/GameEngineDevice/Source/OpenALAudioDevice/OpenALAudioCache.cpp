@@ -95,62 +95,6 @@ void* AudioFileCache::openFile(AsciiString& filename)
 	// Protect the entire openFile function
 	std::lock_guard mut(m_mutex);
 
-	auto it = m_openFiles.find(strToFind);
-
-	if (it != m_openFiles.end()) {
-		++it->second.m_openCount;
-		return it->second.m_file;
-	}
-
-	// Couldn't find the file, so actually open it.
-	File* file = TheFileSystem->openFile(strToFind.str());
-	if (!file) {
-		DEBUG_ASSERTLOG(strToFind.isEmpty(), ("Missing Audio File: '%s'\n", strToFind.str()));
-		return NULL;
-	}
-
-	UnsignedInt fileSize = file->size();
-	char* buffer = file->readEntireAndClose();
-
-	OpenAudioFile openedAudioFile;
-	openedAudioFile.m_file = static_cast<uint8_t*>(av_malloc(sizeof(WavHeader)));
-	openedAudioFile.m_fileSize = sizeof(WavHeader);
-	openedAudioFile.m_ffmpegFile = new FFmpegFile();
-
-	// This transfer ownership of file
-	if (!openedAudioFile.m_ffmpegFile->open(file)) {
-		releaseOpenAudioFile(&openedAudioFile);
-		return nullptr;
-	}
-
-	if (!decodeFFmpeg(&openedAudioFile)) {
-		releaseOpenAudioFile(&openedAudioFile);
-		return nullptr;
-	}
-
-	fillWaveData(&openedAudioFile);
-	openedAudioFile.m_ffmpegFile->close();
-
-	openedAudioFile.m_fileSize = fileSize;
-	m_currentlyUsedSize += openedAudioFile.m_fileSize;
-	if (m_currentlyUsedSize > m_maxSize) {
-		// We need to free some samples, or we're not going to be able to play this sound.
-		if (!freeEnoughSpaceForSample(openedAudioFile)) {
-			m_currentlyUsedSize -= openedAudioFile.m_fileSize;
-			releaseOpenAudioFile(&openedAudioFile);
-			return NULL;
-		}
-	}
-
-	m_openFiles[strToFind] = openedAudioFile;
-	return openedAudioFile.m_file;
-}
-
-void* AudioFileCache::openFile(AsciiString& filename)
-{
-	// Protect the entire openFile function
-	std::lock_guard mut(m_mutex);
-
 	auto it = m_openFiles.find(filename);
 
 	if (it != m_openFiles.end()) {
@@ -166,7 +110,6 @@ void* AudioFileCache::openFile(AsciiString& filename)
 	}
 
 	UnsignedInt fileSize = file->size();
-	char* buffer = file->readEntireAndClose();
 
 	OpenAudioFile openedAudioFile;
 	openedAudioFile.m_file = static_cast<uint8_t*>(av_malloc(sizeof(WavHeader)));
@@ -303,7 +246,7 @@ void AudioFileCache::closeFile(void* fileToClose)
 	}
 }
 
-float AudioFileCache::getFileLength(void* file) const
+float AudioFileCache::getFileLength(void* file)
 {
 	if (file == nullptr) {
 		return 0.0f;
@@ -428,4 +371,18 @@ void AudioFileCache::getWaveData(void* wave_data,
 	freq = header->samples_per_sec;
 	channels = header->channels;
 	bitsPerSample = header->bits_per_sample;
+}
+
+void AudioFileCache::fillWaveData(OpenAudioFile* open_audio)
+{
+	WavHeader wav;
+	wav.chunk_size = open_audio->m_fileSize - (offsetof(WavHeader, chunk_size) + sizeof(uint32_t));
+	wav.subchunk2_size = open_audio->m_fileSize - (offsetof(WavHeader, subchunk2_size) + sizeof(uint32_t));
+	wav.channels = open_audio->m_ffmpegFile->getNumChannels();
+	wav.bits_per_sample = open_audio->m_ffmpegFile->getBytesPerSample() * 8;
+	wav.samples_per_sec = open_audio->m_ffmpegFile->getSampleRate();
+	wav.bytes_per_sec = open_audio->m_ffmpegFile->getSampleRate() * open_audio->m_ffmpegFile->getNumChannels()
+		* open_audio->m_ffmpegFile->getBytesPerSample();
+	wav.block_align = open_audio->m_ffmpegFile->getNumChannels() * open_audio->m_ffmpegFile->getBytesPerSample();
+	memcpy(open_audio->m_file, &wav, sizeof(WavHeader));
 }

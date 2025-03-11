@@ -84,7 +84,7 @@ public:
 	void* openFile(AudioEventRTS* eventToOpenFrom);
 	void closeFile(void* fileToClose);
 	void setMaxSize(UnsignedInt size);
-	float getFileLength(void* file) const;
+	float getFileLength(void* file);
 	// End Protected by mutex
 
 	// Note: These functions should be used for informational purposes only. For speed reasons,

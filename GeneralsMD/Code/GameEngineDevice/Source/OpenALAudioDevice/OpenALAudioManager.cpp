@@ -438,10 +438,12 @@ void OpenALAudioManager::audioDebugDisplay(DebugDisplayInterface* dd, void*, FIL
  */
 Bool OpenALAudioManager::checkALError()
 {
-	ALenum error_code = alGetError();
-	if (error_code != 0) {
-		auto error_msg = alGetString(error_code);
-		DEBUG_ASSERTLOG("OpenAL error: %s", error_msg);
+	ALenum errorCode = alGetError();
+	if (errorCode != 0) {
+#ifndef NDEBUG
+		auto errorMsg = alGetString(errorCode);
+		DEBUG_ASSERTLOG("OpenAL error: %s", errorMsg);
+#endif
 		return false;
 	}
 	return true;
@@ -452,10 +454,12 @@ Bool OpenALAudioManager::checkALError()
  */
 Bool OpenALAudioManager::checkALCError()
 {
-	ALCenum error_code = alcGetError(m_alcDevice);
-	if (error_code != 0) {
-		auto error_msg = alcGetString(m_alcDevice, error_code);
-		DEBUG_ASSERTLOG("ALC error: %s", error_msg);
+	ALCenum errorCode = alcGetError(m_alcDevice);
+	if (errorCode != 0) {
+#ifndef NDEBUG
+		auto errorMsg = alcGetString(m_alcDevice, errorCode);
+		DEBUG_ASSERTLOG("ALC error: %s", errorMsg);
+#endif
 		return false;
 	}
 	return true;
@@ -698,7 +702,7 @@ void OpenALAudioManager::pauseAmbient(Bool shouldPause)
 void OpenALAudioManager::playAudioEvent(AudioEventRTS* event)
 {
 #ifdef INTENSIVE_AUDIO_DEBUG
-	DEBUG_LOG(("MILES (%d) - Processing play request: %d (%s)", TheGameLogic->getFrame(), event->getPlayingHandle(), event->getEventName().str()));
+	DEBUG_LOG(("OPENAL (%d) - Processing play request: %d (%s)", TheGameLogic->getFrame(), event->getPlayingHandle(), event->getEventName().str()));
 #endif
 	const AudioEventInfo* info = event->getAudioEventInfo();
 	if (!info) {
@@ -810,35 +814,25 @@ void OpenALAudioManager::playAudioEvent(AudioEventRTS* event)
 				}
 			}
 
-			H3DSAMPLE sample3D;
+			ALuint source;
 			if (!handleToKill || foundSoundToReplace)
 			{
-				sample3D = getFirst3DSample(event);
-				if (!sample3D)
-				{
-					//If we don't have an available sample, kill the lowest priority assuming we have one that is lower
-					//than the sound we are trying to add. One possibility for strangeness is when an interrupt sound
-					//that wants to kill a handle to replace it, it's possible that another request already killed it,
-					//in which case we need to attempt to find another sound to kill.
-					if (killLowestPrioritySoundImmediately(event))
-					{
-						sample3D = getFirst3DSample(event);
-					}
-				}
+				alGenSources(1, &source);
+
 			}
 			else
 			{
-				sample3D = NULL;
+				source = NULL;
 			}
 			// Push it onto the list of playing things
 			audio->m_audioEventRTS = event;
-			audio->m_3DSample = sample3D;
+			audio->m_source = source;
 			audio->m_file = NULL;
 			audio->m_type = PAT_3DSample;
 			m_playing3DSounds.push_back(audio);
 
-			if (sample3D) {
-				audio->m_file = playSample3D(event, sample3D);
+			if (source) {
+				audio->m_file = playSample3D(event, audio);
 				m_sound->notifyOf3DSampleStart();
 			}
 
@@ -880,36 +874,25 @@ void OpenALAudioManager::playAudioEvent(AudioEventRTS* event)
 				}
 			}
 
-			HSAMPLE sample;
+			ALuint source;
 			if (!handleToKill || foundSoundToReplace)
 			{
-				sample = getFirst2DSample(event);
-				if (!sample)
-				{
-					//If we don't have an available sample, kill the lowest priority assuming we have one that is lower
-					//than the sound we are trying to add. One possibility for strangeness is when an interrupt sound
-					//that wants to kill a handle to replace it, it's possible that another request already killed it,
-					//in which case we need to attempt to find another sound to kill.
-					if (killLowestPrioritySoundImmediately(event))
-					{
-						sample = getFirst2DSample(event);
-					}
-				}
+				alGenSources(1, &source);
 			}
 			else
 			{
-				sample = NULL;
+				source = NULL;
 			}
 
 			// Push it onto the list of playing things
 			audio->m_audioEventRTS = event;
-			audio->m_sample = sample;
+			audio->m_source = source;
 			audio->m_file = NULL;
 			audio->m_type = PAT_Sample;
 			m_playingSounds.push_back(audio);
 
-			if (sample) {
-				audio->m_file = playSample(event, sample);
+			if (source) {
+				audio->m_file = playSample(event, audio);
 				m_sound->notifyOf2DSampleStart();
 			}
 
@@ -980,7 +963,7 @@ void OpenALAudioManager::stopAudioEvent(AudioHandle handle)
 		if (audio->m_audioEventRTS->getPlayingHandle() == handle) {
 			// found it
 			audio->m_requestStop = true;
-			notifyOfAudioCompletion((UnsignedInt)(audio->m_stream), PAT_Stream);
+			notifyOfAudioCompletion((UnsignedInt)(audio->m_source), PAT_Stream);
 			break;
 		}
 	}
@@ -1210,7 +1193,7 @@ void OpenALAudioManager::stopAllAudioImmediately(void)
 }
 
 //-------------------------------------------------------------------------------------------------
-void OpenALAudioManager::freeAllMilesHandles(void)
+void OpenALAudioManager::freeAllOpenALHandles(void)
 {
 	// First, we need to ensure that we don't have any sample handles open. To that end, we must stop
 	// all of our currently playing audio.
@@ -1252,7 +1235,6 @@ void OpenALAudioManager::freeAllMilesHandles(void)
 void OpenALAudioManager::adjustPlayingVolume(PlayingAudio* audio)
 {
 	Real desiredVolume = audio->m_audioEventRTS->getVolume() * audio->m_audioEventRTS->getVolumeShift();
-	Real pan;
 	if (audio->m_type == PAT_Sample) {
 		alSourcef(audio->m_source, AL_GAIN, m_soundVolume * desiredVolume);
 
@@ -1457,8 +1439,6 @@ void OpenALAudioManager::openDevice(void)
 	if (!TheGlobalData->m_audioOn) {
 		return;
 	}
-
-	Int retval = 0;
 
 	// AIL_quick_startup should be replaced later with a call to actually pick which device to use, etc
 	const AudioSettings* audioSettings = getAudioSettings();
@@ -1697,11 +1677,11 @@ void OpenALAudioManager::selectProvider(UnsignedInt providerNdx)
 
 	if (isValidProvider())
 	{
-		freeAllMilesHandles();
+		freeAllOpenALHandles();
 		unselectProvider();
 	}
 
-	LPDIRECTSOUND lpDirectSoundInfo;
+	/*LPDIRECTSOUND lpDirectSoundInfo;
 	AIL_get_DirectSound_info(NULL, (void**)&lpDirectSoundInfo, NULL);
 	Bool useDolby = FALSE;
 	if (lpDirectSoundInfo)
@@ -1742,7 +1722,6 @@ void OpenALAudioManager::selectProvider(UnsignedInt providerNdx)
 		}
 	}
 
-	Bool success = FALSE;
 	if (useDolby)
 	{
 		providerNdx = getProviderIndex("Dolby Surround");
@@ -1751,21 +1730,21 @@ void OpenALAudioManager::selectProvider(UnsignedInt providerNdx)
 	{
 		providerNdx = getProviderIndex("Miles Fast 2D Positional Audio");
 	}
-	success = AIL_open_3D_provider(m_provider3D[providerNdx].id) == 0;
+	success = AIL_open_3D_provider(m_provider3D[providerNdx].id) == 0;*/
 
 	//if (providerNdx < m_providerCount) 
 	//{
 	//	failed = AIL_open_3D_provider(m_provider3D[providerNdx].id);
 	//}
 
-
+	Bool success = FALSE;
 
 	if (!success)
 	{
 		m_selectedProvider = PROVIDER_ERROR;
 		// try to select a failsafe
 		providerNdx = getProviderIndex("Miles Fast 2D Positional Audio");
-		success = AIL_open_3D_provider(m_provider3D[providerNdx].id) == 0;
+		//success = AIL_open_3D_provider(m_provider3D[providerNdx].id) == 0;
 	}
 
 	if (success)
@@ -2130,7 +2109,6 @@ Bool OpenALAudioManager::killLowestPrioritySoundImmediately(AudioEventRTS* event
 //-------------------------------------------------------------------------------------------------
 void OpenALAudioManager::adjustVolumeOfPlayingAudio(AsciiString eventName, Real newVolume)
 {
-	Real pan;
 	std::list<PlayingAudio*>::iterator it;
 
 	PlayingAudio* playing = NULL;

@@ -194,7 +194,7 @@ protected:
 	void releasePlayingAudio(PlayingAudio *release);
 
 	void stopAllAudioImmediately(void);
-	void freeAllMilesHandles(void);
+	void freeAllOpenALHandles(void);
 
 	PlayingAudio *getFirst2DSample(AudioEventRTS *event);
 	PlayingAudio *getFirst3DSample(AudioEventRTS *event);
