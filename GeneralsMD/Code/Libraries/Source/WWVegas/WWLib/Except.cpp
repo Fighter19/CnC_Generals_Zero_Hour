@@ -183,7 +183,7 @@ int __cdecl _purecall(void)
 	** Use int3 to cause an exception.
 	*/
 	WWDEBUG_SAY(("Pure Virtual Function call. Oh No!\n"));
-	_asm int 0x03;
+	__debugbreak();
 #endif	//_DEBUG_ASSERT
 
 	return(return_code);

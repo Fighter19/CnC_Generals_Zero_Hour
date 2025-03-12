@@ -44,6 +44,7 @@
 
 // New needs to be included first to avoid collision with headers when building with Clang
 #include <new>
+#include "intrin_compat.h"
 #ifndef _WIN32
 #include "windows_compat.h"
 #endif

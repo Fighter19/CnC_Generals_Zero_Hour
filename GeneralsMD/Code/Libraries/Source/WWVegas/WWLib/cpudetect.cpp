@@ -124,8 +124,6 @@ const char* CPUDetectClass::Get_Processor_Manufacturer_Name()
 	return ManufacturerNames[ProcessorManufacturer];
 }
 
-#define ASM_RDTSC _asm _emit 0x0f _asm _emit 0x31
-
 static unsigned Calculate_Processor_Speed(sint64& ticks_per_second)
 {
 	struct {
@@ -135,40 +133,16 @@ static unsigned Calculate_Processor_Speed(sint64& ticks_per_second)
 		unsigned timer1_l;
 	} Time;
 
-#ifdef __clang__
-	uint64_t timer0 = __builtin_readcyclecounter();
+	uint64_t timer0 = _rdtsc();
 	Time.timer0_h = (unsigned)(timer0 >> 32);
 	Time.timer0_l = (unsigned)timer0;
-#elif defined(WIN32)
-   __asm {
-      ASM_RDTSC;
-      mov Time.timer0_h, eax
-      mov Time.timer0_l, edx
-   }
-#elif defined(_UNIX)
-      __asm__("rdtsc");
-      __asm__("mov %eax, __Time.timer1_h");
-      __asm__("mov %edx, __Time.timer1_l");
-#endif
 
 	unsigned start=TIMEGETTIME();
 	unsigned elapsed;
 	while ((elapsed=TIMEGETTIME()-start)<200) {
-#ifdef __clang__
-		uint64_t timer1 = __builtin_readcyclecounter();
+		uint64_t timer1 = _rdtsc();
 		Time.timer1_h = (unsigned)(timer1 >> 32);
 		Time.timer1_l = (unsigned)timer1;
-#elif defined(WIN32)
-      __asm {
-         ASM_RDTSC;
-         mov Time.timer1_h, eax
-         mov Time.timer1_l, edx
-      }
-#elif defined(_UNIX)
-      __asm__ ("rdtsc");
-      __asm__("mov %eax, __Time.timer1_h");
-      __asm__("mov %edx, __Time.timer1_l");
-#endif
 	}
 
 	sint64 t=*(sint64*)&Time.timer1_h-*(sint64*)&Time.timer0_h;

@@ -34,26 +34,11 @@
 #include "GameClient/DebugDisplay.h"
 #include "GameClient/Display.h"
 #include "GameClient/GraphDraw.h"
+#include "intrin_compat.h"
 
 __forceinline void ProfileGetTime(int64_t &t)
 {
-#if defined(__has_builtin) && __has_builtin(__builtin_readcyclecounter)
-	t = __builtin_readcyclecounter();
-#elif defined(__has_builtin) && __has_builtin(__builtin_ia32_rdtsc)
-	t = __builtin_ia32_rdtsc();
-#else
-  _asm
-  {
-    mov ecx,[t]
-    push eax
-    push edx
-    rdtsc
-    mov [ecx],eax
-    mov [ecx+4],edx
-    pop edx
-    pop eax
-  };
-#endif
+	t = _rdtsc();
 }
 
 #ifdef _INTERNAL

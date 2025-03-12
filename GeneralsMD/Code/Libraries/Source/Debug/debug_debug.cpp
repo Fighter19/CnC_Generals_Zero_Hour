@@ -22,7 +22,7 @@
 // $Revision: #2 $
 // $DateTime: 2003/07/09 10:57:23 $
 //
-// ©2003 Electronic Arts
+// ï¿½2003 Electronic Arts
 //
 // Debug class implementation
 //////////////////////////////////////////////////////////////////////////////
@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <new>      // needed for placement new prototype
+#include "intrin_compat.h"
 
 // a little dummy variable that makes the linker actually include
 // us...
@@ -269,12 +270,7 @@ bool Debug::SkipNext(void)
 
   // do not implement this function inline, we do need
   // a valid frame pointer here!
-  unsigned help;
-  _asm 
-  {
-    mov eax,[ebp+4]   // return address
-    mov help,eax
-  };
+  uintptr_t help = (uintptr_t)_ReturnAddress();
   curStackFrame=help;
 
   // do we know if to skip the following code?
@@ -386,7 +382,7 @@ bool Debug::AssertDone(void)
           }
           break;
         case IDRETRY:
-          _asm int 0x03
+          __debugbreak();
           break;
         default:
           ((void)0);
@@ -654,7 +650,7 @@ bool Debug::CrashDone(bool die)
             }
             break;
           case IDRETRY:
-            _asm int 0x03
+            __debugbreak();
             break;
           default:
             ((void)0);

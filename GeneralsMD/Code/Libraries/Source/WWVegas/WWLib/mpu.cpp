@@ -112,8 +112,6 @@ unsigned long Get_CPU_Clock(unsigned long & high)
 **
 */
 
-#define ASM_RDTSC _asm _emit 0x0f _asm _emit 0x31
-
 // Max # of samplings to allow before giving up and returning current average.
 #define MAX_TRIES			20
 #define ROUND_THRESHOLD		6
@@ -126,12 +124,9 @@ static unsigned long TSC_High;
 
 void RDTSC(void)
 {
-    _asm
-    {
-        ASM_RDTSC;
-        mov     TSC_Low, eax
-        mov     TSC_High, edx
-    }
+		auto TSC = _rdtsc();
+		TSC_Low = TSC & 0xFFFFFFFF;
+		TSC_High = TSC >> 32;
 }
 
 
@@ -197,8 +192,7 @@ int Get_RDTSC_CPU_Speed(void)
 			QueryPerformanceCounter(&t1);
 		}
 
-		ASM_RDTSC;
-		_asm	mov	stamp0, EAX
+		stamp0 = _rdtsc();
 
 		t0.LowPart = t1.LowPart;		// Reset Initial Time
 		t0.HighPart = t1.HighPart;
@@ -211,9 +205,7 @@ int Get_RDTSC_CPU_Speed(void)
 			QueryPerformanceCounter(&t1);
 		}
 
-		ASM_RDTSC;
-		_asm	mov	stamp1, EAX
-
+		stamp1 = _rdtsc();
 
 		cycles = stamp1 - stamp0;					// # of cycles passed between reads
 

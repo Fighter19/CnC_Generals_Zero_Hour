@@ -40,17 +40,6 @@ static unsigned int GetDoubleClickTime()
 #define HIWORD(value) ((((uint32_t)(value) >> 16) & 0xFFFF))
 #define LOWORD(value) (((uint32_t)(value) & 0xFFFF))
 
-#ifndef _lrotl
-static inline uint32_t _lrotl(uint32_t value, int shift)
-{
-#ifdef __clang__
-	return __builtin_rotateleft32(value, shift);
-#else
-	return ((value << shift) | (value >> (32 - shift)));
-#endif
-}
-#endif
-
 // Copied from windows_base.h from DXVK-Native
 #ifndef MAKE_HRESULT
 #define MAKE_HRESULT(sev, fac, code) \
@@ -84,3 +73,4 @@ static inline uint32_t _lrotl(uint32_t value, int shift)
 #include "gdi_compat.h"
 #include "wnd_compat.h"
 #include "file_compat.h"
+#include "intrin_compat.h"

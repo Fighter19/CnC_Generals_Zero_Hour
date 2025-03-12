@@ -189,15 +189,9 @@ __forceinline long fast_float2long_round(float f)
 {
 	long i;
 
-#if defined(_WIN32) && !defined(_WIN64) 
-	__asm {
-		fld [f]
-		fistp [i]
-	}
-#else
 	// Use simple C code instead of inline assembly
 	i = lroundf(f);
-#endif
+	
 	return i;
 }
 
