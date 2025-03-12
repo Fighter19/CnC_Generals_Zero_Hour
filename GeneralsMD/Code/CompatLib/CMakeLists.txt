@@ -20,6 +20,11 @@ if (WIN32)
     target_link_libraries(d3dx8 PUBLIC d3d8lib)
 endif()
 
+target_include_directories(d3dx8 PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR}/Include
+    ${CMAKE_SOURCE_DIR}/extern/dxvk-native/usr/include/dxvk
+)
+
 endif()
 
 if (UNIX)
