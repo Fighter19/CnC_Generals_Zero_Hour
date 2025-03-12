@@ -73,4 +73,4 @@ static unsigned int GetDoubleClickTime()
 #include "gdi_compat.h"
 #include "wnd_compat.h"
 #include "file_compat.h"
-#include "intrin_compat.h"
+//#include "intrin_compat.h"

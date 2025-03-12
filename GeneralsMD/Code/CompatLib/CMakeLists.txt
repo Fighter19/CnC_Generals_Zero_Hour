@@ -9,6 +9,10 @@ list(TRANSFORM SOURCE_D3DX_COMPAT PREPEND "Source/")
 
 add_library(d3dx8 STATIC ${SOURCE_D3DX_COMPAT})
 
+if(NOT SAGE_USE_GLM)
+    message(FATAL_ERROR "GLM is required for d3dx8 compatibility layer")
+endif()
+
 find_package(glm REQUIRED)
 target_link_libraries(d3dx8 PUBLIC glm::glm)
 

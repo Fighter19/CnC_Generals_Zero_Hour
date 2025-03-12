@@ -22,7 +22,7 @@
 // $Revision: #1 $
 // $DateTime: 2003/07/03 11:55:26 $
 //
-// ©2003 Electronic Arts
+// ï¿½2003 Electronic Arts
 //
 // Unhandled exception handler
 //////////////////////////////////////////////////////////////////////////////
@@ -138,6 +138,8 @@ void DebugExceptionhandler::LogRegisters(Debug &dbg, struct _EXCEPTION_POINTERS 
       << " GS:" << Debug::Width(4) << ctx.SegGs << "\n" << Debug::FillChar() << Debug::Dec();
 }
 
+static_assert(sizeof(long double)==10,"long double must be 10 bytes");
+
 void DebugExceptionhandler::LogFPURegisters(Debug &dbg, struct _EXCEPTION_POINTERS *exptr)
 {
   struct _CONTEXT &ctx=*exptr->ContextRecord;
@@ -169,15 +171,8 @@ void DebugExceptionhandler::LogFPURegisters(Debug &dbg, struct _EXCEPTION_POINTE
     for (unsigned i=0;i<10;i++)
       dbg << Debug::Width(2) << value[i];
 
-    double fpVal;
-
-    // convert from temporary real (10 byte) to double
-    _asm
-    {
-      mov eax,value
-      fld tbyte ptr [eax]
-      fstp qword ptr [fpVal]
-    }
+    long double *value=(long double*)value;
+    double fpVal = *value;
 
     dbg << " " << fpVal << "\n";
   }

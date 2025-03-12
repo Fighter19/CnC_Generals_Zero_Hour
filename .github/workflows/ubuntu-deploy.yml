@@ -29,4 +29,11 @@ jobs:
         uses: lukka/run-cmake@v10
         with:
           configurePreset: "deploy"
-          generator: "Ninja"
+          buildPreset: "deploy"
+          packagePreset: "deploy"
+
+      # - name: Upload RTS artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: x86 Windows RTS
+      #     path: build/deploy/SAGE-0.1-win32.zip

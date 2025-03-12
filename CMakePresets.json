@@ -10,6 +10,7 @@
       "name": "default",
       "displayName": "Default Config",
       "binaryDir": "${sourceDir}/build/${presetName}",
+      "generator": "Ninja",
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
       }
@@ -20,7 +21,10 @@
       "displayName": "Deploy Config",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_CONFIGURATION_TYPES": "Release"
+        "CMAKE_CONFIGURATION_TYPES": "Release",
+        "SAGE_USE_GLM": "ON",
+        "SAGE_USE_FFMPEG": "ON",
+        "SAGE_USE_OPENAL": "ON"
       }
     },
     {
@@ -73,10 +77,16 @@
       "description": "Build the default configuration"
     },
     {
+      "name": "deploy",
+      "configurePreset": "deploy",
+      "description": "Build the deploy configuration",
+      "configuration": "Release"
+    },
+    {
       "name": "win32-deploy",
       "configurePreset": "win32-deploy",
       "description": "Build the win32 deploy configuration",
-      "configuration": "Release"
+      "inherits": "deploy"
     },
     {
       "name": "testing",
@@ -99,18 +109,19 @@
   ],
   "packagePresets": [
     {
-      "name": "default",
-      "displayName": "Default Package",
-      "configurePreset": "default",
+      "name": "deploy",
+      "displayName": "Deploy Package",
+      "configurePreset": "deploy",
+      "generators": [
+        "ZIP"
+      ],
       "description": "Package the default configuration"
     },
     {
       "name": "win32-deploy",
       "displayName": "Win32 Release Package",
       "configurePreset": "win32-deploy",
-      "generators": [
-        "ZIP"
-      ],
+      "inherits": "deploy",
       "description": "Package the win32 deploy configuration"
     }
   ],

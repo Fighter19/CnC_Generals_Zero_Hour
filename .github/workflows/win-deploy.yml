@@ -32,4 +32,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: x86 Windows RTS
-          path: build/win32-release/SAGE-0.1-win32.zip
+          path: build/win32-deploy/SAGE-0.1-win32.zip
