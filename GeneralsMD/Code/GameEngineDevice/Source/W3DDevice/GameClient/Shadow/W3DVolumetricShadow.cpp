@@ -58,8 +58,6 @@
 #include "GameLogic/TerrainLogic.h"
 #include "WW3D2/dx8caps.h"
 #include "GameClient/Drawable.h"
-#include "wwshade/shdmesh.h"
-#include "wwshade/shdsubmesh.h"
 
 #ifdef _INTERNAL
 // for occasional debugging...
@@ -700,81 +698,13 @@ Int W3DShadowGeometry::initFromHLOD(RenderObjClass *robj)
 			m_meshCount++;
 		}
 
-		
-#if (1) //(cnc3)(gth) Support for ShaderMeshes!
-// I'm coding this as a completely independent block rather than re-factoring the code above
-// because it will probably save us pain in future merges.
+		// We deactivated shader meshses
 		if (hlod->Peek_Lod_Model(top,i) && hlod->Peek_Lod_Model(top,i)->Class_ID() == RenderObjClass::CLASSID_SHDMESH)
 		{
 			DEBUG_ASSERTCRASH(m_meshCount < MAX_SHADOW_CASTER_MESHES, ("Too many shadow sub-meshes"));
 
-			ShdMeshClass * shd_mesh = (ShdMeshClass *)hlod->Peek_Lod_Model(top,i);
-
-			for (int sub_mesh_index=0; sub_mesh_index < shd_mesh->Get_Sub_Mesh_Count(); sub_mesh_index++) {
-				ShdSubMeshClass * sub_mesh = shd_mesh->Peek_Sub_Mesh(sub_mesh_index);
-
-				if (!sub_mesh->Get_Flag(MeshGeometryClass::CAST_SHADOW))
-					continue; // CNC3 (gth) Only cast shadows from meshes with the shadow flag ENABLED!
-
-				//transparent meshes that don't have forced shadows will not cast volumetric shadows
-				if (shd_mesh->Is_Translucent() && !sub_mesh->Get_Flag(MeshGeometryClass::CAST_SHADOW))
-					continue; 
-
-				// skin meshes should never cast a volumetric shadow
-				if (sub_mesh->Get_Flag(MeshGeometryClass::SKIN)) 
-					continue;
-
-				geomMesh->m_mesh = NULL; //hope this doesn't cause problems!
-				geomMesh->m_meshRobjIndex=i;
-
-				// Count the polygons and vertices 
-				geomMesh->m_numVerts = sub_mesh->Get_Vertex_Count();
-				geomMesh->m_numPolygons = sub_mesh->Get_Polygon_Count();
-
-				geomMesh->m_verts=sub_mesh->Get_Vertex_Array();
-				geomMesh->m_polygons=sub_mesh->Get_Polygon_Array();
-
-				if (geomMesh->m_numVerts > MAX_SHADOW_VOLUME_VERTS)
-					return FALSE;	//too many vertices to process
-
-				//reset index of all vertices
-				memset(vertParent,0xffffffff,sizeof(vertParent));
-				newVertexCount=geomMesh->m_numVerts;
-				//Find all duplicated vertices.
-				for (j=0; j<geomMesh->m_numVerts; j++)
-				{
-					if (vertParent[j] != 0xffff)
-						continue;	//this vertex has already been processed
-
-					const Vector3 *v_curr=&geomMesh->m_verts[j];
-
-					for (k=j+1; k<geomMesh->m_numVerts; k++)
-					{
-						Vector3 len(*v_curr - geomMesh->m_verts[k]);
-						if (len.Length2() == 0)
-						{	//found duplicate vertex
-							vertParent[k]=j;
-							newVertexCount--;	//decrease total vertices since duplicate found.
-						}
-					}
-					vertParent[j]=j;	//first instance of new vertex
-				}
-				geomMesh->m_parentVerts = new UnsignedShort[geomMesh->m_numVerts];
-				memcpy(geomMesh->m_parentVerts,vertParent,sizeof(UnsignedShort)*geomMesh->m_numVerts);
-				geomMesh->m_numVerts=newVertexCount;	//adjust actual vertex count to ignore duplicates
-				m_numTotalsVerts += newVertexCount;
-				geomMesh->m_parentGeometry = this;
-
-				// build our neighboring polygon information
-//				geomMesh->buildPolygonNeighbors();
-				
-				geomMesh++;
-				m_meshCount++;
-
-			}
-		}
-#endif //(cnc3)(gth) Support for ShaderMeshes!
-	
+			DEBUG_ASSERTCRASH(0, ("Shader meshes are disabled in this build!"));
+		}	
 	}
 	
 //	for (i = 0; i < AdditionalModels.Count(); i++) {
