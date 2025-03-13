@@ -79,7 +79,8 @@ class FFmpegVideoStream : public VideoStream
 		FFmpegFile*				m_ffmpegFile;														///< Bink streaming handle;
 		Char					*m_memFile;													///< Pointer to memory resident file
 		uint64_t				m_startTime = 0;												///< Time the stream started		
-		
+		uint8_t *m_audioBuffer = nullptr;
+
 		FFmpegVideoStream(FFmpegFile* file);																///< only BinkVideoPlayer can create these
 		virtual ~FFmpegVideoStream();												
 												

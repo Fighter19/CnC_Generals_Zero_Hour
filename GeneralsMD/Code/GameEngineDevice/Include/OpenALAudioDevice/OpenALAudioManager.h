@@ -65,9 +65,12 @@ struct ProviderInfo
 
 struct PlayingAudio;
 struct OpenALAudioFileCache;
+class OpenALAudioStream;
 
 class OpenALAudioManager : public AudioManager
 {
+friend class OpenALAudioStream;
+friend class FFmpegVideoStream;
 
 public:
 #if defined(_DEBUG) || defined(_INTERNAL)
@@ -202,9 +205,9 @@ protected:
 	void adjustPlayingVolume(PlayingAudio *audio);
 
 	void stopAllSpeech(void);
-	Bool checkALError();
+	static Bool checkALError();
+    static ALenum getALFormat(uint8_t channels, uint8_t bitsPerSample);
 	Bool checkALCError();
-	ALenum getALFormat(uint8_t channels, uint8_t bitsPerSample);
 
 protected:
 	AsciiString m_alDevicesList[AL_MAX_PLAYBACK_DEVICES];
@@ -237,7 +240,6 @@ protected:
 	std::list<PlayingAudio *> m_stoppedAudio;
 
 	OpenALAudioFileCache *m_audioCache;
-	PlayingAudio *m_binkHandle;
 	UnsignedInt m_num2DSamples;
 	UnsignedInt m_num3DSamples;
 	UnsignedInt m_numStreams;
@@ -251,4 +253,5 @@ protected:
 
 	ALCdevice *m_alcDevice = nullptr;
 	ALCcontext *m_alcContext = nullptr;
+	OpenALAudioStream* m_binkAudio = nullptr;
 };

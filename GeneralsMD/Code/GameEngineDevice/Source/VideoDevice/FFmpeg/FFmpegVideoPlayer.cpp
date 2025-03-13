@@ -61,6 +61,11 @@ extern "C" {
     #include <libswscale/swscale.h>
 }
 
+#ifdef SAGE_USE_OPENAL
+#include "OpenALAudioDevice/OpenALAudioManager.h"
+#include "OpenALAudioDevice/OpenALAudioStream.h"
+#endif
+
 #include <chrono>
 
 //----------------------------------------------------------------------------
@@ -337,6 +342,12 @@ FFmpegVideoStream::FFmpegVideoStream(FFmpegFile* file)
     while (m_good && m_gotFrame == false)
         m_good = m_ffmpegFile->decodePacket();
 
+ #ifdef SAGE_USE_OPENAL
+    // Start audio playback
+    OpenALAudioStream* audioStream = (OpenALAudioStream*)TheAudio->getHandleForBink();
+    audioStream->play();
+#endif
+
     m_startTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
@@ -346,7 +357,7 @@ FFmpegVideoStream::FFmpegVideoStream(FFmpegFile* file)
 
 FFmpegVideoStream::~FFmpegVideoStream()
 {
-    //av_freep(&m_audio_buffer);
+    av_freep(&m_audioBuffer);
     av_frame_free(&m_frame);
     sws_freeContext(m_swsContext);
     delete m_ffmpegFile;
@@ -360,36 +371,43 @@ void FFmpegVideoStream::onFrame(AVFrame *frame, int stream_idx, int stream_type,
         videoStream->m_frame = av_frame_clone(frame);
         videoStream->m_gotFrame = true;
     }
-#if 0//def SAGE_USE_OPENAL
+#ifdef SAGE_USE_OPENAL
     else if (stream_type == AVMEDIA_TYPE_AUDIO) {
-        videoStream->m_audioStream->Update();
-        AVSampleFormat sample_fmt = static_cast<AVSampleFormat>(frame->format);
-        const int bytes_per_sample = av_get_bytes_per_sample(sample_fmt);
-        const int frame_size = av_samples_get_buffer_size(NULL, frame->channels, frame->nb_samples, sample_fmt, 1);
-        uint8_t *frame_data = frame->data[0];
+        OpenALAudioStream* audioStream = (OpenALAudioStream*)TheAudio->getHandleForBink();
+        audioStream->update();
+        AVSampleFormat sampleFmt = static_cast<AVSampleFormat>(frame->format);
+        const int bytesPerSample = av_get_bytes_per_sample(sampleFmt);
+        const int frameSize =
+            av_samples_get_buffer_size(NULL, frame->ch_layout.nb_channels, frame->nb_samples, sampleFmt, 1);
+        uint8_t* frameData = frame->data[0];
         // The format is planar - convert it to interleaved
-        if (av_sample_fmt_is_planar(sample_fmt)) {
-            videoStream->m_audio_buffer = static_cast<uint8_t *>(av_realloc(videoStream->m_audio_buffer, frame_size));
-            if (videoStream->m_audio_buffer == nullptr) {
-                captainslog_error("Failed to allocate audio buffer");
+        if (av_sample_fmt_is_planar(sampleFmt))
+        {
+            videoStream->m_audioBuffer = static_cast<uint8_t*>(av_realloc(videoStream->m_audioBuffer, frameSize));
+            if (videoStream->m_audioBuffer == nullptr)
+            {
+                DEBUG_LOG("Failed to allocate audio buffer");
                 return;
             }
 
             // Write the samples into our audio buffer
-            for (int sample_idx = 0; sample_idx < frame->nb_samples; sample_idx++) {
-                int byte_offset = sample_idx * bytes_per_sample;
-                for (int channel_idx = 0; channel_idx < frame->channels; channel_idx++) {
-                    uint8_t *dst =
-                        &videoStream->m_audio_buffer[byte_offset * frame->channels + channel_idx * bytes_per_sample];
-                    uint8_t *src = &frame->data[channel_idx][byte_offset];
-                    memcpy(dst, src, bytes_per_sample);
+            for (int sample_idx = 0; sample_idx < frame->nb_samples; sample_idx++)
+            {
+                int byte_offset = sample_idx * bytesPerSample;
+                for (int channel_idx = 0; channel_idx < frame->ch_layout.nb_channels; channel_idx++)
+                {
+                    uint8_t* dst =
+                        &videoStream
+                             ->m_audioBuffer[byte_offset * frame->ch_layout.nb_channels + channel_idx * bytesPerSample];
+                    uint8_t* src = &frame->data[channel_idx][byte_offset];
+                    memcpy(dst, src, bytesPerSample);
                 }
             }
-            frame_data = videoStream->m_audio_buffer;
+            frameData = videoStream->m_audioBuffer;
         }
 
-        ALenum format = ALAudioManager::Get_AL_Format(frame->channels, bytes_per_sample * 8);
-        videoStream->m_audioStream->BufferData(frame_data, frame_size, format, frame->sample_rate);
+        ALenum format = OpenALAudioManager::getALFormat(frame->ch_layout.nb_channels, bytesPerSample * 8);
+        audioStream->bufferData(frameData, frameSize, format, frame->sample_rate);
     }
 #endif
 }
@@ -401,6 +419,11 @@ void FFmpegVideoStream::onFrame(AVFrame *frame, int stream_idx, int stream_type,
 
 void FFmpegVideoStream::update( void )
 {
+#ifdef SAGE_USE_OPENAL
+    // Start audio playback
+    OpenALAudioStream* audioStream = (OpenALAudioStream*)TheAudio->getHandleForBink();
+    audioStream->play();
+#endif
 	//BinkWait( m_handle );
 }
 

@@ -41,6 +41,7 @@
 #include <dsound.h>
 #include "Lib/BaseType.h"
 #include "OpenALAudioDevice/OpenALAudioManager.h"
+#include "OpenALAudioDevice/OpenALAudioStream.h"
 #include "OpenALAudioCache.h"
 
 #include "Common/AudioAffect.h"
@@ -86,7 +87,7 @@ OpenALAudioManager::OpenALAudioManager() :
 	m_num2DSamples(0),
 	m_num3DSamples(0),
 	m_numStreams(0),
-	m_binkHandle(NULL),
+	m_binkAudio(NULL),
 	m_pref3DProvider(AsciiString::TheEmptyString),
 	m_prefSpeaker(AsciiString::TheEmptyString)
 {
@@ -2907,15 +2908,18 @@ void OpenALAudioManager::processRequest(AudioRequest* req)
 //-------------------------------------------------------------------------------------------------
 void* OpenALAudioManager::getHandleForBink(void)
 {
-	return nullptr;
+	if (!m_binkAudio) {
+		m_binkAudio = NEW OpenALAudioStream;
+	}
+	return m_binkAudio;
 }
 
 //-------------------------------------------------------------------------------------------------
 void OpenALAudioManager::releaseHandleForBink(void)
 {
-	if (m_binkHandle) {
-		releasePlayingAudio(m_binkHandle);
-		m_binkHandle = NULL;
+	if (m_binkAudio) {
+		delete m_binkAudio;
+		m_binkAudio = NULL;
 	}
 }
 
