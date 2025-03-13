@@ -31,7 +31,7 @@ if (SAGE_USE_MILES)
         ${CMAKE_CURRENT_SOURCE_DIR}/Source/MilesAudioDevice/MilesAudioManager.cpp
     )
     target_link_libraries(GameEngineDevice PUBLIC milesstub)
-    target_compile_definitions(GameEngineDevice PRIVATE SAGE_USE_MILES)
+    target_compile_definitions(GameEngineDevice PUBLIC SAGE_USE_MILES)
 endif()
 
 if (SAGE_USE_OPENAL)
@@ -41,7 +41,7 @@ if (SAGE_USE_OPENAL)
     )
     find_package(OpenAL REQUIRED)
     target_link_libraries(GameEngineDevice PUBLIC OpenAL::OpenAL)
-    target_compile_definitions(GameEngineDevice PRIVATE SAGE_USE_OPENAL)
+    target_compile_definitions(GameEngineDevice PUBLIC SAGE_USE_OPENAL)
 endif()
 
 if(SAGE_USE_BINK)
@@ -49,15 +49,16 @@ if(SAGE_USE_BINK)
         ${CMAKE_CURRENT_SOURCE_DIR}/Source/VideoDevice/Bink/BinkVideoPlayer.cpp
     )
     target_link_libraries(GameEngineDevice PUBLIC binkstub)
-    target_compile_definitions(GameEngineDevice PRIVATE SAGE_USE_BINK)
+    target_compile_definitions(GameEngineDevice PUBLIC SAGE_USE_BINK)
 endif()
 
 if(SAGE_USE_FFMPEG)
     target_sources(GameEngineDevice PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Source/VideoDevice/FFmpeg/FFmpegFile.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source/VideoDevice/FFmpeg/FFmpegVideoPlayer.cpp
     )
     find_package(FFMPEG REQUIRED)
     target_include_directories(GameEngineDevice PRIVATE ${FFMPEG_INCLUDE_DIRS})
     target_link_libraries(GameEngineDevice PRIVATE ${FFMPEG_LIBRARIES})
-    target_compile_definitions(GameEngineDevice PRIVATE SAGE_USE_FFMPEG)
+    target_compile_definitions(GameEngineDevice PUBLIC SAGE_USE_FFMPEG)
 endif()

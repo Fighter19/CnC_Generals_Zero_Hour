@@ -48,7 +48,7 @@
 #include "W3DDevice/Common/W3DRadar.h"
 #include "W3DDevice/Common/W3DFunctionLexicon.h"
 #include "W3DDevice/Common/W3DThingFactory.h"
-#ifdef SAGE_USE_OPENAL
+#if defined(SAGE_USE_OPENAL)
 #include "OpenALAudioDevice/OpenALAudioManager.h"
 #elif defined(SAGE_USE_MILES)
 #include "MilesAudioDevice/MilesAudioManager.h"
@@ -102,12 +102,12 @@ inline ParticleSystemManager* Win32GameEngine::createParticleSystemManager( void
 
 inline NetworkInterface *Win32GameEngine::createNetwork( void ) { return NetworkInterface::createNetwork(); }
 inline Radar *Win32GameEngine::createRadar( void ) { return NEW W3DRadar; }
-#ifdef SAGE_USE_OPENAL
+#if defined(SAGE_USE_OPENAL)
 inline AudioManager *Win32GameEngine::createAudioManager( void ) { return NEW OpenALAudioManager; }
 #elif defined(SAGE_USE_MILES)
 inline AudioManager* Win32GameEngine::createAudioManager(void) { return NEW MilesAudioManager; }
 #else
-inline AudioManager* Win32GameEngine::createAudioManager(void) { return NULL; }
+#error "No audio device defined"
 #endif
  
 #endif  // end __WIN32GAMEENGINE_H_

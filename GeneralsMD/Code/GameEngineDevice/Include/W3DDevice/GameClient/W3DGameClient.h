@@ -48,12 +48,16 @@
 #include "W3DDevice/GameClient/W3DGameWindowManager.h"
 #include "W3DDevice/GameClient/W3DGameFont.h"
 #include "W3DDevice/GameClient/W3DDisplayStringManager.h"
-#include "VideoDevice/Bink/BinkVideoPlayer.h"
 #include "Win32Device/GameClient/Win32DIKeyboard.h"
 #include "Win32Device/GameClient/Win32DIMouse.h"
 #include "Win32Device/GameClient/Win32Mouse.h"
 #include "W3DDevice/GameClient/W3DMouse.h"
 #include "W3DDevice/GameClient/W3DSnow.h"
+#if defined(SAGE_USE_FFMPEG)
+#include "VideoDevice/FFmpeg/FFmpegVideoPlayer.h"
+#elif defined(SAGE_USE_BINK)
+#include "VideoDevice/Bink/BinkVideoPlayer.h"
+#endif
 
 class ThingTemplate;
 
@@ -111,8 +115,14 @@ protected:
 
   /// Manager for display strings
 	virtual DisplayStringManager *createDisplayStringManager( void ) { return NEW W3DDisplayStringManager; }
+#if defined(SAGE_USE_FFMPEG)
+	virtual VideoPlayerInterface *createVideoPlayer( void ) { return NEW FFmpegVideoPlayer; }
+#elif defined(SAGE_USE_BINK)
+    virtual VideoPlayerInterface* createVideoPlayer(void) { return NEW BinkVideoPlayer; }
+#else
+	#error "No video device defined"
+#endif
 
-	virtual VideoPlayerInterface *createVideoPlayer( void ) { return NEW BinkVideoPlayer; }
 	/// factory for creating the TerrainVisual
 	virtual TerrainVisual *createTerrainVisual( void ) { return NEW W3DTerrainVisual; }
 
