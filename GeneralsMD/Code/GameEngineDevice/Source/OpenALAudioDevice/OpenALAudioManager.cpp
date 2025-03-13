@@ -90,7 +90,7 @@ OpenALAudioManager::OpenALAudioManager() :
 	m_pref3DProvider(AsciiString::TheEmptyString),
 	m_prefSpeaker(AsciiString::TheEmptyString)
 {
-	m_audioCache = NEW AudioFileCache;
+	m_audioCache = NEW OpenALAudioFileCache;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -2781,7 +2781,7 @@ void* OpenALAudioManager::playSample(AudioEventRTS* event, PlayingAudio* audio)
 		UnsignedInt channels = 1;
 		UnsignedInt bitPerSample = 16;
 #ifdef SAGE_USE_FFMPEG
-		AudioFileCache::getWaveData(fileBuffer, data, size, freq, channels, bitPerSample);
+		OpenALAudioFileCache::getWaveData(fileBuffer, data, size, freq, channels, bitPerSample);
 #endif
 		alGenBuffers(1, &audio->m_buffer);
 		DEBUG_ASSERTLOG(checkALError(), ("Failed to generate buffer"));

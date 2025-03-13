@@ -99,7 +99,7 @@ MilesAudioManager::MilesAudioManager() :
 	m_pref3DProvider(AsciiString::TheEmptyString),
 	m_prefSpeaker(AsciiString::TheEmptyString)
 {
-	m_audioCache = NEW AudioFileCache;
+	m_audioCache = NEW MilesAudioFileCache;
 }
 
 //-------------------------------------------------------------------------------------------------

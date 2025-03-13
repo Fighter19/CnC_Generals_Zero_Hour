@@ -8,12 +8,12 @@
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-AudioFileCache::AudioFileCache() : m_maxSize(0), m_currentlyUsedSize(0), m_mutexName("AudioFileCacheMutex")
+MilesAudioFileCache::MilesAudioFileCache() : m_maxSize(0), m_currentlyUsedSize(0), m_mutexName("MilesAudioFileCacheMutex")
 {
 }
 
 //-------------------------------------------------------------------------------------------------
-AudioFileCache::~AudioFileCache()
+MilesAudioFileCache::~MilesAudioFileCache()
 {
 	{
 		std::lock_guard mut(m_mutex);
@@ -33,7 +33,7 @@ AudioFileCache::~AudioFileCache()
 }
 
 //-------------------------------------------------------------------------------------------------
-void *AudioFileCache::openFile( AudioEventRTS *eventToOpenFrom )
+void *MilesAudioFileCache::openFile( AudioEventRTS *eventToOpenFrom )
 {
 	// Protect the entire openFile function
 	std::lock_guard mut(m_mutex);
@@ -124,7 +124,7 @@ void *AudioFileCache::openFile( AudioEventRTS *eventToOpenFrom )
 }
 
 //-------------------------------------------------------------------------------------------------
-void AudioFileCache::closeFile( void *fileToClose )
+void MilesAudioFileCache::closeFile( void *fileToClose )
 {
 	if (!fileToClose) {
 		return;
@@ -143,7 +143,7 @@ void AudioFileCache::closeFile( void *fileToClose )
 }
 
 //-------------------------------------------------------------------------------------------------
-void AudioFileCache::setMaxSize( UnsignedInt size )
+void MilesAudioFileCache::setMaxSize( UnsignedInt size )
 {
 	// Protect the function, in case we're trying to use this value elsewhere.
 	std::lock_guard mut(m_mutex);
@@ -152,7 +152,7 @@ void AudioFileCache::setMaxSize( UnsignedInt size )
 }
 
 //-------------------------------------------------------------------------------------------------
-void AudioFileCache::releaseOpenAudioFile( OpenAudioFile *fileToRelease )
+void MilesAudioFileCache::releaseOpenAudioFile( OpenAudioFile *fileToRelease )
 {
 	if (fileToRelease->m_openCount > 0) {
 		// This thing needs to be terminated IMMEDIATELY.
@@ -173,7 +173,7 @@ void AudioFileCache::releaseOpenAudioFile( OpenAudioFile *fileToRelease )
 }
 
 //-------------------------------------------------------------------------------------------------
-Bool AudioFileCache::freeEnoughSpaceForSample(const OpenAudioFile& sampleThatNeedsSpace)
+Bool MilesAudioFileCache::freeEnoughSpaceForSample(const OpenAudioFile& sampleThatNeedsSpace)
 {
 	
 	Int spaceRequired = m_currentlyUsedSize - m_maxSize;

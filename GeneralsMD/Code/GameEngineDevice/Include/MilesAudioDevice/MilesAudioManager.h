@@ -61,7 +61,7 @@ struct ProviderInfo
 };
 
 struct PlayingAudio;
-struct AudioFileCache;
+struct MilesAudioFileCache;
 
 class MilesAudioManager : public AudioManager
 {
@@ -246,7 +246,7 @@ class MilesAudioManager : public AudioManager
 		// in the sound engine
 		std::list<PlayingAudio *> m_stoppedAudio;
 
-		AudioFileCache *m_audioCache;
+		MilesAudioFileCache *m_audioCache;
 		PlayingAudio *m_binkHandle;
 		UnsignedInt m_num2DSamples;
 		UnsignedInt m_num3DSamples;

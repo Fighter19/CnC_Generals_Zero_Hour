@@ -67,13 +67,13 @@ struct OpenAudioFile
 typedef std::unordered_map< AsciiString, OpenAudioFile, rts::hash<AsciiString>, rts::equal_to<AsciiString> > OpenFilesHash;
 typedef OpenFilesHash::iterator OpenFilesHashIt;
 
-class AudioFileCache
+class MilesAudioFileCache
 {
 	public:
-		AudioFileCache();
+		MilesAudioFileCache();
 		
 		// Protected by mutex
-		virtual ~AudioFileCache();
+		virtual ~MilesAudioFileCache();
 		void *openFile( AudioEventRTS *eventToOpenFrom );
 		void closeFile( void *fileToClose );
 		void setMaxSize( UnsignedInt size );

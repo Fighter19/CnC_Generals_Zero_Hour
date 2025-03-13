@@ -39,7 +39,7 @@ if (SAGE_USE_OPENAL)
         ${CMAKE_CURRENT_SOURCE_DIR}/Source/OpenALAudioDevice/OpenALAudioCache.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Source/OpenALAudioDevice/OpenALAudioManager.cpp
     )
-    find_package(OpenAL REQUIRED)
+    find_package(OpenAL CONFIG REQUIRED)
     target_link_libraries(GameEngineDevice PUBLIC OpenAL::OpenAL)
     target_compile_definitions(GameEngineDevice PUBLIC SAGE_USE_OPENAL)
 endif()

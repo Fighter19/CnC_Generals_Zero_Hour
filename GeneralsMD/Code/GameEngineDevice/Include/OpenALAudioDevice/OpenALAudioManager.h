@@ -64,7 +64,7 @@ struct ProviderInfo
 };
 
 struct PlayingAudio;
-struct AudioFileCache;
+struct OpenALAudioFileCache;
 
 class OpenALAudioManager : public AudioManager
 {
@@ -236,7 +236,7 @@ protected:
 	// in the sound engine
 	std::list<PlayingAudio *> m_stoppedAudio;
 
-	AudioFileCache *m_audioCache;
+	OpenALAudioFileCache *m_audioCache;
 	PlayingAudio *m_binkHandle;
 	UnsignedInt m_num2DSamples;
 	UnsignedInt m_num3DSamples;

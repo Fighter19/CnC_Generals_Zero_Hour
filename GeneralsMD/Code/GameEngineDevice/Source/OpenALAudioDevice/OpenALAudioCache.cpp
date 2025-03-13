@@ -33,11 +33,11 @@ struct WavHeader
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-AudioFileCache::AudioFileCache() : m_maxSize(0), m_currentlyUsedSize(0)
+OpenALAudioFileCache::OpenALAudioFileCache() : m_maxSize(0), m_currentlyUsedSize(0)
 {
 }
 
-Bool AudioFileCache::decodeFFmpeg(OpenAudioFile* file)
+Bool OpenALAudioFileCache::decodeFFmpeg(OpenAudioFile* file)
 {
 	auto on_frame = [](AVFrame* frame, int stream_idx, int stream_type, void* user_data) {
 		OpenAudioFile* file = static_cast<OpenAudioFile*>(user_data);
@@ -70,7 +70,7 @@ Bool AudioFileCache::decodeFFmpeg(OpenAudioFile* file)
 }
 
 //-------------------------------------------------------------------------------------------------
-AudioFileCache::~AudioFileCache()
+OpenALAudioFileCache::~OpenALAudioFileCache()
 {
 	{
 		std::lock_guard mut(m_mutex);
@@ -90,7 +90,7 @@ AudioFileCache::~AudioFileCache()
 
 }
 
-void* AudioFileCache::openFile(AsciiString& filename)
+void* OpenALAudioFileCache::openFile(AsciiString& filename)
 {
 	// Protect the entire openFile function
 	std::lock_guard mut(m_mutex);
@@ -146,7 +146,7 @@ void* AudioFileCache::openFile(AsciiString& filename)
 }
 
 //-------------------------------------------------------------------------------------------------
-void* AudioFileCache::openFile(AudioEventRTS* eventToOpenFrom)
+void* OpenALAudioFileCache::openFile(AudioEventRTS* eventToOpenFrom)
 {
 	// Protect the entire openFile function
 	std::lock_guard mut(m_mutex);
@@ -226,7 +226,7 @@ void* AudioFileCache::openFile(AudioEventRTS* eventToOpenFrom)
 }
 
 //-------------------------------------------------------------------------------------------------
-void AudioFileCache::closeFile(void* fileToClose)
+void OpenALAudioFileCache::closeFile(void* fileToClose)
 {
 	if (!fileToClose) {
 		return;
@@ -244,7 +244,7 @@ void AudioFileCache::closeFile(void* fileToClose)
 	}
 }
 
-float AudioFileCache::getFileLength(void* file)
+float OpenALAudioFileCache::getFileLength(void* file)
 {
 	if (file == nullptr) {
 		return 0.0f;
@@ -262,7 +262,7 @@ float AudioFileCache::getFileLength(void* file)
 }
 
 //-------------------------------------------------------------------------------------------------
-void AudioFileCache::setMaxSize(UnsignedInt size)
+void OpenALAudioFileCache::setMaxSize(UnsignedInt size)
 {
 	// Protect the function, in case we're trying to use this value elsewhere.
 	std::lock_guard mut(m_mutex);
@@ -271,7 +271,7 @@ void AudioFileCache::setMaxSize(UnsignedInt size)
 }
 
 //-------------------------------------------------------------------------------------------------
-void AudioFileCache::releaseOpenAudioFile(OpenAudioFile* fileToRelease)
+void OpenALAudioFileCache::releaseOpenAudioFile(OpenAudioFile* fileToRelease)
 {
 	if (fileToRelease->m_openCount > 0) {
 		// This thing needs to be terminated IMMEDIATELY.
@@ -295,7 +295,7 @@ void AudioFileCache::releaseOpenAudioFile(OpenAudioFile* fileToRelease)
 }
 
 //-------------------------------------------------------------------------------------------------
-Bool AudioFileCache::freeEnoughSpaceForSample(const OpenAudioFile& sampleThatNeedsSpace)
+Bool OpenALAudioFileCache::freeEnoughSpaceForSample(const OpenAudioFile& sampleThatNeedsSpace)
 {
 
 	Int spaceRequired = m_currentlyUsedSize - m_maxSize;
@@ -355,7 +355,7 @@ Bool AudioFileCache::freeEnoughSpaceForSample(const OpenAudioFile& sampleThatNee
 	return TRUE;
 }
 
-void AudioFileCache::getWaveData(void* wave_data,
+void OpenALAudioFileCache::getWaveData(void* wave_data,
 	uint8_t*& data,
 	UnsignedInt& size,
 	UnsignedInt& freq,
@@ -371,7 +371,7 @@ void AudioFileCache::getWaveData(void* wave_data,
 	bitsPerSample = header->bits_per_sample;
 }
 
-void AudioFileCache::fillWaveData(OpenAudioFile* open_audio)
+void OpenALAudioFileCache::fillWaveData(OpenAudioFile* open_audio)
 {
 	WavHeader wav;
 	wav.chunk_size = open_audio->m_fileSize - (offsetof(WavHeader, chunk_size) + sizeof(uint32_t));

@@ -10,7 +10,20 @@ add_subdirectory(GameEngineDevice)
 if(WIN32)
     add_executable(RTS WIN32 Main/WinMain.cpp)
     target_link_libraries(RTS GameEngine GameEngineDevice winmm Imm32 vfw32)
-    install(TARGETS RTS RUNTIME DESTINATION .)
+    install(TARGETS RTS RUNTIME_DEPENDENCIES
+        PRE_EXCLUDE_REGEXES
+            "api-ms-.*" # windows API
+            "ext-ms-.*" # windows API
+            "^hvsifiletrust\\.dll$"
+            "^pdmutilities\\.dll$"
+            "^wpaxholder\\.dll$"
+            "^vc.*"
+            "^msvcp.*"
+            "^concrt.*"
+        POST_EXCLUDE_REGEXES
+            ".*system32/.*\.dll" # windows system dlls
+        RUNTIME DESTINATION .
+    )
 endif()
 
 if(SAGE_BUILD_TOOLS)
