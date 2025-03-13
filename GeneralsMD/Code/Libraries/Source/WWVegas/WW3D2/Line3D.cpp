@@ -325,7 +325,7 @@ void Line3DClass::Render(RenderInfoClass & rinfo)
  *========================================================================*/
 void Line3DClass::Scale(float scale)
 {	
-	for (int i=0; i<8; i++) vert[i]*=scale;
+	for (auto & i : vert) i*=scale;
 	Length *= scale;
    Width *= scale;
 
@@ -356,7 +356,7 @@ void Line3DClass::Scale(float scalex, float scaley, float scalez)
 	// The line width is always the same in the y and z axes (the line
 	// approximates a cylinder).
 	Vector3 scale(scalex,scaley,scalez);
-	for (int i=0; i<8; i++) vert[i].Scale(scale);	
+	for (auto & i : vert) i.Scale(scale);	
 	Length *= scalex;
    Width *= scaley;
 

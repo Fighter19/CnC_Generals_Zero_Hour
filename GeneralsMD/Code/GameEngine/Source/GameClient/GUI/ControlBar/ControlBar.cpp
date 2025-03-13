@@ -825,8 +825,8 @@ CommandSet::CommandSet(const AsciiString& name) :
 	m_name(name),
 	m_next(NULL)
 {
-	for( Int i = 0; i < MAX_COMMANDS_PER_SET; i++ )
-		m_command[ i ] = NULL;
+	for(auto & i : m_command)
+		i = NULL;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1462,10 +1462,9 @@ void ControlBar::update( void )
 	if( m_flash )
 	{
 		// go through all the command buttons to see which one needs to flash
-		for( Int i = 0; i < MAX_COMMANDS_PER_SET; ++i )
+		for(auto button : m_commandWindows)
 		{
-			GameWindow *button = m_commandWindows[ i ];
-			if( button != NULL)
+				if( button != NULL)
 			{
 				const CommandButton *commandButton = (const CommandButton *)GadgetButtonGetData(button);
 				if( commandButton != NULL )
@@ -2161,12 +2160,12 @@ void ControlBar::switchToContext( ControlBarContext context, Drawable *draw )
 			m_contextParent[ CP_OBSERVER_LIST ]->winHide( TRUE );
 
 			//Clear any potentially flashing buttons!
-			for( int i = 0; i < MAX_COMMANDS_PER_SET; i++ )
+			for(auto & m_commandWindow : m_commandWindows)
 			{
 				// the implementation won't necessarily use the max number of windows possible
-				if (m_commandWindows[ i ]) 
+				if (m_commandWindow) 
 				{
-					m_commandWindows[ i ]->winClearStatus( WIN_STATUS_FLASHING );
+					m_commandWindow->winClearStatus( WIN_STATUS_FLASHING );
 				}
 			}
 			// if there is a current selected drawable then we wil display a selection portrait if present
@@ -2565,8 +2564,8 @@ void ControlBar::setPortraitByImage( const Image *image )
 		//m_rightHUDWindow->winSetEnabledImage( 0, image );
 		m_rightHUDWindow->winClearStatus( WIN_STATUS_IMAGE );
 		m_rightHUDCameoWindow->winSetStatus( WIN_STATUS_IMAGE );
-		for(Int i = 0; i < MAX_UPGRADE_CAMEO_UPGRADES; ++i)
-			m_rightHUDUpgradeCameos[i]->winHide(TRUE);
+		for(auto & m_rightHUDUpgradeCameo : m_rightHUDUpgradeCameos)
+			m_rightHUDUpgradeCameo->winHide(TRUE);
 
 	}  // end if
 	else
@@ -2574,8 +2573,8 @@ void ControlBar::setPortraitByImage( const Image *image )
 		m_rightHUDWindow->winSetStatus( WIN_STATUS_IMAGE );
 		m_rightHUDCameoWindow->winClearStatus( WIN_STATUS_IMAGE );
 		m_rightHUDUnitSelectParent->winHide(TRUE);
-		for(Int i = 0; i < MAX_UPGRADE_CAMEO_UPGRADES; ++i)
-			m_rightHUDUpgradeCameos[i]->winHide(TRUE);
+		for(auto & m_rightHUDUpgradeCameo : m_rightHUDUpgradeCameos)
+			m_rightHUDUpgradeCameo->winHide(TRUE);
 		//m_rightHUDWindow->winSetEnabledImage( 0, image );
 		//m_rightHUDWindow->winSetStatus( WIN_STATUS_IMAGE );
 
@@ -2677,8 +2676,8 @@ void ControlBar::setPortraitByObject( Object *obj )
 		m_rightHUDUnitSelectParent->winHide(TRUE);
 		m_rightHUDWindow->winSetStatus( WIN_STATUS_IMAGE );
 		m_rightHUDCameoWindow->winClearStatus( WIN_STATUS_IMAGE );
-		for(Int i = 0; i < MAX_UPGRADE_CAMEO_UPGRADES; ++i)
-			m_rightHUDUpgradeCameos[i]->winHide(TRUE);
+		for(auto & m_rightHUDUpgradeCameo : m_rightHUDUpgradeCameos)
+			m_rightHUDUpgradeCameo->winHide(TRUE);
 
 		//Clear any overlay the portrait had on it.
 		GadgetButtonDrawOverlayImage( m_rightHUDCameoWindow, NULL );
@@ -3675,9 +3674,9 @@ void ControlBar::drawSpecialPowerShortcutMultiplierText()
 			continue;
 
 		//draw superweapon ready multipliers
-		for( int i = 0; i < MAX_SPECIAL_POWER_SHORTCUTS; i++ )
+		for(auto & m_shortcutDisplayString : m_shortcutDisplayStrings)
 		{
-			if( !m_shortcutDisplayStrings[ i ] )
+			if( !m_shortcutDisplayString )
 			{
 				//m_shortcutDisplayStrings[ i ] = TheDisplayStringManager->newDisplayString();
 				//m_shortcutDisplayStrings[ i ]->setFont( TheFontLibrary->getFont( "Arial", 16, false ) );

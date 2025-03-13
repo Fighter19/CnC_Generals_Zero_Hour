@@ -1705,9 +1705,9 @@ void GameLogic::logicMessageDispatcher( GameMessage *msg, void *userData )
 			if( allSelectedObjects )
 			{
 				const VecObjectID& selectedObjects = allSelectedObjects->getAllIDs();
-				for (VecObjectID::const_iterator it = selectedObjects.begin(); it != selectedObjects.end(); ++it)
+				for (auto selectedObject : selectedObjects)
 				{
-					Object *beacon = findObjectByID(*it);
+					Object *beacon = findObjectByID(selectedObject);
 					if (beacon)
 					{
 						const ThingTemplate *thing = TheThingFactory->findTemplate( beacon->getControllingPlayer()->getPlayerTemplate()->getBeaconTemplate() );
@@ -1757,9 +1757,9 @@ void GameLogic::logicMessageDispatcher( GameMessage *msg, void *userData )
 			if( currentlySelectedGroup )
 			{
 				const VecObjectID& selectedObjects = currentlySelectedGroup->getAllIDs();
-				for (VecObjectID::const_iterator it = selectedObjects.begin(); it != selectedObjects.end(); ++it)
+				for (auto selectedObject : selectedObjects)
 				{
-					Object *beacon = findObjectByID(*it);
+					Object *beacon = findObjectByID(selectedObject);
 					if (beacon)
 					{
 						Drawable *beaconDrawable = beacon->getDrawable();
@@ -1996,9 +1996,9 @@ void GameLogic::logicMessageDispatcher( GameMessage *msg, void *userData )
 	{
 		const VecObjectID& selectedObjects = currentlySelectedGroup->getAllIDs();
 		TheInGameUI->deselectAllDrawables();
-		for (VecObjectID::const_iterator it = selectedObjects.begin(); it != selectedObjects.end(); ++it)
+		for (auto selectedObject : selectedObjects)
 		{
-			const Object *obj = findObjectByID(*it);
+			const Object *obj = findObjectByID(selectedObject);
 			if (obj)
 			{
 				Drawable *draw = obj->getDrawable();

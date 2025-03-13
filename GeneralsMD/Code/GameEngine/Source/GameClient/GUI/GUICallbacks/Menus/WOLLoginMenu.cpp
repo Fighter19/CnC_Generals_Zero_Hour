@@ -92,10 +92,10 @@ class GameSpyLoginPreferences : public UserPreferences
 {
 public:
 	GameSpyLoginPreferences() { m_emailPasswordMap.clear(); m_emailNickMap.clear(); }
-	virtual ~GameSpyLoginPreferences() { m_emailPasswordMap.clear(); m_emailNickMap.clear(); }
+	~GameSpyLoginPreferences() override { m_emailPasswordMap.clear(); m_emailNickMap.clear(); }
 
-	virtual Bool load(AsciiString fname);
-	virtual Bool write(void);
+	Bool load(AsciiString fname) override;
+	Bool write(void) override;
 
 	AsciiString getPasswordForEmail( AsciiString email );
 	AsciiString getDateForEmail( AsciiString email, AsciiString &month, AsciiString &date, AsciiString &year  );

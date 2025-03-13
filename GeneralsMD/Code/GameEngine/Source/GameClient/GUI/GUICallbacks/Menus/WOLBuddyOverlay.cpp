@@ -705,10 +705,9 @@ void PopulateOldBuddyMessages(void)
 {
 	// show previous messages
 	BuddyMessageList *messages = TheGameSpyInfo->getBuddyMessages();
-	for (BuddyMessageList::iterator mIt = messages->begin(); mIt != messages->end(); ++mIt)
+	for (auto message : *messages)
 	{
-		BuddyMessage message = *mIt;
-		insertChat(message);
+			insertChat(message);
 	}
 }
 

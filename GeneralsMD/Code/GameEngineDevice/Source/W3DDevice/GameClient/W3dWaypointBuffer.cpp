@@ -176,9 +176,9 @@ void W3DWaypointBuffer::drawWaypoints(RenderInfoClass &rinfo)
 
 		const DrawableList *selected = TheInGameUI->getAllSelectedDrawables();
 		Drawable *draw;
-		for( DrawableListCIt it = selected->begin(); it != selected->end(); ++it )
+		for(auto it : *selected)
 		{
-			draw = *it;
+			draw = it;
 			Object *obj = draw->getObject();
 			Int numPoints = 1;
 			if( obj && ! obj->isKindOf( KINDOF_IGNORED_IN_GUI ))//so mobs and stuff sont make a gazillion lines
@@ -228,9 +228,9 @@ void W3DWaypointBuffer::drawWaypoints(RenderInfoClass &rinfo)
 
 		const DrawableList *selected = TheInGameUI->getAllSelectedDrawables();
 		Drawable *draw;
-		for( DrawableListCIt it = selected->begin(); it != selected->end(); ++it )
+		for(auto it : *selected)
 		{
-			draw = *it;
+			draw = it;
 			Object *obj = draw->getObject();
 
 			Int numPoints = 0;
@@ -438,9 +438,9 @@ void W3DWaypointBuffer::drawWaypoints(RenderInfoClass &rinfo)
 									Real elbowDistanceNear = 99999.9f;
 									Real elbowDistanceFar = 99999.9f;
 									
-									for (UnsignedInt cornerIndex = 0; cornerIndex < 4; ++ cornerIndex)
+									for (auto & corner : corners)
 									{
-										nearCandidate = &corners[cornerIndex];//for quicker array access
+										nearCandidate = &corner;//for quicker array access
 										cornerToExitDelta.x = exitPoint.x - nearCandidate->x;
 										cornerToExitDelta.y = exitPoint.y - nearCandidate->y;
 										cornerToExitDelta.normalize();

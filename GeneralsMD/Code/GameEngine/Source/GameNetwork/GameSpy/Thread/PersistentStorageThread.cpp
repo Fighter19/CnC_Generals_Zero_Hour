@@ -374,20 +374,20 @@ class PSThreadClass;
 class GameSpyPSMessageQueue : public GameSpyPSMessageQueueInterface
 {
 public:
-	virtual ~GameSpyPSMessageQueue();
+	~GameSpyPSMessageQueue() override;
 	GameSpyPSMessageQueue();
-	virtual void startThread( void );
-	virtual void endThread( void );
-	virtual Bool isThreadRunning( void );
+	void startThread( void ) override;
+	void endThread( void ) override;
+	Bool isThreadRunning( void ) override;
 
-	virtual void addRequest( const PSRequest& req );
-	virtual Bool getRequest( PSRequest& req );
+	void addRequest( const PSRequest& req ) override;
+	Bool getRequest( PSRequest& req ) override;
 
-	virtual void addResponse( const PSResponse& resp );
-	virtual Bool getResponse( PSResponse& resp );
+	void addResponse( const PSResponse& resp ) override;
+	Bool getResponse( PSResponse& resp ) override;
 
-	virtual void trackPlayerStats( PSPlayerStats stats );
-	virtual PSPlayerStats findPlayerStatsByID( Int id );
+	void trackPlayerStats( PSPlayerStats stats ) override;
+	PSPlayerStats findPlayerStatsByID( Int id ) override;
 
 	PSThreadClass* getThread( void );
 
@@ -437,7 +437,7 @@ public:
 		m_opCount = 0; 
 	}
 
-	void Thread_Function();
+	void Thread_Function() override;
 
 	void persAuthCallback( Bool val ) { m_loginOK = val; m_doneTryingToLogin = true; }
 	void decrOpCount( void ) { --m_opCount; }

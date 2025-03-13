@@ -118,13 +118,13 @@ Bool DockUpdate::isClearToApproach( Object const* docker ) const
 
 	ObjectID dockerID = docker->getID();
 
-	for( Int positionIndex = 0; positionIndex < m_approachPositionOwners.size(); ++positionIndex )
+	for(auto m_approachPositionOwner : m_approachPositionOwners)
 	{
-		if( m_approachPositionOwners[positionIndex] == INVALID_ID )
+		if( m_approachPositionOwner == INVALID_ID )
 		{
 			return TRUE;
 		}
-		if( m_approachPositionOwners[positionIndex] == dockerID )
+		if( m_approachPositionOwner == dockerID )
 		{
 			return TRUE;
 		}

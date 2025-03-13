@@ -67,8 +67,8 @@
 HTreeManagerClass::HTreeManagerClass(void) :
 	NumTrees(0)
 {
-	for (int treeidx=0; treeidx < MAX_TREES; treeidx++) {
-		TreePtr[treeidx] = NULL;
+	for (auto & treeidx : TreePtr) {
+		treeidx = NULL;
 	}
 }
 
@@ -123,10 +123,10 @@ void HTreeManagerClass::Free_All_Trees(void)
 	// Clear the hash table
 	TreeHash.Remove_All();
 
-	for (int treeidx=0; treeidx < MAX_TREES; treeidx++) {
-		if (TreePtr[treeidx] != NULL) {
-			delete TreePtr[treeidx];
-			TreePtr[treeidx] = NULL;
+	for (auto & treeidx : TreePtr) {
+		if (treeidx != NULL) {
+			delete treeidx;
+			treeidx = NULL;
 		}
 	}
 	NumTrees = 0;
@@ -149,20 +149,20 @@ void HTreeManagerClass::Free_All_Trees_With_Exclusion_List(const W3DExclusionLis
 	// or copying it to the new tail index if it is excluded.
 	int new_tail = 0;
 
-	for (int treeidx=0; treeidx < MAX_TREES; treeidx++) {
-		if (TreePtr[treeidx] != NULL) {
+	for (auto & treeidx : TreePtr) {
+		if (treeidx != NULL) {
 			
-			if (exclusion_list.Is_Excluded(TreePtr[treeidx])) {
+			if (exclusion_list.Is_Excluded(treeidx)) {
 
 				//WWDEBUG_SAY(("excluding tree %s\n",TreePtr[treeidx]->Get_Name()));
-				TreePtr[new_tail] = TreePtr[treeidx];
+				TreePtr[new_tail] = treeidx;
 				new_tail++;
 
 			} else {
 				
 				//WWDEBUG_SAY(("deleting tree %s\n",TreePtr[treeidx]->Get_Name()));
-				delete TreePtr[treeidx];
-				TreePtr[treeidx] = NULL;
+				delete treeidx;
+				treeidx = NULL;
 			}
 		}
 	}

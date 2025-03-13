@@ -161,8 +161,8 @@ NAT::NAT()
 	m_numNodes = 0;
 	m_numRetries = 0;
 	m_previousSourcePort = 0;
-	for(Int i = 0; i < MAX_SLOTS; i++)
-		m_sourcePorts[i] = 0;
+	for(unsigned short & m_sourcePort : m_sourcePorts)
+		m_sourcePort = 0;
 	m_spareSocketPort = 0;
 	m_startingPortNumber = 0;
 	m_targetNodeNumber = 0;
@@ -338,14 +338,14 @@ NATConnectionState NAT::connectionUpdate() {
 	m_transport->update();
 
 	// check to see if we've been probed.
-	for (Int i = 0; i < MAX_MESSAGES; ++i) {
-		if (m_transport->m_inBuffer[i].length > 0) {
+	for (auto & i : m_transport->m_inBuffer) {
+		if (i.length > 0) {
 #ifdef DEBUG_LOGGING
 			UnsignedInt ip = m_transport->m_inBuffer[i].addr;
 #endif
 			DEBUG_LOG(("NAT::connectionUpdate - got a packet from %d.%d.%d.%d:%d, length = %d\n",
 									ip >> 24, (ip >> 16) & 0xff, (ip >> 8) & 0xff, ip & 0xff, m_transport->m_inBuffer[i].port, m_transport->m_inBuffer[i].length));
-			UnsignedByte *data = m_transport->m_inBuffer[i].data;
+			UnsignedByte *data = i.data;
 			if (memcmp(data, "PROBE", strlen("PROBE")) == 0) {
 				Int fromNode = atoi((char *)data + strlen("PROBE"));
 				DEBUG_LOG(("NAT::connectionUpdate - we've been probed by node %d.\n", fromNode));
@@ -354,8 +354,8 @@ NATConnectionState NAT::connectionUpdate() {
 					DEBUG_LOG(("NAT::connectionUpdate - probe was sent by our target, setting connection state %d to done.\n", m_targetNodeNumber));
 					setConnectionState(m_targetNodeNumber, NATCONNECTIONSTATE_DONE);
 
-					if (m_transport->m_inBuffer[i].addr != targetSlot->getIP()) {
-						UnsignedInt fromIP = m_transport->m_inBuffer[i].addr;
+					if (i.addr != targetSlot->getIP()) {
+						UnsignedInt fromIP = i.addr;
 #ifdef DEBUG_LOGGING
 						UnsignedInt slotIP = targetSlot->getIP();
 #endif
@@ -364,22 +364,22 @@ NATConnectionState NAT::connectionUpdate() {
 												slotIP >> 24, (slotIP >> 16) & 0xff, (slotIP >> 8) & 0xff, slotIP & 0xff));
 						targetSlot->setIP(fromIP);
 					}
-					if (m_transport->m_inBuffer[i].port != targetSlot->getPort()) {
+					if (i.port != targetSlot->getPort()) {
 						DEBUG_LOG(("NAT::connectionUpdate - incoming packet came from a different port than we expected, incoming: %d expected: %d\n",
 												m_transport->m_inBuffer[i].port, targetSlot->getPort()));
-						targetSlot->setPort(m_transport->m_inBuffer[i].port);
-						m_sourcePorts[m_targetNodeNumber] = m_transport->m_inBuffer[i].port;
+						targetSlot->setPort(i.port);
+						m_sourcePorts[m_targetNodeNumber] = i.port;
 					}
 					notifyUsersOfConnectionDone(m_targetNodeNumber);
 				}
 
-				m_transport->m_inBuffer[i].length = 0;
+				i.length = 0;
 			}
 			if (memcmp(data, "KEEPALIVE", strlen("KEEPALIVE")) == 0) {
 				// keep alive packet, just toss it.
 				DEBUG_LOG(("NAT::connectionUpdate - got keepalive from %d.%d.%d.%d:%d\n",
 										ip >> 24, (ip >> 16) & 0xff, (ip >> 8) && 0xff, ip & 0xff, m_transport->m_inBuffer[i].port));
-				m_transport->m_inBuffer[i].length = 0;
+				i.length = 0;
 			}
 		}
 	}

@@ -187,8 +187,8 @@ RTS3DScene::RTS3DScene()
 		vmtl->Release_Ref();	//material pass is holding the pointer so release ref.
 	}
 #else
-	for (Int i=0; i<MAX_PLAYER_COUNT; i++)
-		m_occludedMaterialPass[i]=NULL;
+	for (auto & m_occludedMaterialPas : m_occludedMaterialPass)
+		m_occludedMaterialPas=NULL;
 #endif
 
 }  // end RTS3DScene
@@ -228,8 +228,8 @@ RTS3DScene::~RTS3DScene()
 	if (m_potentialOccluders)
 		delete [] m_potentialOccluders;
 
-	for (Int i=0; i<MAX_PLAYER_COUNT; i++)
-	{	REF_PTR_RELEASE(m_occludedMaterialPass[i]);
+	for (auto & m_occludedMaterialPas : m_occludedMaterialPass)
+	{	REF_PTR_RELEASE(m_occludedMaterialPas);
 	}
 
 }  // end ~RTS3DScene

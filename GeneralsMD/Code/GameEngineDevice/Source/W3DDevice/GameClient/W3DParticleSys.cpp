@@ -152,10 +152,9 @@ void W3DParticleSystemManager::doParticles(RenderInfoClass &rinfo)
 		set=TheSmudgeManager->addSmudgeSet();	//global smudge set through which all smudges are rendered.
 
 	ParticleSystemManager::ParticleSystemList &particleSysList = TheParticleSystemManager->getAllParticleSystems();
-	for( ParticleSystemManager::ParticleSystemListIt it = particleSysList.begin(); it != particleSysList.end(); ++it)
+	for(auto sys : particleSysList)
 	{
-		ParticleSystem *sys = (*it);
-		if (!sys) {
+			if (!sys) {
 			continue;
 		}
 

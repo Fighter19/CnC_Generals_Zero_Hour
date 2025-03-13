@@ -152,9 +152,9 @@ OpenContain::OpenContain( Thing *thing, const ModuleData* moduleData ) : UpdateM
   m_passengerAllowedToFire = getOpenContainModuleData()->m_passengersAllowedToFire; 
   // overridable by setPass...()  in the parent interface (for use by upgrade module)
 
-	for( Int i = 0; i < MAX_FIRE_POINTS; i++ )
+	for(auto & m_firePoint : m_firePoints)
 	{		
-		m_firePoints[ i ].Make_Identity();
+		m_firePoint.Make_Identity();
 	}  // end for i
 
 }
@@ -270,10 +270,10 @@ void OpenContain::addOrRemoveObjFromWorld(Object* obj, Bool add)
 		const ContainedItemsList* items = obj->getContain()->getContainedItemsList();
 		if (items)
 		{
-			for(ContainedItemsList::const_iterator it = items->begin(); it != items->end(); ++it)
+			for(auto item : *items)
 			{
-				if( !obj->getContain()->isEnclosingContainerFor(*it) )
-					addOrRemoveObjFromWorld(*it, add);
+				if( !obj->getContain()->isEnclosingContainerFor(item) )
+					addOrRemoveObjFromWorld(item, add);
 			}
 		}
 	}
@@ -768,9 +768,9 @@ Real OpenContain::getContainedItemsMass() const
 {
 	/// @todo srj -- may want to cache this information.
 	Real mass = 0;
-	for(ContainedItemsList::const_iterator it = m_containList.begin(); it != m_containList.end(); ++it)
+	for(auto it : m_containList)
 	{
-		PhysicsBehavior* phys = (*it)->getPhysics();
+		PhysicsBehavior* phys = it->getPhysics();
 		if (phys)
 			mass += phys->getMass();
 	}

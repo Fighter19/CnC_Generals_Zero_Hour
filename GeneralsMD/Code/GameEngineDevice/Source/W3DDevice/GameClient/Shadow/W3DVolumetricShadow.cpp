@@ -592,9 +592,9 @@ class W3DShadowGeometry : public RefCountClass, public	HashableClass
 	public:
 
 		W3DShadowGeometry( void ) { };
-		~W3DShadowGeometry( void ) { };
+		~W3DShadowGeometry( void ) override { };
 
-		virtual	const char * Get_Key( void )	{ return m_namebuf;	}
+			const char * Get_Key( void ) override	{ return m_namebuf;	}
 
 		Int init (RenderObjClass *robj);
 		Int initFromHLOD (RenderObjClass *robj);	///<initialize the geometry from a W3D HLOD object.
@@ -1169,13 +1169,13 @@ void W3DVolumetricShadow::updateOptimalExtrusionPadding(void)
 		//find the corner that causes the longest shadow projection
 		//and clamp light position to make sure it falls on even ground about
 		//the same height as the object's base.
-		for (Int i=0; i<4; i++)
+		for (const auto & Corner : Corners)
 		{
 			//Cast ray from top volume corners onto ground plane
-			lightRay = Corners[i] - lightPosWorld;	//vector light to corner
+			lightRay = Corner - lightPosWorld;	//vector light to corner
 			lightRay.Normalize();
 
-			raytest.Ray.Set(Corners[i],Corners[i]+lightRay*MAX_EXTRUSION_LENGTH);
+			raytest.Ray.Set(Corner,Corner+lightRay*MAX_EXTRUSION_LENGTH);
 			result.Reset();
 
 			//find out where this ray intersects terrain.
@@ -1185,7 +1185,7 @@ void W3DVolumetricShadow::updateOptimalExtrusionPadding(void)
 				//anywhere between the base and the intersection point.  If so, we either need
 				//to extend shadow extrusion or make the light angle more vertical.
 
-				shadowRay.Set(result.ContactPoint-Corners[i]);	//vector from object corner to terrain intersection.
+				shadowRay.Set(result.ContactPoint-Corner);	//vector from object corner to terrain intersection.
 				shadowRay.Z = 0;	//remove z-component since we'll be sampling along the xy plane.
 
 				//walk along the shadow/light direction vector looking for large dips - indicating object
@@ -1198,7 +1198,7 @@ void W3DVolumetricShadow::updateOptimalExtrusionPadding(void)
 				Real t=stepSize;
 				for (Int j=0; j<numSteps; j++)
 				{
-					terrainPoint = Corners[i] + shadowRay*t;
+					terrainPoint = Corner + shadowRay*t;
 					terrainPoint.Z=0;	//ignore height
 					
 					Real terrainHeight=TheTerrainRenderObject->getHeightMapHeight(terrainPoint.X,terrainPoint.Y,NULL);
@@ -1212,7 +1212,7 @@ void W3DVolumetricShadow::updateOptimalExtrusionPadding(void)
 						}
 
 						//Find ray from last valid terrain contact point to object box corner.
-						Vector3 clampRay(Corners[i]-lastValidTerrainPoint);
+						Vector3 clampRay(Corner-lastValidTerrainPoint);
 						Real clampAngle=asin(clampRay.Z/clampRay.Length());
 						if (clampAngle >= (PI/2.0f) || clampAngle <= 0)
 							clampAngle = OVERHANGING_OBJECT_CLAMP_ANGLE;	//clamp to about 89 degrees or close to vertical lightpos.
@@ -1565,11 +1565,11 @@ void W3DVolumetricShadow::RenderMeshVolumeBounds(Int meshIndex, Int lightIndex, 
 	}
 	srand(0x1345465);
 	if(pvVertices)
-	{	for (Int i=0; i<8; i++)
+	{	for (auto & vert : verts)
 		{
-			pvVertices->x=verts[i][0];
-			pvVertices->y=verts[i][1];
-			pvVertices->z=verts[i][2];
+			pvVertices->x=vert[0];
+			pvVertices->y=vert[1];
+			pvVertices->z=vert[2];
 #ifdef SV_DEBUG
 			pvVertices->diffuse=(rand()%255) | ((rand()%255)<<8) | ((rand()%255)<<16);
 #endif
@@ -3950,9 +3950,9 @@ class MissingGeomClass : public HashableClass {
 
 public:
 	MissingGeomClass( const char * name ) : Name( name ) {}
-	virtual	~MissingGeomClass( void ) {}
+		~MissingGeomClass( void ) override {}
 
-	virtual	const char * Get_Key( void )	{ return Name;	}
+		const char * Get_Key( void ) override	{ return Name;	}
 
 private:
 	StringClass	Name;

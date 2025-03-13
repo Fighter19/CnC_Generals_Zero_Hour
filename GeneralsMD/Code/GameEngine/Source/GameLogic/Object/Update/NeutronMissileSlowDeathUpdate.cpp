@@ -54,18 +54,18 @@
 NeutronMissileSlowDeathBehaviorModuleData::NeutronMissileSlowDeathBehaviorModuleData( void )
 {
 	
-	for( Int i = 0; i < MAX_NEUTRON_BLASTS; ++i )
+	for(auto & i : m_blastInfo)
 	{
 
-		m_blastInfo[ i ].enabled = FALSE;
-		m_blastInfo[ i ].delay = 0.0f;
-		m_blastInfo[ i ].scorchDelay = 0.0f;
-		m_blastInfo[ i ].innerRadius = 0.0f;
-		m_blastInfo[ i ].outerRadius = 0.0f;
-		m_blastInfo[ i ].maxDamage = 0.0f;
-		m_blastInfo[ i ].minDamage = 0.0f;
-		m_blastInfo[ i ].toppleSpeed = 0.0f;
-		m_blastInfo[ i ].pushForceMag = 0.0f;
+		i.enabled = FALSE;
+		i.delay = 0.0f;
+		i.scorchDelay = 0.0f;
+		i.innerRadius = 0.0f;
+		i.outerRadius = 0.0f;
+		i.maxDamage = 0.0f;
+		i.minDamage = 0.0f;
+		i.toppleSpeed = 0.0f;
+		i.pushForceMag = 0.0f;
 
 	}  // end for i
 	m_scorchSize = 0.0f;

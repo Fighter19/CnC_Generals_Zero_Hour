@@ -68,7 +68,7 @@ static class MouseThreadClass : public ThreadClass
 public:
 	MouseThreadClass() : ThreadClass() {}
 
-	void Thread_Function();
+	void Thread_Function() override;
 
 } thread;
 
@@ -152,9 +152,9 @@ void W3DMouse::initPolygonAssets(void)
 void W3DMouse::freePolygonAssets(void)
 {
 
-	for (Int i=0; i<NUM_MOUSE_CURSORS; i++)
+	for (auto & cursorImage : cursorImages)
 	{
-		cursorImages[i]=NULL;
+		cursorImage=NULL;
 	}
 }
 
@@ -244,14 +244,14 @@ void W3DMouse::initD3DAssets(void)
 void W3DMouse::freeD3DAssets(void)
 {
 	//free pointers to texture surfaces.
-	for (Int i=0; i<MAX_2D_CURSOR_ANIM_FRAMES; i++)
-		REF_PTR_RELEASE(m_currentD3DSurface[i]);
+	for (auto & i : m_currentD3DSurface)
+		REF_PTR_RELEASE(i);
 
 	//free textures.
-	for (Int i=0; i<NUM_MOUSE_CURSORS; i++)
+	for (auto & cursorTexture : cursorTextures)
 	{
-		for (Int j=0; j<MAX_2D_CURSOR_ANIM_FRAMES; j++)
-			REF_PTR_RELEASE(cursorTextures[i][j]);
+		for (auto & j : cursorTexture)
+			REF_PTR_RELEASE(j);
 	}
 
 }

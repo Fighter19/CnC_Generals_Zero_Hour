@@ -70,11 +70,11 @@ RailedTransportAIUpdate::RailedTransportAIUpdate( Thing *thing, const ModuleData
 {
 
 	m_inTransit = FALSE;
-	for( Int i = 0; i < MAX_WAYPOINT_PATHS; ++i )
+	for(auto & i : m_path)
 	{
 
-		m_path[ i ].startWaypointID = 0;
-		m_path[ i ].endWaypointID = 0;
+		i.startWaypointID = 0;
+		i.endWaypointID = 0;
 
 	}  // end for i
 	m_numPaths = 0;

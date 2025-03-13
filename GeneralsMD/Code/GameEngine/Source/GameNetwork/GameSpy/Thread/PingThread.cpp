@@ -56,23 +56,23 @@ class PingThreadClass;
 class Pinger : public PingerInterface
 {
 public:
-	virtual ~Pinger();
+	~Pinger() override;
 	Pinger();
-	virtual void startThreads( void );
-	virtual void endThreads( void );
-	virtual Bool areThreadsRunning( void );
+	void startThreads( void ) override;
+	void endThreads( void ) override;
+	Bool areThreadsRunning( void ) override;
 
-	virtual void addRequest( const PingRequest& req );
-	virtual Bool getRequest( PingRequest& resp );
+	void addRequest( const PingRequest& req ) override;
+	Bool getRequest( PingRequest& resp ) override;
 
-	virtual void addResponse( const PingResponse& resp );
-	virtual Bool getResponse( PingResponse& resp );
+	void addResponse( const PingResponse& resp ) override;
+	Bool getResponse( PingResponse& resp ) override;
 
-	virtual Bool arePingsInProgress( void );
-	virtual Int getPing( AsciiString hostname );
+	Bool arePingsInProgress( void ) override;
+	Int getPing( AsciiString hostname ) override;
 
-	virtual void clearPingMap( void );
-	virtual AsciiString getPingString( Int timeout );
+	void clearPingMap( void ) override;
+	AsciiString getPingString( Int timeout ) override;
 
 private:
 	MutexClass m_requestMutex;
@@ -103,7 +103,7 @@ class PingThreadClass : public ThreadClass
 public:
 	PingThreadClass() : ThreadClass() {}
 
-	void Thread_Function();
+	void Thread_Function() override;
 
 private:
 	Int doPing( UnsignedInt IP, Int timeout );
@@ -114,9 +114,9 @@ private:
 
 Pinger::Pinger() : m_requestCount(0), m_responseCount(0)
 {
-	for (Int i=0; i<NumWorkerThreads; ++i)
+	for (auto & m_workerThread : m_workerThreads)
 	{
-		m_workerThreads[i] = NULL;
+		m_workerThread = NULL;
 	}
 }
 
@@ -128,32 +128,32 @@ Pinger::~Pinger()
 void Pinger::startThreads( void )
 {
 	endThreads();
-	for (Int i=0; i<NumWorkerThreads; ++i)
+	for (auto & m_workerThread : m_workerThreads)
 	{
-		m_workerThreads[i] = NEW PingThreadClass;
-		m_workerThreads[i]->Execute();
+		m_workerThread = NEW PingThreadClass;
+		m_workerThread->Execute();
 	}
 }
 
 void Pinger::endThreads( void )
 {
-	for (Int i=0; i<NumWorkerThreads; ++i)
+	for (auto & m_workerThread : m_workerThreads)
 	{
-		if (m_workerThreads[i])
+		if (m_workerThread)
 		{
-			delete m_workerThreads[i];
-			m_workerThreads[i] = NULL;
+			delete m_workerThread;
+			m_workerThread = NULL;
 		}
 	}
 }
 
 Bool Pinger::areThreadsRunning( void )
 {
-	for (Int i=0; i<NumWorkerThreads; ++i)
+	for (auto & m_workerThread : m_workerThreads)
 	{
-		if (m_workerThreads[i])
+		if (m_workerThread)
 		{
-			if (m_workerThreads[i]->Is_Running())
+			if (m_workerThread->Is_Running())
 				return true;
 		}
 	}

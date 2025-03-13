@@ -401,7 +401,7 @@ AggregateDefClass::Initialize (RenderObjClass &base_model)
 	orig_model_name = (orig_model_name == NULL) ? base_model.Get_Name () : orig_model_name;
 
 	// Record information about this base model
-	::lstrcpy (m_Info.BaseModelName, orig_model_name);
+	::strcpy (m_Info.BaseModelName, orig_model_name);
 	m_Info.SubobjectCount = 0;
 	m_MiscInfo.OriginalClassID = base_model.Class_ID ();
 	m_MiscInfo.Flags = 0;	
@@ -481,8 +481,8 @@ AggregateDefClass::Build_Subobject_List
 					 (Is_Object_In_List (prototype_name, orig_node_list) == false)) {
 					
 					// Add this subobject to our list
-					::lstrcpy (subobj_info.SubobjectName, prototype_name);
-					::lstrcpy (subobj_info.BoneName, pbone_name);
+					::strcpy (subobj_info.SubobjectName, prototype_name);
+					::strcpy (subobj_info.BoneName, pbone_name);
 					Add_Subobject (subobj_info);
 					m_Info.SubobjectCount ++;
 
@@ -607,7 +607,7 @@ AggregateDefClass::Read_Header (ChunkLoadClass &chunk_load)
 	if (chunk_load.Read (&header, sizeof (header)) == sizeof (header)) {
 
 		// Copy the name from the header structure
-		m_pName = ::_strdup (header.Name);
+		m_pName = ::strdup (header.Name);
 		m_Version = header.Version;
 
 		// Success!
@@ -686,8 +686,8 @@ AggregateDefClass::Add_Subobject (const W3dAggregateSubobjectStruct &subobj_info
 {
 	// Create a new structure and copy the contents of the src
 	W3dAggregateSubobjectStruct *pnew_entry = W3DNEW W3dAggregateSubobjectStruct;
-	::lstrcpy (pnew_entry->SubobjectName, subobj_info.SubobjectName);
-	::lstrcpy (pnew_entry->BoneName, subobj_info.BoneName);
+	::strcpy (pnew_entry->SubobjectName, subobj_info.SubobjectName);
+	::strcpy (pnew_entry->BoneName, subobj_info.BoneName);
 
 	// Add this new entry to the list
 	m_SubobjectList.Add (pnew_entry);

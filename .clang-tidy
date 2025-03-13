@@ -1,0 +1,4 @@
+Checks: '-*,modernize-use-override,modernize-use-emplace,modernize-loop-convert'
+CheckOptions:
+  - key: modernize-loop-convert.MinConfidence
+    value: reasonable

@@ -39,8 +39,8 @@ NameKeyGenerator::NameKeyGenerator()
 
 	m_nextID = (UnsignedInt)NAMEKEY_INVALID;  // uninitialized system
 
-	for (Int i = 0; i < SOCKET_COUNT; ++i)
-		m_sockets[i] = NULL;
+	for (auto & m_socket : m_sockets)
+		m_socket = NULL;
 
 }  // end NameKeyGenerator
 
@@ -75,15 +75,15 @@ void NameKeyGenerator::reset()
 //------------------------------------------------------------------------------------------------- 
 void NameKeyGenerator::freeSockets()
 {
-	for (Int i = 0; i < SOCKET_COUNT; ++i)
+	for (auto & m_socket : m_sockets)
 	{
 		Bucket *next;
-		for (Bucket *b = m_sockets[i]; b; b = next)
+		for (Bucket *b = m_socket; b; b = next)
 		{
 			next = b->m_nextInSocket;
 			b->deleteInstance();
 		}
-		m_sockets[i] = NULL;
+		m_socket = NULL;
 	}
 
 }  // end freeSockets
@@ -111,9 +111,9 @@ inline UnsignedInt calcHashForLowercaseString(const char* p)
 //------------------------------------------------------------------------------------------------- 
 AsciiString NameKeyGenerator::keyToName(NameKeyType key)
 {
-	for (Int i = 0; i < SOCKET_COUNT; ++i)
+	for (auto b : m_sockets)
 	{
-		for (Bucket *b = m_sockets[i]; b; b = b->m_nextInSocket)
+		for (; b; b = b->m_nextInSocket)
 		{
 			if (key == b->m_key)
 				return b->m_nameString;

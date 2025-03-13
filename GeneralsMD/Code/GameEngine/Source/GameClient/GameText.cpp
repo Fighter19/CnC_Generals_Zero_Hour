@@ -142,18 +142,18 @@ class GameTextManager : public GameTextInterface
 	public:
 
 		GameTextManager();
-		virtual ~GameTextManager();
+		~GameTextManager() override;
 
-		virtual void					init( void );						///< Initlaizes the text system
+		void					init( void ) override;						///< Initlaizes the text system
 		virtual void					deinit( void );					///< De-initlaizes the text system
-		virtual void					update( void ) {};			///< update text manager
-		virtual void					reset( void );					///< Resets the text system
+		void					update( void ) override {};			///< update text manager
+		void					reset( void ) override;					///< Resets the text system
 
-		virtual UnicodeString fetch( const Char *label, Bool *exists = NULL );		///< Returns the associated labeled unicode text
-		virtual UnicodeString fetch( AsciiString label, Bool *exists = NULL );		///< Returns the associated labeled unicode text
-		virtual AsciiStringVec& getStringsWithLabelPrefix(AsciiString label);
+		UnicodeString fetch( const Char *label, Bool *exists = NULL ) override;		///< Returns the associated labeled unicode text
+		UnicodeString fetch( AsciiString label, Bool *exists = NULL ) override;		///< Returns the associated labeled unicode text
+		AsciiStringVec& getStringsWithLabelPrefix(AsciiString label) override;
 
-		virtual void					initMapStringFile( const AsciiString& filename );
+		void					initMapStringFile( const AsciiString& filename ) override;
 
 	protected:
 

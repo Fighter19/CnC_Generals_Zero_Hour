@@ -147,12 +147,9 @@ void SpawnBehavior::onDie( const DamageInfo *damageInfo )
 	if( modData->m_dieMuxData.isDieApplicable( getObject(), damageInfo ) == FALSE )
 		return;
 
-	for( objectIDListIterator iter = m_spawnIDs.begin();
-				iter != m_spawnIDs.end();
-				iter++
-					)
+	for(auto & m_spawnID : m_spawnIDs)
 	{
-		Object *currentSpawn = TheGameLogic->findObjectByID( (*iter) );
+		Object *currentSpawn = TheGameLogic->findObjectByID( m_spawnID );
 		if( currentSpawn )
 		{
 			// Go through all my spawns and see if they have a SlavedUpdate I can tell I was killed to
@@ -307,9 +304,9 @@ Object* SpawnBehavior::getClosestSlave( const Coord3D *pos )
 {
 	Object *closest = NULL;
 	Real closestDistance;
-	for( objectIDListIterator it = m_spawnIDs.begin(); it != m_spawnIDs.end(); ++it )
+	for(auto & m_spawnID : m_spawnIDs)
 	{
-		Object *obj = TheGameLogic->findObjectByID( *it );
+		Object *obj = TheGameLogic->findObjectByID( m_spawnID );
 		if( obj )
 		{
 			Real distance = ThePartitionManager->getDistanceSquared( obj, pos, FROM_CENTER_2D );
@@ -327,9 +324,9 @@ Object* SpawnBehavior::getClosestSlave( const Coord3D *pos )
 // ------------------------------------------------------------------------------------------------
 void SpawnBehavior::orderSlavesToAttackTarget( Object *target, Int maxShotsToFire, CommandSourceType cmdSource )
 {
-	for( objectIDListIterator it = m_spawnIDs.begin(); it != m_spawnIDs.end(); ++it )
+	for(auto & m_spawnID : m_spawnIDs)
 	{
-		Object *obj = TheGameLogic->findObjectByID( *it );
+		Object *obj = TheGameLogic->findObjectByID( m_spawnID );
 		if( obj )
 		{
 			AIUpdateInterface *ai = obj->getAI();
@@ -344,9 +341,9 @@ void SpawnBehavior::orderSlavesToAttackTarget( Object *target, Int maxShotsToFir
 // ------------------------------------------------------------------------------------------------
 void SpawnBehavior::orderSlavesToAttackPosition( const Coord3D *pos, Int maxShotsToFire, CommandSourceType cmdSource )
 {
-	for( objectIDListIterator it = m_spawnIDs.begin(); it != m_spawnIDs.end(); ++it )
+	for(auto & m_spawnID : m_spawnIDs)
 	{
-		Object *obj = TheGameLogic->findObjectByID( *it );
+		Object *obj = TheGameLogic->findObjectByID( m_spawnID );
 		if( obj )
 		{
 			AIUpdateInterface *ai = obj->getAI();
@@ -361,9 +358,9 @@ void SpawnBehavior::orderSlavesToAttackPosition( const Coord3D *pos, Int maxShot
 // ------------------------------------------------------------------------------------------------
 void SpawnBehavior::orderSlavesToGoIdle( CommandSourceType cmdSource )
 {
-	for( objectIDListIterator it = m_spawnIDs.begin(); it != m_spawnIDs.end(); ++it )
+	for(auto & m_spawnID : m_spawnIDs)
 	{
-		Object *obj = TheGameLogic->findObjectByID( *it );
+		Object *obj = TheGameLogic->findObjectByID( m_spawnID );
 		if( obj )
 		{
 			AIUpdateInterface *ai = obj->getAI();
@@ -378,9 +375,9 @@ void SpawnBehavior::orderSlavesToGoIdle( CommandSourceType cmdSource )
 // ------------------------------------------------------------------------------------------------
 void SpawnBehavior::orderSlavesDisabledUntil( DisabledType type, UnsignedInt frame )
 {
-	for( objectIDListIterator it = m_spawnIDs.begin(); it != m_spawnIDs.end(); ++it )
+	for(auto & m_spawnID : m_spawnIDs)
 	{
-		Object *obj = TheGameLogic->findObjectByID( *it );
+		Object *obj = TheGameLogic->findObjectByID( m_spawnID );
 		if( obj )
 		{
 			AIUpdateInterface *ai = obj->getAI();
@@ -396,9 +393,9 @@ void SpawnBehavior::orderSlavesDisabledUntil( DisabledType type, UnsignedInt fra
 // ------------------------------------------------------------------------------------------------
 void SpawnBehavior::orderSlavesToClearDisabled( DisabledType type )
 {
-	for( objectIDListIterator it = m_spawnIDs.begin(); it != m_spawnIDs.end(); ++it )
+	for(auto & m_spawnID : m_spawnIDs)
 	{
-		Object *obj = TheGameLogic->findObjectByID( *it );
+		Object *obj = TheGameLogic->findObjectByID( m_spawnID );
 		if( obj )
 		{
 			obj->clearDisabled( type );
@@ -410,9 +407,9 @@ void SpawnBehavior::orderSlavesToClearDisabled( DisabledType type )
 CanAttackResult SpawnBehavior::getCanAnySlavesAttackSpecificTarget( AbleToAttackType attackType, const Object *target, CommandSourceType cmdSource )
 {
 	Bool invalidShot = FALSE;
-	for( objectIDListIterator it = m_spawnIDs.begin(); it != m_spawnIDs.end(); ++it )
+	for(auto & m_spawnID : m_spawnIDs)
 	{
-		Object *obj = TheGameLogic->findObjectByID( *it );
+		Object *obj = TheGameLogic->findObjectByID( m_spawnID );
 		if( obj )
 		{
 			CanAttackResult result = obj->getAbleToAttackSpecificObject( attackType, target, cmdSource );
@@ -448,9 +445,9 @@ CanAttackResult SpawnBehavior::getCanAnySlavesAttackSpecificTarget( AbleToAttack
 CanAttackResult SpawnBehavior::getCanAnySlavesUseWeaponAgainstTarget( AbleToAttackType attackType, const Object *victim, const Coord3D *pos, CommandSourceType cmdSource )
 {
 	Bool invalidShot = FALSE;
-	for( objectIDListIterator it = m_spawnIDs.begin(); it != m_spawnIDs.end(); ++it )
+	for(auto & m_spawnID : m_spawnIDs)
 	{
-		Object *obj = TheGameLogic->findObjectByID( *it );
+		Object *obj = TheGameLogic->findObjectByID( m_spawnID );
 		if( obj )
 		{
 			CanAttackResult result = obj->getAbleToUseWeaponAgainstTarget( attackType, victim, pos, cmdSource );
@@ -485,9 +482,9 @@ CanAttackResult SpawnBehavior::getCanAnySlavesUseWeaponAgainstTarget( AbleToAtta
 // ------------------------------------------------------------------------------------------------
 void SpawnBehavior::giveSlavesStealthUpgrade( Bool grantStealth )
 {
-	for( objectIDListIterator it = m_spawnIDs.begin(); it != m_spawnIDs.end(); ++it )
+	for(auto & m_spawnID : m_spawnIDs)
 	{
-		Object *obj = TheGameLogic->findObjectByID( *it );
+		Object *obj = TheGameLogic->findObjectByID( m_spawnID );
 		if( obj )
 		{
 			obj->setStatus( MAKE_OBJECT_STATUS_MASK( OBJECT_STATUS_CAN_STEALTH ), grantStealth );
@@ -498,9 +495,9 @@ void SpawnBehavior::giveSlavesStealthUpgrade( Bool grantStealth )
 // ------------------------------------------------------------------------------------------------
 Bool SpawnBehavior::canAnySlavesAttack()
 {
-	for( objectIDListIterator it = m_spawnIDs.begin(); it != m_spawnIDs.end(); ++it )
+	for(auto & m_spawnID : m_spawnIDs)
 	{
-		Object *obj = TheGameLogic->findObjectByID( *it );
+		Object *obj = TheGameLogic->findObjectByID( m_spawnID );
 		if( obj )
 		{
 			if( obj->isAbleToAttack() )
@@ -583,18 +580,16 @@ Object *SpawnBehavior::reclaimOrphanSpawn( void )
 
 	OrphanData orphanData;
 	AsciiString prevName = "";
-	for (std::vector<AsciiString>::const_iterator tempName = md->m_spawnTemplateNameData.begin();
-			tempName != md->m_spawnTemplateNameData.end(); 
-			++tempName)
+	for (const auto & tempName : md->m_spawnTemplateNameData)
 	{
-		if (prevName.compare(*tempName)) // the list may have redundancy, this will skip some of it
+		if (prevName.compare(tempName)) // the list may have redundancy, this will skip some of it
 			continue;
-		orphanData.m_matchTemplate = TheThingFactory->findTemplate( *tempName );;
+		orphanData.m_matchTemplate = TheThingFactory->findTemplate( tempName );;
 		orphanData.m_source = getObject();
 		orphanData.m_closest = NULL;
 		orphanData.m_closestDistSq = BIG_DISTANCE;
 		player->iterateObjects( findClosestOrphan, &orphanData );
-		prevName = *tempName;
+		prevName = tempName;
 	}
 
 	return orphanData.m_closest;
@@ -799,12 +794,9 @@ void SpawnBehavior::startSpawning()
 // ------------------------------------------------------------------------------------------------
 void SpawnBehavior::onDamage( DamageInfo *info )
 {
-	for( objectIDListIterator iter = m_spawnIDs.begin();
-				iter != m_spawnIDs.end();
-				iter++
-					)
+	for(auto & m_spawnID : m_spawnIDs)
 	{
-		Object *currentSpawn = TheGameLogic->findObjectByID( (*iter) );
+		Object *currentSpawn = TheGameLogic->findObjectByID( m_spawnID );
 		if( currentSpawn )
 		{
 			// Go through all my spawns and see if they have a SlavedUpdate I can tell I was hurt to
@@ -890,9 +882,9 @@ void SpawnBehavior::computeAggregateStates(void)
 
 	m_selfTaskingSpawnCount = 0;
 
-	for( objectIDListIterator iter = m_spawnIDs.begin(); iter != m_spawnIDs.end(); iter++)
+	for(auto & m_spawnID : m_spawnIDs)
 	{
-		currentSpawn = TheGameLogic->findObjectByID( (*iter) );
+		currentSpawn = TheGameLogic->findObjectByID( m_spawnID );
 
 		if( currentSpawn )
 		{
@@ -959,9 +951,9 @@ void SpawnBehavior::computeAggregateStates(void)
 
 		if ( SomebodyIsNotSelected ) // lets select everybody
 		{
-			for( objectIDListIterator iter = m_spawnIDs.begin(); iter != m_spawnIDs.end(); iter++)
+			for(auto & m_spawnID : m_spawnIDs)
 			{
-				currentSpawn = TheGameLogic->findObjectByID( (*iter) );
+				currentSpawn = TheGameLogic->findObjectByID( m_spawnID );
 
 				if( currentSpawn )
 				{
@@ -1025,9 +1017,9 @@ Bool SpawnBehavior::areAllSlavesStealthed() const
 {
 	Object *currentSpawn;
 
-	for( std::list<ObjectID>::const_iterator iter = m_spawnIDs.begin(); iter != m_spawnIDs.end(); iter++)
+	for(auto m_spawnID : m_spawnIDs)
 	{
-		currentSpawn = TheGameLogic->findObjectByID( (*iter) );
+		currentSpawn = TheGameLogic->findObjectByID( m_spawnID );
 		if( currentSpawn )
 		{
       const StealthUpdate *stealthUpdate = currentSpawn->getStealth();
@@ -1046,9 +1038,9 @@ void SpawnBehavior::revealSlaves()
 {
 	Object *currentSpawn;
 
-	for( objectIDListIterator iter = m_spawnIDs.begin(); iter != m_spawnIDs.end(); iter++)
+	for(auto & m_spawnID : m_spawnIDs)
 	{
-		currentSpawn = TheGameLogic->findObjectByID( (*iter) );
+		currentSpawn = TheGameLogic->findObjectByID( m_spawnID );
 		if( currentSpawn )
 		{
 			StealthUpdate *stealthUpdate = currentSpawn->getStealth();

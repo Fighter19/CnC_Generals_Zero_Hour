@@ -403,12 +403,12 @@ void Player::init(const PlayerTemplate* pt)
 		m_resourceGatheringManager = NULL;
 	}
 
-	for (Int i = 0; i < NUM_HOTKEY_SQUADS; ++i) {
-		if (m_squads[i] != NULL) {
-			m_squads[i]->deleteInstance();
-			m_squads[i] = NULL;
+	for (auto & m_squad : m_squads) {
+		if (m_squad != NULL) {
+			m_squad->deleteInstance();
+			m_squad = NULL;
 		}
-		m_squads[i] = newInstance(Squad);	
+		m_squad = newInstance(Squad);	
 	}
 
 	if (m_currentSelection != NULL) {
@@ -539,10 +539,9 @@ Player::~Player()
 	m_defaultTeam = NULL;
 	m_playerTemplate = NULL;
 
-	for( PlayerTeamList::iterator it = m_playerTeamPrototypes.begin(); 
-			 it != m_playerTeamPrototypes.end(); ++it)
+	for(auto & m_playerTeamPrototype : m_playerTeamPrototypes)
 	{
-		(*it)->friend_setOwningPlayer(NULL);
+		m_playerTeamPrototype->friend_setOwningPlayer(NULL);
 	}
 	m_playerTeamPrototypes.clear();	// empty, but don't free the contents
 
@@ -550,10 +549,10 @@ Player::~Player()
 	m_teamRelations->deleteInstance();
 	m_playerRelations->deleteInstance();
 
-	for (Int i = 0; i < NUM_HOTKEY_SQUADS; ++i) {
-		if (m_squads[i] != NULL) {
-			m_squads[i]->deleteInstance();
-			m_squads[i] = NULL;
+	for (auto & m_squad : m_squads) {
+		if (m_squad != NULL) {
+			m_squad->deleteInstance();
+			m_squad = NULL;
 		}
 	}
 
@@ -714,9 +713,9 @@ void Player::update()
 		m_ai->update();
 
 	// Allow the teams this player owns to update themselves.
-	for( PlayerTeamList::iterator it = m_playerTeamPrototypes.begin(); it != m_playerTeamPrototypes.end(); ++it ) 
+	for(auto & m_playerTeamPrototype : m_playerTeamPrototypes) 
 	{
-		for( DLINK_ITERATOR<Team> iter = (*it)->iterate_TeamInstanceList(); !iter.done(); iter.advance() ) 
+		for( DLINK_ITERATOR<Team> iter = m_playerTeamPrototype->iterate_TeamInstanceList(); !iter.done(); iter.advance() ) 
 		{
 			Team *team = iter.cur();
 			if( !team ) 
@@ -1797,10 +1796,9 @@ void Player::healAllObjects()
 //=============================================================================
 void Player::iterateObjects( ObjectIterateFunc func, void *userData ) const
 {
-	for (PlayerTeamList::const_iterator it = m_playerTeamPrototypes.begin(); 
-			 it != m_playerTeamPrototypes.end(); ++it)
+	for (auto m_playerTeamPrototype : m_playerTeamPrototypes)
 	{	
-		(*it)->iterateObjects( func, userData );
+		m_playerTeamPrototype->iterateObjects( func, userData );
 	}
 }
 
@@ -1812,11 +1810,9 @@ void Player::countObjectsByThingTemplate(Int numTmplates, const ThingTemplate* c
 	for (i = 0; i < numTmplates; ++i)
 		counts[i] = 0;
 
-	for (PlayerTeamList::const_iterator it = m_playerTeamPrototypes.begin(); 
-			 it != m_playerTeamPrototypes.end(); 
-			 ++it)
+	for (auto m_playerTeamPrototype : m_playerTeamPrototypes)
 	{	
-		(*it)->countObjectsByThingTemplate(numTmplates, things, ignoreDead, counts, ignoreUnderConstruction);
+		m_playerTeamPrototype->countObjectsByThingTemplate(numTmplates, things, ignoreDead, counts, ignoreUnderConstruction);
 	}
 }
 
@@ -1866,10 +1862,9 @@ Object *Player::findClosestByKindOf( Object *queryObject, KindOfMaskType setMask
 //=============================================================================
 Bool Player::hasAnyBuildings(void) const
 {
-	for (PlayerTeamList::const_iterator it = m_playerTeamPrototypes.begin(); 
-			 it != m_playerTeamPrototypes.end(); ++it)
+	for (auto m_playerTeamPrototype : m_playerTeamPrototypes)
 	{	
-		if ((*it)->hasAnyBuildings()) {
+		if (m_playerTeamPrototype->hasAnyBuildings()) {
 			return true;
 		}
 	}
@@ -1879,10 +1874,9 @@ Bool Player::hasAnyBuildings(void) const
 //=============================================================================
 Bool Player::hasAnyBuildings(KindOfMaskType kindOf) const
 {
-	for (PlayerTeamList::const_iterator it = m_playerTeamPrototypes.begin(); 
-			 it != m_playerTeamPrototypes.end(); ++it)
+	for (auto m_playerTeamPrototype : m_playerTeamPrototypes)
 	{	
-		if ((*it)->hasAnyBuildings(kindOf)) {
+		if (m_playerTeamPrototype->hasAnyBuildings(kindOf)) {
 			return true;
 		}
 	}
@@ -1892,10 +1886,9 @@ Bool Player::hasAnyBuildings(KindOfMaskType kindOf) const
 //=============================================================================
 Bool Player::hasAnyUnits(void) const
 {
-	for (PlayerTeamList::const_iterator it = m_playerTeamPrototypes.begin(); 
-			 it != m_playerTeamPrototypes.end(); ++it)
+	for (auto m_playerTeamPrototype : m_playerTeamPrototypes)
 	{	
-		if ((*it)->hasAnyUnits()) {
+		if (m_playerTeamPrototype->hasAnyUnits()) {
 			return true;
 		}
 	}
@@ -1905,10 +1898,9 @@ Bool Player::hasAnyUnits(void) const
 //=============================================================================
 Bool Player::hasAnyObjects(void) const
 {
-	for (PlayerTeamList::const_iterator it = m_playerTeamPrototypes.begin(); 
-			 it != m_playerTeamPrototypes.end(); ++it)
+	for (auto m_playerTeamPrototype : m_playerTeamPrototypes)
 	{	
-		if ((*it)->hasAnyObjects()) {
+		if (m_playerTeamPrototype->hasAnyObjects()) {
 			return true;
 		}
 	}
@@ -1918,10 +1910,9 @@ Bool Player::hasAnyObjects(void) const
 //=============================================================================
 Bool Player::hasAnyBuildFacility(void) const
 {
-	for (PlayerTeamList::const_iterator it = m_playerTeamPrototypes.begin(); 
-			 it != m_playerTeamPrototypes.end(); ++it)
+	for (auto m_playerTeamPrototype : m_playerTeamPrototypes)
 	{	
-		if ((*it)->hasAnyBuildFacility())
+		if (m_playerTeamPrototype->hasAnyBuildFacility())
 			return true;
 	}
 	return false;
@@ -2014,9 +2005,8 @@ void Player::setUnitsShouldHunt(Bool unitsShouldHunt, CommandSourceType source)
 
 	Coord3D pos;
 	ThePartitionManager->getMostValuableLocation(getPlayerIndex(), ALLOW_ENEMIES, VOT_CashValue, &pos);
-	for (PlayerTeamList::iterator it = m_playerTeamPrototypes.begin(); 
-			 it != m_playerTeamPrototypes.end(); ++it) {
-		for (DLINK_ITERATOR<Team> iter = (*it)->iterate_TeamInstanceList(); !iter.done(); iter.advance()) {
+	for (auto & m_playerTeamPrototype : m_playerTeamPrototypes) {
+		for (DLINK_ITERATOR<Team> iter = m_playerTeamPrototype->iterate_TeamInstanceList(); !iter.done(); iter.advance()) {
 			Team *team = iter.cur();
 			if (!team) {
 				continue;
@@ -2106,9 +2096,8 @@ void Player::killPlayer(void)
 //=============================================================================
 void Player::setObjectsEnabled(AsciiString templateTypeToAffect, Bool enable)
 {
-	for (PlayerTeamList::iterator it = m_playerTeamPrototypes.begin(); 
-			 it != m_playerTeamPrototypes.end(); ++it) {
-		for (DLINK_ITERATOR<Team> iter = (*it)->iterate_TeamInstanceList(); !iter.done(); iter.advance()) {
+	for (auto & m_playerTeamPrototype : m_playerTeamPrototypes) {
+		for (DLINK_ITERATOR<Team> iter = m_playerTeamPrototype->iterate_TeamInstanceList(); !iter.done(); iter.advance()) {
 			Team *team = iter.cur();
 			if (!team) {
 				continue;
@@ -2143,10 +2132,9 @@ void Player::transferAssetsFromThat(Player *that)
 	const ThingTemplate *beaconTemplate = TheThingFactory->findTemplate( that->getPlayerTemplate()->getBeaconTemplate() );
 
 	// transfer all his units.
-	for (PlayerTeamList::iterator it = that->m_playerTeamPrototypes.begin(); 
-			 it != that->m_playerTeamPrototypes.end(); ++it) 
+	for (auto & m_playerTeamPrototype : that->m_playerTeamPrototypes) 
 	{
-		for (DLINK_ITERATOR<Team> iter = (*it)->iterate_TeamInstanceList(); !iter.done(); iter.advance()) 
+		for (DLINK_ITERATOR<Team> iter = m_playerTeamPrototype->iterate_TeamInstanceList(); !iter.done(); iter.advance()) 
 		{
 			Team *team = iter.cur();
 			if (!team) 
@@ -2166,8 +2154,8 @@ void Player::transferAssetsFromThat(Player *that)
 		}
 	}
 
-	for (std::list<Object *>::iterator itObjs = objsToTransfer.begin(); itObjs != objsToTransfer.end(); ++itObjs) {
-		(*itObjs)->setTeam(defaultTeam);
+	for (auto & itObjs : objsToTransfer) {
+		itObjs->setTeam(defaultTeam);
 	}
 
 	// transfer all his money
@@ -2188,9 +2176,8 @@ void Player::garrisonAllUnits(CommandSourceType source)
 	ObjectIterator *iterBuilding = ThePartitionManager->iterateObjectsInRange(&pos, 1e9f, FROM_CENTER_3D, filters, ITER_SORTED_NEAR_TO_FAR);
 	MemoryPoolObjectHolder hold(iterBuilding);
 
-	for (PlayerTeamList::iterator it = m_playerTeamPrototypes.begin(); 
-			 it != m_playerTeamPrototypes.end(); ++it) {
-		for (DLINK_ITERATOR<Team> iter = (*it)->iterate_TeamInstanceList(); !iter.done(); iter.advance()) {
+	for (auto & m_playerTeamPrototype : m_playerTeamPrototypes) {
+		for (DLINK_ITERATOR<Team> iter = m_playerTeamPrototype->iterate_TeamInstanceList(); !iter.done(); iter.advance()) {
 			Team *team = iter.cur();
 			if (!team) {
 				continue;
@@ -2232,9 +2219,8 @@ void Player::garrisonAllUnits(CommandSourceType source)
 //=============================================================================
 void Player::ungarrisonAllUnits(CommandSourceType source)
 {
-	for (PlayerTeamList::iterator it = m_playerTeamPrototypes.begin(); 
-			 it != m_playerTeamPrototypes.end(); ++it) {
-		for (DLINK_ITERATOR<Team> iter = (*it)->iterate_TeamInstanceList(); !iter.done(); iter.advance()) {
+	for (auto & m_playerTeamPrototype : m_playerTeamPrototypes) {
+		for (DLINK_ITERATOR<Team> iter = m_playerTeamPrototype->iterate_TeamInstanceList(); !iter.done(); iter.advance()) {
 			Team *team = iter.cur();
 			if (!team) {
 				continue;
@@ -2266,10 +2252,9 @@ void Player::ungarrisonAllUnits(CommandSourceType source)
 //=============================================================================
 void Player::setUnitsShouldIdleOrResume(Bool idle)
 {
-	for (PlayerTeamList::iterator it = m_playerTeamPrototypes.begin(); 
-			 it != m_playerTeamPrototypes.end(); ++it) 
+	for (auto & m_playerTeamPrototype : m_playerTeamPrototypes) 
 	{
-		for (DLINK_ITERATOR<Team> iter = (*it)->iterate_TeamInstanceList(); !iter.done(); iter.advance()) 
+		for (DLINK_ITERATOR<Team> iter = m_playerTeamPrototype->iterate_TeamInstanceList(); !iter.done(); iter.advance()) 
 		{
 			Team *team = iter.cur();
 			if (!team)
@@ -2520,15 +2505,15 @@ void Player::resetSciences()
 		const RankInfo* rank = TheRankInfoStore->getRankInfo(i);
 		if (rank)
 		{
-			for (ScienceVec::const_iterator it = rank->m_sciencesGranted.begin(); it != rank->m_sciencesGranted.end(); ++it)
+			for (auto it : rank->m_sciencesGranted)
 			{
-				addScience(*it);
+				addScience(it);
 			}
 		}
 	}
 
-	for (ScienceVec::const_iterator it = m_sciences.begin(); it != m_sciences.end(); ++it)
-		TheScriptEngine->notifyOfAcquiredScience(getPlayerIndex(), *it);
+	for (auto m_science : m_sciences)
+		TheScriptEngine->notifyOfAcquiredScience(getPlayerIndex(), m_science);
 }
 
 //=============================================================================
@@ -2543,10 +2528,9 @@ Bool Player::addScience(ScienceType science)
 	m_sciences.push_back(science);
 
 	// 'wake up' any special powers controlled by, well, stuff
-	for (PlayerTeamList::iterator it = m_playerTeamPrototypes.begin(); 
-			 it != m_playerTeamPrototypes.end(); ++it) 
+	for (auto & m_playerTeamPrototype : m_playerTeamPrototypes) 
 	{
-		for (DLINK_ITERATOR<Team> iter = (*it)->iterate_TeamInstanceList(); !iter.done(); iter.advance()) 
+		for (DLINK_ITERATOR<Team> iter = m_playerTeamPrototype->iterate_TeamInstanceList(); !iter.done(); iter.advance()) 
 		{
 			Team *team = iter.cur();
 			if (!team)
@@ -2722,9 +2706,9 @@ Bool Player::setRankLevel(Int newLevel)
 			if (m_skillPoints < rank->m_skillPointsNeeded)
 				m_skillPoints = rank->m_skillPointsNeeded;
 
-			for (ScienceVec::const_iterator it = rank->m_sciencesGranted.begin(); it != rank->m_sciencesGranted.end(); ++it)
+			for (auto it : rank->m_sciencesGranted)
 			{
-				addScience(*it);
+				addScience(it);
 			}
 
 			m_levelDown = rank->m_skillPointsNeeded;
@@ -3086,10 +3070,9 @@ Upgrade *Player::addUpgrade( const UpgradeTemplate *upgradeTemplate, UpgradeStat
 */  
 void Player::onUpgradeCompleted( const UpgradeTemplate *upgradeTemplate )
 {
-	for (PlayerTeamList::iterator it = m_playerTeamPrototypes.begin(); 
-			 it != m_playerTeamPrototypes.end(); ++it) 
+	for (auto & m_playerTeamPrototype : m_playerTeamPrototypes) 
 	{
-		for (DLINK_ITERATOR<Team> iter = (*it)->iterate_TeamInstanceList(); !iter.done(); iter.advance()) 
+		for (DLINK_ITERATOR<Team> iter = m_playerTeamPrototype->iterate_TeamInstanceList(); !iter.done(); iter.advance()) 
 		{
 			Team *team = iter.cur();
 			if( team == NULL ) 
@@ -3791,12 +3774,12 @@ Int Player::getSquadNumberForObject(const Object *objToFind) const
 //-------------------------------------------------------------------------------------------------
 void Player::removeObjectFromHotkeySquad(Object *objToRemove)
 {
-	for (Int i = 0; i < NUM_HOTKEY_SQUADS; ++i) {
-		if (!m_squads[i]) {
+	for (auto & m_squad : m_squads) {
+		if (!m_squad) {
 			continue;
 		}
 
-		m_squads[i]->removeObject(objToRemove);
+		m_squad->removeObject(objToRemove);
 	}
 }
 

@@ -139,9 +139,8 @@ void HelixContain::redeployOccupants( void )
   firePos.z += 8;
   
 
-	for (ContainedItemsList::iterator it = m_containList.begin(); it != m_containList.end(); ++it)
+	for (auto rider : m_containList)
   {
-    Object* rider = *it;
     if (rider)
       rider->setPosition( &firePos );
   }

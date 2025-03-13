@@ -189,9 +189,9 @@ void LANGameInfo::resetAccepted( void )
 		if (TheLAN->GetMyGame() == this && TheLAN->AmIHost())
 			LANEnableStartButton(true);
 	}
-	for(int i = 0; i< MAX_SLOTS; i++)
+	for(auto & i : m_LANSlot)
 	{
-		m_LANSlot[i].unAccept();
+		i.unAccept();
 	}
 }
 // Misc game-related functionality --------------------

@@ -59,10 +59,10 @@ DiscreteCircle::DiscreteCircle(Int xCenter, Int yCenter, Int radius)
 //-------------------------------------------------------------------------------------------------
 void DiscreteCircle::drawCircle(ScanlineDrawFunc functionToDrawWith, void *parmToPass)
 {
-	for (VecHorzLine::const_iterator it = m_edges.begin(); it != m_edges.end(); ++it) {
-		(functionToDrawWith)(it->xStart, it->xEnd, it->yPos, parmToPass);
-		if (it->yPos != m_yPos) {
-			(functionToDrawWith)(it->xStart, it->xEnd, m_yPosDoubled - it->yPos, parmToPass);
+	for (auto m_edge : m_edges) {
+		(functionToDrawWith)(m_edge.xStart, m_edge.xEnd, m_edge.yPos, parmToPass);
+		if (m_edge.yPos != m_yPos) {
+			(functionToDrawWith)(m_edge.xStart, m_edge.xEnd, m_yPosDoubled - m_edge.yPos, parmToPass);
 		}
 	}
 }

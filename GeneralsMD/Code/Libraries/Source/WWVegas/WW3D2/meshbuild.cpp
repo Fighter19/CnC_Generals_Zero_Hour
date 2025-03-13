@@ -104,7 +104,7 @@ class FaceHasherClass : public HashCalculatorClass<MeshBuilderClass::FaceClass>
 {
 public:
 
-	virtual bool	Items_Match(const MeshBuilderClass::FaceClass & a, const MeshBuilderClass::FaceClass & b) 
+	bool	Items_Match(const MeshBuilderClass::FaceClass & a, const MeshBuilderClass::FaceClass & b) override 
 	{
 		// Note: if we want this to detect duplicates that are "rotated", must change
 		// both this function and the Compute_Hash function...
@@ -116,22 +116,22 @@ public:
 		);
 	}
 
-	virtual void	Compute_Hash(const MeshBuilderClass::FaceClass & item)
+	void	Compute_Hash(const MeshBuilderClass::FaceClass & item) override
 	{
 		HashVal = (int)(item.VertIdx[0]*12345.6f + item.VertIdx[1]*1714.38484f + item.VertIdx[2]*27561.3f)&1023; 
 	}
 
-	virtual int		Num_Hash_Bits(void) 
+	int		Num_Hash_Bits(void) override 
 	{ 
 		return 10;  
 	}
 	
-	virtual int		Num_Hash_Values(void)
+	int		Num_Hash_Values(void) override
 	{
 		return 1;	
 	}
 	
-	virtual int		Get_Hash_Value(int /*index*/)
+	int		Get_Hash_Value(int /*index*/) override
 	{
 		return HashVal;
 	}
@@ -678,8 +678,8 @@ int MeshBuilderClass::Add_Face(const FaceClass & face)
 	Faces[CurFace].AddIndex = CurFace;
 
 	// copy the smoothing group into each vert
-	for (int i=0; i<3; i++) {
-		Faces[CurFace].Verts[i].SmGroup = Faces[CurFace].SmGroup;
+	for (auto & Vert : Faces[CurFace].Verts) {
+		Vert.SmGroup = Faces[CurFace].SmGroup;
 	}
 
 	// increment the face index
@@ -1495,11 +1495,11 @@ void MeshBuilderClass::Strip_Optimize_Mesh(void)
 
 					// find vert which is not on the final edge
 					int first_vert = -1;
-					for (int vidx=0; vidx<3; vidx++) {
-						if (	(newpoly->VertIdx[vidx] != pedges[startpoly].Edge[edge_index]->Vertex[0]) &&
-								(newpoly->VertIdx[vidx] != pedges[startpoly].Edge[edge_index]->Vertex[1])) {
+					for (int vidx : newpoly->VertIdx) {
+						if (	(vidx != pedges[startpoly].Edge[edge_index]->Vertex[0]) &&
+								(vidx != pedges[startpoly].Edge[edge_index]->Vertex[1])) {
 						
-								first_vert = newpoly->VertIdx[vidx];
+								first_vert = vidx;
 								break;
 						}
 					}
@@ -1730,9 +1730,9 @@ void MeshBuilderClass::Sort_Vertices(void)
 	** Remap the faces' vertex indices
 	*/
 	for (int fi=0; fi<FaceCount; fi++) {
-		for (int vi=0; vi<3; vi++) {
-			int old_index = Faces[fi].VertIdx[vi];
-			Faces[fi].VertIdx[vi] = vertex_remap_table[old_index];
+		for (int & vi : Faces[fi].VertIdx) {
+			int old_index = vi;
+			vi = vertex_remap_table[old_index];
 		}
 	}
 

@@ -375,8 +375,8 @@ MetaEventTranslator::MetaEventTranslator() :
 	m_lastKeyDown(MK_NONE),
 	m_lastModState(0)
 {
-	for (Int i = 0; i < NUM_MOUSE_BUTTONS; ++i) {
-		m_nextUpShouldCreateDoubleClick[i] = FALSE;
+	for (bool & i : m_nextUpShouldCreateDoubleClick) {
+		i = FALSE;
 	}
 
 

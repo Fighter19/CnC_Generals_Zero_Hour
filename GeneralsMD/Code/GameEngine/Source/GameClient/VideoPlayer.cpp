@@ -312,9 +312,9 @@ void VideoPlayer::remove( VideoStream *stream_to_remove )
 //============================================================================
 void VideoPlayer::addVideo( Video* videoToAdd )
 {
-	for (VecVideoIt it = mVideosAvailableForPlay.begin(); it != mVideosAvailableForPlay.end(); ++it) {
-		if (it->m_internalName == videoToAdd->m_internalName) {
-			(*it) = (*videoToAdd);
+	for (auto & it : mVideosAvailableForPlay) {
+		if (it.m_internalName == videoToAdd->m_internalName) {
+			it = (*videoToAdd);
 			return;
 		}
 	}
@@ -349,9 +349,9 @@ Int VideoPlayer::getNumVideos( void )
 //============================================================================
 const Video* VideoPlayer::getVideo( AsciiString movieTitle )
 {
-	for (VecVideoIt it = mVideosAvailableForPlay.begin(); it != mVideosAvailableForPlay.end(); ++it) {
-		if (it->m_internalName == movieTitle) {
-			return &(*it);
+	for (auto & it : mVideosAvailableForPlay) {
+		if (it.m_internalName == movieTitle) {
+			return &it;
 		}
 	}
 	return NULL;

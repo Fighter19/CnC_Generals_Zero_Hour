@@ -68,9 +68,9 @@ class W3DRenderObjectSnapshot : public Snapshot
 	inline void addToScene(void);	///< add this fogged renderobject to the scene.
 protected:
 
-	virtual void crc( Xfer *xfer );
-	virtual void xfer( Xfer *xfer );
-	virtual void loadPostProcess( void );
+	void crc( Xfer *xfer ) override;
+	void xfer( Xfer *xfer ) override;
+	void loadPostProcess( void ) override;
 
 #ifdef DEBUG_FOG_MEMORY
 	const char *m_robjName;		///<debug pointer so we know what this is a snapshot of.
@@ -292,8 +292,8 @@ void W3DRenderObjectSnapshot::loadPostProcess( void )
 W3DGhostObject::W3DGhostObject()
 {
 
-	for (Int i=0; i< MAX_PLAYER_COUNT; i++) 
-		m_parentSnapshots[i]=NULL;
+	for (auto & m_parentSnapshot : m_parentSnapshots) 
+		m_parentSnapshot=NULL;
 
 	m_drawableInfo.m_drawable = NULL;
 	m_drawableInfo.m_flags = 0;
@@ -574,15 +574,15 @@ void W3DGhostObject::release(void)
 {
 	W3DRenderObjectSnapshot *snap,*nextSnap;
 
-	for (Int i=0; i<MAX_PLAYER_COUNT; i++)
-	{	snap = m_parentSnapshots[i];
+	for (auto & m_parentSnapshot : m_parentSnapshots)
+	{	snap = m_parentSnapshot;
 		while (snap)
 		{
 			nextSnap=snap->m_next;
 			delete snap;
 			snap=nextSnap;
 		}
-		m_parentSnapshots[i]=NULL;
+		m_parentSnapshot=NULL;
 	}
 }
 
@@ -649,12 +649,12 @@ void W3DGhostObject::xfer( Xfer *xfer )
 	
 	// xfer snapshot array
 	UnsignedByte snapshotCount;
-	for( Int i = 0; i < MAX_PLAYER_COUNT; ++i )
+	for(auto & m_parentSnapshot : m_parentSnapshots)
 	{
 
 		// count the snapshots at this index
 		snapshotCount = 0;
-		W3DRenderObjectSnapshot *objectSnapshot = m_parentSnapshots[ i ];
+		W3DRenderObjectSnapshot *objectSnapshot = m_parentSnapshot;
 		while( objectSnapshot )
 		{
 		
@@ -673,7 +673,7 @@ void W3DGhostObject::xfer( Xfer *xfer )
 		// sanity, this catches when we read from the file a count of zero, but our data
 		// structure already has something allocated in this snapshot index
 		//
-		if( snapshotCount == 0 && m_parentSnapshots[ i ] != NULL )
+		if( snapshotCount == 0 && m_parentSnapshot != NULL )
 		{
 
 			DEBUG_CRASH(( "W3DGhostObject::xfer - m_parentShapshots[ %d ] has data present but the count from the xfer stream is empty\n" ));
@@ -689,7 +689,7 @@ void W3DGhostObject::xfer( Xfer *xfer )
 		{
 
 			// iterate through list
-			objectSnapshot = m_parentSnapshots[ i ];
+			objectSnapshot = m_parentSnapshot;
 			while( objectSnapshot )
 			{
 
@@ -742,7 +742,7 @@ void W3DGhostObject::xfer( Xfer *xfer )
 				if( prevObjectSnapshot )
 					prevObjectSnapshot->m_next = objectSnapshot;
 				else
-					m_parentSnapshots[ i ] = objectSnapshot;
+					m_parentSnapshot = objectSnapshot;
 				prevObjectSnapshot = objectSnapshot;
 
 				// xfer data

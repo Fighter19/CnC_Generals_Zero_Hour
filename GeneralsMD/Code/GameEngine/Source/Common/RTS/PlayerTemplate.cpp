@@ -336,13 +336,13 @@ const PlayerTemplate* PlayerTemplateStore::findPlayerTemplate(NameKeyType nameke
 	#ifdef _DEBUG
 	AsciiString nn = KEYNAME(namekey);
 	#endif
-  for (PlayerTemplateVector::const_iterator it = m_playerTemplates.begin(); it != m_playerTemplates.end(); ++it)
+  for (const auto & m_playerTemplate : m_playerTemplates)
 	{
 		#ifdef _DEBUG
 		AsciiString n = KEYNAME((*it).getNameKey());
 		#endif
-		if ((*it).getNameKey() == namekey)
-			return &(*it);
+		if (m_playerTemplate.getNameKey() == namekey)
+			return &m_playerTemplate;
 	}
 	return NULL;
 }

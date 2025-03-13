@@ -129,12 +129,10 @@ const ObjectCreationList* OCLSpecialPower::findOCL() const
 	const Player* controller = getObject()->getControllingPlayer();
 	if (controller != NULL)
 	{
-		for (std::vector<OCLSpecialPowerModuleData::Upgrades>::const_iterator it = d->m_upgradeOCL.begin(); 
-					it != d->m_upgradeOCL.end();
-					++it)
+		for (auto it : d->m_upgradeOCL)
 		{
-			if (controller->hasScience(it->m_science))
-				return it->m_ocl;
+			if (controller->hasScience(it.m_science))
+				return it.m_ocl;
 		}
 	}
 	return d->m_defaultOCL;

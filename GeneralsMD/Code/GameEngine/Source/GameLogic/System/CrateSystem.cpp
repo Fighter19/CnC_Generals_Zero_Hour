@@ -152,9 +152,9 @@ CrateTemplate *CrateSystem::newCrateTemplateOverride( CrateTemplate *crateToOver
 const CrateTemplate *CrateSystem::findCrateTemplate(AsciiString name) const
 {
 	// search weapon list for name
-	for (Int i = 0; i < m_crateTemplateVector.size(); i++)
-		if(m_crateTemplateVector[i]->getName() == name) {
-			CrateTemplateOverride overridable(m_crateTemplateVector[i]);
+	for (auto i : m_crateTemplateVector)
+		if(i->getName() == name) {
+			CrateTemplateOverride overridable(i);
 			return overridable;
 		}
 		
@@ -165,9 +165,9 @@ const CrateTemplate *CrateSystem::findCrateTemplate(AsciiString name) const
 CrateTemplate *CrateSystem::friend_findCrateTemplate(AsciiString name)
 {
 	// search weapon list for name
-	for (Int i = 0; i < m_crateTemplateVector.size(); i++)
-		if(m_crateTemplateVector[i]->getName() == name) {
-			CrateTemplateOverride overridable(m_crateTemplateVector[i]);
+	for (auto & i : m_crateTemplateVector)
+		if(i->getName() == name) {
+			CrateTemplateOverride overridable(i);
 			return const_cast<CrateTemplate*>((const CrateTemplate *)overridable);
 		}
 	return NULL;

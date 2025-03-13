@@ -127,12 +127,12 @@ UnsignedInt AIGroup::getID( void )
 const VecObjectID& AIGroup::getAllIDs( void ) const
 {
 	m_lastRequestedIDList.clear();
-	for (std::list<Object *>::const_iterator cit = m_memberList.begin(); cit != m_memberList.end(); ++cit)
+	for (auto cit : m_memberList)
 	{
-		if ((*cit) == NULL)
+		if (cit == NULL)
 			continue;
 
-		m_lastRequestedIDList.push_back((*cit)->getID());
+		m_lastRequestedIDList.push_back(cit->getID());
 	}
 
 	return m_lastRequestedIDList;
@@ -2159,10 +2159,9 @@ void AIGroup::groupAttackObjectPrivate( Bool forced, Object *victim, Int maxShot
 			const ContainedItemsList* items = contain->getContainedItemsList();
 			if (items)
 			{
-				for( ContainedItemsList::const_iterator it = items->begin(); it != items->end(); ++it )
+				for(auto garrisonedMember : *items)
 				{
-					Object* garrisonedMember = *it;
-					CanAttackResult result = garrisonedMember->getAbleToAttackSpecificObject( forced ? ATTACK_NEW_TARGET_FORCED : ATTACK_NEW_TARGET, victim, cmdSource );
+						CanAttackResult result = garrisonedMember->getAbleToAttackSpecificObject( forced ? ATTACK_NEW_TARGET_FORCED : ATTACK_NEW_TARGET, victim, cmdSource );
 					if( result == ATTACKRESULT_POSSIBLE || result == ATTACKRESULT_POSSIBLE_AFTER_MOVING )
 					{
 						AIUpdateInterface *memberAI = garrisonedMember->getAI();
@@ -2247,10 +2246,9 @@ void AIGroup::groupAttackPosition( const Coord3D *pos, Int maxShotsToFire, Comma
 			const ContainedItemsList* items = contain->getContainedItemsList();
 			if (items)
 			{
-				for( ContainedItemsList::const_iterator it = items->begin(); it != items->end(); ++it )
+				for(auto garrisonedMember : *items)
 				{
-					Object* garrisonedMember = *it;
-					CanAttackResult result = garrisonedMember->getAbleToUseWeaponAgainstTarget( ATTACK_NEW_TARGET, NULL, &attackPos, cmdSource ) ;
+						CanAttackResult result = garrisonedMember->getAbleToUseWeaponAgainstTarget( ATTACK_NEW_TARGET, NULL, &attackPos, cmdSource ) ;
 					if( result == ATTACKRESULT_POSSIBLE || result == ATTACKRESULT_POSSIBLE_AFTER_MOVING )
 					{
 						AIUpdateInterface *memberAI = garrisonedMember->getAI();
@@ -3276,10 +3274,10 @@ void AIGroup::groupOverrideSpecialPowerDestination( SpecialPowerType spType, con
 void AIGroup::crc( Xfer *xfer )
 {
 	ObjectID id = INVALID_ID;
-	for (std::list<Object *>::iterator it = m_memberList.begin(); it != m_memberList.end(); ++it)
+	for (auto & it : m_memberList)
 	{
-		if (*it)
-			id = (*it)->getID();
+		if (it)
+			id = it->getID();
 		xfer->xferUser(&id, sizeof(ObjectID));
 		CRCGEN_LOG(("CRC after AI AIGroup m_memberList for frame %d is 0x%8.8X\n", TheGameLogic->getFrame(), ((XferCRC *)xfer)->getCRC()));
 	}

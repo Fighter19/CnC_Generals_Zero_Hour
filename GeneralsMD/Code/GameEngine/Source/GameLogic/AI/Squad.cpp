@@ -132,8 +132,8 @@ Bool Squad::isOnSquad(const Object *objToTest) const
 {
 	// @todo need a faster way to do this. Perhaps a more efficient data structure?
 	ObjectID objID = objToTest->getID();
-	for (VecObjectID::const_iterator cit = m_objectIDs.begin(); cit != m_objectIDs.end(); ++cit) {
-		if (objID == (*cit)) {
+	for (auto m_objectID : m_objectIDs) {
+		if (objID == m_objectID) {
 			return true;
 		}
 	}
@@ -187,8 +187,8 @@ void Squad::aiGroupFromSquad(AIGroup* aiGroupToFill)
 	
 	// cheat, since we are a member function, and just use m_objectsCached
 	getLiveObjects();
-	for (VecObjectPtr::iterator it = m_objectsCached.begin(); it != m_objectsCached.end(); ++it) {
-		aiGroupToFill->add((*it));
+	for (auto & it : m_objectsCached) {
+		aiGroupToFill->add(it);
 	}
 }
 

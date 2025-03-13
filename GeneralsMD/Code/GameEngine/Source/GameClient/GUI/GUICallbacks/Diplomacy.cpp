@@ -236,9 +236,9 @@ void ShowDiplomacy( Bool immediate )
 			GameWindow *listboxSolo = TheWindowManager->winGetWindowFromId(theWindow, NAMEKEY("Diplomacy.wnd:ListboxSolo"));
 			if (listboxSolo)
 			{
-				for (BriefingList::iterator it = theBriefingList.begin(); it != theBriefingList.end(); ++it)
+				for (auto & it : theBriefingList)
 				{
-					UnicodeString translated = TheGameText->fetch(*it);
+					UnicodeString translated = TheGameText->fetch(it);
 					Int numEntries = GadgetListBoxGetNumEntries(listboxSolo);
 					GadgetListBoxAddEntryText(listboxSolo, translated, TheInGameUI->getMessageColor(numEntries%2), -1);
 				}

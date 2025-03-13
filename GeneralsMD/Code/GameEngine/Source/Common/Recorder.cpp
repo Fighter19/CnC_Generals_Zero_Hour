@@ -843,9 +843,9 @@ Bool RecorderClass::readReplayHeader(ReplayHeader& header)
 
 	fread(&header.desyncGame, sizeof(Bool), 1, m_file);
 	fread(&header.quitEarly, sizeof(Bool), 1, m_file);
-	for (Int i=0; i<MAX_SLOTS; ++i)
+	for (bool & playerDiscon : header.playerDiscons)
 	{
-		fread(&(header.playerDiscons[i]), sizeof(Bool), 1, m_file);
+		fread(&playerDiscon, sizeof(Bool), 1, m_file);
 	}
 
 	// Read the Replay Name.  We don't actually do anything with it.  Oh well.

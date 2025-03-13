@@ -114,12 +114,10 @@ Int CashHackSpecialPower::findAmountToSteal() const
 	const Player* controller = getObject()->getControllingPlayer();
 	if (controller != NULL)
 	{
-		for (std::vector<CashHackSpecialPowerModuleData::Upgrades>::const_iterator it = d->m_upgrades.begin(); 
-					it != d->m_upgrades.end();
-					++it)
+		for (auto m_upgrade : d->m_upgrades)
 		{
-			if (controller->hasScience(it->m_science))
-				return it->m_amountToSteal;
+			if (controller->hasScience(m_upgrade.m_science))
+				return m_upgrade.m_amountToSteal;
 		}
 	}
 	return d->m_defaultAmountToSteal;

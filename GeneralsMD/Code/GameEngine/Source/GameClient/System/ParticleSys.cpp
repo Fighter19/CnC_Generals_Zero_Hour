@@ -3000,8 +3000,8 @@ ParticleSystem *ParticleSystemManager::findParticleSystem( ParticleSystemID id )
 
 	ParticleSystem *system = NULL;
 
-	for( ParticleSystemListIt it = m_allParticleSystemList.begin(); it != m_allParticleSystemList.end(); ++it ) {
-		system = *it;
+	for(auto & it : m_allParticleSystemList) {
+		system = it;
 		if (!system) {
 			continue;
 		}
@@ -3094,12 +3094,10 @@ void ParticleSystemManager::destroyAttachedSystems( Object *obj )
 	// iterate through all systems
 	ParticleSystem *system = NULL;
 
-	for( ParticleSystemListIt it = m_allParticleSystemList.begin(); 
-			 it != m_allParticleSystemList.end(); 
-			 ++it ) 
+	for(auto & it : m_allParticleSystemList) 
 	{
 
-		system = *it;
+		system = it;
 		if( system == NULL )
 			continue;
 		

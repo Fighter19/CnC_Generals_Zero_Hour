@@ -175,9 +175,9 @@ void SubsystemInterfaceList::initSubsystem(SubsystemInterface* sys, const char* 
 //-----------------------------------------------------------------------------
 void SubsystemInterfaceList::postProcessLoadAll()
 {
-	for (SubsystemList::iterator it = m_subsystems.begin(); it != m_subsystems.end(); ++it)
+	for (auto & m_subsystem : m_subsystems)
 	{
-		(*it)->postProcessLoad();
+		m_subsystem->postProcessLoad();
 	}
 }
 

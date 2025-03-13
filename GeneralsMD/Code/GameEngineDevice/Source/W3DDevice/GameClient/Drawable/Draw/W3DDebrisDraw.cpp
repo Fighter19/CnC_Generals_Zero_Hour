@@ -53,8 +53,8 @@
 W3DDebrisDraw::W3DDebrisDraw(Thing *thing, const ModuleData* moduleData) : DrawModule(thing, moduleData)
 {
   m_renderObject = NULL;
-	for (int i = 0; i < STATECOUNT; ++i)
-		m_anims[i] = NULL;
+	for (auto & m_anim : m_anims)
+		m_anim = NULL;
 	m_fxFinal = NULL;
 	m_state = INITIAL;
 	m_frames = 0;
@@ -77,10 +77,10 @@ W3DDebrisDraw::~W3DDebrisDraw(void)
   	REF_PTR_RELEASE(m_renderObject);
  		m_renderObject = NULL; 	
 	}
-	for (int i = 0; i < STATECOUNT; ++i)
+	for (auto & m_anim : m_anims)
 	{
-		REF_PTR_RELEASE(m_anims[i]);
-		m_anims[i] = NULL;
+		REF_PTR_RELEASE(m_anim);
+		m_anim = NULL;
 	}
 }
 

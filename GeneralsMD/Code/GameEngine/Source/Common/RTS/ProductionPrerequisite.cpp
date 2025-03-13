@@ -80,7 +80,7 @@ void ProductionPrerequisite::init()
 //=============================================================================
 void ProductionPrerequisite::resolveNames()
 {
-	for (Int i = 0; i < m_prereqUnits.size(); i++)
+	for (auto & m_prereqUnit : m_prereqUnits)
 	{
 
 		//
@@ -88,16 +88,16 @@ void ProductionPrerequisite::resolveNames()
 		// sub-temlates), which is what we want ... we conceptually only have one
 		// template for any given thing, it's only the *data* that is overridden
 		//
-		if( m_prereqUnits[ i ].name.isNotEmpty() )
+		if( m_prereqUnit.name.isNotEmpty() )
 		{
-			m_prereqUnits[i].unit = TheThingFactory->findTemplate(m_prereqUnits[i].name);	// might be null
+			m_prereqUnit.unit = TheThingFactory->findTemplate(m_prereqUnit.name);	// might be null
 
  			/** @todo for now removing this assert until we can completely remove
  			the GDF stuff, the problem is that some INI files refer to GDF names, and they
  			aren't yet loaded in the world builder but will all go away later anyway etc */
 			DEBUG_ASSERTCRASH(m_prereqUnits[i].unit,("could not find prereq %s\n",m_prereqUnits[i].name.str()));
 
-			m_prereqUnits[i].name.clear(); // we're done with it
+			m_prereqUnit.name.clear(); // we're done with it
 		}
 
 	}
@@ -216,9 +216,9 @@ void ProductionPrerequisite::addUnitPrereq( AsciiString unit, Bool orUnitWithPre
 void ProductionPrerequisite::addUnitPrereq( const std::vector<AsciiString>& units )
 {
 	Bool orWithPrevious = false;
-	for (int i = 0; i < units.size(); ++i)
+	for (const auto & unit : units)
 	{
-		addUnitPrereq(units[i], orWithPrevious);
+		addUnitPrereq(unit, orWithPrevious);
 		orWithPrevious = true;
 	}
 

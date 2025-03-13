@@ -1075,9 +1075,9 @@ void ShatterSystem::Release_Fragments(void)
 
 void ShatterSystem::Reset_Clip_Pools(void)
 {
-	for (int i=0; i<MAX_MESH_FRAGMENTS; i++) {
+	for (auto & ClipPool : ClipPools) {
 		// reset array but don't resize
-		ClipPools[i].Delete_All(false);				
+		ClipPool.Delete_All(false);				
 	}
 }
 
@@ -1102,9 +1102,9 @@ void ShatterSystem::Process_Clip_Pools
 	/*
 	** Loop over all ClipPools and build a mesh for any that contain polygons
 	*/
-	for (int ipool=0; ipool<MAX_MESH_FRAGMENTS; ipool++) {
+	for (auto & ClipPool : ClipPools) {
 
-		if (ClipPools[ipool].Count() > 0) {
+		if (ClipPool.Count() > 0) {
 
 			int ivert,ipoly,ipass,istage;
 
@@ -1113,8 +1113,8 @@ void ShatterSystem::Process_Clip_Pools
 			*/
 			int pcount = 0;
 			int vcount = 0;
-			for (ipoly=0;ipoly<ClipPools[ipool].Count();ipoly++) {
-				int poly_vert_count = ClipPools[ipool][ipoly].Get_Vertex_Count();
+			for (ipoly=0;ipoly<ClipPool.Count();ipoly++) {
+				int poly_vert_count = ClipPool[ipoly].Get_Vertex_Count();
 				vcount += poly_vert_count;
 				pcount += poly_vert_count-2;
 			}
@@ -1168,9 +1168,9 @@ void ShatterSystem::Process_Clip_Pools
 			** Add the polygons and vertices to the mesh, transform the vertices
 			** back into the original mesh's coordinate system as we do this
 			*/
-			for (ipoly=0; ipoly<ClipPools[ipool].Count(); ipoly++) {
+			for (ipoly=0; ipoly<ClipPool.Count(); ipoly++) {
 				
-				PolygonClass & poly = ClipPools[ipool][ipoly];
+				PolygonClass & poly = ClipPool[ipoly];
 				
 				new_mesh->Begin_Tri_Fan();
 				SHATTER_DEBUG_SAY(("Begin Tri Fan\n"));

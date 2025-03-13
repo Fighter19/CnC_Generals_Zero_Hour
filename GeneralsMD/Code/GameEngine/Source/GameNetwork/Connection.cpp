@@ -91,8 +91,8 @@ void Connection::init() {
 	m_numRetries = 0;
 	m_retryMetricsTime = 0;
 
-	for (Int i = 0; i < CONNECTION_LATENCY_HISTORY_LENGTH; ++i) {
-		m_latencies[i] = 0;
+	for (float & m_latencie : m_latencies) {
+		m_latencie = 0;
 	}
 	m_averageLatency = 0;
 	m_isQuitting = FALSE;

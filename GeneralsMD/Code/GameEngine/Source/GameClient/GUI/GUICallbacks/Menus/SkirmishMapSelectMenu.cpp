@@ -70,9 +70,9 @@ static void NullifyControls()
 	mapList = NULL;
 	winMapPreview = NULL;
 	parent = NULL;
-	for (Int i=0; i<MAX_SLOTS; ++i)
+	for (auto & i : buttonMapStartPosition)
 	{
-		buttonMapStartPosition[i] = NULL;
+		i = NULL;
 	}
 }
 

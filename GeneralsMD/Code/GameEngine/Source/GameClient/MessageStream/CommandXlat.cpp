@@ -149,10 +149,9 @@ static Bool canSelectionSalvage( const Object *targetObj)
 
 	const DrawableList *drawList = TheInGameUI->getAllSelectedDrawables();
 
-	for (DrawableListCIt cit = drawList->begin(); cit != drawList->end(); ++cit) 
+	for (auto draw : *drawList) 
 	{
-		Drawable *draw = *cit;
-		if (!draw) 
+			if (!draw) 
 		{
 			continue;
 		}
@@ -271,10 +270,9 @@ static CanAttackResult canObjectForceAttack( Object *obj, const Object *victim, 
 static CanAttackResult canAnyForceAttack(const DrawableList *allSelected, const Object *victim, const Coord3D *pos )
 {
 	// check to make sure that allSelected can attack obj.
-	for (DrawableListCIt cit = allSelected->begin(); cit != allSelected->end(); ++cit) 
+	for (auto draw : *allSelected) 
 	{
-		Drawable *draw = *cit;
-		if (!draw) 
+			if (!draw) 
 		{
 			continue;
 		}
@@ -315,9 +313,9 @@ void pickAndPlayUnitVoiceResponse( const DrawableList *list, GameMessage::Type m
 	//priorities. For example, the voice move or voice crush. Voice move gets set
 	//when we have a null event -- but if any of the units can crush the specified
 	//target, then it changes to VoiceCrush.
-	for( DrawableListCIt it = list->begin(); it != list->end(); ++it )
+	for(auto it : *list)
 	{
-		Object *obj = (*it)->getObject();
+		Object *obj = it->getObject();
 
 		if (obj->isKindOf( KINDOF_IGNORED_IN_GUI ))
 			continue;
@@ -1018,9 +1016,9 @@ GameMessage::Type CommandTranslator::issueAttackCommand( Drawable *target,
 
 		// loop through all the selected drawables
 		Drawable *draw;
-		for( DrawableListCIt it = selected->begin(); it != selected->end(); ++it )
+		for(auto it : *selected)
 		{
-			draw = *it;
+			draw = it;
 			msgType = createAttackMessage(draw, target, commandType );
 		}
 	}
@@ -2208,9 +2206,8 @@ GameMessage::Type CommandTranslator::evaluateContextCommand( Drawable *draw,
 			if (type == DO_COMMAND) {
 				const DrawableList *allSelectedDrawables = TheInGameUI->getAllSelectedDrawables();
 				
-				for (DrawableList::const_iterator it = allSelectedDrawables->begin(); it != allSelectedDrawables->end(); ++it) {
-					Drawable *draw = (*it);
-					if (draw && draw->getObject()) {
+				for (auto draw : *allSelectedDrawables) {
+						if (draw && draw->getObject()) {
 						GameMessage *newMsg = TheMessageStream->appendMessage(msgType);
 						newMsg->appendObjectIDArgument(draw->getObject()->getID());
 						newMsg->appendLocationArgument(*pos);
@@ -2255,9 +2252,9 @@ GameMessage::Type CommandTranslator::evaluateContextCommand( Drawable *draw,
 			{
 				//Can we path there?
 				const DrawableList *allSelectedDrawables = TheInGameUI->getAllSelectedDrawables();
-				for( DrawableList::const_iterator it = allSelectedDrawables->begin(); it != allSelectedDrawables->end(); ++it ) 
+				for(auto allSelectedDrawable : *allSelectedDrawables) 
 				{
-					Object *obj = (*it) ? (*it)->getObject() : NULL;
+					Object *obj = allSelectedDrawable ? allSelectedDrawable->getObject() : NULL;
 					AIUpdateInterface *ai = obj ? obj->getAI() : NULL;
 					if( ai )
           {
@@ -2906,9 +2903,9 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 			//exploit.
 			const DrawableList *drawList = TheInGameUI->getAllSelectedDrawables();
 			Drawable *draw;
-			for( DrawableListCIt it = drawList->begin(); it != drawList->end(); ++it )
+			for(auto it : *drawList)
 			{
-				draw = *it;
+				draw = it;
 				if( selectAircraft && (draw->isAnyKindOf( disqualifyingKindofs ) || !draw->isKindOf( KINDOF_AIRCRAFT )) )
 				{
 					TheInGameUI->deselectAllDrawables();

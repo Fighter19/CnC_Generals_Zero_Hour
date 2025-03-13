@@ -624,9 +624,9 @@ void ParachuteContain::positionRider(Object* rider)
 //-------------------------------------------------------------------------------------------------
 void ParachuteContain::positionContainedObjectsRelativeToContainer()
 {
-	for(ContainedItemsList::const_iterator it = getContainList().begin(); it != getContainList().end(); ++it)
+	for(auto it : getContainList())
 	{
-		positionRider(*it);
+		positionRider(it);
 	}
 }
 

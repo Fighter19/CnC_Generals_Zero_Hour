@@ -119,7 +119,7 @@ class PartitionFilterStealthedOrStealthGarrisoned : public PartitionFilter
 public:
 	PartitionFilterStealthedOrStealthGarrisoned() { } 
 
-	virtual Bool allow(Object *objOther);
+	Bool allow(Object *objOther) override;
 
 #if defined(_DEBUG) || defined(_INTERNAL)
 	virtual const char* debugGetName() { return "PartitionFilterStealthedOrStealthGarrisoned"; }
@@ -338,9 +338,9 @@ UpdateSleepTime StealthDetectorUpdate::update( void )
 			if( contain && contain->isGarrisonable() && contain->getStealthUnitsContained() )
 			{
 				Object* rider = NULL;
-				for(ContainedItemsList::const_iterator it = contain->getContainedItemsList()->begin(); it != contain->getContainedItemsList()->end(); ++it)
+				for(auto it : *contain->getContainedItemsList())
 				{
-					rider = *it;
+					rider = it;
 
           StealthUpdate *stealth = rider->getStealth();
 					if ( stealth ) 

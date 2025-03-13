@@ -890,11 +890,11 @@ Bool LadderPreferences::loadProfile( Int profileID )
 		return success;
 
 	// parse out our ladders
-	for (LadderPreferences::iterator it = begin(); it != end(); ++it)
+	for (auto & it : *this)
 	{
 		LadderPref p;
-		AsciiString ladName = it->first;
-		AsciiString ladData = it->second;
+		AsciiString ladName = it.first;
+		AsciiString ladData = it.second;
 
 		DEBUG_LOG(("Looking at [%s] = [%s]\n", ladName.str(), ladData.str()));
 

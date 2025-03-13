@@ -114,7 +114,7 @@ Filename_From_Asset_Name (const char *asset_name)
 		//
 		// Copy the model name into a new filename buffer
 		//
-		::lstrcpy (filename.Get_Buffer (::lstrlen (asset_name) + 5), asset_name);
+		::strcpy (filename.Get_Buffer (::strlen (asset_name) + 5), asset_name);
 		
 		//
 		// Do we need to strip off the model's suffix?
@@ -1197,9 +1197,9 @@ void RenderObjClass::Add_Dependencies_To_List
 
 class RenderObjPersistFactoryClass : public PersistFactoryClass
 {
-	virtual uint32				Chunk_ID(void) const;
-	virtual PersistClass *	Load(ChunkLoadClass & cload) const;
-	virtual void				Save(ChunkSaveClass & csave,PersistClass * obj)	const;
+	uint32				Chunk_ID(void) const override;
+	PersistClass *	Load(ChunkLoadClass & cload) const override;
+	void				Save(ChunkSaveClass & csave,PersistClass * obj)	const override;
 
 	enum 
 	{

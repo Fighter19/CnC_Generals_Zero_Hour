@@ -91,13 +91,13 @@ class DozerActionPickActionPosState : public State
 public:
 
 	DozerActionPickActionPosState( StateMachine *machine, DozerTask task );
-	virtual StateReturnType update( void );
+	StateReturnType update( void ) override;
 
 protected:
 	// snapshot interface
-	virtual void crc( Xfer *xfer );
-	virtual void xfer( Xfer *xfer );
-	virtual void loadPostProcess();
+	void crc( Xfer *xfer ) override;
+	void xfer( Xfer *xfer ) override;
+	void loadPostProcess() override;
 
 protected:
 	
@@ -248,13 +248,13 @@ class DozerActionMoveToActionPosState : public State
 public:
 
 	DozerActionMoveToActionPosState( StateMachine *machine, DozerTask task ) : State( machine, "DozerActionMoveToActionPosState" ) { m_task = task; }
-	virtual StateReturnType update( void );
+	StateReturnType update( void ) override;
 
 protected:
 	// snapshot interface
-	virtual void crc( Xfer *xfer );
-	virtual void xfer( Xfer *xfer );
-	virtual void loadPostProcess();
+	void crc( Xfer *xfer ) override;
+	void xfer( Xfer *xfer ) override;
+	void loadPostProcess() override;
 
 protected:
 
@@ -393,15 +393,15 @@ public:
 		// Initializations missing and needed
 		m_enterFrame = 0;
 	}
-	virtual StateReturnType update( void );
-	virtual StateReturnType onEnter( void );
-	virtual void onExit( StateExitType status ) { }
+	StateReturnType update( void ) override;
+	StateReturnType onEnter( void ) override;
+	void onExit( StateExitType status ) override { }
 
 protected:
 	// snapshot interface
-	virtual void crc( Xfer *xfer );
-	virtual void xfer( Xfer *xfer );
-	virtual void loadPostProcess();
+	void crc( Xfer *xfer ) override;
+	void xfer( Xfer *xfer ) override;
+	void loadPostProcess() override;
 
 protected:
 	
@@ -804,9 +804,9 @@ public:
 
 protected:
 	// snapshot interface
-	virtual void crc( Xfer *xfer );
-	virtual void xfer( Xfer *xfer );
-	virtual void loadPostProcess();
+	void crc( Xfer *xfer ) override;
+	void xfer( Xfer *xfer ) override;
+	void loadPostProcess() override;
 
 protected:
 
@@ -979,15 +979,15 @@ public:
 		m_idlePlayerNumber = 0;
 		m_isMarkedAsIdle   = FALSE;
 	}
-	virtual StateReturnType update( void );
-	virtual StateReturnType onEnter( void );
-	virtual void onExit( StateExitType status );
+	StateReturnType update( void ) override;
+	StateReturnType onEnter( void ) override;
+	void onExit( StateExitType status ) override;
 
 protected:
 	// snapshot interface
-	virtual void crc( Xfer *xfer );
-	virtual void xfer( Xfer *xfer );
-	virtual void loadPostProcess();
+	void crc( Xfer *xfer ) override;
+	void xfer( Xfer *xfer ) override;
+	void loadPostProcess() override;
 
 protected:
 
@@ -1166,16 +1166,16 @@ public:
 		Note that we DON'T use CONVERT_SLEEP_TO_CONTINUE; since we're not doing anything else
 		interesting in update, we can sleep when this machine sleeps 
 	*/
-	virtual StateReturnType update( void ) { return m_actionMachine->updateStateMachine(); }
+	StateReturnType update( void ) override { return m_actionMachine->updateStateMachine(); }
 
-	virtual StateReturnType onEnter( void );
-	virtual void onExit( StateExitType status );
+	StateReturnType onEnter( void ) override;
+	void onExit( StateExitType status ) override;
 
 protected:
 	// snapshot interface
-	virtual void crc( Xfer *xfer );
-	virtual void xfer( Xfer *xfer );
-	virtual void loadPostProcess();
+	void crc( Xfer *xfer ) override;
+	void xfer( Xfer *xfer ) override;
+	void loadPostProcess() override;
 
 protected:
 
@@ -1265,14 +1265,14 @@ class DozerPrimaryGoingHomeState : public State
 
 protected:
 	// snapshot interface	 STUBBED no member vars
-	virtual void crc( Xfer *xfer ){};
-	virtual void xfer( Xfer *xfer ){};
-	virtual void loadPostProcess(){};
+	void crc( Xfer *xfer ) override{};
+	void xfer( Xfer *xfer ) override{};
+	void loadPostProcess() override{};
 
 public:
 
 	DozerPrimaryGoingHomeState( StateMachine *machine ) : State( machine, "DozerPrimaryGoingHomeState" ) { }
-	virtual StateReturnType update( void ) { return STATE_FAILURE; }
+	StateReturnType update( void ) override { return STATE_FAILURE; }
 
 };
 EMPTY_DTOR(DozerPrimaryGoingHomeState)
@@ -1486,11 +1486,11 @@ DozerAIUpdate::~DozerAIUpdate( void )
 		m_dozerMachine->deleteInstance();
 
 	// no orders
-	for( Int i = 0; i < DOZER_NUM_TASKS; i++ )
+	for(auto & i : m_task)
 	{
 
-		m_task[ i ].m_targetObjectID = INVALID_ID;
-		m_task[ i ].m_taskOrderFrame = 0;
+		i.m_targetObjectID = INVALID_ID;
+		i.m_taskOrderFrame = 0;
 
 	}  // end for i
 

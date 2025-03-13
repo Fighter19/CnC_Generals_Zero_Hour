@@ -47,9 +47,9 @@
 ProjectileStreamUpdate::ProjectileStreamUpdate( Thing *thing, const ModuleData* moduleData ) : UpdateModule( thing, moduleData )
 {
 	ObjectID m_projectileIDs[MAX_PROJECTILE_STREAM];
-	for( Int index = 0; index < MAX_PROJECTILE_STREAM; index++ )
+	for(auto & m_projectileID : m_projectileIDs)
 	{
-		m_projectileIDs[index] = INVALID_ID;
+		m_projectileID = INVALID_ID;
 	}
 
 	m_owningObject = INVALID_ID;

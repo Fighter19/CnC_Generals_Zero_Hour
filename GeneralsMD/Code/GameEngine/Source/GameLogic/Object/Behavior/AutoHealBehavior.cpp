@@ -218,9 +218,9 @@ UpdateSleepTime AutoHealBehavior::update( void )
 			// Smack all objects with this function, and we will end up with a list of Objects deserving of pulseHealObject
 			owningPlayer->iterateObjects( checkForAutoHeal, &helper );
 
-			for( ObjectPointerListIterator iter = objectsToHeal.begin(); iter != objectsToHeal.end(); ++iter )
+			for(auto & iter : objectsToHeal)
 			{
-				pulseHealObject(*iter);
+				pulseHealObject(iter);
 			}
 			objectsToHeal.clear();
 		}

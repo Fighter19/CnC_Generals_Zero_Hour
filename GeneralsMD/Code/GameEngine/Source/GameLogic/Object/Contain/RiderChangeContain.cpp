@@ -172,9 +172,9 @@ Bool RiderChangeContain::isValidContainerFor(const Object* rider, Bool checkCapa
 		//We can enter this bike... but now we need to extend the base functionality by limiting
 		//which infantry can enter.
 		const RiderChangeContainModuleData *data = getRiderChangeContainModuleData();
-		for( int i = 0; i < MAX_RIDERS; i++ )
+		for(const auto & m_rider : data->m_riders)
 		{
-			const ThingTemplate *thing = TheThingFactory->findTemplate( data->m_riders[ i ].m_templateName );
+			const ThingTemplate *thing = TheThingFactory->findTemplate( m_rider.m_templateName );
 			if( thing->isEquivalentTo( rider->getTemplate() ) )
 			{
 				//We found a valid rider, so return success.
@@ -213,30 +213,30 @@ void RiderChangeContain::onContaining( Object *rider, Bool wasSelected )
 
 	//Find the rider in the list and set the appropriate model condition
 	const RiderChangeContainModuleData *data = getRiderChangeContainModuleData();
-	for( int i = 0; i < MAX_RIDERS; i++ )
+	for(const auto & m_rider : data->m_riders)
 	{
-		const ThingTemplate *thing = TheThingFactory->findTemplate( data->m_riders[ i ].m_templateName );
+		const ThingTemplate *thing = TheThingFactory->findTemplate( m_rider.m_templateName );
 		if( thing->isEquivalentTo( rider->getTemplate() ) )
 		{
 
 			//This is our rider, so set the correct model condition.
-			obj->setModelConditionState( data->m_riders[ i ].m_modelConditionFlagType );
+			obj->setModelConditionState( m_rider.m_modelConditionFlagType );
 
 			//Also set the correct weaponset flag
-			obj->setWeaponSetFlag( data->m_riders[ i ].m_weaponSetFlag );
+			obj->setWeaponSetFlag( m_rider.m_weaponSetFlag );
 
 			//Also set the object status
-			obj->setStatus( MAKE_OBJECT_STATUS_MASK( data->m_riders[ i ].m_objectStatusType ) );
+			obj->setStatus( MAKE_OBJECT_STATUS_MASK( m_rider.m_objectStatusType ) );
 
 			//Set the new commandset override
-			obj->setCommandSetStringOverride( data->m_riders[ i ].m_commandSet );
+			obj->setCommandSetStringOverride( m_rider.m_commandSet );
 			TheControlBar->markUIDirty();	// Refresh the UI in case we are selected
 
 			//Change the locomotor.
 			AIUpdateInterface* ai = obj->getAI();
 			if( ai )
 			{
-				ai->chooseLocomotorSet( data->m_riders[ i ].m_locomotorSetType );
+				ai->chooseLocomotorSet( m_rider.m_locomotorSetType );
 			}
 
 			if( obj->getStatusBits().test( OBJECT_STATUS_STEALTHED ) )
@@ -284,19 +284,19 @@ void RiderChangeContain::onRemoving( Object *rider )
 
 	//Find the rider in the list and clear various data.
 	const RiderChangeContainModuleData *data = getRiderChangeContainModuleData();
-	for( int i = 0; i < MAX_RIDERS; i++ )
+	for(const auto & m_rider : data->m_riders)
 	{
-		const ThingTemplate *thing = TheThingFactory->findTemplate( data->m_riders[ i ].m_templateName );
+		const ThingTemplate *thing = TheThingFactory->findTemplate( m_rider.m_templateName );
 		if( thing->isEquivalentTo( rider->getTemplate() ) )
 		{
 			//This is our rider, so clear the current model condition.
-			bike->clearModelConditionFlags( MAKE_MODELCONDITION_MASK2( data->m_riders[ i ].m_modelConditionFlagType, MODELCONDITION_DOOR_1_CLOSING ) );
+			bike->clearModelConditionFlags( MAKE_MODELCONDITION_MASK2( m_rider.m_modelConditionFlagType, MODELCONDITION_DOOR_1_CLOSING ) );
 
 			//Also clear the current weaponset flag
-			bike->clearWeaponSetFlag( data->m_riders[ i ].m_weaponSetFlag );
+			bike->clearWeaponSetFlag( m_rider.m_weaponSetFlag );
 
 			//Also clear the object status
-			bike->clearStatus( MAKE_OBJECT_STATUS_MASK( data->m_riders[ i ].m_objectStatusType ) );
+			bike->clearStatus( MAKE_OBJECT_STATUS_MASK( m_rider.m_objectStatusType ) );
 			
 			if( rider->getControllingPlayer() != NULL )
 			{

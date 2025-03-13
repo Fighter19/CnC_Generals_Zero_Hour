@@ -435,10 +435,10 @@ void PopulateQMLadderListBox( GameWindow *win )
 	LadderPreferences ladPref;
 	ladPref.loadProfile( localProfile );
 	const LadderPrefMap recentLadders = ladPref.getRecentLadders();
-	for (LadderPrefMap::const_iterator cit = recentLadders.begin(); cit != recentLadders.end(); ++cit)
+	for (const auto & recentLadder : recentLadders)
 	{
-		AsciiString addr = cit->second.address;
-		UnsignedShort port = cit->second.port;
+		AsciiString addr = recentLadder.second.address;
+		UnsignedShort port = recentLadder.second.port;
 		if (addr == lastLadderAddr && port == lastLadderPort)
 			continue;
 		const LadderInfo *info = TheLadderList->findLadder( addr, port );
@@ -533,10 +533,10 @@ void PopulateQMLadderComboBox( void )
 	LadderPreferences ladPref;
 	ladPref.loadProfile( localProfile );
 	const LadderPrefMap recentLadders = ladPref.getRecentLadders();
-	for (LadderPrefMap::const_iterator cit = recentLadders.begin(); cit != recentLadders.end(); ++cit)
+	for (const auto & recentLadder : recentLadders)
 	{
-		AsciiString addr = cit->second.address;
-		UnsignedShort port = cit->second.port;
+		AsciiString addr = recentLadder.second.address;
+		UnsignedShort port = recentLadder.second.port;
 		if (addr == lastLadderAddr && port == lastLadderPort)
 			continue;
 		const LadderInfo *info = TheLadderList->findLadder( addr, port );

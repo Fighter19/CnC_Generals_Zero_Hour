@@ -300,35 +300,35 @@ void FlightDeckBehavior::purgeDead()
 {
 	buildInfo();
 
-	for (std::vector<FlightDeckInfo>::iterator it = m_spaces.begin(); it != m_spaces.end(); ++it)
+	for (auto & m_space : m_spaces)
 	{
-		if (it->m_objectInSpace != INVALID_ID)
+		if (m_space.m_objectInSpace != INVALID_ID)
 		{
-			Object* obj = TheGameLogic->findObjectByID(it->m_objectInSpace);
+			Object* obj = TheGameLogic->findObjectByID(m_space.m_objectInSpace);
 			if (obj == NULL || obj->isEffectivelyDead())
 			{
-				it->m_objectInSpace = INVALID_ID;
+				m_space.m_objectInSpace = INVALID_ID;
 			}
 		}
 	}
 
 	{
-		for (std::vector<RunwayInfo>::iterator it = m_runways.begin(); it != m_runways.end(); ++it)
+		for (auto & m_runway : m_runways)
 		{
-			if (it->m_inUseByForTakeoff != INVALID_ID)
+			if (m_runway.m_inUseByForTakeoff != INVALID_ID)
 			{
-				Object* obj = TheGameLogic->findObjectByID(it->m_inUseByForTakeoff);
+				Object* obj = TheGameLogic->findObjectByID(m_runway.m_inUseByForTakeoff);
 				if (obj == NULL || obj->isEffectivelyDead())
 				{
-					it->m_inUseByForTakeoff = INVALID_ID;
+					m_runway.m_inUseByForTakeoff = INVALID_ID;
 				}
 			}
-			if (it->m_inUseByForLanding != INVALID_ID)
+			if (m_runway.m_inUseByForLanding != INVALID_ID)
 			{
-				Object* obj = TheGameLogic->findObjectByID(it->m_inUseByForLanding);
+				Object* obj = TheGameLogic->findObjectByID(m_runway.m_inUseByForLanding);
 				if (obj == NULL || obj->isEffectivelyDead())
 				{
-					it->m_inUseByForLanding = INVALID_ID;
+					m_runway.m_inUseByForLanding = INVALID_ID;
 				}
 			}
 		}
@@ -367,9 +367,9 @@ Bool FlightDeckBehavior::hasReservedSpace(ObjectID id) const
 	if (id == INVALID_ID)	// shouldn't call this way, but Weapon mistakenly does sometimes, so check for it
 		return false;
 
-	for (std::vector<FlightDeckInfo>::const_iterator it = m_spaces.begin(); it != m_spaces.end(); ++it)
+	for (const auto & m_space : m_spaces)
 	{
-		if (it->m_objectInSpace == id)
+		if (m_space.m_objectInSpace == id)
 			return true;
 	}
 	return false;
@@ -402,10 +402,10 @@ FlightDeckBehavior::FlightDeckInfo* FlightDeckBehavior::findPPI(ObjectID id)
 	if (!m_gotInfo || id == INVALID_ID)
 		return NULL;
 
-	for (std::vector<FlightDeckInfo>::iterator it = m_spaces.begin(); it != m_spaces.end(); ++it)
+	for (auto & m_space : m_spaces)
 	{
-		if (it->m_objectInSpace == id)
-			return &*it;
+		if (m_space.m_objectInSpace == id)
+			return &m_space;
 	}
 
 	return NULL; 
@@ -417,10 +417,10 @@ FlightDeckBehavior::FlightDeckInfo* FlightDeckBehavior::findEmptyPPI()
 	if (!m_gotInfo)
 		return NULL;
 
-	for (std::vector<FlightDeckInfo>::iterator it = m_spaces.begin(); it != m_spaces.end(); ++it)
+	for (auto & m_space : m_spaces)
 	{
-		if( it->m_objectInSpace == INVALID_ID )
-			return &*it;
+		if( m_space.m_objectInSpace == INVALID_ID )
+			return &m_space;
 	}
 
 	return NULL;
@@ -440,9 +440,9 @@ Bool FlightDeckBehavior::hasAvailableSpaceFor(const ThingTemplate* thing) const
 	if (!m_gotInfo)	// degenerate case, shouldn't happen, but just in case...
 		return false;
 	
-	for (std::vector<FlightDeckInfo>::const_iterator it = m_spaces.begin(); it != m_spaces.end(); ++it)
+	for (const auto & m_space : m_spaces)
 	{
-		ObjectID id = it->m_objectInSpace;
+		ObjectID id = m_space.m_objectInSpace;
 
 		// since this is const, and we can't purge the dead safely, just peek and see if we have a dead thing.
 		if (id != INVALID_ID)
@@ -569,9 +569,9 @@ void FlightDeckBehavior::calcPPInfo( ObjectID id, PPInfo *info )
 		vector.sub( &info->runwayEnd );
 		info->runwayTakeoffDist = vector.length();
 
-		for (std::vector<RunwayInfo>::iterator it = m_runways.begin(); it != m_runways.end(); ++it)
+		for (auto & m_runway : m_runways)
 		{
-			if (it->m_inUseByForTakeoff == id )
+			if (m_runway.m_inUseByForTakeoff == id )
 			{
 				info->runwayStart = info->runwayPrep;
 			}
@@ -586,11 +586,11 @@ void FlightDeckBehavior::releaseSpace(ObjectID id)
 	buildInfo();
 	purgeDead();
 
-	for (std::vector<FlightDeckInfo>::iterator it = m_spaces.begin(); it != m_spaces.end(); ++it)
+	for (auto & m_space : m_spaces)
 	{
-		if (it->m_objectInSpace == id)
+		if (m_space.m_objectInSpace == id)
 		{
-			it->m_objectInSpace = INVALID_ID;
+			m_space.m_objectInSpace = INVALID_ID;
 		}
 	}
 
@@ -648,11 +648,11 @@ Bool FlightDeckBehavior::reserveRunway(ObjectID id, Bool forLanding)
 	else
 	{
 		//Look at all spaces for landing.
-		for (std::vector<FlightDeckInfo>::iterator it = m_spaces.begin(); it != m_spaces.end(); ++it)
+		for (auto & m_space : m_spaces)
 		{
-			if (it->m_objectInSpace == id)
+			if (m_space.m_objectInSpace == id)
 			{
-				runway = it->m_runway;
+				runway = m_space.m_runway;
 				break;
 			}
 		}
@@ -695,15 +695,15 @@ void FlightDeckBehavior::releaseRunway(ObjectID id)
 	buildInfo();
 	purgeDead();
 
-	for (std::vector<RunwayInfo>::iterator it = m_runways.begin(); it != m_runways.end(); ++it)
+	for (auto & m_runway : m_runways)
 	{
-		if( it->m_inUseByForTakeoff == id )
+		if( m_runway.m_inUseByForTakeoff == id )
 		{
-			it->m_inUseByForTakeoff = INVALID_ID;
+			m_runway.m_inUseByForTakeoff = INVALID_ID;
 		}
-		if( it->m_inUseByForLanding == id )
+		if( m_runway.m_inUseByForLanding == id )
 		{
-			it->m_inUseByForLanding = INVALID_ID;
+			m_runway.m_inUseByForLanding = INVALID_ID;
 		}
 	}
 }
@@ -713,11 +713,11 @@ const std::vector<Coord3D>* FlightDeckBehavior::getTaxiLocations( ObjectID id ) 
 {
 	//Find the runway the object is assigned to.
 	Int runway = -1;
-	for( std::vector<FlightDeckInfo>::const_iterator it = m_spaces.begin(); it != m_spaces.end(); it++ )
+	for(const auto & m_space : m_spaces)
 	{
-		if( it->m_objectInSpace == id )
+		if( m_space.m_objectInSpace == id )
 		{
-			runway = it->m_runway;
+			runway = m_space.m_runway;
 			break;
 		}
 	}
@@ -737,11 +737,11 @@ const std::vector<Coord3D>* FlightDeckBehavior::getCreationLocations( ObjectID i
 {
 	//Find the runway the object is assigned to.
 	Int runway = -1;
-	for( std::vector<FlightDeckInfo>::const_iterator it = m_spaces.begin(); it != m_spaces.end(); it++ )
+	for(const auto & m_space : m_spaces)
 	{
-		if( it->m_objectInSpace == id )
+		if( m_space.m_objectInSpace == id )
 		{
-			runway = it->m_runway;
+			runway = m_space.m_runway;
 			break;
 		}
 	}
@@ -1007,11 +1007,11 @@ void FlightDeckBehavior::defectAllParkedUnits(Team* newTeam, UnsignedInt detecti
 	buildInfo();
 	purgeDead();
 
-	for (std::vector<FlightDeckInfo>::iterator it = m_spaces.begin(); it != m_spaces.end(); ++it)
+	for (auto & m_space : m_spaces)
 	{
-		if (it->m_objectInSpace != INVALID_ID)
+		if (m_space.m_objectInSpace != INVALID_ID)
 		{
-			Object* obj = TheGameLogic->findObjectByID(it->m_objectInSpace);
+			Object* obj = TheGameLogic->findObjectByID(m_space.m_objectInSpace);
 			if (obj == NULL || obj->isEffectivelyDead())
 				continue;
 
@@ -1048,11 +1048,11 @@ void FlightDeckBehavior::killAllParkedUnits()
 	buildInfo();
 	purgeDead();
 
-	for (std::vector<FlightDeckInfo>::iterator it = m_spaces.begin(); it != m_spaces.end(); ++it)
+	for (auto & m_space : m_spaces)
 	{
-		if (it->m_objectInSpace != INVALID_ID)
+		if (m_space.m_objectInSpace != INVALID_ID)
 		{
-			Object* obj = TheGameLogic->findObjectByID(it->m_objectInSpace);
+			Object* obj = TheGameLogic->findObjectByID(m_space.m_objectInSpace);
 			if (obj == NULL || obj->isEffectivelyDead())
 				continue;
 
@@ -1194,10 +1194,10 @@ UpdateSleepTime FlightDeckBehavior::update()
 		m_startedProductionFrame = FOREVER;
 	}
 
-	for( std::vector<FlightDeckInfo>::iterator it = m_spaces.begin(); it != m_spaces.end(); it++ )
+	for(auto & m_space : m_spaces)
 	{
 		//Unassigned space?... so we can build a replacement. 
-		if( it->m_objectInSpace == INVALID_ID )
+		if( m_space.m_objectInSpace == INVALID_ID )
 		{
 			//But are we already building one?
 			ProductionUpdateInterface *pu = getObject()->getProductionUpdateInterface();
@@ -1223,9 +1223,9 @@ UpdateSleepTime FlightDeckBehavior::update()
 
 	//If the carrier has at least one aircraft, then allow it to attack.
 	Bool hasAircraft = FALSE;
-	for( std::vector<FlightDeckInfo>::iterator it = m_spaces.begin(); it != m_spaces.end(); it++ )
+	for(auto & m_space : m_spaces)
 	{
-		if( it->m_objectInSpace != INVALID_ID )
+		if( m_space.m_objectInSpace != INVALID_ID )
 		{
 			hasAircraft = TRUE;
 			break;
@@ -1309,11 +1309,11 @@ void FlightDeckBehavior::exitObjectViaDoor( Object *newObj, ExitDoorType exitDoo
 	FlightDeckInfo* ppi = NULL;
 	if (exitDoor != DOOR_NONE_NEEDED)
 	{
-		for (std::vector<FlightDeckInfo>::iterator it = m_spaces.begin(); it != m_spaces.end(); ++it)
+		for (auto & m_space : m_spaces)
 		{
-			if( it->m_objectInSpace == INVALID_ID )
+			if( m_space.m_objectInSpace == INVALID_ID )
 			{
-				ppi = &(*it);
+				ppi = &m_space;
 				break;
 			}
 		}
@@ -1432,11 +1432,11 @@ void FlightDeckBehavior::aiDoCommand(const AICommandParms* parms)
 void FlightDeckBehavior::propagateOrdersToPlanes()
 {
 	//We just ordered the carrier to stop, so order all the planes that are out to return!
-	for( std::vector<FlightDeckInfo>::iterator it = m_spaces.begin(); it != m_spaces.end(); it++ )
+	for(auto & m_space : m_spaces)
 	{
-		if( it->m_objectInSpace != INVALID_ID )
+		if( m_space.m_objectInSpace != INVALID_ID )
 		{
-			Object *jet = TheGameLogic->findObjectByID( it->m_objectInSpace );
+			Object *jet = TheGameLogic->findObjectByID( m_space.m_objectInSpace );
 			if( jet && isAbleToGiveUpParkingSpace( jet ) )
 			{
 				propagateOrderToSpecificPlane( jet );

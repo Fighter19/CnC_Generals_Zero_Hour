@@ -2413,11 +2413,9 @@ Bool MilesAudioManager::has3DSensitiveStreamsPlaying( void ) const
   if ( m_playingStreams.empty() )
     return FALSE;
 
-	for ( std::list< PlayingAudio* >::const_iterator it = m_playingStreams.begin(); it != m_playingStreams.end(); ++it ) 
+	for (auto playing : m_playingStreams) 
   {
-		const PlayingAudio *playing = (*it);
-
-    if ( ! playing )
+		if ( ! playing )
       continue;
 
     if ( playing->m_audioEventRTS->getAudioEventInfo()->m_soundType != AT_Music )

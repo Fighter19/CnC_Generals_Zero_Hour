@@ -383,11 +383,11 @@ void InGameUI::xfer( Xfer *xfer )
 		{
 			Int timerCount = m_namedTimers.size();
 			xfer->xferInt( &timerCount );
-			for( NamedTimerMapIt timerIter = m_namedTimers.begin(); timerIter != m_namedTimers.end(); ++timerIter )
+			for(auto & m_namedTimer : m_namedTimers)
 			{
-				xfer->xferAsciiString( &(timerIter->second->m_timerName) );
-				xfer->xferUnicodeString( &(timerIter->second->timerText) );
-				xfer->xferBool( &(timerIter->second->isCountdown) );
+				xfer->xferAsciiString( &(m_namedTimer.second->m_timerName) );
+				xfer->xferUnicodeString( &(m_namedTimer.second->timerText) );
+				xfer->xferBool( &(m_namedTimer.second->isCountdown) );
 			}
 		}
 		else // iz a Load
@@ -419,11 +419,9 @@ void InGameUI::xfer( Xfer *xfer )
 			{
 				AsciiString powerName = mapIt->first;
 				SuperweaponList& swList = mapIt->second;
-				for (SuperweaponList::iterator listIt = swList.begin(); listIt != swList.end(); ++listIt)
+				for (auto swInfo : swList)
 				{
-					SuperweaponInfo* swInfo = *listIt;
-
-					// since this list tends to be somewhat sparse, we write stuff out pretty explicitly.
+						// since this list tends to be somewhat sparse, we write stuff out pretty explicitly.
 					xfer->xferInt(&playerIndex);
 					
 					AsciiString templateName = swInfo->getSpecialPowerTemplate()->getName();
@@ -556,11 +554,11 @@ SuperweaponInfo* InGameUI::findSWInfo(Int playerIndex, const AsciiString& powerN
 	SuperweaponMap::iterator mapIt = m_superweapons[playerIndex].find(powerName);
 	if (mapIt != m_superweapons[playerIndex].end())
 	{
-		for (SuperweaponList::iterator listIt = mapIt->second.begin(); listIt != mapIt->second.end(); ++listIt)
+		for (auto & listIt : mapIt->second)
 		{
-			if ((*listIt)->m_id == id)
+			if (listIt->m_id == id)
 			{
-				return *listIt;
+				return listIt;
 			}
 		}
 	}
@@ -653,9 +651,9 @@ void InGameUI::objectChangedTeam(const Object *obj, Int oldPlayerIndex, Int newP
 			Bool found = false;
 			if (mapIt != m_superweapons[oldPlayerIndex].end())
 			{
-				for (SuperweaponList::iterator listIt = mapIt->second.begin(); listIt != mapIt->second.end(); ++listIt)
+				for (auto & listIt : mapIt->second)
 				{
-					if ((*listIt)->m_id == id)
+					if (listIt->m_id == id)
 					{
 						removeSuperweapon(oldPlayerIndex, powerName, id, powerTemplate);
 						addSuperweapon(newPlayerIndex, powerName, id, powerTemplate);
@@ -679,15 +677,15 @@ void InGameUI::objectChangedTeam(const Object *obj, Int oldPlayerIndex, Int newP
 void InGameUI::hideObjectSuperweaponDisplayByScript(const Object *obj)
 {
 	ObjectID objID = obj->getID();
-	for (Int playerIndex = 0; playerIndex < MAX_PLAYER_COUNT; ++playerIndex)
+	for (auto & m_superweapon : m_superweapons)
 	{
-		for (SuperweaponMap::iterator mapIt = m_superweapons[playerIndex].begin(); mapIt != m_superweapons[playerIndex].end(); ++mapIt)
+		for (auto & mapIt : m_superweapon)
 		{
-			for (SuperweaponList::iterator listIt = mapIt->second.begin(); listIt != mapIt->second.end(); ++listIt)
+			for (auto & listIt : mapIt.second)
 			{
-				if ((*listIt)->m_id == objID)
+				if (listIt->m_id == objID)
 				{
-					(*listIt)->m_hiddenByScript = TRUE;
+					listIt->m_hiddenByScript = TRUE;
 				}
 			}
 		}
@@ -699,15 +697,15 @@ void InGameUI::hideObjectSuperweaponDisplayByScript(const Object *obj)
 void InGameUI::showObjectSuperweaponDisplayByScript(const Object *obj)
 {
 	ObjectID objID = obj->getID();
-	for (Int playerIndex = 0; playerIndex < MAX_PLAYER_COUNT; ++playerIndex)
+	for (auto & m_superweapon : m_superweapons)
 	{
-		for (SuperweaponMap::iterator mapIt = m_superweapons[playerIndex].begin(); mapIt != m_superweapons[playerIndex].end(); ++mapIt)
+		for (auto & mapIt : m_superweapon)
 		{
-			for (SuperweaponList::iterator listIt = mapIt->second.begin(); listIt != mapIt->second.end(); ++listIt)
+			for (auto & listIt : mapIt.second)
 			{
-				if ((*listIt)->m_id == objID)
+				if (listIt->m_id == objID)
 				{
-					(*listIt)->m_hiddenByScript = FALSE;
+					listIt->m_hiddenByScript = FALSE;
 				}
 			}
 		}
@@ -1847,10 +1845,9 @@ void InGameUI::update( void )
 	updateIdleWorker();
 
 	// update any random window layout that so requests
-	for (std::list<WindowLayout *>::iterator it = m_windowLayouts.begin(); it != m_windowLayouts.end(); ++it)
+	for (auto layout : m_windowLayouts)
 	{
-		WindowLayout *layout = *it;
-		layout->runUpdate();
+			layout->runUpdate();
 	}
 
 	//Handle keyboard camera rotations
@@ -1927,21 +1924,20 @@ void InGameUI::reset( void )
 	Int i;
 	for (i=0; i<MAX_PLAYER_COUNT; ++i)
 	{
-		for (SuperweaponMap::iterator mapIt = m_superweapons[i].begin(); mapIt != m_superweapons[i].end(); ++mapIt)
+		for (auto & mapIt : m_superweapons[i])
 		{
-			for (SuperweaponList::iterator listIt = mapIt->second.begin(); listIt != mapIt->second.end(); ++listIt)
+			for (auto info : mapIt.second)
 			{
-				SuperweaponInfo *info = *listIt;
-				info->deleteInstance();
+					info->deleteInstance();
 			}
-			mapIt->second.clear();
+			mapIt.second.clear();
 		}
 		m_superweapons[i].clear();
 	}
 
-	for (NamedTimerMapIt timerIt = m_namedTimers.begin(); timerIt != m_namedTimers.end(); ++timerIt)
+	for (auto & m_namedTimer : m_namedTimers)
 	{
-		NamedTimerInfo *info = timerIt->second;
+		NamedTimerInfo *info = m_namedTimer.second;
 		TheDisplayStringManager->freeDisplayString(info->displayString);
 		info->deleteInstance();
 	}
@@ -3340,10 +3336,10 @@ Drawable *InGameUI::getFirstSelectedDrawable( void )
 Bool InGameUI::isDrawableSelected( DrawableID idToCheck ) const
 {
 
-	for( DrawableListCIt it = m_selectedDrawables.begin(); it != m_selectedDrawables.end(); ++it ) 
+	for(auto m_selectedDrawable : m_selectedDrawables) 
 	{
 
-		if( (*it)->getID() == idToCheck )
+		if( m_selectedDrawable->getID() == idToCheck )
 			return TRUE;
 
 	}  // end for
@@ -3358,15 +3354,13 @@ Bool InGameUI::isAnySelectedKindOf( KindOfType kindOf ) const
 {
 	Drawable *draw;
 
-	for( DrawableListCIt it = m_selectedDrawables.begin();
-			 it != m_selectedDrawables.end();
-			 ++it )
+	for(auto m_selectedDrawable : m_selectedDrawables)
 	{
 
 		/** @todo, it seems like we might want to keep a list of drawable pointers so we
 		don't have to do this lookup ... it seems "tightly coupled" to me (CBD) */
 		// get the drawable from the ID
-		draw = *it;
+		draw = m_selectedDrawable;
 		if( draw && draw->isKindOf( kindOf ) )
 			return TRUE;
 
@@ -3382,15 +3376,13 @@ Bool InGameUI::isAllSelectedKindOf( KindOfType kindOf ) const
 {
 	Drawable *draw;
 
-	for( DrawableListCIt it = m_selectedDrawables.begin();
-			 it != m_selectedDrawables.end();
-			 ++it )
+	for(auto m_selectedDrawable : m_selectedDrawables)
 	{
 
 		/** @todo, it seems like we might want to keep a list of drawable pointers so we
 		don't have to do this lookup ... it seems "tightly coupled" to me (CBD) */
 		// get the drawable from the ID
-		draw = *it;
+		draw = m_selectedDrawable;
 		if( draw && draw->isKindOf( kindOf ) == FALSE )
 			return FALSE;  // not all objects are of the kind of type
 
@@ -3524,16 +3516,15 @@ void InGameUI::postDraw( void )
 
 		Bool marginExceeded = FALSE;
 
-		for (Int i=0; i<MAX_PLAYER_COUNT; ++i)
+		for (auto & m_superweapon : m_superweapons)
 		{
 			Color bgColor = GameMakeColor( 0, 0, 0, 255 );
-			for (SuperweaponMap::iterator mapIt = m_superweapons[i].begin(); mapIt != m_superweapons[i].end(); ++mapIt)
+			for (auto & mapIt : m_superweapon)
 			{
-				AsciiString templateName = mapIt->first;
-				for (SuperweaponList::iterator listIt = mapIt->second.begin(); listIt != mapIt->second.end(); ++listIt)
+				AsciiString templateName = mapIt.first;
+				for (auto info : mapIt.second)
 				{
-					SuperweaponInfo *info = *listIt;
-					DEBUG_ASSERTCRASH(info, ("No superweapon info!"));
+						DEBUG_ASSERTCRASH(info, ("No superweapon info!"));
 					if (info && !info->m_hiddenByScript && !info->m_hiddenByScience)
 					{
 						//enforce bottom margin of tactical view
@@ -3728,10 +3719,10 @@ void InGameUI::postDraw( void )
 		Int startX = (Int)(m_namedTimerPosition.x * TheDisplay->getWidth());
 		Int startY = (Int)(m_namedTimerPosition.y * TheDisplay->getHeight());
 		Color bgColor = GameMakeColor( 0, 0, 0, 255 );
-		for (NamedTimerMapIt mapIt = m_namedTimers.begin(); mapIt != m_namedTimers.end(); ++mapIt)
+		for (auto & m_namedTimer : m_namedTimers)
 		{
-			AsciiString timerName = mapIt->first;
-			NamedTimerInfo *info = mapIt->second;
+			AsciiString timerName = m_namedTimer.first;
+			NamedTimerInfo *info = m_namedTimer.second;
 			DEBUG_ASSERTCRASH(info, ("No namedTimer info!"));
 			if (info)
 			{
@@ -4143,10 +4134,10 @@ Bool InGameUI::areSelectedObjectsControllable() const
 
 	// loop through all the selected drawables
 	const Drawable *draw;
-	for( DrawableListCIt it = selected->begin(); it != selected->end(); ++it )
+	for(auto it : *selected)
 	{
 		// get this drawable
-		draw = *it;
+		draw = it;
 
 		// All selected objects will have the same local controller, so 
 		// simply return the first one.
@@ -4210,11 +4201,11 @@ CanAttackResult InGameUI::getCanSelectedObjectsAttack( ActionType action, const 
 
 	// loop through all the selected drawables
 	Drawable *other;
-	for( DrawableListCIt it = selected->begin(); it != selected->end(); ++it )
+	for(auto it : *selected)
 	{
 	
 		// get this drawable
-		other = *it;
+		other = it;
 		count++;
 
 		switch( action )
@@ -4308,11 +4299,11 @@ Bool InGameUI::canSelectedObjectsDoAction( ActionType action, const Object *obje
 
 	// loop through all the selected drawables
 	Drawable *other;
-	for( DrawableListCIt it = selected->begin(); it != selected->end(); ++it )
+	for(auto it : *selected)
 	{
 	
 		// get this drawable
-		other = *it;
+		other = it;
 		count++;
 		Bool success = FALSE;
 
@@ -4465,12 +4456,11 @@ Bool InGameUI::canSelectedObjectsDoSpecialPower( const CommandButton *command, c
 	Int qualify = 0;
 
 	// loop through all the selected drawables
-	for( DrawableListCIt it = selected->begin(); it != selected->end(); ++it )
+	for(auto other : *selected)
 	{
 	
 		// get this drawable
-		Drawable* other = *it;
-		count++;
+			count++;
 
 		if( !doAtObject && !doAtPosition )
 		{
@@ -4528,11 +4518,11 @@ Bool InGameUI::canSelectedObjectsOverrideSpecialPowerDestination( const Coord3D 
 
 	// loop through all the selected drawables
 	Drawable *other;
-	for( DrawableListCIt it = selected->begin(); it != selected->end(); ++it )
+	for(auto it : *selected)
 	{
 	
 		// get this drawable
-		other = *it;
+		other = it;
 		count++;
 
 		if( TheActionManager->canOverrideSpecialPowerDestination( other->getObject(), loc, spType, CMD_FROM_PLAYER ) )
@@ -4584,11 +4574,11 @@ Bool InGameUI::canSelectedObjectsEffectivelyUseWeapon( const CommandButton *comm
 
 	// loop through all the selected drawables
 	Drawable *other;
-	for( DrawableListCIt it = selected->begin(); it != selected->end(); ++it )
+	for(auto it : *selected)
 	{
 	
 		// get this drawable
-		other = *it;
+		other = it;
 		count++;
 
 		if( !doAtObject && !doAtPosition )
@@ -4706,10 +4696,10 @@ Int InGameUI::selectMatchingAcrossRegion( IRegion2D *region )
 	std::set<const ThingTemplate*> drawableList;
 	Bool carBomb = FALSE;
 	
-	for( DrawableListCIt it = selected->begin(); it != selected->end(); ++it )
+	for(auto it : *selected)
 	{
 		// get this drawable
-		draw = *it;
+		draw = it;
 		if( draw && draw->getObject() && draw->getObject()->isLocallyControlled() )
 		{
 			// Use the Object's thing template, doing so will prevent wierdness for disguised vehicles.
@@ -5107,9 +5097,9 @@ void InGameUI::drawFloatingText( void )
 {
 	FloatingTextData *ftd;
 	// loop through and draw all the texts
-	for(FloatingTextListIt it = m_floatingTextList.begin(); it != m_floatingTextList.end(); ++it)
+	for(auto & it : m_floatingTextList)
 	{
-		ftd = *it;
+		ftd = it;
 		ICoord2D pos;
 		// get the local player's index
 		Int playerNdx = ThePlayerList->getLocalPlayer()->getPlayerIndex();
@@ -5630,9 +5620,9 @@ void InGameUI::resetIdleWorker( void )
 		GadgetButtonSetText(m_idleWorkerWin, UnicodeString::TheEmptyString);
 	}
 	m_currentIdleWorkerDisplay = -1;
-	for(Int i = 0; i < MAX_PLAYER_COUNT; ++i)
+	for(auto & m_idleWorker : m_idleWorkers)
 	{
-		m_idleWorkers[i].clear();
+		m_idleWorker.clear();
 	}
 
 }

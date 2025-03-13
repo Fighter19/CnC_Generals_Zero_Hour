@@ -623,7 +623,7 @@ void ScriptActions::doCreateReinforcements(const AsciiString& team, const AsciiS
 				ContainModuleInterface *contain = obj->getContain();
 				if( contain )
 				{
-					vecOfTransports.push_back(std::make_pair(obj->getID(), ((TransportContain*)contain)->getContainMax()));
+					vecOfTransports.emplace_back(obj->getID(), ((TransportContain*)contain)->getContainMax());
 				}
 				else
 				{
@@ -634,7 +634,7 @@ void ScriptActions::doCreateReinforcements(const AsciiString& team, const AsciiS
 			{
 				Int slots = obj->getTransportSlotCount();
 				if (slots==0) slots = 0x7fffff; // 0 means lots.
-				vecOfUnits.push_back(std::make_pair(obj->getID(), slots));
+				vecOfUnits.emplace_back(obj->getID(), slots);
 			}
 		}
 
@@ -643,9 +643,9 @@ void ScriptActions::doCreateReinforcements(const AsciiString& team, const AsciiS
 		PartitionSolver partition(vecOfUnits, vecOfTransports, PREFER_FAST_SOLUTION);
 		partition.solve();
 		SolutionVec solution = partition.getSolution();
-		for (int i = 0; i < solution.size(); ++i) {
-			Object *unit = TheGameLogic->findObjectByID(solution[i].first);
-			Object *trans = TheGameLogic->findObjectByID(solution[i].second);
+		for (auto & i : solution) {
+			Object *unit = TheGameLogic->findObjectByID(i.first);
+			Object *trans = TheGameLogic->findObjectByID(i.second);
 			if (!unit || !trans) {
 				continue;
 			}
@@ -1485,7 +1485,7 @@ void ScriptActions::doLoadAllTransports(const AsciiString& teamName)
 			ContainModuleInterface *contain = obj->getContain();
 			if( contain )
 			{
-				vecOfTransports.push_back(std::make_pair(obj->getID(), ((TransportContain*)obj->getContain())->getContainMax()));
+				vecOfTransports.emplace_back(obj->getID(), ((TransportContain*)obj->getContain())->getContainMax());
 			}
 			else
 			{
@@ -1494,7 +1494,7 @@ void ScriptActions::doLoadAllTransports(const AsciiString& teamName)
 		} 
 		else 
 		{
-			vecOfUnits.push_back(std::make_pair(obj->getID(), obj->getTransportSlotCount()));
+			vecOfUnits.emplace_back(obj->getID(), obj->getTransportSlotCount());
 		}
 	}
 
@@ -1503,9 +1503,9 @@ void ScriptActions::doLoadAllTransports(const AsciiString& teamName)
 	PartitionSolver partition(vecOfUnits, vecOfTransports, PREFER_FAST_SOLUTION);
 	partition.solve();
 	SolutionVec solution = partition.getSolution();
-	for (int i = 0; i < solution.size(); ++i) {
-		Object *unit = TheGameLogic->findObjectByID(solution[i].first);
-		Object *trans = TheGameLogic->findObjectByID(solution[i].second);
+	for (auto & i : solution) {
+		Object *unit = TheGameLogic->findObjectByID(i.first);
+		Object *trans = TheGameLogic->findObjectByID(i.second);
 		if (!unit || !trans) {
 			continue;
 		}
@@ -5838,11 +5838,9 @@ void ScriptActions::doTeamPartialUseCommandButton( Real percentage, const AsciiS
 	
 	Int numObjs = /*REAL_TO_INT_CEIL*/(percentage / 100.0f * objList.size());
 	Int count = 0;
-	for (std::vector<Object*>::const_iterator it = objList.begin(); it != objList.end(); ++it)
+	for (auto obj : objList)
 	{
-		Object *obj = (*it);
-
-		if (count >= numObjs) 
+			if (count >= numObjs) 
 			return;
 
 		obj->doCommandButton(commandButton, CMD_FROM_SCRIPT);

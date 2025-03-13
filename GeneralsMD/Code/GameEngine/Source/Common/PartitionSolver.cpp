@@ -110,7 +110,7 @@ void PartitionSolver::solve(void)
 				if (m_data[i].second <= spacesStillAvailable[j].second) 
 				{
 					spacesStillAvailable[j].second -= m_data[i].second;
-					m_bestSolution.push_back(std::make_pair(m_data[i].first, spacesStillAvailable[j].first));
+					m_bestSolution.emplace_back(m_data[i].first, spacesStillAvailable[j].first);
 					break;
 				}
 			}

@@ -150,8 +150,8 @@ void SpawnPointProductionExitUpdate::initializeBonePositions()
 		return;
 
 	Matrix3D boneTransforms[MAX_SPAWN_POINTS];
-	for( Int matrixIndex = 0; matrixIndex < MAX_SPAWN_POINTS; matrixIndex++ )
-		boneTransforms[matrixIndex].Make_Identity();
+	for(auto & boneTransform : boneTransforms)
+		boneTransform.Make_Identity();
 
 	// Get all the bones of the right name
 	const SpawnPointProductionExitUpdateModuleData* md = getSpawnPointProductionExitUpdateModuleData();

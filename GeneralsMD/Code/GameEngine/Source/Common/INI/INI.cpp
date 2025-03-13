@@ -677,7 +677,7 @@ void INI::parseAsciiStringVector( INI* ini, void * /*instance*/, void *store, co
 	asv->clear();
 	for (const char *token = ini->getNextTokenOrNull(); token != NULL; token = ini->getNextTokenOrNull())
 	{
-		asv->push_back(token);
+		asv->emplace_back(token);
 	}
 }
 
@@ -690,7 +690,7 @@ void INI::parseAsciiStringVectorAppend( INI* ini, void * /*instance*/, void *sto
 	// asv->clear();
 	for (const char *token = ini->getNextTokenOrNull(); token != NULL; token = ini->getNextTokenOrNull())
 	{
-		asv->push_back(token);
+		asv->emplace_back(token);
 	}
 }
 
@@ -1795,7 +1795,7 @@ void INI::parseSoundsList( INI* ini, void *instance, void *store, const void* /*
 	const char *c = ini->getNextTokenOrNull(SEPS);
 	while ( c )
 	{
-		vec->push_back( c );
+		vec->emplace_back(c );
 		c = ini->getNextTokenOrNull(SEPS);
 	}
 }

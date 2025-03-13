@@ -449,9 +449,9 @@ static void populateBuddyGames(void)
 		if (info.m_status == GP_STAGING)
 		{
 			StagingRoomMap *srm = TheGameSpyInfo->getStagingRoomList();
-			for (StagingRoomMap::iterator srmIt = srm->begin(); srmIt != srm->end(); ++srmIt)
+			for (auto & srmIt : *srm)
 			{
-				GameSpyStagingRoom *game = srmIt->second;
+				GameSpyStagingRoom *game = srmIt.second;
 				game->cleanUpSlotPointers();
 				const GameSpyGameSlot *slot = game->getGameSpySlot(0);
 				if (slot && slot->getName() == info.m_locationString)
@@ -707,16 +707,15 @@ void RefreshGameListBox( GameWindow *win, Bool showMap )
 	SortedGameList sgl;
 	StagingRoomMap *srm = TheGameSpyInfo->getStagingRoomList();
 	populateBuddyGames();
-	for (StagingRoomMap::iterator srmIt = srm->begin(); srmIt != srm->end(); ++srmIt)
+	for (auto & srmIt : *srm)
 	{
-		sgl.insert(srmIt->second);
+		sgl.insert(srmIt.second);
 	}
 
 	// populate listbox
-	for (SortedGameList::iterator sglIt = sgl.begin(); sglIt != sgl.end(); ++sglIt)
+	for (auto game : sgl)
 	{
-		GameSpyStagingRoom *game = *sglIt;
-		if (game)
+			if (game)
 		{
 			Int index = insertGame(win, game, showMap);
 			if (game->getID() == selectedID)

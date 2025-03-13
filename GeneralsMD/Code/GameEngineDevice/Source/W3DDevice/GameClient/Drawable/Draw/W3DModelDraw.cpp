@@ -416,12 +416,10 @@ void ModelConditionInfo::addPublicBone(const AsciiString& boneName) const
 //-------------------------------------------------------------------------------------------------
 Bool ModelConditionInfo::matchesMode(Bool night, Bool snowy) const
 {
-	for (std::vector<ModelConditionFlags>::const_iterator it = m_conditionsYesVec.begin(); 
-				it != m_conditionsYesVec.end(); 
-				++it)
+	for (auto it : m_conditionsYesVec)
 	{
-		if (it->test(MODELCONDITION_NIGHT) == (night) &&
-				it->test(MODELCONDITION_SNOW) == (snowy))
+		if (it.test(MODELCONDITION_NIGHT) == (night) &&
+				it.test(MODELCONDITION_SNOW) == (snowy))
 		{
 			return true;
 		}
@@ -575,9 +573,9 @@ void ModelConditionInfo::validateStuff(RenderObjClass* robj, Real scale, const s
 	loadAnimations();
 	if (!(m_validStuff & PUBLIC_BONES_VALID) && isValidTimeToCalcLogicStuff())
 	{
-		for (std::vector<AsciiString>::const_iterator bone_it = extraPublicBones.begin(); bone_it != extraPublicBones.end(); ++bone_it)
+		for (const auto & extraPublicBone : extraPublicBones)
 		{
-			addPublicBone(*bone_it);
+			addPublicBone(extraPublicBone);
 		}
 		m_validStuff |= PUBLIC_BONES_VALID;
 	}
@@ -686,9 +684,9 @@ void ModelConditionInfo::validateCachedBones(RenderObjClass* robj, Real scale) c
 			//}
 		}
 	}
-	for (std::vector<AsciiString>::const_iterator it = m_publicBones.begin(); it != m_publicBones.end(); ++it)
+	for (const auto & m_publicBone : m_publicBones)
 	{
-		if (!doSingleBoneName(robj, *it, m_pristineBones))
+		if (!doSingleBoneName(robj, m_publicBone, m_pristineBones))
 		{
 			// DO crash here, since we specifically requested this bone for this model
 			DEBUG_CRASH(("*** ASSET ERROR: public bone '%s' (and variations thereof) not found in model %s!\n",it->str(),m_modelName.str()));
@@ -864,10 +862,9 @@ void ModelConditionInfo::validateTurretInfo() const
 
 	setFPMode();
 
-	for (int tslot = 0; tslot < MAX_TURRETS; ++tslot)
+	for (auto & tur : m_turrets)
 	{
-		TurretInfo& tur = m_turrets[tslot];
-		if (!isValidTimeToCalcLogicStuff() || m_modelName.isEmpty())
+			if (!isValidTimeToCalcLogicStuff() || m_modelName.isEmpty())
 		{
 			tur.m_turretAngleBone = 0;
 			tur.m_turretPitchBone = 0;
@@ -1074,41 +1071,41 @@ void W3DModelDrawModuleData::validateStuffForTimeAndWeather(const Drawable* draw
 
 	m_validated |= mode;
 
-	for (ModelConditionVector::iterator c_it = m_conditionStates.begin(); c_it != m_conditionStates.end(); ++c_it)
+	for (auto & m_conditionState : m_conditionStates)
 	{
-		if (!c_it->matchesMode(false, false) && !c_it->matchesMode(night, snowy))
+		if (!m_conditionState.matchesMode(false, false) && !m_conditionState.matchesMode(night, snowy))
 			continue;
 
-		c_it->validateStuff(NULL, draw->getScale(), m_extraPublicBones);
+		m_conditionState.validateStuff(NULL, draw->getScale(), m_extraPublicBones);
 	}
 
-	for (TransitionMap::iterator t_it = m_transitionMap.begin(); t_it != m_transitionMap.end(); ++t_it)
+	for (auto & t_it : m_transitionMap)
 	{
 		// here's the tricky part: only want to load the anims for this one if there is at least one
 		// source AND at least one dest state that matches the current mode
-		NameKeyType src = recoverSrcState(t_it->first);
-		NameKeyType dst = recoverDstState(t_it->first);
+		NameKeyType src = recoverSrcState(t_it.first);
+		NameKeyType dst = recoverDstState(t_it.first);
 
 		Bool a = false;
 		Bool b = false;
-		for (ModelConditionVector::iterator c_it = m_conditionStates.begin(); c_it != m_conditionStates.end(); ++c_it)
+		for (auto & m_conditionState : m_conditionStates)
 		{
 
-			if (!a && c_it->m_transitionKey == src && c_it->matchesMode(night, snowy))
+			if (!a && m_conditionState.m_transitionKey == src && m_conditionState.matchesMode(night, snowy))
 				a = true;
 
-			if (!b && c_it->m_transitionKey == dst && c_it->matchesMode(night, snowy))
+			if (!b && m_conditionState.m_transitionKey == dst && m_conditionState.matchesMode(night, snowy))
 				b = true;
 
 		}
 		if (a && b)
 		{
-			t_it->second.loadAnimations();
+			t_it.second.loadAnimations();
 			// nope -- transition states don't get public bones.
 			//it->addPublicBone(m_extraPublicBones);
 
 		// srj sez: hm, this doesn't make sense; I think we really do need to validate transition states.
-			t_it->second.validateStuff(NULL, draw->getScale(), m_extraPublicBones);
+			t_it.second.validateStuff(NULL, draw->getScale(), m_extraPublicBones);
 		}
 	}
 }
@@ -1123,12 +1120,10 @@ W3DModelDrawModuleData::~W3DModelDrawModuleData()
 void W3DModelDrawModuleData::preloadAssets( TimeOfDay timeOfDay, Real scale ) const
 {
 
-	for( ModelConditionVector::iterator it = m_conditionStates.begin(); 
-			 it != m_conditionStates.end(); 
-			 ++it )
+	for(auto & m_conditionState : m_conditionStates)
 	{
 
-		it->preloadAssets( timeOfDay, scale );
+		m_conditionState.preloadAssets( timeOfDay, scale );
 
 	}
 
@@ -1283,11 +1278,11 @@ static void parseShowHideSubObject(INI* ini, void *instance, void *store, const 
 	while (subObjName.isNotEmpty())
 	{
 		Bool found = false;
-		for (std::vector<ModelConditionInfo::HideShowSubObjInfo>::iterator it = vec->begin(); it != vec->end(); ++it)
+		for (auto & it : *vec)
 		{
-			if (stricmp(it->subObjName.str(), subObjName.str()) == 0)
+			if (stricmp(it.subObjName.str(), subObjName.str()) == 0)
 			{
-				it->hide = (userData != NULL);
+				it.hide = (userData != NULL);
 				found = true;
 			}
 		}
@@ -1310,11 +1305,11 @@ void W3DModelDraw::showSubObject( const AsciiString& name, Bool show )
 	if( name.isNotEmpty() )
 	{
 		Bool found = false;
-		for( std::vector<ModelConditionInfo::HideShowSubObjInfo>::iterator it = m_subObjectVec.begin(); it != m_subObjectVec.end(); ++it )
+		for(auto & it : m_subObjectVec)
 		{
-			if( stricmp( it->subObjName.str(), name.str() ) == 0 )
+			if( stricmp( it.subObjName.str(), name.str() ) == 0 )
 			{
-				it->hide = !show;
+				it.hide = !show;
 				found = true;
 			}
 		}
@@ -1401,11 +1396,11 @@ static void parseBoneNameKey(INI* ini, void *instance, void * store, const void 
 //-------------------------------------------------------------------------------------------------
 static Bool doesStateExist(const ModelConditionVector& v, const ModelConditionFlags& f)
 {
-	for (ModelConditionVector::const_iterator it = v.begin(); it != v.end(); ++it)
+	for (const auto & it : v)
 	{
-		for (Int i = it->getConditionsYesCount()-1; i >= 0; --i)
+		for (Int i = it.getConditionsYesCount()-1; i >= 0; --i)
 		{
-			if (f == it->getNthConditionsYes(i))
+			if (f == it.getNthConditionsYes(i))
 				return true;
 		}
 	}
@@ -1654,9 +1649,9 @@ void W3DModelDrawModuleData::parseConditionState(INI* ini, void *instance, void 
 	}
 
 	info.m_validStuff &= ~ModelConditionInfo::HAS_PROJECTILE_BONES;
-	for (int wslot = 0; wslot < WEAPONSLOT_COUNT; ++wslot)
+	for (const auto & wslot : info.m_weaponProjectileLaunchBoneName)
 	{
-		if (info.m_weaponProjectileLaunchBoneName[wslot].isNotEmpty())
+		if (wslot.isNotEmpty())
 		{
 			info.m_validStuff |= ModelConditionInfo::HAS_PROJECTILE_BONES;
 			break;
@@ -1804,10 +1799,10 @@ void W3DModelDraw::doStartOrStopParticleSys()
 {
 	Bool hidden = getDrawable()->isDrawableEffectivelyHidden() || m_fullyObscuredByShroud;
 
-	for (std::vector<ParticleSysTrackerType>::const_iterator it = m_particleSystemIDs.begin(); it != m_particleSystemIDs.end(); ++it)
+	for (auto m_particleSystemID : m_particleSystemIDs)
 	//for (std::vector<ParticleSystemID>::const_iterator it = m_particleSystemIDs.begin(); it != m_particleSystemIDs.end(); ++it)
 	{
-		ParticleSystem *sys = TheParticleSystemManager->findParticleSystem((*it).id);
+		ParticleSystem *sys = TheParticleSystemManager->findParticleSystem(m_particleSystemID.id);
 		if (sys != NULL) {
 			// this can be NULL
 			if (hidden) {
@@ -2346,14 +2341,14 @@ void W3DModelDraw::doHideShowSubObjs(const std::vector<ModelConditionInfo::HideS
 
 	if (!vec->empty())
 	{
-		for (std::vector<ModelConditionInfo::HideShowSubObjInfo>::const_iterator it = vec->begin(); it != vec->end(); ++it)
+		for (const auto & it : *vec)
 		{
 			Int objIndex;
 			RenderObjClass* subObj;
 
-			if ((subObj = m_renderObject->Get_Sub_Object_By_Name(it->subObjName.str(), &objIndex)) != NULL)
+			if ((subObj = m_renderObject->Get_Sub_Object_By_Name(it.subObjName.str(), &objIndex)) != NULL)
 			{
-				subObj->Set_Hidden(it->hide);
+				subObj->Set_Hidden(it.hide);
 
 				const HTreeClass *htree = m_renderObject->Get_HTree();
 				if (htree)
@@ -2361,7 +2356,7 @@ void W3DModelDraw::doHideShowSubObjs(const std::vector<ModelConditionInfo::HideS
 					//get the bone of this subobject so we can hide all other child objects that use this bone
 					//as a parent.
 					Int boneIdx = m_renderObject->Get_Sub_Object_Bone_Index(0, objIndex);
-					doHideShowBoneSubObjs(it->hide, m_renderObject->Get_Num_Sub_Objects(), boneIdx, m_renderObject, htree);
+					doHideShowBoneSubObjs(it.hide, m_renderObject->Get_Num_Sub_Objects(), boneIdx, m_renderObject, htree);
 				}
 				subObj->Release_Ref();
 			}
@@ -2384,10 +2379,10 @@ void W3DModelDraw::doHideShowSubObjs(const std::vector<ModelConditionInfo::HideS
 //-------------------------------------------------------------------------------------------------
 void W3DModelDraw::stopClientParticleSystems() 
 {
-	for (std::vector<ParticleSysTrackerType>::const_iterator it = m_particleSystemIDs.begin(); it != m_particleSystemIDs.end(); ++it)
+	for (auto m_particleSystemID : m_particleSystemIDs)
 	//for (std::vector<ParticleSystemID>::const_iterator it = m_particleSystemIDs.begin(); it != m_particleSystemIDs.end(); ++it)
 	{
-		ParticleSystem *sys = TheParticleSystemManager->findParticleSystem((*it).id);
+		ParticleSystem *sys = TheParticleSystemManager->findParticleSystem(m_particleSystemID.id);
 		if (sys != NULL) 
 		{
 			// this can be NULL
@@ -2596,16 +2591,16 @@ void W3DModelDraw::recalcBonesForClientParticleSystems()
 		
 			if( m_curState != NULL && drawable->testDrawableStatus( DRAWABLE_STATUS_NO_STATE_PARTICLES ) == FALSE ) 
 			{
-				for (std::vector<ParticleSysBoneInfo>::const_iterator it = m_curState->m_particleSysBones.begin(); it != m_curState->m_particleSysBones.end(); ++it)
+				for (const auto & m_particleSysBone : m_curState->m_particleSysBones)
 				{
-					ParticleSystem *sys = TheParticleSystemManager->createParticleSystem(it->particleSystemTemplate);
+					ParticleSystem *sys = TheParticleSystemManager->createParticleSystem(m_particleSysBone.particleSystemTemplate);
 					if (sys != NULL) 
 					{
 						Coord3D pos;
 						pos.zero();
 						Real rotation = 0.0f;
 
-						Int boneIndex = m_renderObject ? m_renderObject->Get_Bone_Index(it->boneName.str()) : 0;
+						Int boneIndex = m_renderObject ? m_renderObject->Get_Bone_Index(m_particleSysBone.boneName.str()) : 0;
 						if (boneIndex != 0)
 						{
 							// ugh... kill the mtx so we get it in modelspace, not world space
@@ -2689,10 +2684,10 @@ Bool W3DModelDraw::updateBonesForClientParticleSystems()
 				
     
 
-		for (std::vector<ParticleSysTrackerType>::const_iterator it = m_particleSystemIDs.begin(); it != m_particleSystemIDs.end(); ++it)
+		for (auto m_particleSystemID : m_particleSystemIDs)
 		{
-			ParticleSystem *sys = TheParticleSystemManager->findParticleSystem((*it).id);
-			Int boneIndex = (*it).boneIndex;
+			ParticleSystem *sys = TheParticleSystemManager->findParticleSystem(m_particleSystemID.id);
+			Int boneIndex = m_particleSystemID.boneIndex;
 			if ( (sys != NULL) && (boneIndex != 0)  ) 
 			{
     		const Matrix3D boneTransform = m_renderObject->Get_Bone_Transform(boneIndex);// just a little worried about state changes
@@ -2879,11 +2874,11 @@ void W3DModelDraw::hideAllMuzzleFlashes(const ModelConditionInfo* state, RenderO
 			continue;
 
 		const ModelConditionInfo::WeaponBarrelInfoVec& barrels = state->m_weaponBarrelInfoVec[wslot];
-		for (ModelConditionInfo::WeaponBarrelInfoVec::const_iterator it = barrels.begin(); it != barrels.end(); ++it)
+		for (const auto & barrel : barrels)
 		{
-			if (it->m_muzzleFlashBone != 0)
+			if (barrel.m_muzzleFlashBone != 0)
 			{
-				it->setMuzzleFlashHidden(renderObject, true);
+				barrel.setMuzzleFlashHidden(renderObject, true);
 			}
 		}
 	}
@@ -3893,9 +3888,9 @@ void W3DModelDraw::rebuildWeaponRecoilInfo(const ModelConditionInfo* state)
 				m_weaponRecoilInfoVec[wslot].resize(ncount, tmp);
 			}
 
-			for (WeaponRecoilInfoVec::iterator it = m_weaponRecoilInfoVec[wslot].begin(); it != m_weaponRecoilInfoVec[wslot].end(); ++it)
+			for (auto & it : m_weaponRecoilInfoVec[wslot])
 			{
-				it->clear();
+				it.clear();
 			}
 		}
 	}
@@ -3982,14 +3977,14 @@ void W3DModelDraw::updateSubObjects()
 
 	if (!m_subObjectVec.empty())
 	{
-		for (std::vector<ModelConditionInfo::HideShowSubObjInfo>::const_iterator it = m_subObjectVec.begin(); it != m_subObjectVec.end(); ++it)
+		for (const auto & it : m_subObjectVec)
 		{
 			Int objIndex;
 			RenderObjClass* subObj;
 
-			if ((subObj = m_renderObject->Get_Sub_Object_By_Name(it->subObjName.str(), &objIndex)) != NULL)
+			if ((subObj = m_renderObject->Get_Sub_Object_By_Name(it.subObjName.str(), &objIndex)) != NULL)
 			{
-				subObj->Set_Hidden(it->hide);
+				subObj->Set_Hidden(it.hide);
 
 				const HTreeClass *htree = m_renderObject->Get_HTree();
 				if (htree)
@@ -3997,7 +3992,7 @@ void W3DModelDraw::updateSubObjects()
 					//get the bone of this subobject so we can hide all other child objects that use this bone
 					//as a parent.
 					Int boneIdx = m_renderObject->Get_Sub_Object_Bone_Index(0, objIndex);
-					doHideShowBoneSubObjs( it->hide, m_renderObject->Get_Num_Sub_Objects(), boneIdx, m_renderObject, htree);
+					doHideShowBoneSubObjs( it.hide, m_renderObject->Get_Num_Sub_Objects(), boneIdx, m_renderObject, htree);
 				}
 				subObj->Release_Ref();
 			}
@@ -4041,17 +4036,17 @@ void W3DModelDraw::xfer( Xfer *xfer )
 	// weapon recoil info vectors
 	UnsignedByte recoilInfoCount;
 	WeaponRecoilInfo weaponRecoilInfo;
-	for( Int i = 0; i < WEAPONSLOT_COUNT; ++i )
+	for(auto & i : m_weaponRecoilInfoVec)
 	{
 
 		// count of data here
-		recoilInfoCount = m_weaponRecoilInfoVec[ i ].size();
+		recoilInfoCount = i.size();
 		xfer->xferUnsignedByte( &recoilInfoCount );
 		if( xfer->getXferMode() == XFER_SAVE )
 		{
 
 			WeaponRecoilInfoVec::const_iterator it;
-			for( it = m_weaponRecoilInfoVec[ i ].begin(); it != m_weaponRecoilInfoVec[ i ].end(); ++it )
+			for( it = i.begin(); it != i.end(); ++it )
 			{
 
 				// state
@@ -4073,7 +4068,7 @@ void W3DModelDraw::xfer( Xfer *xfer )
 		{
 
 			// clear this list before loading
-			m_weaponRecoilInfoVec[ i ].clear();
+			i.clear();
 
 			// read each data item
 			for( Int j = 0; j < recoilInfoCount; ++j )
@@ -4089,7 +4084,7 @@ void W3DModelDraw::xfer( Xfer *xfer )
 				xfer->xferReal( &weaponRecoilInfo.m_recoilRate );
 
 				// stuff it in the vector
-				m_weaponRecoilInfoVec[ i ].push_back( weaponRecoilInfo );
+				i.push_back( weaponRecoilInfo );
 
 			}  // end for, j
 
@@ -4288,31 +4283,31 @@ void W3DModelDrawModuleData::xfer( Xfer *x )
 	XferVersion version = currentVersion;
 	x->xferVersion( &version, currentVersion );
 
-	for (ModelConditionVector::iterator it = m_conditionStates.begin(); it != m_conditionStates.end(); ++it)
+	for (auto & m_conditionState : m_conditionStates)
 	{
-		ModelConditionInfo *info = &(*it);
+		ModelConditionInfo *info = &m_conditionState;
 		x->xferByte(&(info->m_validStuff));
 #if defined(_DEBUG) || defined(_INTERNAL)
 		x->xferAsciiString(&(info->m_description));
 #endif
 		if (info->m_validStuff)
 		{
-			for (PristineBoneInfoMap::iterator bit = info->m_pristineBones.begin(); bit != info->m_pristineBones.end(); ++bit)
+			for (auto & m_pristineBone : info->m_pristineBones)
 			{
-				PristineBoneInfo *bone = &(bit->second);
+				PristineBoneInfo *bone = &(m_pristineBone.second);
 				x->xferInt(&(bone->boneIndex));
 				x->xferUser(&(bone->mtx), sizeof(Matrix3D));
 			}
-			for (Int i=0; i<MAX_TURRETS; ++i)
+			for (auto & m_turret : info->m_turrets)
 			{
-				x->xferInt(&(info->m_turrets[i].m_turretAngleBone));
-				x->xferInt(&(info->m_turrets[i].m_turretPitchBone));
+				x->xferInt(&(m_turret.m_turretAngleBone));
+				x->xferInt(&(m_turret.m_turretPitchBone));
 			}
-			for (Int i=0; i<WEAPONSLOT_COUNT; ++i)
+			for (auto & i : info->m_weaponBarrelInfoVec)
 			{
-				for (ModelConditionInfo::WeaponBarrelInfoVec::iterator wit = info->m_weaponBarrelInfoVec[i].begin(); wit != info->m_weaponBarrelInfoVec[i].end(); ++wit)
+				for (auto & wit : i)
 				{
-					x->xferUser(&(wit->m_projectileOffsetMtx), sizeof(Matrix3D));
+					x->xferUser(&(wit.m_projectileOffsetMtx), sizeof(Matrix3D));
 				}
 			}
 		}

@@ -92,15 +92,15 @@ class HModelPrototypeClass : public W3DMPO, public PrototypeClass
 public:
 	HModelPrototypeClass(HModelDefClass * def)				{ HModelDef = def; assert(HModelDef); }
 
-	virtual const char *			Get_Name(void)	const			{ return HModelDef->Get_Name(); }	
-	virtual int								Get_Class_ID(void) const	{ return RenderObjClass::CLASSID_HLOD; }
-	virtual RenderObjClass *	Create(void)					{ return NEW_REF( HLodClass, (*HModelDef) ); }	
-	virtual void							DeleteSelf()										{ delete this; }
+	const char *			Get_Name(void)	const override			{ return HModelDef->Get_Name(); }	
+	int								Get_Class_ID(void) const override	{ return RenderObjClass::CLASSID_HLOD; }
+	RenderObjClass *	Create(void) override					{ return NEW_REF( HLodClass, (*HModelDef) ); }	
+	void							DeleteSelf() override										{ delete this; }
 
 	HModelDefClass *				HModelDef;
 
 protected:
-	virtual ~HModelPrototypeClass(void)							{ if (HModelDef) delete HModelDef; }						 
+	~HModelPrototypeClass(void) override							{ if (HModelDef) delete HModelDef; }						 
 
 };
 

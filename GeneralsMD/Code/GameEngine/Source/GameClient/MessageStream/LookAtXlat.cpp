@@ -200,9 +200,9 @@ GameMessageDisposition LookAtTranslator::translateGameMessage(const GameMessage 
 
 			// see if we need to start/stop scrolling
 			Int numDirs = 0;
-			for (Int i=0; i<4; ++i)
+			for (bool i : scrollDir)
 			{
-				if (scrollDir[i])
+				if (i)
 					numDirs++;
 			}
 

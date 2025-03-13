@@ -307,10 +307,9 @@ ModuleFactory::~ModuleFactory( void )
 {
 	m_moduleTemplateMap.clear();
 
-	for (ModuleDataList::iterator i = m_moduleDataList.begin(); i != m_moduleDataList.end(); ++i)
+	for (auto data : m_moduleDataList)
 	{
-		const ModuleData* data = *i;
-		delete data;
+			delete data;
 	}
 	m_moduleDataList.clear();
 
@@ -704,9 +703,9 @@ void ModuleFactory::addModuleInternal( NewModuleProc proc, NewModuleDataProc dat
 //-------------------------------------------------------------------------------------------------
 void ModuleFactory::crc( Xfer *xfer )
 {
-	for (ModuleDataList::iterator mdIt = m_moduleDataList.begin(); mdIt != m_moduleDataList.end(); ++mdIt)
+	for (auto & mdIt : m_moduleDataList)
 	{
-		((ModuleData *)(*mdIt))->crc(xfer);
+		((ModuleData *)mdIt)->crc(xfer);
 	}
 }
 
@@ -719,9 +718,9 @@ void ModuleFactory::xfer( Xfer *xfer )
 	XferVersion version = currentVersion;
 	xfer->xferVersion( &version, currentVersion );
 
-	for (ModuleDataList::iterator mdIt = m_moduleDataList.begin(); mdIt != m_moduleDataList.end(); ++mdIt)
+	for (auto & mdIt : m_moduleDataList)
 	{
-		((ModuleData *)(*mdIt))->xfer(xfer);
+		((ModuleData *)mdIt)->xfer(xfer);
 	}
 }
 

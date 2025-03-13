@@ -113,9 +113,9 @@ AsciiString ScienceStore::getInternalNameForScience(ScienceType science) const
 std::vector<AsciiString> ScienceStore::friend_getScienceNames() const
 {
 	std::vector<AsciiString> v;
-	for (ScienceInfoVec::const_iterator it = m_sciences.begin(); it != m_sciences.end(); ++it)
+	for (auto m_science : m_sciences)
 	{
-		const ScienceInfo* si = (const ScienceInfo*)(*it)->getFinalOverride();
+		const ScienceInfo* si = (const ScienceInfo*)m_science->getFinalOverride();
 		NameKeyType nk = (NameKeyType)(si->m_science);
 		v.push_back(TheNameKeyGenerator->keyToName(nk));
 	}
@@ -134,9 +134,9 @@ void ScienceInfo::addRootSciences(ScienceVec& v) const
 	else
 	{
 		// we're not a root. add the roots of all our prereqs.
-		for (ScienceVec::const_iterator it = m_prereqSciences.begin(); it != m_prereqSciences.end(); ++it)
+		for (auto m_prereqScience : m_prereqSciences)
 		{
-			const ScienceInfo* si = TheScienceStore->findScienceInfo(*it);
+			const ScienceInfo* si = TheScienceStore->findScienceInfo(m_prereqScience);
 			if (si)
 				si->addRootSciences(v);
 		}
@@ -147,9 +147,9 @@ void ScienceInfo::addRootSciences(ScienceVec& v) const
 //-------------------------------------------------------------------------------------------------
 const ScienceInfo* ScienceStore::findScienceInfo(ScienceType st) const
 {
-	for (ScienceInfoVec::const_iterator it = m_sciences.begin(); it != m_sciences.end(); ++it)
+	for (auto m_science : m_sciences)
 	{
-		const ScienceInfo* si = (const ScienceInfo*)(*it)->getFinalOverride();
+		const ScienceInfo* si = (const ScienceInfo*)m_science->getFinalOverride();
 		if (si->m_science == st)
 		{
 			return si;
@@ -181,12 +181,12 @@ const ScienceInfo* ScienceStore::findScienceInfo(ScienceType st) const
 		ScienceInfo* info = NULL;
 
 		// see if the science already exists. (can't use findScienceInfo() since it is const and should remain so.)
-		for (ScienceInfoVec::iterator it = TheScienceStore->m_sciences.begin(); it != TheScienceStore->m_sciences.end(); ++it)
+		for (auto & m_science : TheScienceStore->m_sciences)
 		{
 			// note that we don't use getFinalOverride here. this is correct and as-desired.
-			if ((*it)->m_science == st)
+			if (m_science->m_science == st)
 			{
-				info = *it;
+				info = m_science;
 				break;
 			}
 		}
@@ -283,9 +283,9 @@ Bool ScienceStore::playerHasPrereqsForScience(const Player* player, ScienceType 
 	const ScienceInfo* si = findScienceInfo(st);
 	if (si)
 	{
-		for (ScienceVec::const_iterator it2 = si->m_prereqSciences.begin(); it2 != si->m_prereqSciences.end(); ++it2)
+		for (auto m_prereqScience : si->m_prereqSciences)
 		{
-			if (!player->hasScience(*it2))
+			if (!player->hasScience(m_prereqScience))
 			{
 				return false;
 			}
@@ -304,9 +304,9 @@ Bool ScienceStore::playerHasRootPrereqsForScience(const Player* player, ScienceT
 	const ScienceInfo* si = findScienceInfo(st);
 	if (si)
 	{
-		for (ScienceVec::const_iterator it2 = si->m_rootSciences.begin(); it2 != si->m_rootSciences.end(); ++it2)
+		for (auto m_rootScience : si->m_rootSciences)
 		{
-			if (!player->hasScience(*it2))
+			if (!player->hasScience(m_rootScience))
 			{
 				return false;
 			}
@@ -326,9 +326,9 @@ void ScienceStore::getPurchasableSciences(const Player* player, ScienceVec& purc
 {
 	purchasable.clear();
 	potentiallyPurchasable.clear();
-	for (ScienceInfoVec::const_iterator it = m_sciences.begin(); it != m_sciences.end(); ++it)
+	for (auto m_science : m_sciences)
 	{
-		const ScienceInfo* si = (const ScienceInfo*)(*it)->getFinalOverride();
+		const ScienceInfo* si = (const ScienceInfo*)m_science->getFinalOverride();
 		
 		if (si->m_sciencePurchasePointCost == 0)
 		{

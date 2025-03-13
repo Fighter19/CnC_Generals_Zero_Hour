@@ -117,10 +117,10 @@ MinefieldBehavior::MinefieldBehavior( Thing *thing, const ModuleData* moduleData
 	m_regenerates = d->m_regenerates;
 	m_draining = false;
 	m_virtualMinesRemaining = d->m_numVirtualMines;
-	for (Int i = 0; i < MAX_IMMUNITY; ++i)
+	for (auto & m_immune : m_immunes)
 	{
-		m_immunes[i].id = INVALID_ID;
-		m_immunes[i].collideTime = 0;
+		m_immune.id = INVALID_ID;
+		m_immune.collideTime = 0;
 	}
 
 	// start off awake, and we will calcSleepTime from here on
@@ -151,8 +151,8 @@ UpdateSleepTime MinefieldBehavior::calcSleepTime()
 		return UPDATE_SLEEP_NONE;
 
 	// if there is anybody in our immulity monitoring we need to update every frame
-	for( Int i = 0; i < MAX_IMMUNITY; ++i )
-		if( m_immunes[ i ].id != INVALID_ID )
+	for(auto & m_immune : m_immunes)
+		if( m_immune.id != INVALID_ID )
 			return UPDATE_SLEEP_NONE;
 
 	UnsignedInt sleepTime = FOREVER;
@@ -217,17 +217,17 @@ UpdateSleepTime MinefieldBehavior::update()
 	}
 
 	// check for expired immunities.
-	for (Int i = 0; i < MAX_IMMUNITY; ++i)
+	for (auto & m_immune : m_immunes)
 	{
-		if (m_immunes[i].id == INVALID_ID)
+		if (m_immune.id == INVALID_ID)
 			continue;
 
-		if (TheGameLogic->findObjectByID(m_immunes[i].id) == NULL ||
-				now > m_immunes[i].collideTime + 2)
+		if (TheGameLogic->findObjectByID(m_immune.id) == NULL ||
+				now > m_immune.collideTime + 2)
 		{
 			//DEBUG_LOG(("expiring an immunity %d\n",m_immunes[i].id));
-			m_immunes[i].id = INVALID_ID;	// he's dead, jim.
-			m_immunes[i].collideTime = 0;
+			m_immune.id = INVALID_ID;	// he's dead, jim.
+			m_immune.collideTime = 0;
 		}
 	}
 
@@ -356,12 +356,12 @@ void MinefieldBehavior::onCollide( Object *other, const Coord3D *loc, const Coor
 
 	// is this guy in our immune list?
 	// NOTE NOTE NOTE, must always do this check FIRST so that 'collideTime' is updated...
-	for (Int i = 0; i < MAX_IMMUNITY; ++i)
+	for (auto & m_immune : m_immunes)
 	{
-		if (m_immunes[i].id == other->getID())
+		if (m_immune.id == other->getID())
 		{
 			//DEBUG_LOG(("ignoring due to immunity %d\n",m_immunes[i].id));
-			m_immunes[i].collideTime = now;
+			m_immune.collideTime = now;
 			return;
 		}
 	}
@@ -396,13 +396,13 @@ void MinefieldBehavior::onCollide( Object *other, const Coord3D *loc, const Coor
 		// collide, even if no longer clearing mines. (this prevents the problem
 		// of a guy who touches two close-together mines while clearing, then puts up his
 		// detector and is blown to smithereens by the other one.)
-		for (Int i = 0; i < MAX_IMMUNITY; ++i)
+		for (auto & m_immune : m_immunes)
 		{
-			if (m_immunes[i].id == INVALID_ID || m_immunes[i].id == other->getID())
+			if (m_immune.id == INVALID_ID || m_immune.id == other->getID())
 			{
 				//DEBUG_LOG(("add/update immunity %d\n",m_immunes[i].id));
-				m_immunes[i].id = other->getID();
-				m_immunes[i].collideTime = now;
+				m_immune.id = other->getID();
+				m_immune.collideTime = now;
 
 				// wake up
 				setWakeFrame( obj, calcSleepTime() );
@@ -415,12 +415,12 @@ void MinefieldBehavior::onCollide( Object *other, const Coord3D *loc, const Coor
 
 	// if we detonated another one nearby, we have to move a little bit to detonate another one.
 	Bool found = false;
-	for (std::vector<DetonatorInfo>::iterator it = m_detonators.begin(); it != m_detonators.end(); ++it)
+	for (auto & m_detonator : m_detonators)
 	{
-		if (other->getID() == it->id)
+		if (other->getID() == m_detonator.id)
 		{
 			found = TRUE;
-			Real distSqr = calcDistSquared(*other->getPosition(), it->where);
+			Real distSqr = calcDistSquared(*other->getPosition(), m_detonator.where);
 			if (distSqr <= sqr(d->m_repeatDetonateMoveThresh))
 			{
 				// too close. punt for now.
@@ -429,7 +429,7 @@ void MinefieldBehavior::onCollide( Object *other, const Coord3D *loc, const Coor
 			else
 			{
 				// far enough. update the loc, then break out and blow up.
-				it->where = *other->getPosition();
+				m_detonator.where = *other->getPosition();
 				break;
 			}
 		}

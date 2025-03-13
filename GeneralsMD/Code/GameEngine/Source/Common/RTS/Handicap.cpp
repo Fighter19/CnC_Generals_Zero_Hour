@@ -58,9 +58,9 @@ Handicap::Handicap()
 //-----------------------------------------------------------------------------
 void Handicap::init()
 {
-	for (Int i = 0; i < HANDICAP_TYPE_COUNT; ++i)
-		for (Int j = 0; j < THING_TYPE_COUNT; ++j)
-			m_handicaps[i][j] = 1.0f;
+	for (auto & m_handicap : m_handicaps)
+		for (float & j : m_handicap)
+			j = 1.0f;
 }
 
 //-----------------------------------------------------------------------------

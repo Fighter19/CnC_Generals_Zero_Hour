@@ -482,9 +482,9 @@ void W3DSnowManager::renderAsQuads(RenderInfoClass &rinfo, Int cubeOriginX, Int 
 
 
 	//pre-multiple the offsets by particle size
-	for (Int i=0; i<4; i++)
+	for (auto & vertex_offset : vertex_offsets)
 	{
-		vertex_offsets[i] *= m_quadSize;
+		vertex_offset *= m_quadSize;
 	}
 
 	Matrix4x4 identity(true);

@@ -152,21 +152,21 @@ class PeerThreadClass;
 class GameSpyPeerMessageQueue : public GameSpyPeerMessageQueueInterface
 {
 public:
-	virtual ~GameSpyPeerMessageQueue();
+	~GameSpyPeerMessageQueue() override;
 	GameSpyPeerMessageQueue();
-	virtual void startThread( void );
-	virtual void endThread( void );
-	virtual Bool isThreadRunning( void );
-	virtual Bool isConnected( void );
-	virtual Bool isConnecting( void );
+	void startThread( void ) override;
+	void endThread( void ) override;
+	Bool isThreadRunning( void ) override;
+	Bool isConnected( void ) override;
+	Bool isConnecting( void ) override;
 
-	virtual void addRequest( const PeerRequest& req );
-	virtual Bool getRequest( PeerRequest& req );
+	void addRequest( const PeerRequest& req ) override;
+	Bool getRequest( PeerRequest& req ) override;
 
-	virtual void addResponse( const PeerResponse& resp );
-	virtual Bool getResponse( PeerResponse& resp );
+	void addResponse( const PeerResponse& resp ) override;
+	Bool getResponse( PeerResponse& resp ) override;
 
-	virtual SerialAuthResult getSerialAuthResult( void ) { return m_serialAuth; }
+	SerialAuthResult getSerialAuthResult( void ) override { return m_serialAuth; }
 	void setSerialAuthResult( SerialAuthResult result ) { m_serialAuth = result; }
 
 	PeerThreadClass* getThread( void );
@@ -232,7 +232,7 @@ public:
 		}
 	}
 
-	void Thread_Function();
+	void Thread_Function() override;
 
 	void markAsDisconnected( void ) { m_isConnecting = m_isConnected = false; }
 
@@ -485,24 +485,24 @@ Int PeerThreadClass::findServer( SBServer server )
 
 	SBServer serverToRemove = NULL;
 
-	for (std::map<Int, SBServer>::iterator it = m_stagingServers.begin(); it != m_stagingServers.end(); ++it)
+	for (auto & m_stagingServer : m_stagingServers)
 	{
-		if (it->second == server)
+		if (m_stagingServer.second == server)
 		{
-			return it->first;
+			return m_stagingServer.first;
 		}
 		else
 		{
-			const char *oldName = SBServerGetStringValue(it->second, "gamename", tmp);
-			UnsignedInt oldPrivateIP = SBServerGetPrivateInetAddress(it->second);
-			UnsignedShort oldPrivatePort = SBServerGetPrivateQueryPort(it->second);
-			UnsignedInt oldPublicIP = SBServerGetPublicInetAddress(it->second);
+			const char *oldName = SBServerGetStringValue(m_stagingServer.second, "gamename", tmp);
+			UnsignedInt oldPrivateIP = SBServerGetPrivateInetAddress(m_stagingServer.second);
+			UnsignedShort oldPrivatePort = SBServerGetPrivateQueryPort(m_stagingServer.second);
+			UnsignedInt oldPublicIP = SBServerGetPublicInetAddress(m_stagingServer.second);
 			if (!strcmp(oldName, newName) &&
 				oldPrivateIP == newPrivateIP &&
 				oldPublicIP == newPublicIP &&
 				oldPrivatePort == newPrivatePort)
 			{
-				serverToRemove = it->second;
+				serverToRemove = m_stagingServer.second;
 			}
 		}
 	}
@@ -2030,9 +2030,9 @@ void PeerThreadClass::doQuickMatch( PEER peer )
 								msg.append(buf);
 								buf[0] = 0;
 								msg.append("\\Maps\\");
-								for (Int i=0; i<m_qmInfo.qmMaps.size(); ++i)
+								for (auto && qmMap : m_qmInfo.qmMaps)
 								{
-									if (m_qmInfo.qmMaps[i])
+									if (qmMap)
 										msg.append("1");
 									else
 										msg.append("0");

@@ -232,8 +232,8 @@ GameLODManager::GameLODManager(void)
 	m_currentTextureReduction=0;
 	m_reallyLowMHz = 400;
 	
-	for (Int i=0; i<STATIC_GAME_LOD_CUSTOM; i++)
-		m_numLevelPresets[i]=0;
+	for (int & m_numLevelPreset : m_numLevelPresets)
+		m_numLevelPreset=0;
 };
 
 GameLODManager::~GameLODManager()

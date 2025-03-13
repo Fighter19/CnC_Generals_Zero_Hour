@@ -248,7 +248,7 @@ static void Scan_Mesh_Header (ChunkLoadClass &cload, StringList &files, const ch
 		// files we refer to.
 		const char *filename = Make_W3D_Filename(hdr.ContainerName);
 		if (*filename)	// don't push empty filenames
-			files.push_back(filename);
+			files.emplace_back(filename);
 	}
 }
 
@@ -283,7 +283,7 @@ static void Scan_Mesh_Textures (ChunkLoadClass &cload, StringList &files, const 
 					char texture[_MAX_PATH];
 					cload.Read(texture, cload.Cur_Chunk_Length());
 					if (*texture)	// don't push empty filenames
-						files.push_back(texture);
+						files.emplace_back(texture);
 				}
 				cload.Close_Chunk();
 			}
@@ -318,7 +318,7 @@ static void Scan_Anim (ChunkLoadClass &cload, StringList &files, const char *w3d
 			{
 				const char *hierarchy = Make_W3D_Filename(hdr.HierarchyName);
 				if (*hierarchy)	// don't push an empty filename
-					files.push_back(hierarchy);
+					files.emplace_back(hierarchy);
 			}
 		}
 		cload.Close_Chunk();
@@ -351,7 +351,7 @@ static void Scan_Compressed_Anim (ChunkLoadClass &cload, StringList &files, cons
 			{
 				const char *hierarchy = Make_W3D_Filename(hdr.HierarchyName);
 				if (*hierarchy)	// don't push an empty filename
-					files.push_back(hierarchy);
+					files.emplace_back(hierarchy);
 			}
 		}
 		cload.Close_Chunk();
@@ -384,7 +384,7 @@ static void Scan_HModel (ChunkLoadClass &cload, StringList &files, const char *w
 			{
 				const char *hierarchy = Make_W3D_Filename(hdr.HierarchyName);
 				if (*hierarchy)	// don't push an empty filename
-					files.push_back(hierarchy);
+					files.emplace_back(hierarchy);
 			}
 		}
 		cload.Close_Chunk();
@@ -414,7 +414,7 @@ static void Scan_Emitter (ChunkLoadClass &cload, StringList &files, const char *
 			W3dEmitterInfoStruct hdr;
 			cload.Read(&hdr, sizeof(hdr));
 			if (hdr.TextureFilename[0])	// don't push an empty texture name
-				files.push_back(hdr.TextureFilename);
+				files.emplace_back(hdr.TextureFilename);
 		}
 		cload.Close_Chunk();
 	}
@@ -446,7 +446,7 @@ static void Scan_Aggregate (ChunkLoadClass &cload, StringList &files, const char
 				// Check the name of the base model against the name of this file.
 				const char *base_model = Make_W3D_Filename(chunk.BaseModelName);
 				if (*base_model)
-					files.push_back(base_model);
+					files.emplace_back(base_model);
 			}
 
 			// Iterate through the sub-objects.
@@ -460,7 +460,7 @@ static void Scan_Aggregate (ChunkLoadClass &cload, StringList &files, const char
 					// Check the name of the subobject against the name of this file.
 					const char *subobject = Make_W3D_Filename(subchunk.SubobjectName);
 					if (*subobject)
-						files.push_back(subobject);
+						files.emplace_back(subobject);
 				}
 			}
 		}
@@ -493,7 +493,7 @@ static void Scan_HLOD (ChunkLoadClass &cload, StringList &files, const char *w3d
 			{
 				const char *hierarchy = Make_W3D_Filename(hdr.HierarchyName);
 				if (*hierarchy)
-					files.push_back(hierarchy);
+					files.emplace_back(hierarchy);
 			}
 		}
 		cload.Close_Chunk();

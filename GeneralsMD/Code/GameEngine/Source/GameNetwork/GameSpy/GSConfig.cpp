@@ -50,29 +50,29 @@ class GameSpyConfig : public GameSpyConfigInterface
 {
 public:
 	GameSpyConfig( AsciiString config );
-	~GameSpyConfig() {}
+	~GameSpyConfig() override {}
 
 	// Pings
-	std::list<AsciiString> getPingServers(void)	{ return m_pingServers; }
-	Int getNumPingRepetitions(void)							{ return m_pingReps; }
-	Int getPingTimeoutInMs(void)								{ return m_pingTimeout; }
-	virtual Int getPingCutoffGood( void )				{	return m_pingCutoffGood; }
-	virtual Int getPingCutoffBad( void )				{ return m_pingCutoffBad;	}
+	std::list<AsciiString> getPingServers(void) override	{ return m_pingServers; }
+	Int getNumPingRepetitions(void) override							{ return m_pingReps; }
+	Int getPingTimeoutInMs(void) override								{ return m_pingTimeout; }
+	Int getPingCutoffGood( void ) override				{	return m_pingCutoffGood; }
+	Int getPingCutoffBad( void ) override				{ return m_pingCutoffBad;	}
 
 	// QM
-	std::list<AsciiString> getQMMaps(void)			{ return m_qmMaps; }
-	Int getQMBotID(void)												{ return m_qmBotID; }
-	Int getQMChannel(void)											{ return m_qmChannel; }
-	void setQMChannel(Int channel)							{ m_qmChannel = channel; }
+	std::list<AsciiString> getQMMaps(void) override			{ return m_qmMaps; }
+	Int getQMBotID(void) override												{ return m_qmBotID; }
+	Int getQMChannel(void) override											{ return m_qmChannel; }
+	void setQMChannel(Int channel) override							{ m_qmChannel = channel; }
 
 	// Player Info
-	Int getPointsForRank(Int rank);
-	virtual Bool isPlayerVIP(Int id);
+	Int getPointsForRank(Int rank) override;
+	Bool isPlayerVIP(Int id) override;
 	
-	virtual Bool getManglerLocation(Int index, AsciiString& host, UnsignedShort& port);
+	Bool getManglerLocation(Int index, AsciiString& host, UnsignedShort& port) override;
 
 	// Ladder / Any other external parsing
-	AsciiString getLeftoverConfig(void)					{ return m_leftoverConfig; }
+	AsciiString getLeftoverConfig(void) override					{ return m_leftoverConfig; }
 	
 	// NAT Timeouts
 	virtual Int getTimeBetweenRetries() { return m_natRetryInterval; }
@@ -83,7 +83,7 @@ public:
 	virtual time_t getRoundTimeout() { return m_natRoundTimeout; }
 
 	// Custom match
-	virtual Bool restrictGamesToLobby() { return m_restrictGamesToLobby; }
+	Bool restrictGamesToLobby() override { return m_restrictGamesToLobby; }
 
 protected:
 	std::list<AsciiString> m_pingServers;

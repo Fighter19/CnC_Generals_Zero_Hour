@@ -172,9 +172,9 @@ const Coord3D* GenerateMinefieldBehavior::getMinefieldTarget() const
 //-------------------------------------------------------------------------------------------------
 static Bool isAnythingTooClose2D(const std::vector<Object*>& v, const Coord3D& pos, Real minDistSqr)
 {
-	for (std::vector<Object*>::const_iterator it = v.begin(); it != v.end(); ++it)
+	for (auto it : v)
 	{
-		const Coord3D* p = (*it)->getPosition();
+		const Coord3D* p = it->getPosition();
 		Real distSqr = sqr(p->x - pos.x) + sqr(p->y - pos.y);
 		if (distSqr < minDistSqr)
 			return true;
@@ -477,10 +477,9 @@ UpdateSleepTime GenerateMinefieldBehavior::update()
 					m_upgraded = TRUE;
 					
 					// Remove all old mine objects if present
-					for (std::list<ObjectID>::iterator it = m_mineList.begin(); it != m_mineList.end(); ++it)
+					for (auto objID : m_mineList)
 					{
-						ObjectID objID = *it;
-						Object *obj = TheGameLogic->findObjectByID(objID);
+							Object *obj = TheGameLogic->findObjectByID(objID);
 						if (obj)
 						{
 							TheGameLogic->destroyObject(obj);

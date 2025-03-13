@@ -158,10 +158,10 @@ void ScoreKeeper::addObjectBuilt( const Object *o)
 Int ScoreKeeper::getTotalUnitsBuilt( KindOfMaskType validMask, KindOfMaskType invalidMask )
 {
 	Int count = 0;
-	for (ObjectCountMapIt it = m_objectsBuilt.begin(); it != m_objectsBuilt.end(); ++it)
+	for (auto & it : m_objectsBuilt)
 	{
-		const ThingTemplate *theTemplate = it->first;
-		Int numBuilt = it->second;
+		const ThingTemplate *theTemplate = it.first;
+		Int numBuilt = it.second;
 		if (theTemplate && theTemplate->isKindOfMulti(validMask, invalidMask))
 			count += numBuilt;
 	}
@@ -171,9 +171,9 @@ Int ScoreKeeper::getTotalUnitsBuilt( KindOfMaskType validMask, KindOfMaskType in
 Int ScoreKeeper::getTotalObjectsBuilt( const ThingTemplate *pTemplate )
 {
 	Int count = 0;
-	for (ObjectCountMapIt it = m_objectsBuilt.begin(); it != m_objectsBuilt.end(); ++it)
+	for (auto & it : m_objectsBuilt)
 	{
-		const ThingTemplate *theTemplate = it->first;
+		const ThingTemplate *theTemplate = it.first;
 		if (theTemplate->isEquivalentTo(pTemplate))
 			++count;
 	}
@@ -362,12 +362,12 @@ Int ScoreKeeper::calculateScore( void )
 Int ScoreKeeper::getTotalBuildingsDestroyed( void )
 {
 	int count = 0;
-	for (int i = 0; i< MAX_PLAYER_COUNT; ++i)
+	for (int i : m_totalBuildingsDestroyed)
 	{
 	// Design change, display even if we killed our own
 //		if(i == m_myPlayerIdx)
 //			continue;
-		count += m_totalBuildingsDestroyed[i];
+		count += i;
 		//for (ObjectCountMapIt it = m_objectsDestroyed[i].begin(); it != m_objectsDestroyed[i].end(); ++it) 
 		//		{
 		//			
@@ -380,12 +380,12 @@ Int ScoreKeeper::getTotalBuildingsDestroyed( void )
 Int ScoreKeeper::getTotalUnitsDestroyed( void )
 {
 	int count = 0;
-	for (int i = 0; i< MAX_PLAYER_COUNT; ++i)
+	for (int i : m_totalUnitsDestroyed)
 	{
 	// Design change, display even if we killed our own
 //		if(i == m_myPlayerIdx)
 //			continue;
-		count += m_totalUnitsDestroyed[i];
+		count += i;
 //		for (ObjectCountMapIt it = m_objectsDestroyed[i].begin(); it != m_objectsDestroyed[i].end(); ++it) 
 //		{
 //		}

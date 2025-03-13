@@ -288,9 +288,8 @@ UnsignedInt getPickTypesForCurrentSelection( Bool forceAttackMode )
 
 	const DrawableList *allSelectedDrawables = TheInGameUI->getAllSelectedDrawables();
 
-	for (DrawableListCIt cit = allSelectedDrawables->begin(); cit != allSelectedDrawables->end(); ++cit) {
-		Drawable *draw = *cit;
-		if (!draw) {
+	for (auto draw : *allSelectedDrawables) {
+			if (!draw) {
 			continue;
 		}
 

@@ -333,7 +333,7 @@ Bool Transport::doRecv()
 		m_incomingPackets[m_statisticsSlot]++;
 		m_incomingBytes[m_statisticsSlot] += len;
 
-		for (int i=0; i<MAX_MESSAGES; ++i)
+		for (auto & i : m_inBuffer)
 		{
 #if defined(_DEBUG) || defined(_INTERNAL)
 			// Latency simulation
@@ -356,13 +356,13 @@ Bool Transport::doRecv()
 			else
 			{
 #endif
-				if (m_inBuffer[i].length == 0)
+				if (i.length == 0)
 				{
 					// Empty slot; use it
-					m_inBuffer[i].length = incomingMessage.length;
-					m_inBuffer[i].addr = ntohl(from.sin_addr.s_addr);
-					m_inBuffer[i].port = ntohs(from.sin_port);
-					memcpy(&m_inBuffer[i], buf, len);
+					i.length = incomingMessage.length;
+					i.addr = ntohl(from.sin_addr.s_addr);
+					i.port = ntohs(from.sin_port);
+					memcpy(&i, buf, len);
 					break;
 				}
 #if defined(_DEBUG) || defined(_INTERNAL)

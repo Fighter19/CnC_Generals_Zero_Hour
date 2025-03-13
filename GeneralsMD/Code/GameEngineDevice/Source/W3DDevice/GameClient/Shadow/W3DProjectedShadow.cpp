@@ -164,9 +164,9 @@ class W3DShadowTexture : public RefCountClass, public	HashableClass
 			m_shadowUV[0].Set(1.0f,0.0f,0.0f);	//u runs along world x axis
 			m_shadowUV[1].Set(0.0f,-1.0f,0.0f);	//v runs along world -y axis
 		}
-		~W3DShadowTexture( void ) { REF_PTR_RELEASE(m_texture);}
+		~W3DShadowTexture( void ) override { REF_PTR_RELEASE(m_texture);}
 
-		virtual	const char * Get_Key( void )	{ return m_namebuf;	}
+			const char * Get_Key( void ) override	{ return m_namebuf;	}
 
 		Int init (RenderObjClass *robj);
 
@@ -2127,15 +2127,15 @@ W3DProjectedShadow::W3DProjectedShadow(void)
 	m_allowWorldAlign = FALSE;	/// wrap shadow around world geometry - else align perpendicular to local z-axis.
 	m_isEnabled = TRUE;
 	m_isInvisibleEnabled = FALSE;
-	for (Int i=0; i<MAX_SHADOW_LIGHTS; i++)
-		m_shadowTexture[i]=NULL;
+	for (auto & i : m_shadowTexture)
+		i=NULL;
 }
 
 W3DProjectedShadow::~W3DProjectedShadow(void)
 {
 	REF_PTR_RELEASE(m_shadowProjector);
-	for (Int i=0; i<MAX_SHADOW_LIGHTS; i++)
-		REF_PTR_RELEASE(m_shadowTexture[i]);
+	for (auto & i : m_shadowTexture)
+		REF_PTR_RELEASE(i);
 }
 
 void W3DProjectedShadow::init(void)
@@ -2423,9 +2423,9 @@ class MissingTextureClass : public HashableClass {
 
 public:
 	MissingTextureClass( const char * name ) : Name( name ) {}
-	virtual	~MissingTextureClass( void ) {}
+		~MissingTextureClass( void ) override {}
 
-	virtual	const char * Get_Key( void )	{ return Name;	}
+		const char * Get_Key( void ) override	{ return Name;	}
 
 private:
 	StringClass	Name;

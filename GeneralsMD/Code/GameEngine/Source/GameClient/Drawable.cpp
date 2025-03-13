@@ -599,10 +599,10 @@ void Drawable::onDestroy( void )
 	// run the onDelete on all modules present so they each have an opportunity to cleanup
 	// anything they need to ... including talking to any other modules
 	//
-	for( Int i = 0; i < NUM_DRAWABLE_MODULE_TYPES; i++ )
+	for(auto m : m_modules)
 	{
 
-		for( Module** m = m_modules[ i ]; m && *m; ++m )
+		for( ; m && *m; ++m )
 			(*m)->onDelete();
 
 	}  // end for i
@@ -2964,9 +2964,9 @@ void Drawable::drawContained( const IRegion2D *healthBarRegion )
 	const ContainedItemsList* contained = container->getContainedItemsList();
 	if (contained)
 	{
-		for (ContainedItemsList::const_iterator it = contained->begin(); it != contained->end(); ++it)
+		for (auto it : *contained)
 		{
-			if ((*it)->isKindOf(KINDOF_INFANTRY))
+			if (it->isKindOf(KINDOF_INFANTRY))
 				++numInfantry;
 		}
 	}
@@ -4750,8 +4750,8 @@ void Drawable::preloadAssets( TimeOfDay timeOfDay )
 {
 
 	/// walk all our modules and preload any assets we need to
-	for( Int i = 0; i < NUM_DRAWABLE_MODULE_TYPES; ++i )
-		for( Module** m = m_modules[i]; m && *m; ++m )
+	for(auto m : m_modules)
+		for( ; m && *m; ++m )
 			(*m)->preloadAssets( timeOfDay );
 
 }  // end preloadAssets
@@ -5209,8 +5209,8 @@ void Drawable::xfer( Xfer *xfer )
 	UnsignedByte iconCount = 0;
 	if (hasIconInfo())
 	{
-		for( UnsignedByte i = 0; i < MAX_ICONS; ++i )
-			if( getIconInfo()->m_icon[ i ] )
+		for(auto & i : getIconInfo()->m_icon)
+			if( i )
 				iconCount++;
 	}
 	xfer->xferUnsignedByte( &iconCount );

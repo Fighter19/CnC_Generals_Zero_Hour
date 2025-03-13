@@ -109,48 +109,48 @@ public:
 	//---------------------------------------------------------------------------------------
 	// Setup / Teardown functions
 	Network();
-	~Network();
-	void init( void );																				///< Initialize or re-initialize the instance
-	void reset( void );																				///< Reinitialize the network
-	void update( void );																			///< Process command list
-	void liteupdate( void );																	///< Do a lightweight update to send packets and pass messages.
+	~Network() override;
+	void init( void ) override;																				///< Initialize or re-initialize the instance
+	void reset( void ) override;																				///< Reinitialize the network
+	void update( void ) override;																			///< Process command list
+	void liteupdate( void ) override;																	///< Do a lightweight update to send packets and pass messages.
 	Bool deinit( void );																			///< Shutdown connections, release memory
 
-	void setLocalAddress(UnsignedInt ip, UnsignedInt port);
-	inline UnsignedInt getRunAhead(void) { return m_runAhead; }
-	inline UnsignedInt getFrameRate(void) { return m_frameRate; }
-	UnsignedInt getPacketArrivalCushion(void);								///< Returns the smallest packet arrival cushion since this was last called.
-	Bool isFrameDataReady( void );
-	void parseUserList( const GameInfo *game );
-	void startGame(void);																			///< Sets the network game frame counter to -1
+	void setLocalAddress(UnsignedInt ip, UnsignedInt port) override;
+	inline UnsignedInt getRunAhead(void) override { return m_runAhead; }
+	inline UnsignedInt getFrameRate(void) override { return m_frameRate; }
+	UnsignedInt getPacketArrivalCushion(void) override;								///< Returns the smallest packet arrival cushion since this was last called.
+	Bool isFrameDataReady( void ) override;
+	void parseUserList( const GameInfo *game ) override;
+	void startGame(void) override;																			///< Sets the network game frame counter to -1
 
-	void sendChat(UnicodeString text, Int playerMask);
-	void sendDisconnectChat(UnicodeString text);
+	void sendChat(UnicodeString text, Int playerMask) override;
+	void sendDisconnectChat(UnicodeString text) override;
 
-	void sendFile(AsciiString path, UnsignedByte playerMask, UnsignedShort commandID);
-	UnsignedShort sendFileAnnounce(AsciiString path, UnsignedByte playerMask);
-	Int getFileTransferProgress(Int playerID, AsciiString path);
-	Bool areAllQueuesEmpty(void);
+	void sendFile(AsciiString path, UnsignedByte playerMask, UnsignedShort commandID) override;
+	UnsignedShort sendFileAnnounce(AsciiString path, UnsignedByte playerMask) override;
+	Int getFileTransferProgress(Int playerID, AsciiString path) override;
+	Bool areAllQueuesEmpty(void) override;
 
-	void quitGame();
-	virtual void selfDestructPlayer(Int index);
+	void quitGame() override;
+	void selfDestructPlayer(Int index) override;
 
 
-	void voteForPlayerDisconnect(Int slot);
-	virtual Bool isPacketRouter( void );
+	void voteForPlayerDisconnect(Int slot) override;
+	Bool isPacketRouter( void ) override;
 
 	// Bandwidth metrics
-	Real getIncomingBytesPerSecond( void );
-	Real getIncomingPacketsPerSecond( void );
-	Real getOutgoingBytesPerSecond( void );
-	Real getOutgoingPacketsPerSecond( void );
-	Real getUnknownBytesPerSecond( void );
-	Real getUnknownPacketsPerSecond( void );
+	Real getIncomingBytesPerSecond( void ) override;
+	Real getIncomingPacketsPerSecond( void ) override;
+	Real getOutgoingBytesPerSecond( void ) override;
+	Real getOutgoingPacketsPerSecond( void ) override;
+	Real getUnknownBytesPerSecond( void ) override;
+	Real getUnknownPacketsPerSecond( void ) override;
 
 	// Multiplayer Load Progress Functions
-	void updateLoadProgress( Int percent );
-	void loadProgressComplete( void );
-	void sendTimeOutGameStart( void );
+	void updateLoadProgress( Int percent ) override;
+	void loadProgressComplete( void ) override;
+	void sendTimeOutGameStart( void ) override;
 
 #if defined(_INTERNAL) || defined(_DEBUG)
 	// Disconnect screen testing
@@ -158,29 +158,29 @@ public:
 #endif
 
 	// Exposing some info contained in the Connection Manager
-	UnsignedInt getLocalPlayerID( void );
-	UnicodeString getPlayerName(Int playerNum);
-	Int getNumPlayers(void );
+	UnsignedInt getLocalPlayerID( void ) override;
+	UnicodeString getPlayerName(Int playerNum) override;
+	Int getNumPlayers(void ) override;
 
-	Int getAverageFPS() { return m_conMgr->getAverageFPS(); }
-	Int getSlotAverageFPS(Int slot);
+	Int getAverageFPS() override { return m_conMgr->getAverageFPS(); }
+	Int getSlotAverageFPS(Int slot) override;
 
-	void attachTransport(Transport *transport);
-	void initTransport();
+	void attachTransport(Transport *transport) override;
+	void initTransport() override;
 
-	void setSawCRCMismatch( void );
-	Bool sawCRCMismatch( void ) { return m_sawCRCMismatch; }
-	Bool isPlayerConnected( Int playerID );
+	void setSawCRCMismatch( void ) override;
+	Bool sawCRCMismatch( void ) override { return m_sawCRCMismatch; }
+	Bool isPlayerConnected( Int playerID ) override;
 
-	void notifyOthersOfCurrentFrame();														///< Tells all the other players what frame we are on.
-	void notifyOthersOfNewFrame(UnsignedInt frame);								///< Tells all the other players that we are on a new frame.
+	void notifyOthersOfCurrentFrame() override;														///< Tells all the other players what frame we are on.
+	void notifyOthersOfNewFrame(UnsignedInt frame) override;								///< Tells all the other players that we are on a new frame.
 
-	Int  getExecutionFrame();																			///< Returns the next valid frame for simultaneous command execution.
+	Int  getExecutionFrame() override;																			///< Returns the next valid frame for simultaneous command execution.
 
 	// For disconnect blame assignment
-	UnsignedInt getPingFrame();
-	Int getPingsSent();
-	Int getPingsRecieved();
+	UnsignedInt getPingFrame() override;
+	Int getPingsSent() override;
+	Int getPingsRecieved() override;
 
 protected:
 	void GetCommandsFromCommandList();														///< Remove commands from TheCommandList and put them on the Network command list.

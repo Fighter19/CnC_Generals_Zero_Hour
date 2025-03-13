@@ -212,9 +212,9 @@ void TeamFactory::clear()
 		// the TeamProto will try to remove itself from the list when it goes away
 	TeamPrototypeMap tmp = m_prototypes;
 	m_prototypes.clear();
-	for (TeamPrototypeMap::iterator it = tmp.begin(); it != tmp.end(); ++it)
+	for (auto & it : tmp)
 	{
-		it->second->deleteInstance();
+		it.second->deleteInstance();
 	}
 }
 
@@ -409,9 +409,9 @@ Team* TeamFactory::findTeam(const AsciiString& name)
 // ------------------------------------------------------------------------
 void TeamFactory::teamAboutToBeDeleted(Team* team)
 {
-	for (TeamPrototypeMap::iterator it = m_prototypes.begin(); it != m_prototypes.end(); ++it)
+	for (auto & m_prototype : m_prototypes)
 	{
-		it->second->teamAboutToBeDeleted(team);
+		m_prototype.second->teamAboutToBeDeleted(team);
 	}
 	if (ThePlayerList)
 		ThePlayerList->teamAboutToBeDeleted(team);
@@ -824,8 +824,8 @@ TeamPrototype::TeamPrototype( TeamFactory *tf,
 		m_owningPlayer->addTeamToList(this);
 	
 	m_retrievedGenericScripts = false;
-	for (Int i = 0; i < MAX_GENERIC_SCRIPTS; ++i) {
-		m_genericScriptsToRun[i] = NULL;
+	for (auto & i : m_genericScriptsToRun) {
+		i = NULL;
 	}
 }
 
@@ -856,12 +856,12 @@ TeamPrototype::~TeamPrototype()
 	}
 	m_productionConditionScript = NULL;
 
-	for (Int i = 0; i < MAX_GENERIC_SCRIPTS; ++i) 
+	for (auto & i : m_genericScriptsToRun) 
 	{
-		if (m_genericScriptsToRun[i]) 
+		if (i) 
 		{
-			m_genericScriptsToRun[i]->deleteInstance();
-			m_genericScriptsToRun[i] = NULL;
+			i->deleteInstance();
+			i = NULL;
 		}
 	}
 }
@@ -1348,9 +1348,9 @@ Team::Team(TeamPrototype *proto, TeamID id ) :
 		TheScriptEngine->AppendDebugMessage(teamName, false);
 	}
 
-	for (Int i = 0; i < MAX_GENERIC_SCRIPTS; ++i) 
+	for (bool & i : m_shouldAttemptGenericScript) 
 	{
-		m_shouldAttemptGenericScript[i] = true;
+		i = true;
 	}
 
 	
@@ -2323,9 +2323,9 @@ static Bool isInBuildVariations(const ThingTemplate* ttWithVariations, const Thi
 	if (bv.empty())
 		return false;
 
-	for (std::vector<AsciiString>::const_iterator it = bv.begin(); it != bv.end(); ++it)
+	for (const auto & it : bv)
 	{
-		if (b->getName() == *it)
+		if (b->getName() == it)
 			return true;
 	}
 	return false;

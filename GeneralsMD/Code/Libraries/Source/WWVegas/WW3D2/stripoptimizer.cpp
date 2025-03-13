@@ -502,9 +502,9 @@ namespace Strip
 
 inline Triangle* TriangleQueue::getTop	(void) const
 {
-	for (int i = 0; i < 4; i++)
-	if (m_bin[i])
-		return m_bin[i];				// return head
+	for (auto i : m_bin)
+	if (i)
+		return i;				// return head
 	return 0;							// end
 }
 
@@ -633,9 +633,9 @@ inline void TriangleQueue::removeTriangle	(Triangle* t)
 		WWASSERT(m_nodeConnectivity[t->m_vertices[i]] >= 0);		// WASS?
 	}
 
-	for (int i = 0; i < 3; i++)							// perform reinsertions now...
-	if (update[i])
-		reinsert(update[i]);
+	for (auto & i : update)							// perform reinsertions now...
+	if (i)
+		reinsert(i);
 
 }
 
@@ -653,8 +653,8 @@ inline void TriangleQueue::removeTriangle	(Triangle* t)
 inline TriangleQueue::TriangleQueue	(Triangle* tris, int N)
 {
 	int i;
-	for (int i = 0; i < 4; i++)
-		m_bin[i] = 0;							// initialize to zero
+	for (auto & i : m_bin)
+		i = 0;							// initialize to zero
 
 	int largestIndex = 0;
 

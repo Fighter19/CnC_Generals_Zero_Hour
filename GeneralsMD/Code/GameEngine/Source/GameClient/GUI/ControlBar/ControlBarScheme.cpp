@@ -215,11 +215,11 @@ ControlBarSchemeAnimation::~ControlBarSchemeAnimation( void )
 
 void ControlBarScheme::reset(void)
 {
-	for (Int i = 0; i < MAX_CONTROL_BAR_SCHEME_IMAGE_LAYERS; i++)
+	for (auto & i : m_layer)
 	{
-		ControlBarSchemeImageList::iterator it = m_layer[i].begin();
+		ControlBarSchemeImageList::iterator it = i.begin();
 
-		while (it != m_layer[i].end())
+		while (it != i.end())
 		{
 			ControlBarSchemeImage *im = *it;
 			if( im )
@@ -227,7 +227,7 @@ void ControlBarScheme::reset(void)
 			im = NULL;
 			it ++;	
 		}
-		m_layer[i].clear();
+		i.clear();
 	
 	}
 
@@ -297,8 +297,8 @@ ControlBarScheme::ControlBarScheme(void)
 {
 
 	m_animations.clear();
-	for (Int i = 0; i < MAX_CONTROL_BAR_SCHEME_IMAGE_LAYERS; i++)
-		m_layer[i].clear();
+	for (auto & i : m_layer)
+		i.clear();
 	m_name.clear();
 	m_ScreenCreationRes.x = m_ScreenCreationRes.y = 0;
 	m_side.clear();
@@ -988,10 +988,9 @@ ControlBarScheme *ControlBarSchemeManager::findControlBarScheme( AsciiString nam
 //-----------------------------------------------------------------------------
 void ControlBarSchemeManager::preloadAssets( TimeOfDay timeOfDay )
 {
-	for (ControlBarSchemeList::iterator it = m_schemeList.begin(); it != m_schemeList.end(); ++it)
+	for (auto CBScheme : m_schemeList)
 	{
-		ControlBarScheme *CBScheme = *it;
-		if( !CBScheme )
+			if( !CBScheme )
 		{
 			DEBUG_ASSERTCRASH(FALSE,("There's no ControlBarScheme in the ControlBarSchemeList:m_schemeList"));
 			continue;
@@ -1007,12 +1006,11 @@ void ControlBarSchemeManager::preloadAssets( TimeOfDay timeOfDay )
 			TheDisplay->preloadTextureAssets(CBScheme->m_buttonQueueImage->getFilename());
 		}
 
-		for (Int layer = 0; layer < MAX_CONTROL_BAR_SCHEME_IMAGE_LAYERS; ++layer)
+		for (auto & layer : CBScheme->m_layer)
 		{
-			for (ControlBarScheme::ControlBarSchemeImageList::iterator listIt = CBScheme->m_layer[layer].begin(); listIt != CBScheme->m_layer[layer].end(); ++listIt)
+			for (auto cbImage : layer)
 			{
-				ControlBarSchemeImage *cbImage = *listIt;
-				if (cbImage)
+					if (cbImage)
 				{
 					const Image *image = TheMappedImageCollection->findImageByName( cbImage->m_name );
 					if (image)

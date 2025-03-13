@@ -72,11 +72,11 @@ DamageFX::DamageFX()
 //-------------------------------------------------------------------------------------------------
 void DamageFX::clear()
 {
-	for (Int dt = 0; dt < DAMAGE_NUM_TYPES; ++dt)
+	for (auto & dt : m_dfx)
 	{
 		for (Int v = LEVEL_FIRST; v <= LEVEL_LAST; ++v)
 		{
-			m_dfx[dt][v].clear();
+			dt[v].clear();
 		}
 	}
 }

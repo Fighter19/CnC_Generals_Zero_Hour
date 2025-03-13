@@ -486,9 +486,9 @@ void BoneFXUpdate::computeNextLogicFXTime(const BaseBoneListInfo *info, Int &nex
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 void BoneFXUpdate::killRunningParticleSystems() {
-	for (std::vector<ParticleSystemID>::iterator it = m_particleSystemIDs.begin(); it != m_particleSystemIDs.end(); ++it)
+	for (auto & m_particleSystemID : m_particleSystemIDs)
 	{
-		ParticleSystem *sys = TheParticleSystemManager->findParticleSystem(*it);
+		ParticleSystem *sys = TheParticleSystemManager->findParticleSystem(m_particleSystemID);
 		if( sys )
 			sys->destroy();
 	}

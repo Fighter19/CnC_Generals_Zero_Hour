@@ -279,10 +279,10 @@ void GadgetTabControlShowSubPane( GameWindow *tabControl, Int whichPane)
 {
 	TabControlData *tabData = (TabControlData *)tabControl->winGetUserData();
 
-	for( Int paneIndex = 0; paneIndex < NUM_TAB_PANES; paneIndex++ )
+	for(auto & subPane : tabData->subPanes)
 	{
-		if( tabData->subPanes[paneIndex] != NULL )
-			tabData->subPanes[paneIndex]->winHide( true );
+		if( subPane != NULL )
+			subPane->winHide( true );
 	}
 	if( tabData->subPanes[whichPane] )
 		tabData->activeTab = whichPane;
@@ -332,12 +332,12 @@ void GadgetTabControlResizeSubPanes( GameWindow *tabControl )
 	TabControlData *tabData = (TabControlData *)tabControl->winGetUserData();
 	Int width, height, x, y;
 	GadgetTabControlComputeSubPaneSize(tabControl, &width, &height, &x, &y);
-	for( Int paneIndex = 0; paneIndex < NUM_TAB_PANES; paneIndex++ )
+	for(auto & subPane : tabData->subPanes)
 	{
-		if( tabData->subPanes[paneIndex] )
+		if( subPane )
 		{
-			tabData->subPanes[paneIndex]->winSetSize( width, height );
-			tabData->subPanes[paneIndex]->winSetPosition( x, y );
+			subPane->winSetSize( width, height );
+			subPane->winSetPosition( x, y );
 		}
 	}
 }

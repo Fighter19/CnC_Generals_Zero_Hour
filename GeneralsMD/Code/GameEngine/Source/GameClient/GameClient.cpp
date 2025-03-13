@@ -99,8 +99,8 @@ GameClient::GameClient()
 {
 
 	// zero our translator list
-	for( Int i = 0; i < MAX_CLIENT_TRANSLATORS; i++ )
-		m_translators[ i ] = TRANSLATOR_ID_INVALID;
+	for(unsigned int & m_translator : m_translators)
+		m_translator = TRANSLATOR_ID_INVALID;
 	m_numTranslators = 0;
 	m_commandTranslator = NULL;
 	
@@ -999,8 +999,8 @@ void GameClient::flushTextBearingDrawables( void )
 	// WALK THIS LIST AND CALL EACH DRAWABLES TEXTY STUFF
 	/////////////////////////////
 
-	for( TextBearingDrawableListIterator it = m_textBearingDrawableList.begin(); it != m_textBearingDrawableList.end(); ++it )
-	  (*it)->drawUIText();
+	for(auto & it : m_textBearingDrawableList)
+	  it->drawUIText();
 
 	m_textBearingDrawableList.clear();
 }
@@ -1315,9 +1315,9 @@ void GameClient::preloadAssets( TimeOfDay timeOfDay )
 GameClient::DrawableTOCEntry *GameClient::findTOCEntryByName( AsciiString name )
 {
 
-	for( DrawableTOCListIterator it = m_drawableTOC.begin(); it != m_drawableTOC.end(); ++it )
-		if( (*it).name == name )
-			return &(*it);
+	for(auto & it : m_drawableTOC)
+		if( it.name == name )
+			return &it;
 
 	return NULL;
 
@@ -1329,9 +1329,9 @@ GameClient::DrawableTOCEntry *GameClient::findTOCEntryByName( AsciiString name )
 GameClient::DrawableTOCEntry *GameClient::findTOCEntryById( UnsignedShort id )
 {
 
-	for( DrawableTOCListIterator it = m_drawableTOC.begin(); it != m_drawableTOC.end(); ++it )
-		if( (*it).id == id )
-			return &(*it);
+	for(auto & it : m_drawableTOC)
+		if( it.id == id )
+			return &it;
 
 	return NULL;
 

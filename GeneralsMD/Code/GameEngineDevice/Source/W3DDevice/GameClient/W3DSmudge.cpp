@@ -507,7 +507,7 @@ void W3DSmudgeManager::render(RenderInfoClass &rinfo)
 					//Set center vertex opacity.
 					vertexDiffuse[4] = ((Int)(smudge->m_opacity * 255.0f) << 24) | THE_COLOR;
 
-					for (Int i=0; i<5; i++)
+					for (unsigned int i : vertexDiffuse)
 					{
 						verts->x=smVerts->pos.X;
 						verts->y=smVerts->pos.Y;
@@ -515,7 +515,7 @@ void W3DSmudgeManager::render(RenderInfoClass &rinfo)
 						verts->nx=0;	//keep AGP write-combining active
 						verts->ny=0;
 						verts->nz=0;
-						verts->diffuse=vertexDiffuse[i];	//set to transparent
+						verts->diffuse=i;	//set to transparent
 						verts->u1=smVerts->uv.X;
 						verts->v1=smVerts->uv.Y;
 						verts->u2=0;	//keep AGP write-combining active

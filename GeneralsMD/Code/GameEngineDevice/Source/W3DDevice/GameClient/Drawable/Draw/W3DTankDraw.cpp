@@ -95,8 +95,8 @@ W3DTankDraw::W3DTankDraw( Thing *thing, const ModuleData* moduleData )
 	m_treadDebrisLeft = NULL;
 	m_treadDebrisRight = NULL;
 
-	for (Int i=0; i<MAX_TREADS_PER_TANK; i++)
-		m_treads[i].m_robj = NULL;
+	for (auto & m_tread : m_treads)
+		m_tread.m_robj = NULL;
 
 	m_treadCount=0;
 	//Assume all things face along x axis when created.
@@ -163,9 +163,9 @@ void W3DTankDraw::createEmitters( void )
 //-------------------------------------------------------------------------------------------------
 W3DTankDraw::~W3DTankDraw()
 {
-	for (Int i=0; i<MAX_TREADS_PER_TANK; i++)
-		if (m_treads[i].m_robj)
-			REF_PTR_RELEASE(m_treads[i].m_robj);
+	for (auto & m_tread : m_treads)
+		if (m_tread.m_robj)
+			REF_PTR_RELEASE(m_tread.m_robj);
 }
 
 //-------------------------------------------------------------------------------------------------

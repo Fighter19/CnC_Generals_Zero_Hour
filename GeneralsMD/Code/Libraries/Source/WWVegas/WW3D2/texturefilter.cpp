@@ -218,9 +218,9 @@ void TextureFilterClass::Set_Mip_Mapping(FilterType mipmap)
 */
 void TextureFilterClass::_Set_Default_Min_Filter(FilterType filter)
 {
-	for (int i=0;i<MAX_TEXTURE_STAGES;++i) 
+	for (auto & _MinTextureFilter : _MinTextureFilters) 
 	{
-		_MinTextureFilters[i][FILTER_TYPE_DEFAULT]=_MinTextureFilters[i][filter];
+		_MinTextureFilter[FILTER_TYPE_DEFAULT]=_MinTextureFilter[filter];
 	}
 }
 
@@ -231,9 +231,9 @@ void TextureFilterClass::_Set_Default_Min_Filter(FilterType filter)
 */
 void TextureFilterClass::_Set_Default_Mag_Filter(FilterType filter)
 {
-	for (int i=0;i<MAX_TEXTURE_STAGES;++i) 
+	for (auto & _MagTextureFilter : _MagTextureFilters) 
 	{
-		_MagTextureFilters[i][FILTER_TYPE_DEFAULT]=_MagTextureFilters[i][filter];
+		_MagTextureFilter[FILTER_TYPE_DEFAULT]=_MagTextureFilter[filter];
 	}
 }
 
@@ -243,8 +243,8 @@ void TextureFilterClass::_Set_Default_Mag_Filter(FilterType filter)
 */
 void TextureFilterClass::_Set_Default_Mip_Filter(FilterType filter)
 {
-	for (int i=0;i<MAX_TEXTURE_STAGES;++i) 
+	for (auto & _MipMapFilter : _MipMapFilters) 
 	{
-		_MipMapFilters[i][FILTER_TYPE_DEFAULT]=_MipMapFilters[i][filter];
+		_MipMapFilter[FILTER_TYPE_DEFAULT]=_MipMapFilter[filter];
 	}
 }

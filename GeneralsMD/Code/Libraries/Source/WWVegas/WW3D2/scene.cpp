@@ -96,10 +96,10 @@ enum
 class SimpleSceneIterator : public SceneIterator
 {
 public:
-	virtual void					First(void);
-	virtual void					Next(void);
-	virtual bool					Is_Done(void);
-	virtual RenderObjClass *	Current_Item(void);
+	void					First(void) override;
+	void					Next(void) override;
+	bool					Is_Done(void) override;
+	RenderObjClass *	Current_Item(void) override;
 
 protected:
 

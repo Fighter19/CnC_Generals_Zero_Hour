@@ -463,8 +463,8 @@ void MainMenuInit( WindowLayout *layout, void *userData )
 	startGame = FALSE;
 	dropDown = DROPDOWN_NONE;
 	pendingDropDown = DROPDOWN_NONE;
-	for(Int i = 0; i < DROPDOWN_COUNT; ++i)
-		dropDownWindows[i] = NULL;
+	for(auto & dropDownWindow : dropDownWindows)
+		dropDownWindow = NULL;
 
 	// get ids for our windows
 	mainMenuID = TheNameKeyGenerator->nameToKey( AsciiString( "MainMenu.wnd:MainMenuParent" ) );

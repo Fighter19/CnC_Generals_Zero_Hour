@@ -224,9 +224,9 @@ int SHAEngine::Result(void * result) const
 	Process_Block(&partial[0], acc);
 
 	memcpy((char *)&FinalResult, &acc, sizeof(acc));
-	for (int index = 0; index < sizeof(FinalResult)/sizeof(long); index++) {
+	for (unsigned long index : FinalResult.Long) {
 //	for (int index = 0; index < SRC_BLOCK_SIZE/sizeof(long); index++) {
-		(long &)FinalResult.Long[index] = Reverse_LONG(FinalResult.Long[index]);
+		(long &)index = Reverse_LONG(index);
 	}
 	(bool&)IsCached = true;
 	memcpy(result, &FinalResult, sizeof(FinalResult));

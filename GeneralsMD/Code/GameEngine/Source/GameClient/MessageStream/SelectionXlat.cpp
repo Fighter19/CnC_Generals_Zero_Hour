@@ -531,9 +531,8 @@ GameMessageDisposition SelectionTranslator::translateGameMessage(const GameMessa
 				if (TheInGameUI->isInPreferSelectionMode() && !listOfSelectedDrawables.empty()) {
 					GameMessage *selectMore = TheMessageStream->appendMessage( GameMessage::MSG_CREATE_SELECTED_GROUP_NO_SOUND );
 					selectMore->appendBooleanArgument(FALSE);
-					for (DrawableListIt it = listOfSelectedDrawables.begin(); it != listOfSelectedDrawables.end(); ++it) {
-						Drawable *draw = *it;
-						if (draw && draw->isSelectable()) {
+					for (auto draw : listOfSelectedDrawables) {
+							if (draw && draw->isSelectable()) {
 							TheInGameUI->selectDrawable(draw);
 							selectMore->appendObjectIDArgument(draw->getObject()->getID());
 						}
@@ -670,9 +669,8 @@ GameMessageDisposition SelectionTranslator::translateGameMessage(const GameMessa
           // -Mark Lorenzen, 6/12/03
           Bool onlyTheOneBuildingIsSelectableAnyway = TRUE;
           DrawableID buildingID = INVALID_DRAWABLE_ID;
-          for (DrawableListIt it = drawablesThatWillSelect.begin(); it != drawablesThatWillSelect.end(); ++it) 
+          for (auto d : drawablesThatWillSelect) 
 				  {
-            const Drawable *d = *it;
             if ( d->isKindOf( KINDOF_STRUCTURE ) ) 
             {// make sure there is really only the one building in the list, as it may be multiply listed
               

@@ -100,10 +100,9 @@ static Object* getPotentialRappeller(Object* obj)
 	const ContainedItemsList* items = obj->getContain() ? obj->getContain()->getContainedItemsList() : NULL;
 	if (items)
 	{
-		for (ContainedItemsList::const_iterator it = items->begin(); it != items->end(); ++it )
+		for (auto rider : *items)
 		{
-			Object* rider = *it;
-			if (rider->isKindOf(KINDOF_CAN_RAPPEL))
+				if (rider->isKindOf(KINDOF_CAN_RAPPEL))
 			{
 				return rider;
 			}
@@ -118,13 +117,13 @@ class ChinookEvacuateState : public State
 	MEMORY_POOL_GLUE_WITH_USERLOOKUP_CREATE(ChinookEvacuateState, "ChinookEvacuateState")		
 protected:
 	// snapshot interface	STUBBED - no member vars to save. jba.
-	virtual void crc( Xfer *xfer ){};
-	virtual void xfer( Xfer *xfer ){};
-	virtual void loadPostProcess(){};
+	void crc( Xfer *xfer ) override{};
+	void xfer( Xfer *xfer ) override{};
+	void loadPostProcess() override{};
 public:
 	ChinookEvacuateState( StateMachine *machine ) : State( machine, "ChinookEvacuateState" ) { }
 
-	StateReturnType onEnter()
+	StateReturnType onEnter() override
 	{
 		Object* obj = getMachineOwner();
 		if( obj->getContain() )
@@ -135,7 +134,7 @@ public:
 		return STATE_SUCCESS;
 	}
 
-	virtual StateReturnType update()
+	StateReturnType update() override
 	{
 		return STATE_SUCCESS;
 	}
@@ -149,13 +148,13 @@ class ChinookHeadOffMapState :  public State
 	//I'm outta here
 protected:
 	// snapshot interface	STUBBED - no member vars to save. jba.
-	virtual void crc( Xfer *xfer ){};
-	virtual void xfer( Xfer *xfer ){};
-	virtual void loadPostProcess(){};
+	void crc( Xfer *xfer ) override{};
+	void xfer( Xfer *xfer ) override{};
+	void loadPostProcess() override{};
 public:
 	ChinookHeadOffMapState( StateMachine *machine ) : State( machine, "ChinookHeadOffMapState" ) {}
 
-	StateReturnType onEnter() // Give move order out of town
+	StateReturnType onEnter() override // Give move order out of town
 	{
 		Object *owner = getMachineOwner();
 		ChinookAIUpdate* ai = (ChinookAIUpdate*)owner->getAIUpdateInterface();
@@ -167,7 +166,7 @@ public:
 		return STATE_CONTINUE;
 	}
 
-	StateReturnType update()
+	StateReturnType update() override
 	{
 		Object *owner = getMachineOwner();
 
@@ -200,12 +199,12 @@ private:
 
 protected:
 	// snapshot interface
-	virtual void crc( Xfer *xfer )
+	void crc( Xfer *xfer ) override
 	{
 		// empty
 	}
 
-	virtual void xfer( Xfer *xfer )
+	void xfer( Xfer *xfer ) override
 	{
 		// version
 		XferVersion currentVersion = 1;
@@ -216,7 +215,7 @@ protected:
 		xfer->xferBool(&m_landing);
 	}
 
-	virtual void loadPostProcess()
+	void loadPostProcess() override
 	{
 		// empty
 	}
@@ -227,7 +226,7 @@ public:
 		m_destLoc.zero();
 	}
 
-	virtual StateReturnType onEnter()
+	StateReturnType onEnter() override
 	{
 		Object* obj = getMachineOwner();
 		ChinookAIUpdate* ai = (ChinookAIUpdate*)obj->getAIUpdateInterface();
@@ -284,7 +283,7 @@ public:
 		return STATE_CONTINUE;
 	}
 
-	virtual StateReturnType update()
+	StateReturnType update() override
 	{
 		Object* obj = getMachineOwner();
 		if (obj->isEffectivelyDead())
@@ -302,7 +301,7 @@ public:
 		return STATE_CONTINUE;
 	}
 
-	virtual void onExit( StateExitType status )
+	void onExit( StateExitType status ) override
 	{
 		Object* obj = getMachineOwner();
 		ChinookAIUpdate* ai = (ChinookAIUpdate*)obj->getAIUpdateInterface();
@@ -361,14 +360,14 @@ private:
 
 	void removeDoneRappellers()
 	{
-		for (std::vector<RopeInfo>::iterator it = m_ropes.begin(); it != m_ropes.end(); ++it)
+		for (auto & m_rope : m_ropes)
 		{
-			for (std::list<ObjectID>::iterator oit = it->rappellerIDs.begin(); oit != it->rappellerIDs.end(); )
+			for (std::list<ObjectID>::iterator oit = m_rope.rappellerIDs.begin(); oit != m_rope.rappellerIDs.end(); )
 			{
 				Object* rappeller = TheGameLogic->findObjectByID(*oit);
 				if (rappeller == NULL || rappeller->isEffectivelyDead() || !rappeller->isAboveTerrain())
 				{
-					oit = it->rappellerIDs.erase(oit);
+					oit = m_rope.rappellerIDs.erase(oit);
 				}
 				else
 				{
@@ -416,12 +415,12 @@ private:
 
 protected:
 	// snapshot interface
-	virtual void crc( Xfer *xfer )
+	void crc( Xfer *xfer ) override
 	{
 		// empty
 	}
 
-	virtual void xfer( Xfer *xfer )
+	void xfer( Xfer *xfer ) override
 	{
 		// version
 		const XferVersion currentVersion = 2;
@@ -468,13 +467,13 @@ protected:
 		}
 	}
 
-	virtual void loadPostProcess()
+	void loadPostProcess() override
 	{
-		for (std::vector<RopeInfo>::iterator it = m_ropes.begin(); it != m_ropes.end(); ++it)
+		for (auto & m_rope : m_ropes)
 		{
-			it->ropeDrawable = TheGameClient->findDrawableByID(it->ropeID);
+			m_rope.ropeDrawable = TheGameClient->findDrawableByID(m_rope.ropeID);
 			// always nuke this, since we're done with it till we save/load again
-			it->ropeID = INVALID_DRAWABLE_ID;
+			m_rope.ropeID = INVALID_DRAWABLE_ID;
 		}
 	}
 
@@ -482,7 +481,7 @@ public:
 	ChinookCombatDropState( StateMachine *machine ): State( machine, "ChinookCombatDropState" ) { }
 
 	// --------------
-	virtual StateReturnType onEnter()
+	StateReturnType onEnter() override
 	{
 		Object* obj = getMachineOwner();
 		Drawable* draw = obj->getDrawable();
@@ -548,7 +547,7 @@ public:
 	}
 
 	// --------------
-	virtual StateReturnType update()
+	StateReturnType update() override
 	{
 		Object* obj = getMachineOwner();
 		ChinookAIUpdate* ai = (ChinookAIUpdate*)obj->getAIUpdateInterface();
@@ -566,24 +565,24 @@ public:
 
 		// ok, now check each rope: if it's empty, or we're at the next drop time, spawn a new rappeller
 		Int numRopesInUse = 0;
-		for (std::vector<RopeInfo>::iterator it = m_ropes.begin(); it != m_ropes.end(); ++it)
+		for (auto & m_rope : m_ropes)
 		{
-			if (it->ropeLen < it->ropeLenMax)
+			if (m_rope.ropeLen < m_rope.ropeLenMax)
 			{
-				it->ropeSpeed += fabs(TheGlobalData->m_gravity);
-				if (it->ropeSpeed > d->m_ropeDropSpeed)
-					it->ropeSpeed = d->m_ropeDropSpeed;
-				it->ropeLen += it->ropeSpeed;
-				setRopeCurLen(it->ropeDrawable, it->ropeLen);
+				m_rope.ropeSpeed += fabs(TheGlobalData->m_gravity);
+				if (m_rope.ropeSpeed > d->m_ropeDropSpeed)
+					m_rope.ropeSpeed = d->m_ropeDropSpeed;
+				m_rope.ropeLen += m_rope.ropeSpeed;
+				setRopeCurLen(m_rope.ropeDrawable, m_rope.ropeLen);
 				if (d->m_waitForRopesToDrop)
 				{
 					// can't use this rope till it's dropped all the way
-					++it->nextDropTime;
+					++m_rope.nextDropTime;
 					continue;
 				}
 			}
 
-			if (now >= it->nextDropTime)
+			if (now >= m_rope.nextDropTime)
 			{
 				Object* rappeller = getPotentialRappeller(obj);
 				if (rappeller != NULL)
@@ -599,7 +598,7 @@ public:
 						DEBUG_CRASH(("rappeller is not free to exit... what?"));
 					}
 
-					rappeller->setTransformMatrix(&it->dropStartMtx);
+					rappeller->setTransformMatrix(&m_rope.dropStartMtx);
 
 					AIUpdateInterface* rappellerAI = rappeller ? rappeller->getAIUpdateInterface() : NULL;
 					if (rappellerAI)
@@ -608,13 +607,13 @@ public:
 						rappellerAI->aiRappelInto(getMachineGoalObject(), *getMachineGoalPosition(), CMD_FROM_AI);
 					}
 
-					it->rappellerIDs.push_back(rappeller->getID());
+					m_rope.rappellerIDs.push_back(rappeller->getID());
 
-					it->nextDropTime = now + GameLogicRandomValue(d->m_perRopeDelayMin, d->m_perRopeDelayMax);
+					m_rope.nextDropTime = now + GameLogicRandomValue(d->m_perRopeDelayMin, d->m_perRopeDelayMax);
 				}
 			}
 
-			if (!it->rappellerIDs.empty())
+			if (!m_rope.rappellerIDs.empty())
 			{
 				++numRopesInUse;
 			}
@@ -630,7 +629,7 @@ public:
 	}
 
 	// --------------
-	virtual void onExit( StateExitType status )
+	void onExit( StateExitType status ) override
 	{
 		Object* obj = getMachineOwner();
 		ChinookAIUpdate* ai = (ChinookAIUpdate*)obj->getAIUpdateInterface();
@@ -642,11 +641,11 @@ public:
 		if (obj->isEffectivelyDead())
 		{
 			// oops. drop the rangers.
-			for (std::vector<RopeInfo>::iterator it = m_ropes.begin(); it != m_ropes.end(); ++it)
+			for (auto & m_rope : m_ropes)
 			{
-				for (std::list<ObjectID>::iterator oit = it->rappellerIDs.begin(); oit != it->rappellerIDs.end(); ++oit)
+				for (auto & rappellerID : m_rope.rappellerIDs)
 				{
-					Object* rappeller = TheGameLogic->findObjectByID(*oit);
+					Object* rappeller = TheGameLogic->findObjectByID(rappellerID);
 					AIUpdateInterface* rappellerAI = rappeller ? rappeller->getAIUpdateInterface() : NULL;
 					if (rappellerAI != NULL)
 					{
@@ -657,15 +656,15 @@ public:
 		}
 
 		UnsignedInt now = TheGameLogic->getFrame();
-		for (Int i = 0; i < m_ropes.size(); ++i)
+		for (auto & m_rope : m_ropes)
 		{
-			if (m_ropes[i].ropeDrawable)
+			if (m_rope.ropeDrawable)
 			{
 				const UnsignedInt ROPE_EXPIRATION_TIME = LOGICFRAMES_PER_SECOND * 5;
 				const Real initialSpeed = TheGlobalData->m_gravity * 30;	// give it a little kick
-				setRopeSpeed(m_ropes[i].ropeDrawable, initialSpeed, d->m_ropeDropSpeed, TheGlobalData->m_gravity);
-				m_ropes[i].ropeDrawable->setExpirationDate(now + ROPE_EXPIRATION_TIME);
-				m_ropes[i].ropeDrawable = NULL; // we're done with it, so null it so we won't save it
+				setRopeSpeed(m_rope.ropeDrawable, initialSpeed, d->m_ropeDropSpeed, TheGlobalData->m_gravity);
+				m_rope.ropeDrawable->setExpirationDate(now + ROPE_EXPIRATION_TIME);
+				m_rope.ropeDrawable = NULL; // we're done with it, so null it so we won't save it
 			}
 		}
 
@@ -688,12 +687,12 @@ private:
 	Real m_destZ;
 protected:
 	// snapshot interface
-	virtual void crc( Xfer *xfer )
+	void crc( Xfer *xfer ) override
 	{
 		// empty
 	}
 
-	virtual void xfer( Xfer *xfer )
+	void xfer( Xfer *xfer ) override
 	{
 		// version
 		XferVersion currentVersion = 1;
@@ -705,7 +704,7 @@ protected:
 		xfer->xferReal(&m_destZ);
 	}
 
-	virtual void loadPostProcess()
+	void loadPostProcess() override
 	{
 		// empty
 	}
@@ -713,7 +712,7 @@ protected:
 public:
 	ChinookMoveToBldgState( StateMachine *machine ): AIMoveToState( machine ) { }
 
-	virtual StateReturnType onEnter()
+	StateReturnType onEnter() override
 	{
 		Object* obj = getMachineOwner();
 		ChinookAIUpdate* ai = (ChinookAIUpdate*)obj->getAIUpdateInterface();
@@ -744,7 +743,7 @@ public:
 		return AIMoveToState::onEnter();
 	}
 
-	virtual StateReturnType update()
+	StateReturnType update() override
 	{
 		Object* obj = getMachineOwner();
 
@@ -758,7 +757,7 @@ public:
 		return status;
 	}
 
-	virtual void onExit( StateExitType status )
+	void onExit( StateExitType status ) override
 	{
 		Object* obj = getMachineOwner();
 		ChinookAIUpdate* ai = (ChinookAIUpdate*)obj->getAIUpdateInterface();
@@ -780,12 +779,12 @@ class ChinookRecordCreationState : public State
 	MEMORY_POOL_GLUE_WITH_USERLOOKUP_CREATE(ChinookRecordCreationState, "ChinookRecordCreationState")		
 protected:
 	// snapshot interface
-	virtual void crc( Xfer *xfer )
+	void crc( Xfer *xfer ) override
 	{
 		// empty
 	}
 
-	virtual void xfer( Xfer *xfer )
+	void xfer( Xfer *xfer ) override
 	{
 		// version
 		XferVersion currentVersion = 1;
@@ -793,7 +792,7 @@ protected:
 		xfer->xferVersion( &version, currentVersion );
 	}
 
-	virtual void loadPostProcess()
+	void loadPostProcess() override
 	{
 		// empty
 	}
@@ -801,7 +800,7 @@ protected:
 public:
 	ChinookRecordCreationState( StateMachine *machine ): State( machine, "ChinookRecordCreationState" ) { }
 
-	virtual StateReturnType onEnter()
+	StateReturnType onEnter() override
 	{
 		Object* obj = getMachineOwner();
 		ChinookAIUpdate* ai = (ChinookAIUpdate*)obj->getAIUpdateInterface();
@@ -812,7 +811,7 @@ public:
 		return STATE_SUCCESS;
 	}
 
-	virtual StateReturnType update()
+	StateReturnType update() override
 	{
 		return STATE_SUCCESS;
 	}

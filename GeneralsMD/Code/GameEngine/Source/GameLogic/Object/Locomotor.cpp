@@ -2674,10 +2674,9 @@ void LocomotorSet::xfer( Xfer *xfer )
 	// data
 	if (xfer->getXferMode() == XFER_SAVE)
 	{
-		for (LocomotorVector::iterator it = m_locomotors.begin(); it != m_locomotors.end(); ++it)
+		for (auto loco : m_locomotors)
 		{
-			Locomotor* loco = *it;
-			AsciiString name = loco->getTemplateName();
+				AsciiString name = loco->getTemplateName();
 			xfer->xferAsciiString(&name);
 			xfer->xferSnapshot(loco);
 		}
@@ -2745,11 +2744,11 @@ void LocomotorSet::xferSelfAndCurLocoPtr(Xfer *xfer, Locomotor** loco)
 		}
 		else
 		{
-			for (int i = 0; i < m_locomotors.size(); ++i)
+			for (auto & m_locomotor : m_locomotors)
 			{
-				if (m_locomotors[i]->getTemplateName() == name)
+				if (m_locomotor->getTemplateName() == name)
 				{
-					*loco = m_locomotors[i];
+					*loco = m_locomotor;
 					return;
 				}
 			}
@@ -2763,10 +2762,10 @@ void LocomotorSet::xferSelfAndCurLocoPtr(Xfer *xfer, Locomotor** loco)
 //-------------------------------------------------------------------------------------------------
 void LocomotorSet::clear()
 {
-	for (int i = 0; i < m_locomotors.size(); ++i)
+	for (auto & m_locomotor : m_locomotors)
 	{
-		if (m_locomotors[i])
-			m_locomotors[i]->deleteInstance();
+		if (m_locomotor)
+			m_locomotor->deleteInstance();
 	}
 	m_locomotors.clear();
 	m_validLocomotorSurfaces = 0;
@@ -2796,10 +2795,9 @@ void LocomotorSet::addLocomotor(const LocomotorTemplate* lt)
 //-------------------------------------------------------------------------------------------------
 Locomotor* LocomotorSet::findLocomotor(LocomotorSurfaceTypeMask t)
 {
-	for (LocomotorVector::iterator it = m_locomotors.begin(); it != m_locomotors.end(); ++it)
+	for (auto curLocomotor : m_locomotors)
 	{
-		Locomotor* curLocomotor = *it;
-		if (curLocomotor && (curLocomotor->getLegalSurfaces() & t))
+			if (curLocomotor && (curLocomotor->getLegalSurfaces() & t))
 			return curLocomotor;
 	}
 	return NULL;

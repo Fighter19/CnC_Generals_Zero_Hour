@@ -702,8 +702,8 @@ void DX8Caps::Check_Texture_Compression_Support(const D3DCAPS8& caps)
 void DX8Caps::Check_Texture_Format_Support(WW3DFormat display_format,const D3DCAPS8& caps)
 {
 	if (display_format==WW3D_FORMAT_UNKNOWN) {
-		for (unsigned i=0;i<WW3D_FORMAT_COUNT;++i) {
-			SupportTextureFormat[i]=false;
+		for (bool & i : SupportTextureFormat) {
+			i=false;
 		}
 		return;
 	}
@@ -734,8 +734,8 @@ void DX8Caps::Check_Texture_Format_Support(WW3DFormat display_format,const D3DCA
 void DX8Caps::Check_Render_To_Texture_Support(WW3DFormat display_format,const D3DCAPS8& caps)
 {
 	if (display_format==WW3D_FORMAT_UNKNOWN) {
-		for (unsigned i=0;i<WW3D_FORMAT_COUNT;++i) {
-			SupportRenderToTextureFormat[i]=false;
+		for (bool & i : SupportRenderToTextureFormat) {
+			i=false;
 		}
 		return;
 	}
@@ -771,9 +771,9 @@ void DX8Caps::Check_Depth_Stencil_Support(WW3DFormat display_format, const D3DCA
 {
 	if (display_format==WW3D_FORMAT_UNKNOWN) 
 	{
-		for (unsigned i=0;i<WW3D_ZFORMAT_COUNT;++i) 
+		for (bool & i : SupportDepthStencilFormat) 
 		{
-			SupportDepthStencilFormat[i]=false;
+			i=false;
 		}
 		return;
 	}
@@ -1058,8 +1058,8 @@ void DX8Caps::Vendor_Specific_Hacks(const D3DADAPTER_IDENTIFIER8& adapter_id)
 			CanDoMultiPass=false;
 
 			DXLOG(("Disabling render-to-texture on Rage Pro\r\n"));
-			for (unsigned i=0;i<WW3D_FORMAT_COUNT;++i) {
-				SupportRenderToTextureFormat[i]=false;
+			for (bool & i : SupportRenderToTextureFormat) {
+				i=false;
 			}
 		}
 
@@ -1072,8 +1072,8 @@ void DX8Caps::Vendor_Specific_Hacks(const D3DADAPTER_IDENTIFIER8& adapter_id)
 			CanDoMultiPass=false;
 
 			DXLOG(("Disabling render-to-texture on ATI Rage 128 Pro GL\r\n"));
-			for (unsigned i=0;i<WW3D_FORMAT_COUNT;++i) {
-				SupportRenderToTextureFormat[i]=false;
+			for (bool & i : SupportRenderToTextureFormat) {
+				i=false;
 			}
 
 		}
@@ -1102,8 +1102,8 @@ void DX8Caps::Vendor_Specific_Hacks(const D3DADAPTER_IDENTIFIER8& adapter_id)
 			DeviceId==DEVICE_ATI_MOBILITY_R7500 ||
 			DeviceId==DEVICE_ATI_R7500) {
 			DXLOG(("Disabling render-to-texture on Radeon\r\n"));
-			for (unsigned i=0;i<WW3D_FORMAT_COUNT;++i) {
-				SupportRenderToTextureFormat[i]=false;
+			for (bool & i : SupportRenderToTextureFormat) {
+				i=false;
 			}
 		}
 
@@ -1131,8 +1131,8 @@ void DX8Caps::Vendor_Specific_Hacks(const D3DADAPTER_IDENTIFIER8& adapter_id)
 
 		if (DeviceId==DEVICE_3DFX_VOODOO_3) {
 			DXLOG(("Disabling render-to-texture on Voodoo3\r\n"));
-			for (unsigned i=0;i<WW3D_FORMAT_COUNT;++i) {
-				SupportRenderToTextureFormat[i]=false;
+			for (bool & i : SupportRenderToTextureFormat) {
+				i=false;
 			}
 		}
 	}

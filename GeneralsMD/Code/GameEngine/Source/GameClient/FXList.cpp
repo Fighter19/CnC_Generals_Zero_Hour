@@ -99,7 +99,7 @@ class SoundFXNugget : public FXNugget
 	
 public:
 
-	virtual void doFXPos(const Coord3D *primary, const Matrix3D* /*primaryMtx*/, const Real /*primarySpeed*/, const Coord3D * /*secondary*/, const Real /*overrideRadius*/ ) const
+	void doFXPos(const Coord3D *primary, const Matrix3D* /*primaryMtx*/, const Real /*primarySpeed*/, const Coord3D * /*secondary*/, const Real /*overrideRadius*/ ) const override
 	{
 		AudioEventRTS sound(m_soundName);
 		
@@ -111,7 +111,7 @@ public:
 		TheAudio->addAudioEvent(&sound);
 	}
 
-	virtual void doFXObj(const Object* primary, const Object* secondary = NULL) const
+	void doFXObj(const Object* primary, const Object* secondary = NULL) const override
 	{
 		AudioEventRTS sound(m_soundName);
 		if (primary)
@@ -169,7 +169,7 @@ public:
 		m_probability = 1.0f;
 	}
 
-	virtual void doFXPos(const Coord3D *primary, const Matrix3D* primaryMtx, const Real primarySpeed, const Coord3D *secondary, const Real /*overrideRadius*/ ) const
+	void doFXPos(const Coord3D *primary, const Matrix3D* primaryMtx, const Real primarySpeed, const Coord3D *secondary, const Real /*overrideRadius*/ ) const override
 	{
 		if (m_probability <= GameClientRandomValueReal(0, 1))
 			return;
@@ -267,7 +267,7 @@ public:
 		m_secondaryOffset.x = m_secondaryOffset.y = m_secondaryOffset.z = 0;
 	}
 
-	virtual void doFXPos(const Coord3D *primary, const Matrix3D* /*primaryMtx*/, const Real /*primarySpeed*/, const Coord3D * secondary, const Real /*overrideRadius*/ ) const
+	void doFXPos(const Coord3D *primary, const Matrix3D* /*primaryMtx*/, const Real /*primarySpeed*/, const Coord3D * secondary, const Real /*overrideRadius*/ ) const override
 	{
 		const ThingTemplate* tmpl = TheThingFactory->findTemplate(m_templateName);
 		DEBUG_ASSERTCRASH(tmpl, ("RayEffect %s not found\n",m_templateName.str()));
@@ -324,7 +324,7 @@ public:
 		m_color.red = m_color.green = m_color.blue = 0;
 	}
 
-	virtual void doFXObj(const Object* primary, const Object* /*secondary*/) const
+	void doFXObj(const Object* primary, const Object* /*secondary*/) const override
 	{
 		if (primary)
 		{
@@ -341,7 +341,7 @@ public:
 		}
 	}
 
-	virtual void doFXPos(const Coord3D *primary, const Matrix3D* /*primaryMtx*/, const Real /*primarySpeed*/, const Coord3D * /*secondary*/, const Real /*overrideRadius*/ ) const
+	void doFXPos(const Coord3D *primary, const Matrix3D* /*primaryMtx*/, const Real /*primarySpeed*/, const Coord3D * /*secondary*/, const Real /*overrideRadius*/ ) const override
 	{
 		if (primary)
 		{
@@ -389,7 +389,7 @@ public:
 	{
 	}
 
-	virtual void doFXPos(const Coord3D *primary, const Matrix3D* /*primaryMtx*/, const Real /*primarySpeed*/, const Coord3D * /*secondary*/, const Real /*overrideRadius*/ ) const
+	void doFXPos(const Coord3D *primary, const Matrix3D* /*primaryMtx*/, const Real /*primarySpeed*/, const Coord3D * /*secondary*/, const Real /*overrideRadius*/ ) const override
 	{
 		if (primary)
 		{
@@ -447,7 +447,7 @@ public:
 	{
 	}
 
-	virtual void doFXPos(const Coord3D *primary, const Matrix3D* /*primaryMtx*/, const Real /*primarySpeed*/, const Coord3D * /*secondary*/, const Real /*overrideRadius*/ ) const
+	void doFXPos(const Coord3D *primary, const Matrix3D* /*primaryMtx*/, const Real /*primarySpeed*/, const Coord3D * /*secondary*/, const Real /*overrideRadius*/ ) const override
 	{
 		if (primary)
 		{
@@ -523,7 +523,7 @@ public:
 		m_rotateX = m_rotateY = m_rotateZ = 0;
 	}
 
-	virtual void doFXPos(const Coord3D *primary, const Matrix3D* primaryMtx, const Real /*primarySpeed*/, const Coord3D * /*secondary*/, const Real overrideRadius ) const
+	void doFXPos(const Coord3D *primary, const Matrix3D* primaryMtx, const Real /*primarySpeed*/, const Coord3D * /*secondary*/, const Real overrideRadius ) const override
 	{
 		if (primary)
 		{
@@ -535,7 +535,7 @@ public:
 		}
 	}
 
-	virtual void doFXObj(const Object* primary, const Object* secondary) const
+	void doFXObj(const Object* primary, const Object* secondary) const override
 	{
 		if (primary)
 		{
@@ -694,12 +694,12 @@ public:
     m_orientToBone = true;
 	}
 
-	virtual void doFXPos(const Coord3D *primary, const Matrix3D* primaryMtx, const Real /*primarySpeed*/, const Coord3D * /*secondary*/, const Real /*overrideRadius*/ ) const
+	void doFXPos(const Coord3D *primary, const Matrix3D* primaryMtx, const Real /*primarySpeed*/, const Coord3D * /*secondary*/, const Real /*overrideRadius*/ ) const override
 	{
 		DEBUG_CRASH(("You must use the object form for this effect"));
 	}
 
-	virtual void doFXObj(const Object* primary, const Object* /*secondary*/) const
+	void doFXObj(const Object* primary, const Object* /*secondary*/) const override
 	{
 		if (primary)
 		{
@@ -794,10 +794,10 @@ FXList::~FXList()
 //-------------------------------------------------------------------------------------------------
 void FXList::clear()
 {
-	for (FXNuggetList::iterator it = m_nuggets.begin(); it != m_nuggets.end(); ++it)
+	for (auto & m_nugget : m_nuggets)
 	{
-		if (*it)
-			(*it)->deleteInstance();
+		if (m_nugget)
+			m_nugget->deleteInstance();
 	}
 	m_nuggets.clear();
 }
@@ -808,9 +808,9 @@ void FXList::doFXPos(const Coord3D *primary, const Matrix3D* primaryMtx, const R
 	if (ThePartitionManager->getShroudStatusForPlayer(ThePlayerList->getLocalPlayer()->getPlayerIndex(), primary) != CELLSHROUD_CLEAR)
 		return;
 
-	for (FXNuggetList::const_iterator it = m_nuggets.begin(); it != m_nuggets.end(); ++it)
+	for (auto m_nugget : m_nuggets)
 	{
-		(*it)->doFXPos(primary, primaryMtx, primarySpeed, secondary, overrideRadius);
+		m_nugget->doFXPos(primary, primaryMtx, primarySpeed, secondary, overrideRadius);
 	}
 }
 
@@ -820,11 +820,11 @@ void FXList::doFXObj(const Object* primary, const Object* secondary) const
 	if (primary && primary->getShroudedStatus(ThePlayerList->getLocalPlayer()->getPlayerIndex()) > OBJECTSHROUD_PARTIAL_CLEAR)
 		return;	//the primary object is fogged or shrouded so don't bother with the effect.
 
-	for (FXNuggetList::const_iterator it = m_nuggets.begin(); it != m_nuggets.end(); ++it)
+	for (auto m_nugget : m_nuggets)
 	{
 
 		// HERE THE PRIMARY IS THE GUY RECEIVING THE FX, AND SECONDARY MIGHT BE THE GUY DEALING IT
-		(*it)->doFXObj(primary, secondary);
+		m_nugget->doFXObj(primary, secondary);
 	}
 }
 

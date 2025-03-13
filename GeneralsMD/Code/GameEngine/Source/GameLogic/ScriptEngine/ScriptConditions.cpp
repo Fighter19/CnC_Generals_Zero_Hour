@@ -1418,9 +1418,9 @@ Bool ScriptConditions::evaluateNamedSelected(Condition *pCondition, Parameter *p
 
 	// loop through all the selected drawables
 	Drawable *draw;
-	for( DrawableListCIt it = selected->begin(); it != selected->end(); ++it )
+	for(auto it : *selected)
 	{
-		draw = *it;
+		draw = it;
 
 		if (draw->getObject()->getName() == (pUnitParm->getString())) { 
 			isSelected = true;

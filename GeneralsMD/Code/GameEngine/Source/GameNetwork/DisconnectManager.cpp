@@ -82,10 +82,10 @@ void DisconnectManager::init() {
 	m_currentPacketRouterIndex = 0;
 	m_timeOfDisconnectScreenOn = 0;
 
-	for (Int i = 0; i < MAX_SLOTS; ++i) {
-		for (Int j = 0; j < MAX_SLOTS; ++j) {
-			m_playerVotes[i][j].vote = FALSE;
-			m_playerVotes[i][j].frame = 0;
+	for (auto & m_playerVote : m_playerVotes) {
+		for (auto & j : m_playerVote) {
+			j.vote = FALSE;
+			j.frame = 0;
 		}
 	}
 
@@ -441,8 +441,8 @@ void DisconnectManager::allCommandsReady(UnsignedInt frame, ConnectionManager *c
 			TheNetwork->notifyOthersOfNewFrame(frame);
 
 			// reset the votes since we're moving to a new frame.
-			for (Int i = 0; i < MAX_SLOTS; ++i) {
-				m_playerVotes[i][conMgr->getLocalPlayerID()].vote = FALSE;
+			for (auto & m_playerVote : m_playerVotes) {
+				m_playerVote[conMgr->getLocalPlayerID()].vote = FALSE;
 			}
 
 			DEBUG_LOG(("DisconnectManager::allCommandsReady - resetting m_timeOfDisconnectScreenOn\n"));
@@ -739,9 +739,9 @@ Bool DisconnectManager::isPlayerVotedOut(Int slot, ConnectionManager *conMgr) {
 
 UnsignedInt DisconnectManager::getMaxDisconnectFrame() {
 	UnsignedInt retval = 0;
-	for (Int i = 0; i < MAX_SLOTS; ++i) {
-		if (m_disconnectFrames[i] > retval) {
-			retval = m_disconnectFrames[i];
+	for (unsigned int m_disconnectFrame : m_disconnectFrames) {
+		if (m_disconnectFrame > retval) {
+			retval = m_disconnectFrame;
 		}
 	}
 	return retval;
@@ -793,10 +793,10 @@ void DisconnectManager::resetPlayersVotes(Int playerID, UnsignedInt frame, Conne
 	DEBUG_LOG(("DisconnectManager::resetPlayersVotes - resetting player %d's votes on frame %d\n", playerID, frame));
 
 	// we need to reset this player's votes that happened before or on the given frame.
-	for(Int i = 0; i < MAX_SLOTS; ++i) {
-		if (m_playerVotes[i][playerID].frame <= frame) {
+	for(auto & m_playerVote : m_playerVotes) {
+		if (m_playerVote[playerID].frame <= frame) {
 			DEBUG_LOG(("DisconnectManager::resetPlayersVotes - resetting player %d's vote for player %d from frame %d on frame %d\n", playerID, i, m_playerVotes[i][playerID].frame, frame));
-			m_playerVotes[i][playerID].vote = FALSE;
+			m_playerVote[playerID].vote = FALSE;
 		}
 	}
 

@@ -79,12 +79,9 @@ void CreateCrateDie::onDie( const DamageInfo * damageInfo )
 	if( killer && killer->getRelationship( me ) == ALLIES )
 		return; //Nope, no crate for killing ally at all.
 
-	for( AsciiStringListConstIterator iter = getCreateCrateDieModuleData()->m_crateNameList.begin();
-				iter != getCreateCrateDieModuleData()->m_crateNameList.end();
-				iter++
-			)
+	for(const auto & iter : getCreateCrateDieModuleData()->m_crateNameList)
 	{
-		currentCrateData = TheCrateSystem->findCrateTemplate( *iter );
+		currentCrateData = TheCrateSystem->findCrateTemplate( iter );
 		if( currentCrateData )
 		{
 			if( ! testCreationChance( currentCrateData ) )
@@ -181,17 +178,14 @@ Object *CreateCrateDie::createCrate( CrateTemplate const *currentCrateData )
 	Real multipleCrateRunningTotal = 0;
 	AsciiString crateName = "";
 
-	for( crateCreationEntryConstIterator iter = currentCrateData->m_possibleCrates.begin();
-				iter != currentCrateData->m_possibleCrates.end();
-				iter++
-			)
+	for(const auto & m_possibleCrate : currentCrateData->m_possibleCrates)
 	{
-		multipleCrateRunningTotal += (*iter).crateChance;
+		multipleCrateRunningTotal += m_possibleCrate.crateChance;
 		if( multipleCrateRunningTotal > multipleCratePick )
 		{
 			// Run through the list of possibles, and if the sum of the chances is greater than my random pick,
 			// then this is the correct one.  (This simulates contiguous %, or weighted distribution)
-			crateName = (*iter).crateName;
+			crateName = m_possibleCrate.crateName;
 			break;
 		}
 	}

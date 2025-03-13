@@ -50,8 +50,8 @@
 FirestormDynamicGeometryInfoUpdateModuleData::FirestormDynamicGeometryInfoUpdateModuleData() : DynamicGeometryInfoUpdateModuleData()
 {
 	
-	for( Int i = 0; i < MAX_FIRESTORM_SYSTEMS; i++ )
-		m_particleSystem[ i ] = NULL;
+	for(auto & i : m_particleSystem)
+		i = NULL;
 	m_fxList = NULL;
 	m_particleOffsetZ = 0.0f;
 	m_scorchSize = 0.0f;
@@ -99,8 +99,8 @@ FirestormDynamicGeometryInfoUpdateModuleData::FirestormDynamicGeometryInfoUpdate
 FirestormDynamicGeometryInfoUpdate::FirestormDynamicGeometryInfoUpdate( Thing *thing, const ModuleData* moduleData ) : DynamicGeometryInfoUpdate( thing, moduleData )
 {
 	
-	for( Int i = 0; i < MAX_FIRESTORM_SYSTEMS; i++ )
-		m_myParticleSystemID[ i ] = INVALID_PARTICLE_SYSTEM_ID;
+	for(auto & i : m_myParticleSystemID)
+		i = INVALID_PARTICLE_SYSTEM_ID;
 	m_effectsFired = FALSE;
 	m_scorchPlaced = FALSE;
 	m_lastDamageFrame = 0;
@@ -173,12 +173,12 @@ UpdateSleepTime FirestormDynamicGeometryInfoUpdate::update( void )
 	// Parent goes first, and we use part of what he did to alter our bound particle system
 	// get and update our running particle system if we have one
 	//
-	for( Int i = 0; i < MAX_FIRESTORM_SYSTEMS; i++ )
+	for(auto & i : m_myParticleSystemID)
 	{
 
-		if( m_myParticleSystemID[ i ] )
+		if( i )
 		{
-			ParticleSystem *sys = TheParticleSystemManager->findParticleSystem( m_myParticleSystemID[ i ] );
+			ParticleSystem *sys = TheParticleSystemManager->findParticleSystem( i );
 		
 			if( sys )
 			{
@@ -194,7 +194,7 @@ UpdateSleepTime FirestormDynamicGeometryInfoUpdate::update( void )
 			{
 
 				// this system not found (it probably died)... stop trying to find it in the future
-				m_myParticleSystemID[ i ] = INVALID_PARTICLE_SYSTEM_ID;
+				i = INVALID_PARTICLE_SYSTEM_ID;
 
 			}  // end else
 

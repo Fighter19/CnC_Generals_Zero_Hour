@@ -118,8 +118,8 @@ BridgeInfo::BridgeInfo()
 	curDamageState = BODY_PRISTINE;
 	damageStateChanged = FALSE;
 	bridgeObjectID = INVALID_ID;
-	for( Int i = 0; i < BRIDGE_MAX_TOWERS; ++i )
-		towerObjectID[ i ] = INVALID_ID;
+	for(auto & i : towerObjectID)
+		i = INVALID_ID;
 
 }
 

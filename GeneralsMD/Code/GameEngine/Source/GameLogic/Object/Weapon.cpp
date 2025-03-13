@@ -1268,7 +1268,7 @@ void WeaponTemplate::dealDamageInternal(ObjectID sourceID, ObjectID victimID, co
 		{
 			
 			// add AFTER checking for historic stuff
-			m_historicDamage.push_back( HistoricWeaponDamageInfo(frameNow, *pos) );
+			m_historicDamage.emplace_back(frameNow, *pos );
 
 		}  // end else
 
@@ -1515,10 +1515,9 @@ WeaponStore::~WeaponStore()
 {
 	deleteAllDelayedDamage();
 
-	for (Int i = 0; i < m_weaponTemplateVector.size(); i++)
+	for (auto wt : m_weaponTemplateVector)
 	{
-		WeaponTemplate* wt = m_weaponTemplateVector[i];
-		if (wt)
+			if (wt)
 			wt->deleteInstance();
 	}
 	m_weaponTemplateVector.clear();
@@ -1570,9 +1569,9 @@ const WeaponTemplate *WeaponStore::findWeaponTemplate( AsciiString name ) const
 WeaponTemplate *WeaponStore::findWeaponTemplatePrivate( NameKeyType key ) const
 {
 	// search weapon list for name
-	for (Int i = 0; i < m_weaponTemplateVector.size(); i++)
-		if( m_weaponTemplateVector[ i ]->getNameKey() == key )
-			return m_weaponTemplateVector[i];
+	for (auto i : m_weaponTemplateVector)
+		if( i->getNameKey() == key )
+			return i;
 
 	return NULL;
 
@@ -1639,10 +1638,9 @@ void WeaponStore::deleteAllDelayedDamage()
 void WeaponStore::resetWeaponTemplates( void )
 {
 
-	for (Int i = 0; i < m_weaponTemplateVector.size(); i++)
+	for (auto wt : m_weaponTemplateVector)
 	{
-		WeaponTemplate* wt = m_weaponTemplateVector[i];
-		wt->reset();
+			wt->reset();
 	}
 
 }
@@ -1651,10 +1649,9 @@ void WeaponStore::resetWeaponTemplates( void )
 void WeaponStore::reset()
 {
 	// clean up any overriddes.
-	for (Int i = 0; i < m_weaponTemplateVector.size(); ++i)
+	for (auto wt : m_weaponTemplateVector)
 	{
-		WeaponTemplate *wt = m_weaponTemplateVector[i];
-		if (wt->isOverride()) 
+			if (wt->isOverride()) 
 		{
 			WeaponTemplate *override = wt;
 			wt = wt->friend_clearNextTemplate();
@@ -1688,10 +1685,9 @@ void WeaponStore::postProcessLoad()
 		return;
 	}
 
-	for (Int i = 0; i < m_weaponTemplateVector.size(); i++)
+	for (auto wt : m_weaponTemplateVector)
 	{
-		WeaponTemplate* wt = m_weaponTemplateVector[i];
-		if (wt)
+			if (wt)
 			wt->postProcessLoad();
 	}
 

@@ -6005,9 +6005,9 @@ Object * ScriptEngine::getUnitNamed(const AsciiString& unitName)
 		return m_conditionObject;
 	}
 
-	for (VecNamedRequestsIt it = m_namedObjects.begin(); it != m_namedObjects.end(); ++it) {
-		if (unitName == (it->first)) {
-			return it->second;
+	for (auto & m_namedObject : m_namedObjects) {
+		if (unitName == (m_namedObject.first)) {
+			return m_namedObject.second;
 		}
 	}
 	return NULL;
@@ -6018,9 +6018,9 @@ Object * ScriptEngine::getUnitNamed(const AsciiString& unitName)
 //-------------------------------------------------------------------------------------------------
 Bool ScriptEngine::didUnitExist(const AsciiString& unitName)
 {
-	for (VecNamedRequestsIt it = m_namedObjects.begin(); it != m_namedObjects.end(); ++it) {
-		if (unitName == (it->first)) {
-			return (it->second == NULL);
+	for (auto & m_namedObject : m_namedObjects) {
+		if (unitName == (m_namedObject.first)) {
+			return (m_namedObject.second == NULL);
 		}
 	}
 	return false;
@@ -6475,8 +6475,8 @@ Bool ScriptEngine::evaluateFlag( Condition *pCondition )
 		return true;
 	}
 
-	for (ListAsciiStringIt it = m_uiInteractions.begin(); it != m_uiInteractions.end(); ++it) {
-		if (it->compare(pCondition->getParameter(0)->getString()) == 0) {
+	for (auto & m_uiInteraction : m_uiInteractions) {
+		if (m_uiInteraction.compare(pCondition->getParameter(0)->getString()) == 0) {
 			// just return. This flag will be cleared up at the end of the ScriptEngine::update() call
 			return true;
 		}
@@ -7101,14 +7101,14 @@ void ScriptEngine::addObjectToCache(Object* pNewObject)
 		return;
 	}
 
-	for (VecNamedRequestsIt it = m_namedObjects.begin(); it != m_namedObjects.end(); ++it) {
-		if (it->first == objName) {
-			if (it->second == NULL) {
+	for (auto & m_namedObject : m_namedObjects) {
+		if (m_namedObject.first == objName) {
+			if (m_namedObject.second == NULL) {
 				AsciiString newNameForDead;
 				newNameForDead.format("Reassigning dead object's name '%s' to object (%d) of type '%s'\n", objName.str(), pNewObject->getID(), pNewObject->getTemplate()->getName().str());
 				TheScriptEngine->AppendDebugMessage(newNameForDead, FALSE);
 				DEBUG_LOG((newNameForDead.str()));
-				it->second = pNewObject;
+				m_namedObject.second = pNewObject;
 				return;
 			} else {
 				DEBUG_CRASH(("Attempting to assign the name '%s' to object (%d) of type '%s'," 
@@ -7119,8 +7119,8 @@ void ScriptEngine::addObjectToCache(Object* pNewObject)
 			}
 		}
 
-		if (pNewObject == (it->second)) {
-			it->first = objName;
+		if (pNewObject == (m_namedObject.second)) {
+			m_namedObject.first = objName;
 			return;
 		}
 	}
@@ -7137,9 +7137,9 @@ void ScriptEngine::addObjectToCache(Object* pNewObject)
 //-------------------------------------------------------------------------------------------------
 void ScriptEngine::removeObjectFromCache( Object* pDeadObject )
 {
-	for (VecNamedRequestsIt it = m_namedObjects.begin(); it != m_namedObjects.end(); ++it) {
-		if (pDeadObject == (it->second)) {
-			it->second = NULL;	// Don't remove it, cause we want to check whether we ever knew a name later
+	for (auto & m_namedObject : m_namedObjects) {
+		if (pDeadObject == (m_namedObject.second)) {
+			m_namedObject.second = NULL;	// Don't remove it, cause we want to check whether we ever knew a name later
 			break;
 		}
 	}
@@ -7172,11 +7172,11 @@ void ScriptEngine::transferObjectName( const AsciiString& unitName, Object *pNew
 
 	//Loop through the cached list and find the string entry. If found, change the object
 	//so it's pointing to the new one.
-	for( VecNamedRequestsIt it = m_namedObjects.begin(); it != m_namedObjects.end(); ++it )
+	for(auto & m_namedObject : m_namedObjects)
 	{
-		if( !unitName.compare( it->first ) )
+		if( !unitName.compare( m_namedObject.first ) )
 		{
-			Object* pOldObj = it->second;
+			Object* pOldObj = m_namedObject.second;
 			if( pOldObj )
 			{
 				// if you are transferring your name, you should also transfer any custom indicator color you have.
@@ -7186,7 +7186,7 @@ void ScriptEngine::transferObjectName( const AsciiString& unitName, Object *pNew
 					pNewObject->removeCustomIndicatorColor();
 			}
 
-			it->second = pNewObject;
+			m_namedObject.second = pNewObject;
 
 			return;
 		}
@@ -7225,7 +7225,7 @@ void ScriptEngine::notifyOfCompletedVideo( const AsciiString& completedVideo )
 //-------------------------------------------------------------------------------------------------
 void ScriptEngine::notifyOfTriggeredSpecialPower( Int playerIndex, const AsciiString& completedPower, ObjectID sourceObj )
 {
-	m_triggeredSpecialPowers[playerIndex].push_back(AsciiStringObjectIDPair(completedPower, sourceObj));
+	m_triggeredSpecialPowers[playerIndex].emplace_back(completedPower, sourceObj);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -7233,7 +7233,7 @@ void ScriptEngine::notifyOfTriggeredSpecialPower( Int playerIndex, const AsciiSt
 //-------------------------------------------------------------------------------------------------
 void ScriptEngine::notifyOfMidwaySpecialPower( Int playerIndex, const AsciiString& completedPower, ObjectID sourceObj )
 {
-	m_midwaySpecialPowers[playerIndex].push_back(AsciiStringObjectIDPair(completedPower, sourceObj));
+	m_midwaySpecialPowers[playerIndex].emplace_back(completedPower, sourceObj);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -7241,7 +7241,7 @@ void ScriptEngine::notifyOfMidwaySpecialPower( Int playerIndex, const AsciiStrin
 //-------------------------------------------------------------------------------------------------
 void ScriptEngine::notifyOfCompletedSpecialPower( Int playerIndex, const AsciiString& completedPower, ObjectID sourceObj )
 {
-	m_finishedSpecialPowers[playerIndex].push_back(AsciiStringObjectIDPair(completedPower, sourceObj));
+	m_finishedSpecialPowers[playerIndex].emplace_back(completedPower, sourceObj);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -7249,7 +7249,7 @@ void ScriptEngine::notifyOfCompletedSpecialPower( Int playerIndex, const AsciiSt
 //-------------------------------------------------------------------------------------------------
 void ScriptEngine::notifyOfCompletedUpgrade( Int playerIndex, const AsciiString& upgrade, ObjectID sourceObj )
 {
-	m_completedUpgrades[playerIndex].push_back(AsciiStringObjectIDPair(upgrade, sourceObj));
+	m_completedUpgrades[playerIndex].emplace_back(upgrade, sourceObj);
 }
 
 //-------------------------------------------------------------------------------------------------

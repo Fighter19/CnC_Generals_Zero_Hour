@@ -451,8 +451,8 @@ W3DDisplay::~W3DDisplay()
 	delete m_debugDisplay;
 
 	// delete the display strings
-	for (int i = 0; i < DisplayStringCount; i++)
-		TheDisplayStringManager->freeDisplayString(m_displayStrings[i]);
+	for (auto & m_displayString : m_displayStrings)
+		TheDisplayStringManager->freeDisplayString(m_displayString);
 
 	// delete 2D renderer
 	if( m_2DRender )
@@ -473,8 +473,8 @@ W3DDisplay::~W3DDisplay()
 	REF_PTR_RELEASE( m_3DScene );
 	REF_PTR_RELEASE( m_2DScene );
 	REF_PTR_RELEASE( m_3DInterfaceScene );
-	for (Int j=0; j<LightEnvironmentClass::MAX_LIGHTS; j++)
-		REF_PTR_RELEASE( m_myLight[j] );
+	for (auto & j : m_myLight)
+		REF_PTR_RELEASE( j );
 
 	PredictiveLODOptimizerClass::Free();
 
@@ -980,13 +980,13 @@ void W3DDisplay::gatherDebugStats( void )
 		else
 			font = TheFontLibrary->getFont( AsciiString("FixedSys"), 8, FALSE );
 
-		for (int i = 0; i < DisplayStringCount; i++)
+		for (auto & m_displayString : m_displayStrings)
 		{
-			if (m_displayStrings[i] == NULL)
+			if (m_displayString == NULL)
 			{
-				m_displayStrings[i] = TheDisplayStringManager->newDisplayString();
+				m_displayString = TheDisplayStringManager->newDisplayString();
 				DEBUG_ASSERTCRASH( m_displayStrings[i], ("Failed to create DisplayString") );
-				m_displayStrings[i]->setFont( font );
+				m_displayString->setFont( font );
 			}
 		}
 

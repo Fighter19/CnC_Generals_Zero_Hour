@@ -577,9 +577,9 @@ static void updateLadderDetails( Int selID, GameWindow *staticTextLadderName, Ga
 
 	// maps
 	AsciiStringList validMaps = info->validMaps;
-	for ( AsciiStringListIterator it = validMaps.begin(); it != validMaps.end(); ++it)
+	for (auto & validMap : validMaps)
 	{
-		const MapMetaData *md = TheMapCache->findMap(*it);
+		const MapMetaData *md = TheMapCache->findMap(validMap);
 		if (md)
 		{
 			GadgetListBoxAddEntryText(listboxLadderDetails, md->m_displayName, color, -1);

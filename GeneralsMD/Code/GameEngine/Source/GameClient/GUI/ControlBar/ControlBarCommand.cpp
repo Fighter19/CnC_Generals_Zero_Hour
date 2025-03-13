@@ -999,9 +999,9 @@ static Int getRappellerCount(Object* obj)
 	const ContainedItemsList* items = obj->getContain() ? obj->getContain()->getContainedItemsList() : NULL;
 	if (items)
 	{
-		for (ContainedItemsList::const_iterator it = items->begin(); it != items->end(); ++it )
+		for (auto item : *items)
 		{
-			if ((*it)->isKindOf(KINDOF_CAN_RAPPEL))
+			if (item->isKindOf(KINDOF_CAN_RAPPEL))
 			{
 				++num;
 			}
@@ -1240,10 +1240,9 @@ CommandAvailability ControlBar::getCommandAvailability( const CommandButton *com
 			if( TheUpgradeCenter->canAffordUpgrade( player, command->getUpgradeTemplate() ) == FALSE )
 				return COMMAND_RESTRICTED;//COMMAND_CANT_AFFORD;
 
-			for( Int i = 0; i < command->getScienceVec().size(); i++ )
+			for(auto st : command->getScienceVec())
 			{
-				ScienceType st = command->getScienceVec()[ i ];
-				if( !player->hasScience( st ) )
+					if( !player->hasScience( st ) )
 				{
 					return COMMAND_RESTRICTED;
 				}
@@ -1276,10 +1275,9 @@ CommandAvailability ControlBar::getCommandAvailability( const CommandButton *com
 			if( TheUpgradeCenter->canAffordUpgrade( player, command->getUpgradeTemplate() ) == FALSE )
 				return COMMAND_RESTRICTED;//COMMAND_CANT_AFFORD;
 
-			for( Int i = 0; i < command->getScienceVec().size(); i++ )
+			for(auto st : command->getScienceVec())
 			{
-				ScienceType st = command->getScienceVec()[ i ];
-				if( !player->hasScience( st ) )
+					if( !player->hasScience( st ) )
 				{
 					return COMMAND_RESTRICTED;
 				}
@@ -1481,10 +1479,9 @@ CommandAvailability ControlBar::getCommandAvailability( const CommandButton *com
 				return COMMAND_RESTRICTED;
 
 			const DrawableList *selected = TheInGameUI->getAllSelectedDrawables();
-			for( DrawableListCIt it = selected->begin(); it != selected->end(); ++it )
+			for(auto draw : *selected)
 			{
-				Drawable *draw = *it;
-				if( draw && draw->getObject() && draw->getObject()->isLocallyControlled() && draw->getObject()->getCurrentWeapon())
+					if( draw && draw->getObject() && draw->getObject()->isLocallyControlled() && draw->getObject()->getCurrentWeapon())
 				{
 					WeaponSlotType wslot = draw->getObject()->getCurrentWeapon()->getWeaponSlot();
 					if (wslot != command->getWeaponSlot())

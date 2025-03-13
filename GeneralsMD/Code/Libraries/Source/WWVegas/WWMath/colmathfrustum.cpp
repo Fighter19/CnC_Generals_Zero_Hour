@@ -58,8 +58,8 @@ CollisionMath::Overlap_Test(const FrustumClass & frustum,const Vector3 & point)
 {
 	int mask = 0;
 	
-	for (int i = 0; i < 6; i++) {
-		int result = CollisionMath::Overlap_Test(frustum.Planes[i],point);
+	for (const auto & Plane : frustum.Planes) {
+		int result = CollisionMath::Overlap_Test(Plane,point);
 		if (result == OUTSIDE) {
 			return OUTSIDE;
 		}
@@ -78,8 +78,8 @@ CollisionMath::Overlap_Test(const FrustumClass & frustum,const TriClass & tri)
 	int mask = 0;
 	
 	// TODO: doesn't catch all cases...
-	for (int i = 0; i < 6; i++) {
-		int result = CollisionMath::Overlap_Test(frustum.Planes[i],tri);
+	for (const auto & Plane : frustum.Planes) {
+		int result = CollisionMath::Overlap_Test(Plane,tri);
 		if (result == OUTSIDE) {
 			return OUTSIDE;
 		}
@@ -98,8 +98,8 @@ CollisionMath::Overlap_Test(const FrustumClass & frustum,const SphereClass & sph
 	int mask = 0;
 	
 	// TODO: doesn't catch all cases...
-	for (int i = 0; i < 6; i++) {
-		int result = CollisionMath::Overlap_Test(frustum.Planes[i],sphere);
+	for (const auto & Plane : frustum.Planes) {
+		int result = CollisionMath::Overlap_Test(Plane,sphere);
 		if (result == OUTSIDE) {
 			return OUTSIDE;
 		}
@@ -118,8 +118,8 @@ CollisionMath::Overlap_Test(const FrustumClass & frustum,const AABoxClass & box)
 	int mask = 0;
 	
 	// TODO: doesn't catch all cases...
-	for (int i = 0; i < 6; i++) {
-		int result = CollisionMath::Overlap_Test(frustum.Planes[i],box);
+	for (const auto & Plane : frustum.Planes) {
+		int result = CollisionMath::Overlap_Test(Plane,box);
 		if (result == OUTSIDE) {
 			return OUTSIDE;
 		}
@@ -139,8 +139,8 @@ CollisionMath::Overlap_Test(const FrustumClass & frustum,const OBBoxClass & box)
 	int mask = 0;
 	
 	// TODO: doesn't catch all cases...
-	for (int i = 0; i < 6; i++) {
-		int result = CollisionMath::Overlap_Test(frustum.Planes[i],box);
+	for (const auto & Plane : frustum.Planes) {
+		int result = CollisionMath::Overlap_Test(Plane,box);
 		if (result == OUTSIDE) {
 			return OUTSIDE;
 		}

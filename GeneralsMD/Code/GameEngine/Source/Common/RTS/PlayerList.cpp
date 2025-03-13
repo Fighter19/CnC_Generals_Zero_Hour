@@ -90,8 +90,8 @@ PlayerList::~PlayerList()
 	} catch (...) {
 		// nothing
 	}
-	for( Int i = 0; i < MAX_PLAYER_COUNT; ++i )
-		delete m_players[ i ];
+	for(auto & m_player : m_players)
+		delete m_player;
 }
 
 //-----------------------------------------------------------------------------
@@ -253,9 +253,9 @@ void PlayerList::init()
 void PlayerList::update()
 {
 	// update all players
-	for( Int i = 0; i < MAX_PLAYER_COUNT; i++ )
+	for(auto & m_player : m_players)
 	{
-		m_players[i]->update();
+		m_player->update();
 	}  // end for i
 
 }
@@ -264,9 +264,9 @@ void PlayerList::update()
 void PlayerList::newMap()
 {
 	// update all players
-	for( Int i = 0; i < MAX_PLAYER_COUNT; i++ )
+	for(auto & m_player : m_players)
 	{
-		m_players[i]->newMap();
+		m_player->newMap();
 	}  // end for i
 
 }
@@ -274,9 +274,9 @@ void PlayerList::newMap()
 // ------------------------------------------------------------------------
 void PlayerList::teamAboutToBeDeleted(Team* team)
 {
-	for( Int i = 0; i < MAX_PLAYER_COUNT; i++ )
+	for(auto & m_player : m_players)
 	{
-		m_players[i]->removeTeamRelationship(team);
+		m_player->removeTeamRelationship(team);
 	}
 }
 
@@ -284,9 +284,9 @@ void PlayerList::teamAboutToBeDeleted(Team* team)
 void PlayerList::updateTeamStates(void) 
 {
 	// Clear team flags for all players.
-	for( Int i = 0; i < MAX_PLAYER_COUNT; i++ )
+	for(auto & m_player : m_players)
 	{
-		m_players[i]->updateTeamStates();
+		m_player->updateTeamStates();
 	}  // end for i
 }
 

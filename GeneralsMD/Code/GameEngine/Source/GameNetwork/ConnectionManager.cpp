@@ -75,17 +75,17 @@ ConnectionManager::~ConnectionManager(void)
 		m_transport = NULL;
 	}
 
-	for (Int i = 0; i < MAX_SLOTS; ++i) {
-		if (m_frameData[i] != NULL) {
-			m_frameData[i]->deleteInstance();
-			m_frameData[i] = NULL;
+	for (auto & i : m_frameData) {
+		if (i != NULL) {
+			i->deleteInstance();
+			i = NULL;
 		}
 	}
 
-	for (Int i = 0; i < NUM_CONNECTIONS; ++i) {
-		if (m_connections[i] != NULL) {
-			m_connections[i]->deleteInstance();
-			m_connections[i] = NULL;
+	for (auto & m_connection : m_connections) {
+		if (m_connection != NULL) {
+			m_connection->deleteInstance();
+			m_connection = NULL;
 		}
 	}
 
@@ -117,8 +117,8 @@ ConnectionManager::~ConnectionManager(void)
 
 	s_fileCommandMap.clear();
 	s_fileRecipientMaskMap.clear();
-	for (Int i = 0; i < MAX_SLOTS; ++i) {
-		s_fileProgressMap[i].clear();
+	for (auto & i : s_fileProgressMap) {
+		i.clear();
 	}
 }
 
@@ -127,8 +127,8 @@ ConnectionManager::~ConnectionManager(void)
  */
 ConnectionManager::ConnectionManager(void)
 {
-	for (Int i = 0; i < MAX_SLOTS; ++i) {
-		m_frameData[i] = NULL;
+	for (auto & i : m_frameData) {
+		i = NULL;
 	}
 	m_transport = NULL;
 	m_disconnectManager = NULL;
@@ -151,8 +151,8 @@ void ConnectionManager::init()
 //	}
 //	m_transport->reset();
 
-	for (UnsignedInt i = 0; i < NUM_CONNECTIONS; ++i) {
-		m_connections[i] = NULL;
+	for (auto & m_connection : m_connections) {
+		m_connection = NULL;
 	}
 
 	if (m_pendingCommands == NULL) {
@@ -172,25 +172,25 @@ void ConnectionManager::init()
 	TheMemoryPoolFactory->debugSetInitFillerIndex(m_localSlot);
 #endif
 	m_packetRouterSlot = 0; /// @todo The LAN/WOL interface should be telling us who the packet router is based on machine specs passed around through game options.
-	for (Int i = 0; i < MAX_SLOTS; ++i) {
-		m_packetRouterFallback[i] = -1;
+	for (unsigned int & i : m_packetRouterFallback) {
+		i = -1;
 	}
 
-	for (Int i = 0; i < MAX_SLOTS; ++i) {
-		if (m_frameData[i] != NULL) {
-			m_frameData[i]->deleteInstance();
-			m_frameData[i] = NULL;
+	for (auto & i : m_frameData) {
+		if (i != NULL) {
+			i->deleteInstance();
+			i = NULL;
 		}
 	}
 
 //	m_averageFps = 30;			// since 30 fps is the desired rate, we'll start off at that.
 //	m_averageLatency = (Real)0.2; // 200ms seems like a good starting point.
 
-	for (Int i = 0; i < MAX_SLOTS; ++i) {
-		m_fpsAverages[i] = -1;
+	for (int & m_fpsAverage : m_fpsAverages) {
+		m_fpsAverage = -1;
 	}
-	for (Int i = 0; i < MAX_SLOTS; ++i) {
-		m_latencyAverages[i] = 0.0; // using zero since all floating point standards should be able to specify 0.0 accurately.
+	for (float & m_latencyAverage : m_latencyAverages) {
+		m_latencyAverage = 0.0; // using zero since all floating point standards should be able to specify 0.0 accurately.
 	}
 	m_smallestPacketArrivalCushion = -1;
 
@@ -210,8 +210,8 @@ void ConnectionManager::init()
 
 	s_fileCommandMap.clear();
 	s_fileRecipientMaskMap.clear();
-	for (Int i = 0; i < MAX_SLOTS; ++i) {
-		s_fileProgressMap[i].clear();
+	for (auto & i : s_fileProgressMap) {
+		i.clear();
 	}
 }
 
@@ -229,18 +229,18 @@ void ConnectionManager::reset()
 		m_transport = NULL;
 	}
 
-	for (Int i = 0; i < NUM_CONNECTIONS; ++i) {
-		if (m_connections[i] != NULL) {
-			m_connections[i]->deleteInstance();
-			m_connections[i] = NULL;
+	for (auto & m_connection : m_connections) {
+		if (m_connection != NULL) {
+			m_connection->deleteInstance();
+			m_connection = NULL;
 		}
 	}
 
-	for (Int i=0; i<MAX_SLOTS; ++i)
+	for (auto & i : m_frameData)
 	{
-		if (m_frameData[i] != NULL) {
-			m_frameData[i]->deleteInstance();
-			m_frameData[i] = NULL;
+		if (i != NULL) {
+			i->deleteInstance();
+			i = NULL;
 		}
 	}
 
@@ -275,8 +275,8 @@ void ConnectionManager::reset()
 		m_latencyAverages[i] = 0.0;
 	}
 
-	for (Int i = 0; i < MAX_SLOTS; ++i) {
-		m_packetRouterFallback[i] = -1;
+	for (unsigned int & i : m_packetRouterFallback) {
+		i = -1;
 	}
 
 	m_frameMetrics.reset();
@@ -315,10 +315,10 @@ void ConnectionManager::attachTransport(Transport *transport) {
  * the start of a game since there won't be any commands for the first few frames due to runahead.
  */
 void ConnectionManager::zeroFrames(UnsignedInt startingFrame, UnsignedInt numFrames) {
-	for (Int i = 0; i < MAX_SLOTS; ++i) {
-		if (m_frameData[i] != NULL) {
+	for (auto & i : m_frameData) {
+		if (i != NULL) {
 //			DEBUG_LOG(("Calling zeroFrames on player %d, starting frame %d, numFrames %d\n", i, startingFrame, numFrames));
-			m_frameData[i]->zeroFrames(startingFrame, numFrames);
+			i->zeroFrames(startingFrame, numFrames);
 		}
 	}
 }
@@ -327,12 +327,12 @@ void ConnectionManager::zeroFrames(UnsignedInt startingFrame, UnsignedInt numFra
  * Destroy any game messages that are left over due to the run ahead.
  */
 void ConnectionManager::destroyGameMessages() {
-	for (Int i = 0; i < MAX_SLOTS; ++i) {
+	for (auto & i : m_frameData) {
 		// Need to destroy these game messages because when the game ends, there are
 		// still some game messages left over because of the run ahead aspect of
 		// network play.
-		if (m_frameData[i] != NULL) {
-			m_frameData[i]->destroyGameMessages();
+		if (i != NULL) {
+			i->destroyGameMessages();
 		}
 	}
 }
@@ -349,12 +349,12 @@ void ConnectionManager::doRelay() {
 
 	NetPacket *packet = NULL;
 
-	for (Int i = 0; i < MAX_MESSAGES; ++i) {
-		if (m_transport->m_inBuffer[i].length != 0) {
+	for (auto & i : m_transport->m_inBuffer) {
+		if (i.length != 0) {
 			// This transport buffer has yet to be processed.
 
 			// make a NetPacket out of this data so it can be broken up into individual commands.
-			packet = newInstance(NetPacket)(&(m_transport->m_inBuffer[i]));
+			packet = newInstance(NetPacket)(&i);
 
 			//DEBUG_LOG(("ConnectionManager::doRelay() - got a packet with %d commands\n", packet->getNumCommands()));
 			//LOGBUFFER( packet->getData(), packet->getLength() );
@@ -387,7 +387,7 @@ void ConnectionManager::doRelay() {
 			cmdList = NULL;
 
 			// signal that this has been processed.
-			m_transport->m_inBuffer[i].length = 0;
+			i.length = 0;
 		}
 	}
 
@@ -943,12 +943,12 @@ PlayerLeaveCode ConnectionManager::processPlayerLeave(NetPlayerLeaveCommandMsg *
 	if (playerID == m_localSlot)
 	{
 		// we're leaving, so mark our connections and frame datas to go away.
-		for (Int i=0; i<MAX_SLOTS; ++i)
+		for (auto & m_connection : m_connections)
 		{
-			if (m_connections[i])
+			if (m_connection)
 			{
-				m_connections[i]->clearCommandsExceptFrom(m_localSlot);
-				m_connections[i]->setQuitting();
+				m_connection->clearCommandsExceptFrom(m_localSlot);
+				m_connection->setQuitting();
 			}
 		}
 	}
@@ -1615,11 +1615,11 @@ NetCommandList *ConnectionManager::getFrameCommandList(UnsignedInt frame)
 	NetCommandList *retlist = newInstance(NetCommandList);
 	retlist->init();
 
-	for (Int i = 0; i < MAX_SLOTS; ++i) {
-		if (m_frameData[i] != NULL) {
-			retlist->appendList(m_frameData[i]->getFrameCommandList(frame));
+	for (auto & i : m_frameData) {
+		if (i != NULL) {
+			retlist->appendList(i->getFrameCommandList(frame));
 			if (frame > FRAMES_TO_KEEP) {
-				m_frameData[i]->resetFrame(frame - FRAMES_TO_KEEP);	// After getting the commands for that frame from this
+				i->resetFrame(frame - FRAMES_TO_KEEP);	// After getting the commands for that frame from this
 													// FrameDataManager object, we need to tell it that we're
 													// done with the messages for that frame.
 				DEBUG_LOG(("getFrameCommandList - called reset frame on player %d for frame %d\n", i, frame - FRAMES_TO_KEEP));
@@ -1638,9 +1638,9 @@ void ConnectionManager::setFrameGrouping(time_t frameGrouping) {
 	if (m_localSlot == m_packetRouterSlot) {
 		frameGrouping = frameGrouping / 2;
 	}
-	for (Int i = 0; i < MAX_SLOTS; ++i) {
-		if (m_connections[i] != NULL) {
-			m_connections[i]->setFrameGrouping(frameGrouping);
+	for (auto & m_connection : m_connections) {
+		if (m_connection != NULL) {
+			m_connection->setFrameGrouping(frameGrouping);
 		}
 	}
 }
@@ -1803,15 +1803,15 @@ void ConnectionManager::disconnectLocalPlayer() {
  * Takes all the commands that are ready to send and sends them right now.
  */
 void ConnectionManager::flushConnections() {
-	for (Int i = 0; i < MAX_SLOTS; ++i) {
-		if (m_connections[i] != NULL) {
+	for (auto & m_connection : m_connections) {
+		if (m_connection != NULL) {
 //			DEBUG_LOG(("ConnectionManager::flushConnections - flushing connection to player %d\n", i));
 			/*
 			if (m_connections[i]->isQueueEmpty()) {
 //				DEBUG_LOG(("ConnectionManager::flushConnections - connection queue empty\n"));
 			}
 			*/
-			m_connections[i]->doSend();
+			m_connection->doSend();
 		}
 	}
 

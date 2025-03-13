@@ -62,8 +62,8 @@
  *=============================================================================================*/
 PaletteClass::PaletteClass(RGBClass const & rgb)
 {
-	for (int index = 0; index < COLOR_COUNT; index++) {
-		Palette[index] = rgb;
+	for (auto & index : Palette) {
+		index = rgb;
 	}
 }
 
@@ -138,8 +138,8 @@ PaletteClass & PaletteClass::operator = (PaletteClass const & palette)
  *=============================================================================================*/
 void PaletteClass::Adjust(int ratio)
 {
-	for (int index = 0; index < COLOR_COUNT; index++) {
-		Palette[index].Adjust(ratio, BlackColor);
+	for (auto & index : Palette) {
+		index.Adjust(ratio, BlackColor);
 	}
 }
 

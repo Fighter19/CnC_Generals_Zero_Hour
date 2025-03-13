@@ -57,9 +57,9 @@ ArmorTemplate::ArmorTemplate()
 //-------------------------------------------------------------------------------------------------
 void ArmorTemplate::clear()
 {
-	for (int i = 0; i < DAMAGE_NUM_TYPES; i++)
+	for (float & i : m_damageCoefficient)
 	{
-		m_damageCoefficient[i] = 1.0f;
+		i = 1.0f;
 	}
 }
 
@@ -89,9 +89,9 @@ Real ArmorTemplate::adjustDamage(DamageType t, Real damage) const
 
 	if (stricmp(damageName, "Default") == 0)
 	{
-		for (Int i = 0; i < DAMAGE_NUM_TYPES; i++)
+		for (float & i : self->m_damageCoefficient)
 		{
-			self->m_damageCoefficient[i] = pct;
+			i = pct;
 		}
 		return;
 	}

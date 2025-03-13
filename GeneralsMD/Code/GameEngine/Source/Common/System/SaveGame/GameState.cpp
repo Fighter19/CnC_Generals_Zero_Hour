@@ -344,8 +344,8 @@ GameState::~GameState( void )
 {
 
 	// clear our snapshot block list
-	for (Int i=0; i<SNAPSHOT_MAX; ++i)
-	m_snapshotBlockList[i].clear();
+	for (auto & i : m_snapshotBlockList)
+	i.clear();
 
 	// make certain that the post process list is clean
 	m_snapshotPostProcessList.clear();

@@ -112,9 +112,9 @@ static Object *findBestTunnel(Player *ownerPlayer, const Coord3D *pos)
 	Object *bestTunnel = NULL;
 	Real bestDistSqr = 0;
 	const std::list<ObjectID> *allTunnels = tunnels->getContainerList();
-	for( std::list<ObjectID>::const_iterator iter = allTunnels->begin(); iter != allTunnels->end(); iter++ ) {
+	for(auto allTunnel : *allTunnels) {
 		// For each ID, look it up and change its team.  We all get captured together.
-		Object *currentTunnel = TheGameLogic->findObjectByID( *iter );
+		Object *currentTunnel = TheGameLogic->findObjectByID( allTunnel );
 		if( currentTunnel ) {
 			Real dx = currentTunnel->getPosition()->x-pos->x;
 			Real dy = currentTunnel->getPosition()->y-pos->y;
@@ -216,8 +216,8 @@ Bool AITNGuardMachine::lookForInnerTarget(void)
 		return true;	// Transitions to AITNGuardInnerState.
 	}
 	const std::list<ObjectID> *allTunnels = tunnels->getContainerList();
-	for( std::list<ObjectID>::const_iterator iter = allTunnels->begin(); iter != allTunnels->end(); iter++ ) {
-		Object *currentTunnel = TheGameLogic->findObjectByID( *iter );
+	for(auto allTunnel : *allTunnels) {
+		Object *currentTunnel = TheGameLogic->findObjectByID( allTunnel );
 		if( currentTunnel ) {
 			// Check for attacking.
 			if (currentTunnel->getAI()) {

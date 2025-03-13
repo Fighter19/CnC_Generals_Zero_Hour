@@ -1791,10 +1791,10 @@ FontCharsClass::Free_Character_Arrays (void)
 	//
 	//	Delete each member of the ascii character array
 	//
-	for (int index = 0; index < 256; index ++) {		
-		if ( ASCIICharArray[index] != NULL ) {
-			delete ASCIICharArray[index];
-			ASCIICharArray[index] = NULL;
+	for (auto & index : ASCIICharArray) {		
+		if ( index != NULL ) {
+			delete index;
+			index = NULL;
 		}
 	}
 	

@@ -83,8 +83,8 @@
 AIUpdateModuleData::AIUpdateModuleData()
 {
 	//m_locomotorTemplates	-- nothing to do
-	for (int i = 0; i < MAX_TURRETS; i++)
-		m_turretData[i] = NULL;
+	for (auto & i : m_turretData)
+		i = NULL;
 	m_autoAcquireEnemiesWhenIdle = 0;
 	m_moodAttackCheckRate = LOGICFRAMES_PER_SECOND * 2;
 #ifdef ALLOW_SURRENDER
@@ -98,11 +98,11 @@ AIUpdateModuleData::AIUpdateModuleData()
 //-------------------------------------------------------------------------------------------------
 AIUpdateModuleData::~AIUpdateModuleData()
 {
-	for (int i = 0; i < MAX_TURRETS; i++)
+	for (auto & i : m_turretData)
 	{
-		if (m_turretData[i])
+		if (i)
 		{
-			TurretAIData* td = const_cast<TurretAIData*>(m_turretData[i]);
+			TurretAIData* td = const_cast<TurretAIData*>(i);
 			if (td)
 				td->deleteInstance();
 		}
@@ -647,11 +647,11 @@ AIUpdateInterface::~AIUpdateInterface( void )
 		m_stateMachine->deleteInstance();
 	}
 
-	for (int i = 0; i < MAX_TURRETS; i++)
+	for (auto & i : m_turretAI)
 	{
-		if (m_turretAI[i])
-			m_turretAI[i]->deleteInstance();
-		m_turretAI[i] = NULL;
+		if (i)
+			i->deleteInstance();
+		i = NULL;
 	}
 	m_stateMachine = NULL;
 
@@ -734,11 +734,11 @@ Bool AIUpdateInterface::isTurretInNaturalPosition(WhichTurretType tur) const
 //=============================================================================
 Bool AIUpdateInterface::isWeaponSlotOnTurretAndAimingAtTarget(WeaponSlotType wslot, const Object* victim) const
 {
-	for (int i = 0; i < MAX_TURRETS; i++)
+	for (auto i : m_turretAI)
 	{
-		if (m_turretAI[i] && m_turretAI[i]->isWeaponSlotOnTurret(wslot))
+		if (i && i->isWeaponSlotOnTurret(wslot))
 		{
-			return m_turretAI[i]->isTryingToAimAtTarget(victim);
+			return i->isTryingToAimAtTarget(victim);
 		}
 	}
 	return FALSE;
@@ -841,10 +841,9 @@ Bool AIUpdateInterface::chooseLocomotorSetExplicit(LocomotorSetType wst)
 	{
 		m_locomotorSet.clear();
 		m_curLocomotor = NULL;
-		for (Int i = 0; i < set->size(); ++i)
+		for (auto lt : *set)
 		{
-			const LocomotorTemplate* lt = set->at(i);
-			if (lt)
+				if (lt)
 				m_locomotorSet.addLocomotor(lt);
 		}
 		m_curLocomotorSet = wst;
@@ -1094,11 +1093,11 @@ UpdateSleepTime AIUpdateInterface::update( void )
 			! obj->isDisabledByType( DISABLED_HACKED ) )
 	{
 		// If we are dead, don't let the turrets do anything anymore, or else they will keep attacking
-		for (int i = 0; i < MAX_TURRETS; ++i) 
+		for (auto & i : m_turretAI) 
 		{
-			if (m_turretAI[i]) 
+			if (i) 
 			{
-				UpdateSleepTime tmp = m_turretAI[i]->updateTurretAI();
+				UpdateSleepTime tmp = i->updateTurretAI();
 				if (tmp < subMachineSleep)
 					subMachineSleep = tmp;
 			}
@@ -3103,10 +3102,9 @@ void AIUpdateInterface::privateIdle(CommandSourceType cmdSource)
 		const ContainedItemsList* items = contain->getContainedItemsList();
 		if (items)
 		{
-			for (ContainedItemsList::const_iterator it = items->begin(); it != items->end(); ++it)
+			for (auto obj : *items)
 			{
-				Object* obj = *it;
-				AIUpdateInterface* ai = obj ? obj->getAI() : NULL;
+					AIUpdateInterface* ai = obj ? obj->getAI() : NULL;
 				if (ai)
 					ai->aiIdle(cmdSource);
 			}

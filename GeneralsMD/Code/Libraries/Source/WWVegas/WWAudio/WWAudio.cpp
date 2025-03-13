@@ -207,11 +207,11 @@ void
 WWAudioClass::Flush_Cache (void)
 {
 	// Loop through all the hash indicies
-	for (int hash_index = 0; hash_index < MAX_CACHE_HASH; hash_index ++) {
+	for (auto & m_CachedBuffer : m_CachedBuffers) {
 
 		// Loop through all the buffers at this hash index and free them all
-		for (int index = 0; index < m_CachedBuffers[hash_index].Count (); index ++) {
-			CACHE_ENTRY_STRUCT &info = m_CachedBuffers[hash_index][index];
+		for (int index = 0; index < m_CachedBuffer.Count (); index ++) {
+			CACHE_ENTRY_STRUCT &info = m_CachedBuffer[index];
 
 			// Free the buffer data
 			SAFE_FREE (info.string_id);
@@ -219,7 +219,7 @@ WWAudioClass::Flush_Cache (void)
 		}
 
 		// Remove all the entries for this hash index
-		m_CachedBuffers[hash_index].Delete_All ();
+		m_CachedBuffer.Delete_All ();
 	}
 
 	m_CurrentCacheSize = 0;

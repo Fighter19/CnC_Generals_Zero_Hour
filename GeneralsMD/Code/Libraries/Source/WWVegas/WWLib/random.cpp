@@ -169,8 +169,8 @@ Random2Class::Random2Class(unsigned seed) :
 {
 	Random3Class random(seed);
 
-	for (int index = 0; index < ARRAY_SIZE(Table); index++) {
-		Table[index] = random;
+	for (int & index : Table) {
+		index = random;
 	}
 }
 

@@ -493,13 +493,13 @@ void StructureToppleUpdate::doToppleDelayBurstFX()
 	if( lastDamageInfo == NULL || getDamageTypeFlag( d->m_damageFXTypes, lastDamageInfo->in.m_damageType ) )
 	{
 
-		for (std::vector<FXBoneInfo>::const_iterator it = d->fxbones.begin(); it != d->fxbones.end(); ++it)
+		for (const auto & fxbone : d->fxbones)
 		{
-			ParticleSystem *sys = TheParticleSystemManager->createParticleSystem(it->particleSystemTemplate);
+			ParticleSystem *sys = TheParticleSystemManager->createParticleSystem(fxbone.particleSystemTemplate);
 			if (sys != NULL) 
 			{
 				Coord3D pos;
-				if (drawable->getPristineBonePositions(it->boneName.str(), 0, &pos, NULL, 1) == 1) 
+				if (drawable->getPristineBonePositions(fxbone.boneName.str(), 0, &pos, NULL, 1) == 1) 
 				{
 					// got the bone position...
 					sys->setPosition(&pos);

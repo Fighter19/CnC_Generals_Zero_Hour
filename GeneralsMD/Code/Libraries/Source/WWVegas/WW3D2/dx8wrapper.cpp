@@ -272,7 +272,7 @@ bool DX8Wrapper::Init(void * hwnd, bool lite)
 	IsWindowed = false;	
 	DX8Wrapper_IsWindowed = false;
 
-	for (int light=0;light<4;++light) CurrentDX8LightEnables[light]=false;
+	for (bool & CurrentDX8LightEnable : CurrentDX8LightEnables) CurrentDX8LightEnable=false;
 
 	::ZeroMemory(&old_world, sizeof(D3DMATRIX));
 	::ZeroMemory(&old_view, sizeof(D3DMATRIX));
@@ -453,11 +453,11 @@ void DX8Wrapper::Invalidate_Cached_Render_States(void)
 	Release_Render_State();
 
 	// (gth) clear the matrix shadows too
-	for (int i=0; i<D3DTS_WORLD+1; i++) {
-		DX8Transforms[i][0].Set(0,0,0,0);
-		DX8Transforms[i][1].Set(0,0,0,0);
-		DX8Transforms[i][2].Set(0,0,0,0);
-		DX8Transforms[i][3].Set(0,0,0,0);
+	for (auto & DX8Transform : DX8Transforms) {
+		DX8Transform[0].Set(0,0,0,0);
+		DX8Transform[1].Set(0,0,0,0);
+		DX8Transform[2].Set(0,0,0,0);
+		DX8Transform[3].Set(0,0,0,0);
 	}
 
 }
@@ -686,10 +686,10 @@ void DX8Wrapper::Release_Device(void)
 		/*
 		** Release the current vertex and index buffers
 		*/
-		for (unsigned i=0;i<MAX_VERTEX_STREAMS;++i) 
+		for (auto & vertex_buffer : render_state.vertex_buffers) 
 		{
-			if (render_state.vertex_buffers[i]) render_state.vertex_buffers[i]->Release_Engine_Ref();
-			REF_PTR_RELEASE(render_state.vertex_buffers[i]);
+			if (vertex_buffer) vertex_buffer->Release_Engine_Ref();
+			REF_PTR_RELEASE(vertex_buffer);
 		}
 		if (render_state.index_buffer) render_state.index_buffer->Release_Engine_Ref();
 		REF_PTR_RELEASE(render_state.index_buffer);

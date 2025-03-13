@@ -493,10 +493,9 @@ void ControlBar::populateBuildTooltipLayout( const CommandButton *commandButton,
 			{
 
 				//Do we have a prerequisite science?
-				for( Int i = 0; i < commandButton->getScienceVec().size(); i++ )
+				for(auto st : commandButton->getScienceVec())
 				{
-					ScienceType st = commandButton->getScienceVec()[ i ];
-					if( !player->hasScience( st ) )
+						if( !player->hasScience( st ) )
 					{
 						missingScience = TRUE;
 						break;

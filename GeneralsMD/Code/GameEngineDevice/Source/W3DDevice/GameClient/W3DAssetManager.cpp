@@ -108,10 +108,10 @@ class W3DPrototypeClass : public MemoryPoolObject, public PrototypeClass
 public:
 	W3DPrototypeClass(RenderObjClass * proto, const AsciiString& name);
 
-	virtual const char*					Get_Name(void) const			{ return Name.str(); }
-	virtual int									Get_Class_ID(void) const	{ return Proto->Class_ID(); }
-	virtual RenderObjClass *		Create(void);
-	virtual void								DeleteSelf()							{	deleteInstance(); }
+	const char*					Get_Name(void) const override			{ return Name.str(); }
+	int									Get_Class_ID(void) const override	{ return Proto->Class_ID(); }
+	RenderObjClass *		Create(void) override;
+	void								DeleteSelf() override							{	deleteInstance(); }
 
 protected:
 	//virtual ~W3DPrototypeClass(void);
@@ -799,13 +799,13 @@ RenderObjClass * W3DAssetManager::Create_Render_Obj(
 		const char *mesh_name = ::strchr (name, '.');
 		if (mesh_name != NULL) 
 		{
-			::lstrcpyn(filename, name, ((int)mesh_name) - ((int)name) + 1);
+			::strcpy(filename, name, ((int)mesh_name) - ((int)name) + 1);
 #ifdef	INCLUDE_GRANNY_IN_BUILD
 			if (isGranny)
 				::lstrcat(filename, ".gr2");
 			else
 #endif
-				::lstrcat(filename, ".w3d");
+				::strcat(filename, ".w3d");
 		} else {
 			sprintf( filename, "%s.w3d", name);
 		}

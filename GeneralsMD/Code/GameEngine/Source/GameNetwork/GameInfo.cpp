@@ -288,9 +288,9 @@ Bool GameSlot::isOpen( void ) const
 
 GameInfo::GameInfo()
 {
-	for (int i=0; i<MAX_SLOTS; ++i)
+	for (auto & i : m_slot)
 	{
-		m_slot[i] = NULL;
+		i = NULL;
 	}
 	reset();
 }
@@ -323,10 +323,10 @@ void GameInfo::reset( void )
   
 	//
 
-	for (Int i=0; i<MAX_SLOTS; ++i)
+	for (auto & i : m_slot)
 	{
-		if (m_slot[i])
-			m_slot[i]->reset();
+		if (i)
+			i->reset();
 	}
 
 	m_preorderMask = 0;
@@ -348,19 +348,19 @@ void GameInfo::markPlayerAsPreorder(Int index)
 
 void GameInfo::clearSlotList( void )
 {
-	for (int i=0; i<MAX_SLOTS; ++i)
+	for (auto & i : m_slot)
 	{
-		if (m_slot[i])
-			m_slot[i]->setState(SLOT_CLOSED);
+		if (i)
+			i->setState(SLOT_CLOSED);
 	}
 }
 
 Int GameInfo::getNumPlayers( void ) const
 {
 	Int numPlayers = 0;
-	for (int i=0; i<MAX_SLOTS; ++i)
+	for (auto i : m_slot)
 	{
-		if (m_slot[i] && m_slot[i]->isOccupied())
+		if (i && i->isOccupied())
 			numPlayers++;
 	}
 	return numPlayers;
@@ -369,9 +369,9 @@ Int GameInfo::getNumPlayers( void ) const
 Int GameInfo::getNumNonObserverPlayers( void ) const
 {
 	Int numPlayers = 0;
-	for (int i=0; i<MAX_SLOTS; ++i)
+	for (auto i : m_slot)
 	{
-		if (m_slot[i] && m_slot[i]->isOccupied() && m_slot[i]->getPlayerTemplate() != PLAYERTEMPLATE_OBSERVER)
+		if (i && i->isOccupied() && i->getPlayerTemplate() != PLAYERTEMPLATE_OBSERVER)
 			numPlayers++;
 	}
 	return numPlayers;

@@ -251,26 +251,26 @@ void Radar::clearAllEvents( void )
 	m_lastRadarEvent = -1;
 
 	// zero out all data
-	for( Int i = 0; i < MAX_RADAR_EVENTS; ++i )
+	for(auto & i : m_event)
 	{
 
-		m_event[ i ].type = RADAR_EVENT_INVALID;
-		m_event[ i ].active = FALSE;
-		m_event[ i ].createFrame = 0;
-		m_event[ i ].dieFrame = 0;
-		m_event[ i ].fadeFrame = 0;
-		m_event[ i ].color1.red = 0;
-		m_event[ i ].color1.green = 0;
-		m_event[ i ].color1.blue = 0;
-		m_event[ i ].color2.red = 0;
-		m_event[ i ].color2.green = 0;
-		m_event[ i ].color2.blue = 0;
-		m_event[ i ].worldLoc.x = 0.0f;
-		m_event[ i ].worldLoc.y = 0.0f;
-		m_event[ i ].worldLoc.z = 0.0f;
-		m_event[ i ].radarLoc.x = 0;
-		m_event[ i ].radarLoc.y = 0;
-		m_event[ i ].soundPlayed = FALSE;
+		i.type = RADAR_EVENT_INVALID;
+		i.active = FALSE;
+		i.createFrame = 0;
+		i.dieFrame = 0;
+		i.fadeFrame = 0;
+		i.color1.red = 0;
+		i.color1.green = 0;
+		i.color1.blue = 0;
+		i.color2.red = 0;
+		i.color2.green = 0;
+		i.color2.blue = 0;
+		i.worldLoc.x = 0.0f;
+		i.worldLoc.y = 0.0f;
+		i.worldLoc.z = 0.0f;
+		i.radarLoc.x = 0;
+		i.radarLoc.y = 0;
+		i.soundPlayed = FALSE;
 
 	}  // end for i
 
@@ -1307,22 +1307,22 @@ Bool Radar::tryEvent( RadarEventType event, const Coord3D *pos )
 	// see if there was any matching radar event within range of this one
 	// that wasn't too long ago, if there was we won't create another and get outta here
 	//
-	for( Int i = 0; i < MAX_RADAR_EVENTS; ++i )
+	for(auto & i : m_event)
 	{
 	
 		// only pay attention to under attack events
-		if( m_event[ i ].type == event )
+		if( i.type == event )
 		{
 
 			// get distance from our new event location to this event location in 2D
-			Real distSquared = m_event[ i ].worldLoc.x - pos->x * m_event[ i ].worldLoc.x - pos->x +
-												 m_event[ i ].worldLoc.y - pos->y * m_event[ i ].worldLoc.y - pos->y;
+			Real distSquared = i.worldLoc.x - pos->x * i.worldLoc.x - pos->x +
+												 i.worldLoc.y - pos->y * i.worldLoc.y - pos->y;
 
 			if( distSquared <= closeEnoughDistanceSq )
 			{
 
 				// finally only reject making a new event of this existing one is "recent enough"
-				if( currentFrame - m_event[ i ].createFrame < framesBetweenEvents )
+				if( currentFrame - i.createFrame < framesBetweenEvents )
 					return FALSE;  // reject it
 
 			}  // end if

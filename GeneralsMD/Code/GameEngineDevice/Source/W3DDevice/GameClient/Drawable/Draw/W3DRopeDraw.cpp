@@ -190,13 +190,13 @@ void W3DRopeDraw::doDrawModule(const Matrix3D* transformMtx)
 		const Coord3D* pos = getDrawable()->getPosition();
 		Vector3 start(pos->x, pos->y, pos->z + m_curZOffset);
 		Real eachLen = m_curLen / m_segments.size();
-		for (std::vector<SegInfo>::iterator it = m_segments.begin(); it != m_segments.end(); ++it)
+		for (auto & m_segment : m_segments)
 		{
-			Vector3 end(pos->x + deflection*it->wobbleAxisX, pos->y + deflection*it->wobbleAxisY, start.Z - eachLen);
-			if (it->line)
-				(it->line)->Reset(start, end);
-			if (it->softLine)
-				(it->softLine)->Reset(start, end);
+			Vector3 end(pos->x + deflection*m_segment.wobbleAxisX, pos->y + deflection*m_segment.wobbleAxisY, start.Z - eachLen);
+			if (m_segment.line)
+				(m_segment.line)->Reset(start, end);
+			if (m_segment.softLine)
+				(m_segment.softLine)->Reset(start, end);
 			start = end;
 		}
 	}

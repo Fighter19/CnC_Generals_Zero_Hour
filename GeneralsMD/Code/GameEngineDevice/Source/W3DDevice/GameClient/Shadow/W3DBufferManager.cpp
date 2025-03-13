@@ -62,15 +62,15 @@ W3DBufferManager::W3DBufferManager(void)
 	m_numEmptyIndexSlotsAllocated=0;
 	m_numEmptyIndexBuffersAllocated=0;
 
-	for (Int i=0; i<MAX_FVF; i++)
-		m_W3DVertexBuffers[i]=NULL;
-	for (Int i=0; i<MAX_FVF; i++)
-		for (Int j=0; j<MAX_VB_SIZES; j++)
-			m_W3DVertexBufferSlots[i][j]=NULL;
+	for (auto & m_W3DVertexBuffer : m_W3DVertexBuffers)
+		m_W3DVertexBuffer=NULL;
+	for (auto & m_W3DVertexBufferSlot : m_W3DVertexBufferSlots)
+		for (auto & j : m_W3DVertexBufferSlot)
+			j=NULL;
 
 	m_W3DIndexBuffers=NULL;
-	for (Int j=0; j<MAX_IB_SIZES; j++)
-		m_W3DIndexBufferSlots[j]=NULL;
+	for (auto & m_W3DIndexBufferSlot : m_W3DIndexBufferSlots)
+		m_W3DIndexBufferSlot=NULL;
 }
 
 W3DBufferManager::~W3DBufferManager(void)
@@ -162,10 +162,9 @@ void W3DBufferManager::freeAllBuffers(void)
 
 void W3DBufferManager::ReleaseResources(void)
 {
-	for (Int i=0; i<MAX_FVF; i++)
+	for (auto vb : m_W3DVertexBuffers)
 	{
-		W3DVertexBuffer *vb = m_W3DVertexBuffers[i];
-		while (vb)
+			while (vb)
 		{
 			REF_PTR_RELEASE(vb->m_DX8VertexBuffer);
 			vb=vb->m_nextVB;	//get next vertex buffer of this type
@@ -182,10 +181,9 @@ void W3DBufferManager::ReleaseResources(void)
 
 Bool W3DBufferManager::ReAcquireResources(void)
 {
-	for (Int i=0; i<MAX_FVF; i++)
+	for (auto vb : m_W3DVertexBuffers)
 	{
-		W3DVertexBuffer *vb = m_W3DVertexBuffers[i];
-		while (vb)
+			while (vb)
 		{	DEBUG_ASSERTCRASH( vb->m_DX8VertexBuffer == NULL, ("ReAcquire of existing vertex buffer"));
 			vb->m_DX8VertexBuffer=NEW_REF(DX8VertexBufferClass,(FVFTypeIndexList[vb->m_format],vb->m_size,DX8VertexBufferClass::USAGE_DEFAULT));
 			DEBUG_ASSERTCRASH( vb->m_DX8VertexBuffer, ("Failed ReAcquire of vertex buffer"));

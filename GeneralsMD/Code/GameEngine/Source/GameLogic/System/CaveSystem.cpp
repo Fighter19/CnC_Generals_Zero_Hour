@@ -50,10 +50,9 @@ void CaveSystem::init()
 
 void CaveSystem::reset()
 {
-	for( std::vector<TunnelTracker*>::iterator iter = m_tunnelTrackerVector.begin(); iter != m_tunnelTrackerVector.end(); iter++ )
+	for(auto currentTracker : m_tunnelTrackerVector)
 	{
-		TunnelTracker *currentTracker = *iter;
-		if( currentTracker )// could be NULL, since we don't slide back to fill deleted entries so offsets don't shift
+			if( currentTracker )// could be NULL, since we don't slide back to fill deleted entries so offsets don't shift
 		{
 			currentTracker->deleteInstance();
 		}

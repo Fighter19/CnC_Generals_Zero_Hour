@@ -2009,8 +2009,8 @@ DynamicMemoryAllocator::DynamicMemoryAllocator() :
 	m_usedBlocksInDma(0),
 	m_rawBlocks(NULL)
 {
-	for (Int i = 0; i < MAX_DYNAMICMEMORYALLOCATOR_SUBPOOLS; i++)
-		m_pools[i] = 0;
+	for (auto & m_pool : m_pools)
+		m_pool = 0;
 }
 
 //-----------------------------------------------------------------------------

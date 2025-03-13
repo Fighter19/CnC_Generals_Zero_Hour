@@ -92,8 +92,8 @@ W3DProjectileStreamDraw::W3DProjectileStreamDraw( Thing *thing, const ModuleData
 {
 	const W3DProjectileStreamDrawModuleData* d = getW3DProjectileStreamDrawModuleData();
 	m_texture = WW3DAssetManager::Get_Instance()->Get_Texture( d->m_textureName.str() );
-	for( Int index = 0; index < MAX_PROJECTILE_STREAM; index++ )
-		m_allLines[index] = NULL;
+	for(auto & m_allLine : m_allLines)
+		m_allLine = NULL;
 	m_linesValid = 0;
 }
 

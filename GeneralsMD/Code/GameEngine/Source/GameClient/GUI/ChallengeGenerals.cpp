@@ -132,11 +132,11 @@ void INI::parseChallengeModeDefinition( INI* ini )
 
 const GeneralPersona* ChallengeGenerals::getPlayerGeneralByCampaignName( AsciiString name ) const 
 {
-	for (Int i = 0; i < NUM_GENERALS; i++)
+	for (const auto & i : m_position)
 	{
-		AsciiString campaignName = m_position[i].getCampaign();
+		AsciiString campaignName = i.getCampaign();
 		if (campaignName.compareNoCase( name.str() ) == 0)
-			return &m_position[i];
+			return &i;
 	}
 	DEBUG_ASSERTCRASH(NULL, ("Can't find General by Campaign Name"));
 	return NULL;
@@ -144,22 +144,22 @@ const GeneralPersona* ChallengeGenerals::getPlayerGeneralByCampaignName( AsciiSt
 
 const GeneralPersona* ChallengeGenerals::getGeneralByGeneralName( AsciiString name ) const
 {
-	for (Int i = 0; i < NUM_GENERALS; i++)
+	for (const auto & i : m_position)
 	{
-		AsciiString generalName = m_position[i].getBioName();
+		AsciiString generalName = i.getBioName();
 		if (generalName.compareNoCase( name.str() ) == 0)
-			return &m_position[i];
+			return &i;
 	}
 	return NULL;
 }
 
 const GeneralPersona* ChallengeGenerals::getGeneralByTemplateName( AsciiString name ) const
 {
-	for (Int i = 0; i < NUM_GENERALS; i++)
+	for (const auto & i : m_position)
 	{
-		AsciiString templateName = m_position[i].getPlayerTemplateName();
+		AsciiString templateName = i.getPlayerTemplateName();
 		if (templateName.compareNoCase( name.str() ) == 0)
-			return &m_position[i];
+			return &i;
 	}
 	return NULL;
 }

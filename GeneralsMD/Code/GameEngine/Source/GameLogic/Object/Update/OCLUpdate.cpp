@@ -200,10 +200,9 @@ UpdateSleepTime OCLUpdate::update( void )
 			if (playerT->getSide().str()) playerFactionName = playerT->getSide().str();
 
 			// Loop through the list of faction ocls to find the matching faction that triggeres the specific ocls
-			for (OCLUpdateModuleData::FactionOCLList::const_iterator it = data->m_factionOCL.begin(); it != data->m_factionOCL.end(); ++it)
+			for (auto info : data->m_factionOCL)
 			{
-				OCLUpdateModuleData::FactionOCLInfo info = *it;
-				if (playerFactionName == info.m_factionName)
+					if (playerFactionName == info.m_factionName)
 				{
 					ObjectCreationList::create( info.m_ocl, getObject(), &creationCoord, getObject()->getPosition(), getObject()->getOrientation() );
 					break;

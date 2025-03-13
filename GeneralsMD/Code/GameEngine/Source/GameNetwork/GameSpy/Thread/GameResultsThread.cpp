@@ -56,24 +56,24 @@ class GameResultsThreadClass;
 class GameResultsQueue : public GameResultsInterface
 {
 public:
-	virtual ~GameResultsQueue();
+	~GameResultsQueue() override;
 	GameResultsQueue();
 
-	virtual void init() {}
-	virtual void reset() {}
-	virtual void update() {}
+	void init() override {}
+	void reset() override {}
+	void update() override {}
 
-	virtual void startThreads( void );
-	virtual void endThreads( void );
-	virtual Bool areThreadsRunning( void );
+	void startThreads( void ) override;
+	void endThreads( void ) override;
+	Bool areThreadsRunning( void ) override;
 
-	virtual void addRequest( const GameResultsRequest& req );
-	virtual Bool getRequest( GameResultsRequest& resp );
+	void addRequest( const GameResultsRequest& req ) override;
+	Bool getRequest( GameResultsRequest& resp ) override;
 
-	virtual void addResponse( const GameResultsResponse& resp );
-	virtual Bool getResponse( GameResultsResponse& resp );
+	void addResponse( const GameResultsResponse& resp ) override;
+	Bool getResponse( GameResultsResponse& resp ) override;
 
-	virtual Bool areGameResultsBeingSent( void );
+	Bool areGameResultsBeingSent( void ) override;
 
 private:
 	MutexClass m_requestMutex;
@@ -101,7 +101,7 @@ class GameResultsThreadClass : public ThreadClass
 public:
 	GameResultsThreadClass() : ThreadClass() {}
 
-	void Thread_Function();
+	void Thread_Function() override;
 
 private:
 	Int sendGameResults( UnsignedInt IP, UnsignedShort port, const std::string& results );
@@ -112,9 +112,9 @@ private:
 
 GameResultsQueue::GameResultsQueue() : m_requestCount(0), m_responseCount(0)
 {
-	for (Int i=0; i<NumWorkerThreads; ++i)
+	for (auto & m_workerThread : m_workerThreads)
 	{
-		m_workerThreads[i] = NULL;
+		m_workerThread = NULL;
 	}
 
 	startThreads();
@@ -128,32 +128,32 @@ GameResultsQueue::~GameResultsQueue()
 void GameResultsQueue::startThreads( void )
 {
 	endThreads();
-	for (Int i=0; i<NumWorkerThreads; ++i)
+	for (auto & m_workerThread : m_workerThreads)
 	{
-		m_workerThreads[i] = NEW GameResultsThreadClass;
-		m_workerThreads[i]->Execute();
+		m_workerThread = NEW GameResultsThreadClass;
+		m_workerThread->Execute();
 	}
 }
 
 void GameResultsQueue::endThreads( void )
 {
-	for (Int i=0; i<NumWorkerThreads; ++i)
+	for (auto & m_workerThread : m_workerThreads)
 	{
-		if (m_workerThreads[i])
+		if (m_workerThread)
 		{
-			delete m_workerThreads[i];
-			m_workerThreads[i] = NULL;
+			delete m_workerThread;
+			m_workerThread = NULL;
 		}
 	}
 }
 
 Bool GameResultsQueue::areThreadsRunning( void )
 {
-	for (Int i=0; i<NumWorkerThreads; ++i)
+	for (auto & m_workerThread : m_workerThreads)
 	{
-		if (m_workerThreads[i])
+		if (m_workerThread)
 		{
-			if (m_workerThreads[i]->Is_Running())
+			if (m_workerThread->Is_Running())
 				return true;
 		}
 	}

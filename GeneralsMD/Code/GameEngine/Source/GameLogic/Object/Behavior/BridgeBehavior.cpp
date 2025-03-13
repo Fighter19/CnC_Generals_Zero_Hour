@@ -894,9 +894,9 @@ void BridgeBehavior::handleObjectsOnBridgeOnDie( void )
 		// objects in the bridge area are "on top" of the bridge
 		//
 		Real lowBridgeZ = bridgePolygon[ 0 ].z;
-		for( Int i = 0; i < 4; ++i )
-			if( bridgePolygon[ i ].z < lowBridgeZ )
-				lowBridgeZ = bridgePolygon[ i ].z;
+		for(auto & i : bridgePolygon)
+			if( i.z < lowBridgeZ )
+				lowBridgeZ = i.z;
 		
 		//
 		// given the polygon area, how big is the radius that we need to scan in the world
@@ -1407,8 +1407,8 @@ void BridgeBehavior::xfer( Xfer *xfer )
 	}  // end if
 
 	// xfer the tower object ids
-	for( Int i = 0; i < BRIDGE_MAX_TOWERS; ++i )
-		xfer->xferObjectID( &m_towerID[ i ] );
+	for(auto & i : m_towerID)
+		xfer->xferObjectID( &i );
 
 	// set the tower object ids in the bridge info
 	if( xfer->getXferMode() == XFER_LOAD )

@@ -187,10 +187,9 @@ static LadderInfo *parseLadder(AsciiString raw)
 				else
 				{
 					AsciiStringList validFactions = lad->validFactions;
-					for (AsciiStringListIterator it = validFactions.begin(); it != validFactions.end(); ++it)
+					for (auto faction : validFactions)
 					{
-						AsciiString faction = *it;
-						AsciiString marker;
+							AsciiString marker;
 						marker.format("INI:Faction%s", faction.str());
 						DEBUG_LOG(("Faction %s has marker %s corresponding to str %ls\n", faction.str(), marker.str(), TheGameText->fetch(marker).str()));
 					}

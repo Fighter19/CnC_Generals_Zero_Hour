@@ -126,9 +126,9 @@ DynamicShroudClearingRangeUpdate::DynamicShroudClearingRangeUpdate( Thing *thing
 
 	m_nativeClearingRange = obj->getShroudClearingRange();//capture this before we start monkeying with it
 
-	for (int d = 0; d < GRID_FX_DECAL_COUNT; ++d)
+	for (auto & d : m_gridDecal)
 	{
-		m_gridDecal[d].clear();
+		d.clear();
 	}
 
 }
@@ -145,11 +145,11 @@ DynamicShroudClearingRangeUpdate::~DynamicShroudClearingRangeUpdate( void )
 //-------------------------------------------------------------------------------------------------
 void DynamicShroudClearingRangeUpdate::createGridDecals( const RadiusDecalTemplate& tmpl, Real radius, const Coord3D& pos )
 {
-	for (int d = 0; d < GRID_FX_DECAL_COUNT; ++d)
+	for (auto & d : m_gridDecal)
 	{
-		m_gridDecal[d].clear();
-		tmpl.createRadiusDecal(pos, radius, getObject()->getControllingPlayer(), m_gridDecal[d]);
-		m_gridDecal[d].setPosition(pos);
+		d.clear();
+		tmpl.createRadiusDecal(pos, radius, getObject()->getControllingPlayer(), d);
+		d.setPosition(pos);
 	}
 
 
@@ -169,7 +169,7 @@ void DynamicShroudClearingRangeUpdate::animateGridDecals( void )
 	Real angleInc = (PI*2.0f) / (Real)GRID_FX_DECAL_COUNT;
 	Real opacity = 1.0f - (m_currentClearingRange / m_nativeClearingRange);
 
-	for (int d = 0; d < GRID_FX_DECAL_COUNT; ++d)
+	for (auto & d : m_gridDecal)
 	{
 		pos.x = ctr->x + (sinf(angle) * radius);
 		pos.y = ctr->y + (cosf(angle) * radius);
@@ -177,8 +177,8 @@ void DynamicShroudClearingRangeUpdate::animateGridDecals( void )
 		pos.x -= ((Int)pos.x)%23;
 		pos.y -= ((Int)pos.y)%23;
 
-		m_gridDecal[d].setPosition(pos);
-		m_gridDecal[d].setOpacity( opacity );
+		d.setPosition(pos);
+		d.setOpacity( opacity );
 		angle += angleInc;
 
 	}
@@ -191,9 +191,9 @@ void DynamicShroudClearingRangeUpdate::animateGridDecals( void )
 //-------------------------------------------------------------------------------------------------
 void DynamicShroudClearingRangeUpdate::killGridDecals()
 {
-	for (int d = 0; d < GRID_FX_DECAL_COUNT; ++d)
+	for (auto & d : m_gridDecal)
 	{
-		m_gridDecal[d].clear();
+		d.clear();
 	}
 
 }

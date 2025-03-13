@@ -1405,17 +1405,17 @@ void W3DView::getAxisAlignedViewRegion(Region3D &axisAlignedRegion)
 	//
 	axisAlignedRegion.lo = box[ 0 ];
 	axisAlignedRegion.hi = box[ 0 ];
-	for( Int i = 0; i < 4; i++ )
+	for(auto & i : box)
 	{
 
-		if( box[ i ].x < axisAlignedRegion.lo.x )
-			axisAlignedRegion.lo.x = box[ i ].x;
-		if( box[ i ].y < axisAlignedRegion.lo.y )
-			axisAlignedRegion.lo.y = box[ i ].y;
-		if( box[ i ].x > axisAlignedRegion.hi.x )
-		  axisAlignedRegion.hi.x = box[ i ].x;
-		if( box[ i ].y > axisAlignedRegion.hi.y )
-		  axisAlignedRegion.hi.y = box[ i ].y;
+		if( i.x < axisAlignedRegion.lo.x )
+			axisAlignedRegion.lo.x = i.x;
+		if( i.y < axisAlignedRegion.lo.y )
+			axisAlignedRegion.lo.y = i.y;
+		if( i.x > axisAlignedRegion.hi.x )
+		  axisAlignedRegion.hi.x = i.x;
+		if( i.y > axisAlignedRegion.hi.y )
+		  axisAlignedRegion.hi.y = i.y;
 
 	}  // end for i
 

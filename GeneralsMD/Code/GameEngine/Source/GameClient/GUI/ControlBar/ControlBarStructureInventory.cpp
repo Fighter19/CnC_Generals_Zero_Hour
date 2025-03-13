@@ -112,11 +112,11 @@ void ControlBar::populateStructureInventory( Object *building )
 
 	// Start by hiding all the buttons.  Otherwise buttons we don't use will have the buttons
 	// the last thing selected left behind.
-	for( Int commandIndex = 0; commandIndex < MAX_COMMANDS_PER_SET; commandIndex++ )
+	for(auto & m_commandWindow : m_commandWindows)
 	{
-		if( m_commandWindows[commandIndex] )
+		if( m_commandWindow )
 		{
-			m_commandWindows[commandIndex]->winHide(TRUE);
+			m_commandWindow->winHide(TRUE);
 		}
 	}
 	

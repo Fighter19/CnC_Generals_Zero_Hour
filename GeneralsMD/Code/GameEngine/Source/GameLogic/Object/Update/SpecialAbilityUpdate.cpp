@@ -1182,9 +1182,9 @@ Bool SpecialAbilityUpdate::continuePreparation()
       }
         
       //Specialized code that specifically creates and looks up a laser update.
-      for( std::list<ObjectID>::iterator it = m_specialObjectIDList.begin(); it != m_specialObjectIDList.end(); ++it )
+      for(auto & it : m_specialObjectIDList)
       {
-        Object* specialObject = TheGameLogic->findObjectByID( *it );
+        Object* specialObject = TheGameLogic->findObjectByID( it );
         if( specialObject )
         {
           if( !initLaser( specialObject, target ) )

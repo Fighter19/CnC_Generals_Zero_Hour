@@ -109,9 +109,9 @@ FirewallHelperClass::FirewallHelperClass(void)
 		m_sparePorts[i] = 0;
 	}
 
-	for (Int i = 0; i < MAX_NUM_MANGLERS; i++)
+	for (unsigned int & m_mangler : m_manglers)
 	{
-		m_manglers[i] = 0;
+		m_mangler = 0;
 	}
 	
 	m_currentState = DETECTIONSTATE_IDLE;
@@ -160,8 +160,8 @@ void FirewallHelperClass::reset(void)
 {
 	closeAllSpareSockets();
 	m_currentState = DETECTIONSTATE_IDLE;
-	for (Int i = 0; i < MAX_SPARE_SOCKETS; ++i) {
-		m_messages[i].length = 0;
+	for (auto & m_message : m_messages) {
+		m_message.length = 0;
 	}
 }
 
@@ -392,10 +392,10 @@ Bool FirewallHelperClass::sendToManglerFromPort(UnsignedInt address, UnsignedSho
 
 SpareSocketStruct * FirewallHelperClass::findSpareSocketByPort(UnsignedShort port) {
 	DEBUG_LOG(("FirewallHelperClass::findSpareSocketByPort - trying to find spare socket with port %d\n", port));
-	for (Int i = 0; i < MAX_SPARE_SOCKETS; ++i) {
-		if (m_spareSockets[i].port == port) {
+	for (auto & m_spareSocket : m_spareSockets) {
+		if (m_spareSocket.port == port) {
 			DEBUG_LOG(("FirewallHelperClass::findSpareSocketByPort - found it!\n"));
-			return &(m_spareSockets[i]);
+			return &m_spareSocket;
 		}
 	}
 
@@ -404,9 +404,9 @@ SpareSocketStruct * FirewallHelperClass::findSpareSocketByPort(UnsignedShort por
 }
 
 ManglerMessage * FirewallHelperClass::findEmptyMessage() {
-	for (Int i = 0; i < MAX_SPARE_SOCKETS; ++i) {
-		if (m_messages[i].length == 0) {
-			return &(m_messages[i]);
+	for (auto & m_message : m_messages) {
+		if (m_message.length == 0) {
+			return &m_message;
 		}
 	}
 	return NULL;
@@ -446,13 +446,13 @@ UnsignedShort FirewallHelperClass::getManglerResponse(UnsignedShort packetID, In
 
 	sockaddr_in addr;
 
-	for (Int i = 0; i < MAX_SPARE_SOCKETS; ++i) {
-		if (m_spareSockets[i].udp != NULL) {
+	for (auto & m_spareSocket : m_spareSockets) {
+		if (m_spareSocket.udp != NULL) {
 			ManglerMessage *message = findEmptyMessage();
 			if (message == NULL) {
 				break;
 			}
-			Int retval = m_spareSockets[i].udp->Read((unsigned char *)message, sizeof(ManglerData), &addr);
+			Int retval = m_spareSocket.udp->Read((unsigned char *)message, sizeof(ManglerData), &addr);
 			if (retval > 0) {
 				CRC crc;
 				crc.computeCRC((unsigned char *)(&(message->data.magic)), sizeof(ManglerData) - sizeof(unsigned int));
@@ -480,9 +480,9 @@ UnsignedShort FirewallHelperClass::getManglerResponse(UnsignedShort packetID, In
 
 	// See if we have already received it and saved it.
 	if (msg == NULL) {
-		for (Int i = 0; i < MAX_SPARE_SOCKETS; ++i) {
-			if ((m_messages[i].length != 0) && (m_messages[i].data.PacketID == packetID)) {
-				msg = &(m_messages[i]);
+		for (auto & m_message : m_messages) {
+			if ((m_message.length != 0) && (m_message.data.PacketID == packetID)) {
+				msg = &m_message;
 				msg->length = 0;
 			}
 		}
@@ -1559,13 +1559,13 @@ Bool FirewallHelperClass::openSpareSocket(UnsignedShort port) {
  *  closeSpareSocket - closes a socket at a specific port.
  */
 void FirewallHelperClass::closeSpareSocket(UnsignedShort port) {
-	for (Int i = 0; i < MAX_SPARE_SOCKETS; ++i) {
-		if (m_spareSockets[i].port == port) {
-			if (m_spareSockets[i].udp != NULL) {
-				delete m_spareSockets[i].udp;
-				m_spareSockets[i].udp = NULL;
+	for (auto & m_spareSocket : m_spareSockets) {
+		if (m_spareSocket.port == port) {
+			if (m_spareSocket.udp != NULL) {
+				delete m_spareSocket.udp;
+				m_spareSocket.udp = NULL;
 			}
-			m_spareSockets[i].port = 0;
+			m_spareSocket.port = 0;
 			break;
 		}
 	}
@@ -1575,13 +1575,13 @@ void FirewallHelperClass::closeSpareSocket(UnsignedShort port) {
  *  closeAllSpareSockets - closes all spare sockets, duh.
  */
 void FirewallHelperClass::closeAllSpareSockets() {
-	for (Int i = 0; i < MAX_SPARE_SOCKETS; ++i) {
-		if (m_spareSockets[i].port != 0) {
-			m_spareSockets[i].port = 0;
+	for (auto & m_spareSocket : m_spareSockets) {
+		if (m_spareSocket.port != 0) {
+			m_spareSocket.port = 0;
 		}
-		if (m_spareSockets[i].udp != NULL) {
-			delete (m_spareSockets[i].udp);
-			m_spareSockets[i].udp = NULL;
+		if (m_spareSocket.udp != NULL) {
+			delete (m_spareSocket.udp);
+			m_spareSocket.udp = NULL;
 		}
 	}
 }

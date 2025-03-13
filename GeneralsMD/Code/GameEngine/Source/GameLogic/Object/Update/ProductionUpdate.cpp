@@ -191,12 +191,12 @@ ProductionUpdate::ProductionUpdate( Thing *thing, const ModuleData* moduleData )
 	m_productionQueueTail = NULL;
 	m_productionCount = 0;
 	m_uniqueID = (ProductionID)1;
-	for (Int i = 0; i < DOOR_COUNT_MAX; ++i)
+	for (auto & m_door : m_doors)
 	{
-		m_doors[i].m_doorOpenedFrame = 0;
-		m_doors[i].m_doorWaitOpenFrame = 0;
-		m_doors[i].m_doorClosedFrame = 0;
-		m_doors[i].m_holdOpen = false;
+		m_door.m_doorOpenedFrame = 0;
+		m_door.m_doorWaitOpenFrame = 0;
+		m_door.m_doorClosedFrame = 0;
+		m_door.m_holdOpen = false;
 	}
 	m_constructionCompleteFrame = 0;
 	m_clearFlags.clear();
@@ -438,12 +438,12 @@ Bool ProductionUpdate::queueCreateUnit( const ThingTemplate *unitType, Productio
 	// builds four for that price!
 	production->m_productionQuantityTotal = 1;
 	production->m_productionQuantityProduced = 0;
-	for( std::vector<QuantityModifier>::const_iterator it = data->m_quantityModifiers.begin(); it != data->m_quantityModifiers.end(); ++it )
+	for(const auto & m_quantityModifier : data->m_quantityModifiers)
   {
-		const ThingTemplate* productionTemplate = TheThingFactory->findTemplate( it->m_templateName );
+		const ThingTemplate* productionTemplate = TheThingFactory->findTemplate( m_quantityModifier.m_templateName );
 		if( productionTemplate && productionTemplate->isEquivalentTo( unitType ) )
 		{
-			production->m_productionQuantityTotal = it->m_quantity;
+			production->m_productionQuantityTotal = m_quantityModifier.m_quantity;
 			break;
 		}
 	}

@@ -841,11 +841,11 @@ W3DRadar::W3DRadar( void )
 	m_reconstructViewBox = TRUE;
 	m_viewAngle = 0.0f;
 	m_viewZoom = 0.0f;
-	for( Int i = 0; i < 4; i++ )
+	for(auto & i : m_viewBox)
 	{
 
-		m_viewBox[ i ].x = 0;
-		m_viewBox[ i ].y = 0;
+		i.x = 0;
+		i.y = 0;
 
 	}  // end for
 

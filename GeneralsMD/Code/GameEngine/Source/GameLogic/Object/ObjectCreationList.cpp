@@ -137,7 +137,7 @@ public:
 	{
 	}
 
-	virtual Object* create( const Object* primaryObj, const Coord3D *primary, const Coord3D* secondary, Real angle, UnsignedInt lifetimeFrames = 0 ) const
+	Object* create( const Object* primaryObj, const Coord3D *primary, const Coord3D* secondary, Real angle, UnsignedInt lifetimeFrames = 0 ) const override
 	{
 		if (!primaryObj || !primary || !secondary)
 		{ 
@@ -184,7 +184,7 @@ public:
 	{
 	}
 
-	virtual Object* create( const Object* primaryObj, const Coord3D *primary, const Coord3D* secondary, Real angle, UnsignedInt lifetimeFrames = 0 ) const
+	Object* create( const Object* primaryObj, const Coord3D *primary, const Coord3D* secondary, Real angle, UnsignedInt lifetimeFrames = 0 ) const override
 	{
 		if (!primaryObj || !primary || !secondary)
 		{ 
@@ -272,12 +272,12 @@ public:
 		// End Add
 	}
 
-	virtual Object* create(const Object *primaryObj, const Coord3D *primary, const Coord3D *secondary, Real angle, UnsignedInt lifetimeFrames = 0 ) const
+	Object* create(const Object *primaryObj, const Coord3D *primary, const Coord3D *secondary, Real angle, UnsignedInt lifetimeFrames = 0 ) const override
 	{
 		return create( primaryObj, primary, secondary, true, lifetimeFrames );
 	}
 
-	virtual Object* create(const Object* primaryObj, const Coord3D *primary, const Coord3D* secondary, Bool createOwner, UnsignedInt lifetimeFrames = 0 ) const
+	Object* create(const Object* primaryObj, const Coord3D *primary, const Coord3D* secondary, Bool createOwner, UnsignedInt lifetimeFrames = 0 ) const override
 	{
 		if (!primaryObj || !primary || !secondary)
 		{
@@ -447,16 +447,16 @@ public:
 				}
 
 				const ThingTemplate* putInContainerTmpl = m_putInContainerName.isEmpty() ? NULL : TheThingFactory->findTemplate(m_putInContainerName);
-				for (std::vector<Payload>::const_iterator it = m_payload.begin(); it != m_payload.end(); ++it)
+				for (const auto & it : m_payload)
   			{
-					const ThingTemplate* payloadTmpl = TheThingFactory->findTemplate(it->m_payloadName);
+					const ThingTemplate* payloadTmpl = TheThingFactory->findTemplate(it.m_payloadName);
 					if( !payloadTmpl )
 					{
 						DEBUG_CRASH( ("DeliverPayloadNugget::create() -- %s couldn't create %s (template not found).", 
 							transport->getTemplate()->getName().str(), it->m_payloadName.str() ) );
 						return NULL;
 					}
-					for (int i = 0; i < it->m_payloadCount; ++i)
+					for (int i = 0; i < it.m_payloadCount; ++i)
 					{
 						Object* payload = TheThingFactory->newObject( payloadTmpl, owner );
 						payload->setPosition(&startPos);
@@ -630,7 +630,7 @@ public:
 	{
 	}
 
-	virtual Object* create( const Object* primary, const Object* secondary, UnsignedInt lifetimeFrames = 0 ) const
+	Object* create( const Object* primary, const Object* secondary, UnsignedInt lifetimeFrames = 0 ) const override
 	{
 		if (primary)
 		{
@@ -661,7 +661,7 @@ public:
 		return NULL;
 	}
 
-	virtual Object* create(const Object* primaryObj, const Coord3D *primary, const Coord3D* secondary, Real angle, UnsignedInt lifetimeFrames = 0 ) const
+	Object* create(const Object* primaryObj, const Coord3D *primary, const Coord3D* secondary, Real angle, UnsignedInt lifetimeFrames = 0 ) const override
 	{
 		DEBUG_CRASH(("You must call this effect with an object, not a location"));
 		return NULL;
@@ -787,7 +787,7 @@ public:
 		m_offset.zero(); 
 	}
 
-	virtual Object* create(const Object* primary, const Object* secondary, UnsignedInt lifetimeFrames = 0 ) const
+	Object* create(const Object* primary, const Object* secondary, UnsignedInt lifetimeFrames = 0 ) const override
 	{
 		if (primary)
 		{
@@ -803,7 +803,7 @@ public:
 		return NULL;
 	}
 
-	virtual Object* create(const Object* primaryObj, const Coord3D *primary, const Coord3D* secondary, Real angle, UnsignedInt lifetimeFrames = 0 ) const
+	Object* create(const Object* primaryObj, const Coord3D *primary, const Coord3D* secondary, Real angle, UnsignedInt lifetimeFrames = 0 ) const override
 	{
 		if (primary)
 		{
@@ -1437,8 +1437,8 @@ protected:
 		for (const char* debrisName = ini->getNextToken(); debrisName; debrisName = ini->getNextTokenOrNull())
 		{
 			if (TheGlobalData->m_preloadAssets)
-				debrisModelNamesGlobalHack.push_back(debrisName);
-			debrisNugget->m_names.push_back(AsciiString(debrisName));
+				debrisModelNamesGlobalHack.emplace_back(debrisName);
+			debrisNugget->m_names.emplace_back(debrisName);
 			debrisName = ini->getNextTokenOrNull();
 		}
 	}
@@ -1534,9 +1534,9 @@ Object* ObjectCreationList::createInternal( const Object* primaryObj, const Coor
 {
 	DEBUG_ASSERTCRASH(primaryObj != NULL, ("You should always call OCLs with a non-null primary Obj, even for positional calls, to get team ownership right"));
 	Object *theFirstObject = NULL;
-	for (ObjectCreationNuggetVector::const_iterator i = m_nuggets.begin(); i != m_nuggets.end(); ++i)
+	for (auto m_nugget : m_nuggets)
 	{
-		Object *curObj = (*i)->create( primaryObj, primary, secondary, createOwner, lifetimeFrames );
+		Object *curObj = m_nugget->create( primaryObj, primary, secondary, createOwner, lifetimeFrames );
 		if (theFirstObject==NULL) {
 			theFirstObject = curObj;
 		}
@@ -1549,9 +1549,9 @@ Object* ObjectCreationList::createInternal( const Object* primaryObj, const Coor
 {
 	DEBUG_ASSERTCRASH(primaryObj != NULL, ("You should always call OCLs with a non-null primary Obj, even for positional calls, to get team ownership right"));
 	Object *theFirstObject = NULL;
-	for (ObjectCreationNuggetVector::const_iterator i = m_nuggets.begin(); i != m_nuggets.end(); ++i)
+	for (auto m_nugget : m_nuggets)
 	{
-		Object *curObj =  (*i)->create( primaryObj, primary, secondary, angle, lifetimeFrames );
+		Object *curObj =  m_nugget->create( primaryObj, primary, secondary, angle, lifetimeFrames );
 		if (theFirstObject==NULL) {
 			theFirstObject = curObj;
 		}
@@ -1564,9 +1564,9 @@ Object* ObjectCreationList::createInternal( const Object* primary, const Object*
 {
 	DEBUG_ASSERTCRASH(primary != NULL, ("You should always call OCLs with a non-null primary Obj, even for positional calls, to get team ownership right"));
 	Object *theFirstObject = NULL;
-	for (ObjectCreationNuggetVector::const_iterator i = m_nuggets.begin(); i != m_nuggets.end(); ++i)
+	for (auto m_nugget : m_nuggets)
 	{
-		Object *curObj =  (*i)->create( primary, secondary, lifetimeFrames );
+		Object *curObj =  m_nugget->create( primary, secondary, lifetimeFrames );
 		if (theFirstObject==NULL) {
 			theFirstObject = curObj;
 		}
@@ -1586,10 +1586,10 @@ ObjectCreationListStore::ObjectCreationListStore()
 //-------------------------------------------------------------------------------------------------
 ObjectCreationListStore::~ObjectCreationListStore()
 {
-	for (ObjectCreationNuggetVector::iterator i = m_nuggets.begin(); i != m_nuggets.end(); ++i)
+	for (auto & m_nugget : m_nuggets)
 	{
-		if (*i)
-			(*i)->deleteInstance();
+		if (m_nugget)
+			m_nugget->deleteInstance();
 	}
 	m_nuggets.clear();
 }

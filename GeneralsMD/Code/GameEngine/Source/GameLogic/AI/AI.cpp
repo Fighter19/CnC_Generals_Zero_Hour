@@ -510,7 +510,7 @@ private:
 public:
 	PartitionFilterLiveMapEnemies(const Object *obj) : m_obj(obj) { }
 
-	virtual Bool allow(Object *objOther)
+	Bool allow(Object *objOther) override
 	{
 		// this is way fast (bit test) so do it first.
 		if (objOther->isEffectivelyDead())
@@ -540,7 +540,7 @@ private:
 public:
 	PartitionFilterWithinAttackRange(const Object* obj) : m_obj(obj) { }
 
-	virtual Bool allow(Object* objOther)
+	Bool allow(Object* objOther) override
 	{
 		for (Int i = 0; i < WEAPONSLOT_COUNT;	i++ )
 		{
@@ -1014,13 +1014,13 @@ void AI::crc( Xfer *xfer )
 		aiData = aiData->m_next;
 	}
 
-	for (std::list<AIGroup *>::iterator groupIt = m_groupList.begin(); groupIt != m_groupList.end(); ++groupIt)
+	for (auto & groupIt : m_groupList)
 	{
-		if (*groupIt)
+		if (groupIt)
 		{
 			marker = "MARKER:AIGroup";
 			xfer->xferAsciiString(&marker);
-			xfer->xferSnapshot( (*groupIt) );
+			xfer->xferSnapshot( groupIt );
 		}
 	}
 

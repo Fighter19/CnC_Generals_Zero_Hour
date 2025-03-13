@@ -83,7 +83,7 @@ public:
 	virtual const char* debugGetName() { return "PartitionFilterHordeMember"; }
 #endif
 
-	virtual Bool allow(Object *objOther)
+	Bool allow(Object *objOther) override
 	{
 		// must be exact same type as us (well, maybe)
 		if (m_data->m_exactMatch && m_obj->getTemplate() != objOther->getTemplate())
@@ -237,8 +237,8 @@ void HordeUpdate::showHideFlag(Bool show)
 		Object *obj = getObject();
 		if (draw && obj)
 		{
-			for (std::vector<AsciiString>::const_iterator it = d->m_flagSubObjNames.begin(); it != d->m_flagSubObjNames.end(); ++it)
-				draw->showSubObject(*it, show);
+			for (const auto & m_flagSubObjName : d->m_flagSubObjNames)
+				draw->showSubObject(m_flagSubObjName, show);
 			draw->updateSubObjects();
 		}
 	}

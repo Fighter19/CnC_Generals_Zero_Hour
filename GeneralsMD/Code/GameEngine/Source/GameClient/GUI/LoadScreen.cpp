@@ -192,8 +192,8 @@ SinglePlayerLoadScreen::SinglePlayerLoadScreen( void )
 	m_videoStream = NULL;
 	m_videoBuffer = NULL;
 	m_objectiveWin = NULL;
-	for(Int i = 0; i < MAX_OBJECTIVE_LINES; ++i)
-		m_objectiveLines[i] = NULL;
+	for(auto & m_objectiveLine : m_objectiveLines)
+		m_objectiveLine = NULL;
 
 }
 	
@@ -202,8 +202,8 @@ SinglePlayerLoadScreen::~SinglePlayerLoadScreen( void )
 	m_progressBar = NULL;
 	m_percent = NULL;
 	m_objectiveWin = NULL;
-	for(Int i = 0; i < MAX_OBJECTIVE_LINES; ++i)
-		m_objectiveLines[i] = NULL;
+	for(auto & m_objectiveLine : m_objectiveLines)
+		m_objectiveLine = NULL;
 	if(m_videoBuffer)
 		delete m_videoBuffer;
 	m_videoBuffer = NULL;
@@ -1388,9 +1388,9 @@ void MultiPlayerLoadScreen::init( GameInfo *game )
 	//DEBUG_LOG(("NumPlayers %d\n", TheNetwork->getNumPlayers()));
 
 	GameWindow *teamWin[MAX_SLOTS];
-	for (Int i = 0; i < MAX_SLOTS; ++i)
+	for (auto & i : teamWin)
 	{
-		teamWin[i] = NULL;
+		i = NULL;
 	}
 
 	Int netSlot = 0;
@@ -1640,9 +1640,9 @@ GameSlot *lSlot = game->getSlot(game->getLocalSlotNum());
 	GadgetStaticTextSetText( m_nameLocalGeneral, localName );
 
 	GameWindow *teamWin[MAX_SLOTS];
-	for (Int i = 0; i < MAX_SLOTS; ++i)
+	for (auto & i : teamWin)
 	{
-		teamWin[i] = NULL;
+		i = NULL;
 	}
 
 	Int netSlot = 0;

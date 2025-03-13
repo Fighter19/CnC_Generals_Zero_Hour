@@ -335,10 +335,10 @@ void CaveContain::changeTeamOnAllConnectedCaves( Team *newTeam, Bool setOriginal
 {
 	TunnelTracker *myTracker = TheCaveSystem->getTunnelTrackerForCaveIndex( m_caveIndex );
 	const std::list<ObjectID> *allCaves = myTracker->getContainerList();
-	for( std::list<ObjectID>::const_iterator iter = allCaves->begin(); iter != allCaves->end(); iter++ )
+	for(auto allCave : *allCaves)
 	{
 		// For each ID, look it up and change its team.  We all get captured together.
-		Object *currentCave = TheGameLogic->findObjectByID( *iter );
+		Object *currentCave = TheGameLogic->findObjectByID( allCave );
 		if( currentCave )
 		{
 			// This is a distributed Garrison in terms of capturing, so when one node 

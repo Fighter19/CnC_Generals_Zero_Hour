@@ -240,8 +240,8 @@ Eva::Eva() :
 	m_enabled(TRUE)
 {
 
-	for (Int i = 0; i < EVA_COUNT; ++i) {
-		m_shouldPlay[i] = FALSE;
+	for (bool & i : m_shouldPlay) {
+		i = FALSE;
 	}
 }
 
@@ -276,8 +276,8 @@ void Eva::reset()
 	}
 
 	// remove all things flagged as "need to play"
-	for (Int i = 0; i < EVA_COUNT; ++i) {
-		m_shouldPlay[i] = FALSE;
+	for (bool & i : m_shouldPlay) {
+		i = FALSE;
 	}	
 
 	// If we were previously disabled, re-enable ourselves.

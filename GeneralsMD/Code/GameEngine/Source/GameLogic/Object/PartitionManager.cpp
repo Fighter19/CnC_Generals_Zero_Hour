@@ -3131,13 +3131,13 @@ Int PartitionManager::calcMinRadius(const ICoord2D& cur)
 	*/
 
 	double minDistSqr = 1e12;				// double, not real
-	for (int i = 0; i < 4; ++i)
+	for (auto & centerPo : centerPos)
 	{
-		for (int j = 0; j < 4; ++j)
+		for (auto & otherPo : otherPos)
 		{
 			// double, not real
-			double dx = centerPos[i].x - otherPos[j].x;
-			double dy = centerPos[i].y - otherPos[j].y;
+			double dx = centerPo.x - otherPo.x;
+			double dy = centerPo.y - otherPo.y;
 			double curDistSqr = dx*dx + dy*dy;
 			if (minDistSqr > curDistSqr)
 				minDistSqr = curDistSqr;
@@ -3290,9 +3290,9 @@ Object *PartitionManager::getClosestObjects(
     const OffsetVec& offsets = m_radiusVec[curRadius];
 		if (offsets.empty())
 			continue;
-    for (OffsetVec::const_iterator it = offsets.begin(); it != offsets.end(); ++it)
+    for (auto offset : offsets)
 		{
-			PartitionCell* thisCell = getCellAt(cellCenterX + it->x, cellCenterY + it->y);
+			PartitionCell* thisCell = getCellAt(cellCenterX + offset.x, cellCenterY + offset.y);
 			if (thisCell == NULL)
 				continue;
 

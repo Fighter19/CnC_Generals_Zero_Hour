@@ -80,7 +80,7 @@ public:
 #if defined(_DEBUG) || defined(_INTERNAL)
 	virtual const char* debugGetName() { return "PartitionFilterTensileFormationMember"; }
 #endif
-	virtual Bool allow( Object *objOther )
+	Bool allow( Object *objOther ) override
 	{
 		return ( getTFU( objOther ) != NULL );
 	}
@@ -134,10 +134,10 @@ TensileFormationUpdate::TensileFormationUpdate( Thing *thing, const ModuleData *
 	m_life = 0;
 	m_lowestSlideElevation = 255.0f;
 
-	for ( int t = 0; t < 4; ++t)
+	for (auto & m_link : m_links)
 	{
-		m_links[ t ].id = INVALID_ID; 
-		m_links[ t ].tensor.set(0,0,0);
+		m_link.id = INVALID_ID; 
+		m_link.tensor.set(0,0,0);
 	}
 
 	m_crackSound = modData->m_crackSound;
@@ -309,15 +309,15 @@ UpdateSleepTime TensileFormationUpdate::update( void )
 
 	//APPLY TENSORS===========================
 	Coord3D tensorSum = { 0, 0, 0 };
-	for ( int t = 0; t < 4; ++t )
+	for (auto & m_link : m_links)
 	{
-		Object *other = TheGameLogic->findObjectByID( m_links[ t ].id );
+		Object *other = TheGameLogic->findObjectByID( m_link.id );
 
 		if ( other )
 		{
 			Coord3D desiredPos = *other->getPosition();
 
-			Coord3D tensor = m_links[ t ].tensor;
+			Coord3D tensor = m_link.tensor;
 
 			desiredPos.sub( &tensor );
 
@@ -417,9 +417,9 @@ void TensileFormationUpdate::propagateDislodgement ( Bool enabled )
 		//}
 	}
 
-	for ( int t = 0; t < 4; ++t )
+	for (auto & m_link : m_links)
 	{
-		Object *other = TheGameLogic->findObjectByID( m_links[ t ].id );
+		Object *other = TheGameLogic->findObjectByID( m_link.id );
 		if ( other )
 		{
 			BodyModuleInterface *body = other->getBodyModule();

@@ -368,7 +368,7 @@ void ModuleInfo::addModuleInfo(ThingTemplate *thingTemplate,
 
 #endif
 
-	m_info.push_back(Nugget(name, moduleTag, data, interfaceMask, inheritable, overrideableByLikeKind));
+	m_info.emplace_back(name, moduleTag, data, interfaceMask, inheritable, overrideableByLikeKind);
 
 }
 
@@ -1379,11 +1379,9 @@ const WeaponTemplateSet* ThingTemplate::findWeaponTemplateSet(const WeaponSetFla
 // returns false if we have no weaponsets, or they are all empty.
 Bool ThingTemplate::canPossiblyHaveAnyWeapon() const
 {
-	for (WeaponTemplateSetVector::const_iterator it = m_weaponTemplateSets.begin(); 
-					it != m_weaponTemplateSets.end();
-					++it)
+	for (const auto & m_weaponTemplateSet : m_weaponTemplateSets)
 	{
-		if (it->hasAnyWeapons())
+		if (m_weaponTemplateSet.hasAnyWeapons())
 			return true;
 	}
 	return false;

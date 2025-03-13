@@ -71,7 +71,7 @@ State::State( StateMachine *machine, AsciiString name )
  */
 void State::friend_onCondition( StateTransFuncPtr test, StateID toStateID, void* userData, const char* description )
 {
-	m_transitions.push_back(TransitionInfo(test, toStateID, userData, description));
+	m_transitions.emplace_back(test, toStateID, userData, description);
 }
 
 
@@ -166,9 +166,9 @@ StateReturnType State::friend_checkForTransitions( StateReturnType status )
 			// check transition condition list
 			if (!m_transitions.empty())
 			{
-				for(std::vector<TransitionInfo>::const_iterator it = m_transitions.begin(); it != m_transitions.end(); ++it)
+				for(const auto & m_transition : m_transitions)
 				{
-					if (it->test( this, it->userData ))
+					if (m_transition.test( this, m_transition.userData ))
 					{
 						// test returned true, change to associated state
 
@@ -181,17 +181,17 @@ StateReturnType State::friend_checkForTransitions( StateReturnType status )
 	#endif
 
 						// check if machine should exit
-						if (it->toStateID == EXIT_MACHINE_WITH_SUCCESS)
+						if (m_transition.toStateID == EXIT_MACHINE_WITH_SUCCESS)
 						{
 							return STATE_SUCCESS;
 						}
-						else if (it->toStateID == EXIT_MACHINE_WITH_FAILURE)
+						else if (m_transition.toStateID == EXIT_MACHINE_WITH_FAILURE)
 						{
 							return STATE_FAILURE;//Lorenzen wants to know why...
 						}
 
 						// move to new state
-						return getMachine()->internalSetState( it->toStateID );
+						return getMachine()->internalSetState( m_transition.toStateID );
 					}
 				}
 			}
@@ -223,9 +223,9 @@ StateReturnType State::friend_checkForSleepTransitions( StateReturnType status )
 	if (m_transitions.empty())
 		return status;
 
-	for(std::vector<TransitionInfo>::const_iterator it = m_transitions.begin(); it != m_transitions.end(); ++it)
+	for(const auto & m_transition : m_transitions)
 	{
-		if (!it->test( this, it->userData ))
+		if (!m_transition.test( this, m_transition.userData ))
 			continue;
 
 		// test returned true, change to associated state
@@ -239,18 +239,18 @@ StateReturnType State::friend_checkForSleepTransitions( StateReturnType status )
 #endif
 
 		// check if machine should exit
-		if (it->toStateID == EXIT_MACHINE_WITH_SUCCESS)
+		if (m_transition.toStateID == EXIT_MACHINE_WITH_SUCCESS)
 		{
 			return STATE_SUCCESS;
 		}
-		else if (it->toStateID == EXIT_MACHINE_WITH_FAILURE)
+		else if (m_transition.toStateID == EXIT_MACHINE_WITH_FAILURE)
 		{
 			return STATE_FAILURE;
 		}
 		else
 		{
 			// move to new state
-			return getMachine()->internalSetState( it->toStateID );
+			return getMachine()->internalSetState( m_transition.toStateID );
 		}
 	}
 

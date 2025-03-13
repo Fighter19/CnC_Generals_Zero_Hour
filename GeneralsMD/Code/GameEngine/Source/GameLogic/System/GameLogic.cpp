@@ -281,9 +281,9 @@ void GameLogic::setDefaults( Bool loadingSaveGame )
 #ifdef ALLOW_NONSLEEPY_UPDATES
 	m_normalUpdates.clear();
 #endif
-	for (std::vector<UpdateModulePtr>::iterator it = m_sleepyUpdates.begin(); it != m_sleepyUpdates.end(); ++it)
+	for (auto & m_sleepyUpdate : m_sleepyUpdates)
 	{
-		(*it)->friend_setIndexInLogic(-1);
+		m_sleepyUpdate->friend_setIndexInLogic(-1);
 	}
 	m_sleepyUpdates.clear();
 	m_curUpdateModule = NULL;
@@ -2474,10 +2474,9 @@ void GameLogic::processDestroyList( void )
 {
 	//USE_PERF_TIMER(processDestroyList)
 
-	for( ObjectPointerListIterator iterator = m_objectsToDestroy.begin(); iterator != m_objectsToDestroy.end(); iterator++ )
+	for(auto currentObject : m_objectsToDestroy)
 	{
-		Object* currentObject = (*iterator);
-
+		
 #ifdef ALLOW_NONSLEEPY_UPDATES
 		for (std::list<UpdateModulePtr>::iterator it = m_normalUpdates.begin(); it != m_normalUpdates.end(); /* nothing */)
 		{
@@ -2507,10 +2506,9 @@ void GameLogic::processDestroyList( void )
 		UpdateModulePtr sleepyUpdatesForThisObject[MAX_SUO];
 		Int numSUO = 0;
 
-		for (std::vector<UpdateModulePtr>::iterator it2 = m_sleepyUpdates.begin(); it2 != m_sleepyUpdates.end(); ++it2)
+		for (auto u : m_sleepyUpdates)
 		{
-			UpdateModulePtr u = *it2;
-			if (u->friend_getObject() == currentObject && numSUO < MAX_SUO)
+				if (u->friend_getObject() == currentObject && numSUO < MAX_SUO)
 			{
 				sleepyUpdatesForThisObject[numSUO++] = u;
 			}
@@ -4302,9 +4300,9 @@ Bool GameLogic::isProgressComplete( void )
 		return TRUE;
 
 	// Only loop on the Number of players we got in here
-	for(Int i =0; i < MAX_SLOTS; ++i)
+	for(bool i : m_progressComplete)
 	{
-		if(!m_progressComplete[i])
+		if(!i)
 			return FALSE;
 	}
 	return TRUE;
@@ -4488,9 +4486,9 @@ void GameLogic::crc( Xfer *xfer )
 GameLogic::ObjectTOCEntry *GameLogic::findTOCEntryByName( AsciiString name )
 {
 
-	for( ObjectTOCListIterator it = m_objectTOC.begin(); it != m_objectTOC.end(); ++it )
-		if( (*it).name == name )
-			return &(*it);
+	for(auto & it : m_objectTOC)
+		if( it.name == name )
+			return &it;
 
 	return NULL;
 
@@ -4502,9 +4500,9 @@ GameLogic::ObjectTOCEntry *GameLogic::findTOCEntryByName( AsciiString name )
 GameLogic::ObjectTOCEntry *GameLogic::findTOCEntryById( UnsignedShort id )
 {
 
-	for( ObjectTOCListIterator it = m_objectTOC.begin(); it != m_objectTOC.end(); ++it )
-		if( (*it).id == id )
-			return &(*it);
+	for(auto & it : m_objectTOC)
+		if( it.id == id )
+			return &it;
 
 	return NULL;
 
@@ -4644,10 +4642,10 @@ void GameLogic::prepareLogicForObjectLoad( void )
 			// the save game file
 			//
 			Object *oldTower;
-			for( Int i = 0; i < BRIDGE_MAX_TOWERS; ++i )
+			for(auto i : bridgeInfo->towerObjectID)
 			{
 
-				oldTower = findObjectByID( bridgeInfo->towerObjectID[ i ] );
+				oldTower = findObjectByID( i );
 				if (oldTower) {
 					destroyObject( oldTower );
 				}
@@ -4926,10 +4924,10 @@ void GameLogic::xfer( Xfer *xfer )
 	{
 		if( xfer->getXferMode() == XFER_SAVE )
 		{
-			for (BuildableMap::const_iterator it = m_thingTemplateBuildableOverrides.begin(); it != m_thingTemplateBuildableOverrides.end(); ++it )
+			for (const auto & m_thingTemplateBuildableOverride : m_thingTemplateBuildableOverrides)
 			{
-				AsciiString name = it->first;
-				BuildableStatus bs = it->second;
+				AsciiString name = m_thingTemplateBuildableOverride.first;
+				BuildableStatus bs = m_thingTemplateBuildableOverride.second;
 				xfer->xferAsciiString(&name);
 				xfer->xferUser(&bs, sizeof(bs));
 			}
@@ -4966,10 +4964,10 @@ void GameLogic::xfer( Xfer *xfer )
 
 		if( xfer->getXferMode() == XFER_SAVE )
 		{
-			for (ControlBarOverrideMap::const_iterator it = m_controlBarOverrides.begin(); it != m_controlBarOverrides.end(); ++it )
+			for (const auto & m_controlBarOverride : m_controlBarOverrides)
 			{
-				AsciiString name = it->first;
-				AsciiString value = it->second ? it->second->getName() : AsciiString::TheEmptyString;
+				AsciiString name = m_controlBarOverride.first;
+				AsciiString value = m_controlBarOverride.second ? m_controlBarOverride.second->getName() : AsciiString::TheEmptyString;
 				xfer->xferAsciiString(&name);
 				xfer->xferAsciiString(&value);
 			}
@@ -5039,9 +5037,9 @@ void GameLogic::loadPostProcess( void )
 			m_nextObjID = (ObjectID)((UnsignedInt)obj->getID() + 1);
 
 	// blow away the sleepy update and normal update module lists
-	for (std::vector<UpdateModulePtr>::iterator it = m_sleepyUpdates.begin(); it != m_sleepyUpdates.end(); ++it)
+	for (auto & m_sleepyUpdate : m_sleepyUpdates)
 	{
-		(*it)->friend_setIndexInLogic(-1);
+		m_sleepyUpdate->friend_setIndexInLogic(-1);
 	}
 	m_sleepyUpdates.clear();
 #ifdef ALLOW_NONSLEEPY_UPDATES

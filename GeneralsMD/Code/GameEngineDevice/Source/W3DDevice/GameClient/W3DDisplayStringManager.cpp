@@ -44,9 +44,9 @@
 //-------------------------------------------------------------------------------------------------
 W3DDisplayStringManager::W3DDisplayStringManager( void )
 {
-	for (Int i = 0; i < MAX_GROUPS; ++i) 
+	for (auto & m_groupNumeralString : m_groupNumeralStrings) 
 	{
-		m_groupNumeralStrings[i] = NULL;
+		m_groupNumeralString = NULL;
 	}
 
 	m_formationLetterDisplayString = NULL;
@@ -56,11 +56,11 @@ W3DDisplayStringManager::W3DDisplayStringManager( void )
 //-------------------------------------------------------------------------------------------------
 W3DDisplayStringManager::~W3DDisplayStringManager( void )
 {
-	for (Int i = 0; i < MAX_GROUPS; ++i) 
+	for (auto & m_groupNumeralString : m_groupNumeralStrings) 
 	{
-		if (m_groupNumeralStrings[i])
-			freeDisplayString(m_groupNumeralStrings[i]);
-		m_groupNumeralStrings[i] = NULL;
+		if (m_groupNumeralString)
+			freeDisplayString(m_groupNumeralString);
+		m_groupNumeralString = NULL;
 	}
 
 	if (m_formationLetterDisplayString)

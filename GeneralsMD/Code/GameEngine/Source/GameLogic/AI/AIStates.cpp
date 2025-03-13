@@ -417,18 +417,18 @@ static Object* findEnemyInContainer(Object* killer, Object* bldg)
 	const ContainedItemsList* items = bldg->getContain() ? bldg->getContain()->getContainedItemsList() : NULL;
 	if (items)
 	{
-		for (ContainedItemsList::const_iterator it = items->begin(); it != items->end(); ++it )
+		for (auto item : *items)
 		{
-			if ((*it)->isEffectivelyDead())
+			if (item->isEffectivelyDead())
 			{
 				DEBUG_CRASH(("why is there a dead thing in this container?"));
 				continue;
 			}
 
 			// order matters: we want to know if I consider it to be an enemy, not vice versa
-			if (killer->getRelationship(*it) == ENEMIES)
+			if (killer->getRelationship(item) == ENEMIES)
 			{
-				return *it;
+				return item;
 			}
 		}
 	}
@@ -1958,9 +1958,9 @@ public:
 
 protected:
 	// snapshot interface
-	virtual void crc( Xfer *xfer );
-	virtual void xfer( Xfer *xfer );
-	virtual void loadPostProcess();
+	void crc( Xfer *xfer ) override;
+	void xfer( Xfer *xfer ) override;
+	void loadPostProcess() override;
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -5738,9 +5738,9 @@ public:
 	AIAttackThenIdleStateMachine( Object *owner, AsciiString name );
 protected:
 	// snapshot interface .
-	virtual void crc( Xfer *xfer );
-	virtual void xfer( Xfer *xfer );
-	virtual void loadPostProcess();
+	void crc( Xfer *xfer ) override;
+	void xfer( Xfer *xfer ) override;
+	void loadPostProcess() override;
 };
 
 // ------------------------------------------------------------------------------------------------

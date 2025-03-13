@@ -216,9 +216,9 @@ DX8TextureCategoryClass::~DX8TextureCategoryClass()
 	while (DX8PolygonRendererClass* p_renderer=PolygonRendererList.Get_Head()) {
 		TheDX8MeshRenderer.Unregister_Mesh_Type(p_renderer->Get_Mesh_Model_Class());
 	}
-	for (int a=0;a<MeshMatDescClass::MAX_TEX_STAGES;++a) 
+	for (auto & texture : textures) 
 	{
-		REF_PTR_RELEASE(textures[a]);
+		REF_PTR_RELEASE(texture);
 	}
 
 	REF_PTR_RELEASE(material);

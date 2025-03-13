@@ -81,21 +81,21 @@ class VictoryConditions : public VictoryConditionsInterface
 public:
 	VictoryConditions();
 	
-	void init( void );
-	void reset( void );
-	void update( void );
+	void init( void ) override;
+	void reset( void ) override;
+	void update( void ) override;
 
-	Bool hasAchievedVictory(Player *player);					///< has a specific player and his allies won?
-	Bool hasBeenDefeated(Player *player);							///< has a specific player and his allies lost?
-	Bool hasSinglePlayerBeenDefeated(Player *player);	///< has a specific player lost?
+	Bool hasAchievedVictory(Player *player) override;					///< has a specific player and his allies won?
+	Bool hasBeenDefeated(Player *player) override;							///< has a specific player and his allies lost?
+	Bool hasSinglePlayerBeenDefeated(Player *player) override;	///< has a specific player lost?
 
-	void cachePlayerPtrs( void );											///< players have been created - cache the ones of interest
+	void cachePlayerPtrs( void ) override;											///< players have been created - cache the ones of interest
 
-	Bool isLocalAlliedVictory( void );								///< convenience function
-	Bool isLocalAlliedDefeat( void );									///< convenience function
-	Bool isLocalDefeat( void );												///< convenience function
-	Bool amIObserver( void ) { return m_isObserver;} 	///< Am I an observer?( need this for scripts )
-	virtual UnsignedInt getEndFrame( void ) { return m_endFrame; }	///< on which frame was the game effectively over?
+	Bool isLocalAlliedVictory( void ) override;								///< convenience function
+	Bool isLocalAlliedDefeat( void ) override;									///< convenience function
+	Bool isLocalDefeat( void ) override;												///< convenience function
+	Bool amIObserver( void ) override { return m_isObserver;} 	///< Am I an observer?( need this for scripts )
+	UnsignedInt getEndFrame( void ) override { return m_endFrame; }	///< on which frame was the game effectively over?
 private:
 	Player*				m_players[MAX_PLAYER_COUNT];
 	Int						m_localSlotNum;
@@ -155,9 +155,9 @@ void VictoryConditions::update( void )
 		Bool multipleAlliances = false;
 		Player *alive = NULL;
 		Player *player;
-		for (Int i=0; i<MAX_PLAYER_COUNT; ++i)
+		for (auto & m_player : m_players)
 		{
-			player = m_players[i];
+			player = m_player;
 			if (player && !hasSinglePlayerBeenDefeated(player))
 			{
 				if (alive)
@@ -247,10 +247,10 @@ Bool VictoryConditions::hasAchievedVictory(Player *player)
 
 	if (m_singleAllianceRemaining)
 	{
-		for (Int i=0; i<MAX_PLAYER_COUNT; ++i)
+		for (auto & m_player : m_players)
 		{
-			if ( m_players[i] && !hasSinglePlayerBeenDefeated(m_players[i]) &&
-				(player == m_players[i] || areAllies(m_players[i], player)) )
+			if ( m_player && !hasSinglePlayerBeenDefeated(m_player) &&
+				(player == m_player || areAllies(m_player, player)) )
 				return true;
 		}
 	}

@@ -220,11 +220,11 @@ void ControlBar::populateMultiSelect( void )
 	resetCommonCommandData();
 
 	// by default, hide all the controls in the command section
-	for( Int i = 0; i < MAX_COMMANDS_PER_SET; i++ )
+	for(auto & m_commandWindow : m_commandWindows)
 	{
-		if (m_commandWindows[ i ])
+		if (m_commandWindow)
 		{
-			m_commandWindows[ i ]->winHide( TRUE );
+			m_commandWindow->winHide( TRUE );
 		}
 	}
 
@@ -240,12 +240,11 @@ void ControlBar::populateMultiSelect( void )
 	DEBUG_ASSERTCRASH( selectedDrawables->empty() == FALSE, ("populateMultiSelect: Drawable list is empty\n") );
 
 	// loop through all the selected drawables
-	for( DrawableListCIt it = selectedDrawables->begin();
-			 it != selectedDrawables->end(); ++it )
+	for(auto selectedDrawable : *selectedDrawables)
 	{
 	
 		// get the drawable
-		draw = *it;
+		draw = selectedDrawable;
 
 		
 		if (draw->getObject()->isKindOf(KINDOF_IGNORED_IN_GUI)) // ignore these guys
@@ -321,12 +320,11 @@ void ControlBar::updateContextMultiSelect( void )
 	DEBUG_ASSERTCRASH( selectedDrawables->empty() == FALSE, ("populateMultiSelect: Drawable list is empty\n") );
 
 	// loop through all the selected drawable IDs
-	for( DrawableListCIt it = selectedDrawables->begin();
-			 it != selectedDrawables->end(); ++it )
+	for(auto selectedDrawable : *selectedDrawables)
 	{
 	
 		// get the drawable from the ID
-		draw = *it;
+		draw = selectedDrawable;
 
 		if (draw->getObject()->isKindOf(KINDOF_IGNORED_IN_GUI)) // ignore these guys
 			continue;

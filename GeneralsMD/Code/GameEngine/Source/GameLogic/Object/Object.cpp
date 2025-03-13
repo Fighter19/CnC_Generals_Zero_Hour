@@ -528,8 +528,8 @@ void Object::initObject()
 //	m_weaponSet.updateWeaponSet(this);
 //	m_weaponBonusCondition = 0;
 
-	for (int i = 0; i < WEAPONSLOT_COUNT; ++i)
-		m_lastWeaponCondition[i] = WSF_INVALID;
+	for (char & i : m_lastWeaponCondition)
+		i = WSF_INVALID;
 
 	// emit message announcing object's creation
 	TheGameLogic->sendObjectCreated( this );
@@ -731,9 +731,9 @@ Int Object::getTransportSlotCount() const
 		const ContainedItemsList* items = contain->getContainedItemsList();
 		if (items)
 		{
-			for (ContainedItemsList::const_iterator it = items->begin(); it != items->end(); ++it)
+			for (auto item : *items)
 			{
-				count += (*it)->getTransportSlotCount();
+				count += item->getTransportSlotCount();
 			}
 		}
 	}

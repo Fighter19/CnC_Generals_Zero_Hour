@@ -75,8 +75,8 @@ MaterialPassClass::MaterialPassClass(void) :
 	CullVolume(NULL),
 	EnableOnTranslucentMeshes(true)
 {
-	for (int i=0; i<MAX_TEX_STAGES; i++) {
-		Texture[i] = NULL;
+	for (auto & i : Texture) {
+		i = NULL;
 	}
 }
 
@@ -95,8 +95,8 @@ MaterialPassClass::MaterialPassClass(void) :
  *=============================================================================================*/
 MaterialPassClass::~MaterialPassClass(void)
 {
-	for (int i=0; i<MAX_TEX_STAGES; i++) {
-		REF_PTR_RELEASE(Texture[i]);
+	for (auto & i : Texture) {
+		REF_PTR_RELEASE(i);
 	}
 	REF_PTR_RELEASE(Material);
 }

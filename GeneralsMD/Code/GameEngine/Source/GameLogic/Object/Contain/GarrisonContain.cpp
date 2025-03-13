@@ -649,10 +649,9 @@ void GarrisonContain::addValidObjectsToGarrisonPoints( void )
 	if (containList.empty())
 		return;
 
-	for( ContainedItemsList::const_iterator it = containList.begin(); it != containList.end(); ++it )
+	for(auto obj : containList)
 	{
-		Object* obj = *it;
-		AIUpdateInterface* ai = obj->getAIUpdateInterface();
+			AIUpdateInterface* ai = obj->getAIUpdateInterface();
 		if( ai )
 		{
 			Object *victim = ai->getCurrentVictim();
@@ -693,13 +692,13 @@ void GarrisonContain::trackTargets( void )
 	AIUpdateInterface *ai;
 	Object *obj;
 
-	for( ContainedItemsList::const_iterator it = containList.begin(); it != containList.end(); ++it )
+	for(auto it : containList)
 	{
 
 		DEBUG_ASSERTCRASH(m_garrisonPointsInitialized, ("garrisonPoints are not inited"));
 
 		// get the object
-		obj = *it;
+		obj = it;
 
 		// only consider objects that are actually at garrison points for re-shuffling
 		Int ourIndex = getObjectGarrisonPointIndex( obj );
@@ -842,12 +841,12 @@ void GarrisonContain::updateEffects( void )
 	UnsignedInt currentFrame = TheGameLogic->getFrame();
 	const ContainedItemsList& containList = getContainList();
 
-	for( ContainedItemsList::const_iterator it = containList.begin(); it != containList.end(); ++it )
+	for(auto it : containList)
 	{
 		Object *obj;
 
 		// get the object
-		obj = *it;
+		obj = it;
 
 		//
 		// did the object fire last frame, if so make a muzzle flash if needed at the
@@ -884,19 +883,19 @@ void GarrisonContain::updateEffects( void )
 	}  // end for containment iterator
 
 	// remove any firing effects for time that has passed
-	for( Int i = 0; i < MAX_GARRISON_POINTS; ++i )
+	for(auto & i : m_garrisonPointData)
 	{
 
-		if( m_garrisonPointData[ i ].effect && 
-				m_garrisonPointData[ i ].lastEffectFrame != 0 && 
-				currentFrame - m_garrisonPointData[ i ].lastEffectFrame > MUZZLE_FLASH_LIFETIME  )
+		if( i.effect && 
+				i.lastEffectFrame != 0 && 
+				currentFrame - i.lastEffectFrame > MUZZLE_FLASH_LIFETIME  )
 		{
 
 			// clear the model condition
-			m_garrisonPointData[ i ].effect->clearModelConditionState( MODELCONDITION_FIRING_A );
+			i.effect->clearModelConditionState( MODELCONDITION_FIRING_A );
 
 			// clear the last effect frame
-			m_garrisonPointData[ i ].lastEffectFrame = 0;
+			i.lastEffectFrame = 0;
 
 		}  // end if
 
@@ -1013,17 +1012,15 @@ void GarrisonContain::positionObjectsAtStationGarrisonPoints()
 
 	const ContainedItemsList& containList = getContainList();
 	Object *contained;
-	for( ContainedItemsList::const_iterator it = containList.begin(); it != containList.end(); ++it )
+	for(auto it : containList)
 	{
-		contained = *it;
+		contained = it;
     Bool foundHisSpot = FALSE;
 
     // now lets find him in our station point list, and make sure he stays put there.
-    for( std::vector<StationPointData>::const_iterator pt = m_stationPointList.begin();
-    pt != m_stationPointList.end();
-    ++pt) 
+    for(const auto & pt : m_stationPointList) 
     {
-      const StationPointData *spd = &*pt;
+      const StationPointData *spd = &pt;
 
       if( spd->occupantID == contained->getID() )
       {
@@ -1051,9 +1048,9 @@ void GarrisonContain::positionObjectsAtStationGarrisonPoints()
 Bool GarrisonContain::pickAStationForMe( const Object *obj )
 {
   Bool foundVacancy = FALSE;
-  for( std::vector<StationPointData>::iterator pt = m_stationPointList.begin(); pt != m_stationPointList.end(); ++pt) 
+  for(auto & pt : m_stationPointList) 
   {
-    StationPointData *spd = &*pt; // non const
+    StationPointData *spd = &pt; // non const
     if ( spd->occupantID  == INVALID_ID ) // found a vacancy
     {
       spd->occupantID = obj->getID();
@@ -1076,9 +1073,9 @@ void GarrisonContain::removeObjectFromStationPoint( const Object *obj )
     return;
 
   Bool foundOccupant = FALSE;
-  for( std::vector<StationPointData>::iterator pt = m_stationPointList.begin(); pt != m_stationPointList.end(); ++pt) 
+  for(auto & pt : m_stationPointList) 
   {
-    StationPointData *spd = &*pt; // non const
+    StationPointData *spd = &pt; // non const
     if ( spd->occupantID  == obj->getID() ) // found him sitting there
     {
       spd->occupantID = INVALID_ID;// give up your space
@@ -1130,12 +1127,12 @@ void GarrisonContain::healObjects( void )
 		return;
 
 	const ContainedItemsList& containList = getContainList();
-	for( ContainedItemsList::const_iterator it = containList.begin(); it != containList.end(); ++it )
+	for(auto it : containList)
 	{
 		Object *obj;
 
 		// get the object
-		obj = *it;
+		obj = it;
 
 		healSingleObject(obj, modData->m_framesForFullHeal);
 	}
@@ -1734,11 +1731,11 @@ void GarrisonContain::moveObjectsWithMe( void )
 		return;
 
 	const ContainedItemsList& containList = getContainList();
-	for( ContainedItemsList::const_iterator it = containList.begin(); it != containList.end(); ++it )
+	for(auto it : containList)
 	{
 		Object *obj;
 		// get the object
-		obj = *it;
+		obj = it;
 		obj->setPosition(getObject()->getPosition());
 	}
 }
@@ -1931,15 +1928,15 @@ void GarrisonContain::loadPostProcess( void )
 	OpenContain::loadPostProcess();
 
 	// connect up pointers needed
-	for( Int i = 0; i < MAX_GARRISON_POINTS; i++ )
+	for(auto & i : m_garrisonPointData)
 	{
 
 		// object pointer		
-		if( m_garrisonPointData[ i ].objectID != INVALID_ID )
+		if( i.objectID != INVALID_ID )
 		{
 
-			m_garrisonPointData[ i ].object = TheGameLogic->findObjectByID( m_garrisonPointData[ i ].objectID );
-			if( m_garrisonPointData[ i ].object == NULL )
+			i.object = TheGameLogic->findObjectByID( i.objectID );
+			if( i.object == NULL )
 			{
 
 				DEBUG_CRASH(( "GarrisonContain::loadPostProcess - Unable to find object for point data\n" ));
@@ -1949,14 +1946,14 @@ void GarrisonContain::loadPostProcess( void )
 
 		}  // end if
 		else
-			m_garrisonPointData[ i ].object = NULL;
+			i.object = NULL;
 
 		// drawable effect pointer
-		if( m_garrisonPointData[ i ].effectID != INVALID_ID )
+		if( i.effectID != INVALID_ID )
 		{
 
-			m_garrisonPointData[ i ].effect = TheGameClient->findDrawableByID( m_garrisonPointData[ i ].effectID );
-			if( m_garrisonPointData[ i ].effect == NULL )
+			i.effect = TheGameClient->findDrawableByID( i.effectID );
+			if( i.effect == NULL )
 			{
 
 				DEBUG_CRASH(( "GarrisonContain::loadPostProcess - Unable to find effect for point data\n" ));
@@ -1966,7 +1963,7 @@ void GarrisonContain::loadPostProcess( void )
 
 		}  // end if
 		else
-			m_garrisonPointData[ i ].effect = NULL;
+			i.effect = NULL;
 
 	}  // end for i
 
@@ -2013,8 +2010,8 @@ void GarrisonContain::loadStationGarrisonPoints( void )
 
 
     Coord3D tempBuffer[MAX_GARRISON_POINTS];
-  	for( int t = 0; t < MAX_GARRISON_POINTS; ++t )
-		  tempBuffer[ t ] = *(structure->getPosition());
+  	for(auto & t : tempBuffer)
+		  t = *(structure->getPosition());
 
 		count = structure->getMultiLogicalBonePosition("STATION", modData->m_containMax, tempBuffer, NULL);
 		if ( count > 0) stationBonesFound = TRUE;

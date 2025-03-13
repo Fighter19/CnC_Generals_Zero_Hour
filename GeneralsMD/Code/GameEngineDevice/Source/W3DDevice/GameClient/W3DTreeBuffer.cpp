@@ -430,7 +430,7 @@ protected:
 public:
 	GDIFileStream2():m_file(NULL) {};
 	GDIFileStream2(File* pFile):m_file(pFile) {};
-	virtual Int read(void *pData, Int numBytes) {
+	Int read(void *pData, Int numBytes) override {
 		return(m_file?m_file->read(pData, numBytes):0);
 	};
 };

@@ -50,7 +50,7 @@ public:
 
 	PartitionFilterFlammable(){ }
 	
-	virtual Bool allow(Object *objOther);
+	Bool allow(Object *objOther) override;
 #if defined(_DEBUG) || defined(_INTERNAL)
 	virtual const char* debugGetName() { return "PartitionFilterFlammable"; }
 #endif

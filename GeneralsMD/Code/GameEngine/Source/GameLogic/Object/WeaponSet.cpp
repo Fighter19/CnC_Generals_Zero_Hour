@@ -116,9 +116,9 @@ void WeaponTemplateSet::clear()
 //-------------------------------------------------------------------------------------------------
 Bool WeaponTemplateSet::hasAnyWeapons() const
 {
-	for (int i = 0; i < WEAPONSLOT_COUNT; ++i) 
+	for (auto i : m_template) 
 	{
-		if (m_template[i])
+		if (i)
 			return true;
 	}
 	return false;
@@ -187,16 +187,16 @@ WeaponSet::WeaponSet()
 	m_totalDamageTypeMask.clear();
 	m_hasPitchLimit = false;
 	m_hasDamageWeapon = false;
-	for (Int i = 0; i < WEAPONSLOT_COUNT; ++i)
-		m_weapons[i] = NULL;
+	for (auto & m_weapon : m_weapons)
+		m_weapon = NULL;
 }
 
 //-------------------------------------------------------------------------------------------------
 WeaponSet::~WeaponSet()
 {
-	for (Int i = 0; i < WEAPONSLOT_COUNT; ++i)
-		if (m_weapons[i])
-			m_weapons[i]->deleteInstance();
+	for (auto & m_weapon : m_weapons)
+		if (m_weapon)
+			m_weapon->deleteInstance();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -417,10 +417,9 @@ static Int getVictimAntiMask(const Object* victim)
 //-------------------------------------------------------------------------------------------------
 void WeaponSet::weaponSetOnWeaponBonusChange(const Object *source)
 {
-	for( Int i = 0; i < WEAPONSLOT_COUNT;	i++ )
+	for(auto weapon : m_weapons)
 	{
-		Weapon *weapon = m_weapons[ i ];
-		if( weapon )
+			if( weapon )
 		{
 			weapon->onWeaponBonusChange(source);
 		}
@@ -433,10 +432,9 @@ Bool WeaponSet::isAnyWithinTargetPitch(const Object* obj, const Object* victim) 
 	if (!m_hasPitchLimit)
 		return true;
 
-	for( Int i = 0; i < WEAPONSLOT_COUNT;	i++ )
+	for(auto weapon : m_weapons)
 	{
-		const Weapon* weapon = m_weapons[ i ];
-		if (weapon && weapon->isWithinTargetPitch(obj, victim))
+			if (weapon && weapon->isWithinTargetPitch(obj, victim))
 		{
 			return true;
 		}
@@ -747,10 +745,9 @@ CanAttackResult WeaponSet::getAbleToUseWeaponAgainstTarget( AbleToAttackType att
 		const ContainedItemsList* items = contain->getContainedItemsList();
 		if (items)
 		{
-			for (ContainedItemsList::const_iterator it = items->begin(); it != items->end(); ++it)
+			for (auto garrisonedMember : *items)
 			{
-				Object* garrisonedMember = *it;
-				if( garrisonedMember->isAbleToAttack() )
+					if( garrisonedMember->isAbleToAttack() )
 				{
 					CanAttackResult result = garrisonedMember->getAbleToUseWeaponAgainstTarget( attackType, victim, pos, commandSource );
 					if( result == ATTACKRESULT_POSSIBLE || result == ATTACKRESULT_POSSIBLE_AFTER_MOVING )
@@ -976,10 +973,9 @@ Bool WeaponSet::chooseBestWeaponForTarget(const Object* obj, const Object* victi
 //-------------------------------------------------------------------------------------------------
 void WeaponSet::reloadAllAmmo(const Object *obj, Bool now)
 {
-	for( Int i = 0; i < WEAPONSLOT_COUNT;	i++ )
+	for(auto weapon : m_weapons)
 	{
-		Weapon* weapon = m_weapons[i];
-		if (weapon != NULL)
+			if (weapon != NULL)
 		{
 			if (now)
 				weapon->loadAmmoNow(obj);
@@ -992,10 +988,9 @@ void WeaponSet::reloadAllAmmo(const Object *obj, Bool now)
 //-------------------------------------------------------------------------------------------------
 Bool WeaponSet::isOutOfAmmo() const
 {
-	for( Int i = 0; i < WEAPONSLOT_COUNT;	i++ )
+	for(auto weapon : m_weapons)
 	{
-		const Weapon* weapon = m_weapons[i];
-		if (weapon == NULL)
+			if (weapon == NULL)
 			continue;
 		if (weapon->getStatus() != OUT_OF_AMMO)
 		{
@@ -1008,10 +1003,9 @@ Bool WeaponSet::isOutOfAmmo() const
 //-------------------------------------------------------------------------------------------------
 const Weapon* WeaponSet::findAmmoPipShowingWeapon() const
 {
-	for( Int i = 0; i < WEAPONSLOT_COUNT;	i++ )
+	for(auto weapon : m_weapons)
 	{
-		const Weapon *weapon = m_weapons[ i ];
-		if (weapon && weapon->isShowsAmmoPips())
+			if (weapon && weapon->isShowsAmmoPips())
 		{
 			return weapon;
 		}
@@ -1036,11 +1030,11 @@ Weapon* WeaponSet::findWaypointFollowingCapableWeapon()
 UnsignedInt WeaponSet::getMostPercentReadyToFireAnyWeapon() const
 {
 	UnsignedInt mostReady = 0;
-	for( Int i = 0; i < WEAPONSLOT_COUNT;	i++ )
+	for(auto m_weapon : m_weapons)
 	{
-		if( m_weapons[ i ] )
+		if( m_weapon )
 		{
-			UnsignedInt percentage = (UnsignedInt)(m_weapons[ i ]->getPercentReadyToFire() * 100.0f);
+			UnsignedInt percentage = (UnsignedInt)(m_weapon->getPercentReadyToFire() * 100.0f);
 			if( percentage > mostReady )
 			{
 				mostReady = percentage;
@@ -1125,10 +1119,9 @@ Weapon* WeaponSet::getWeaponInWeaponSlot(WeaponSlotType wslot) const
 	//or else those weapons will have unlimited range!
 void WeaponSet::clearLeechRangeModeForAllWeapons()
 {
-	for( Int i = 0; i < WEAPONSLOT_COUNT;	i++ )
+	for(auto weapon : m_weapons)
 	{
-		Weapon* weapon = m_weapons[ i ];
-		if( weapon )
+			if( weapon )
 		{
 			//Just clear the leech range active flag.
 			weapon->setLeechRangeActive( FALSE );

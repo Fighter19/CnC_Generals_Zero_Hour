@@ -629,10 +629,9 @@ void Xfer::xferScienceVec( ScienceVec *scienceVec )
 
 	if( getXferMode() == XFER_SAVE )
 	{
-		for( ScienceVec::const_iterator it = scienceVec->begin(); it != scienceVec->end(); ++it )
+		for(auto science : *scienceVec)
 		{
-			ScienceType science = *it;
-			xferScienceType(&science);
+				xferScienceType(&science);
 		}
 	}
 	else if( getXferMode() == XFER_LOAD )
@@ -658,10 +657,9 @@ void Xfer::xferScienceVec( ScienceVec *scienceVec )
 	}
 	else if( getXferMode() == XFER_CRC )
 	{
-		for( ScienceVec::const_iterator it = scienceVec->begin(); it != scienceVec->end(); ++it )
+		for(auto science : *scienceVec)
 		{
-			ScienceType science = *it;
-			xferImplementation( &science, sizeof( ScienceType ) );
+				xferImplementation( &science, sizeof( ScienceType ) );
 		}  // end for, it
 	}  // end else if, crc
 	else
