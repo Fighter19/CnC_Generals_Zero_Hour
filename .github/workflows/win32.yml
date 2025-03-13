@@ -1,6 +1,10 @@
 name: Windows-32
 on:
   push:
+  pull_request:
+    branches:
+      - develop
+      - main
 
 jobs:
   job:
