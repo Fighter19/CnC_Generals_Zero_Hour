@@ -19,6 +19,10 @@
 #include <string>
 #include <stdio.h>
 #include "Registry.h"
+#ifndef _WIN32
+#include <string_compat.h>
+#endif
+
 
 void FormatURLFromRegistry( std::string& gamePatchURL, std::string& mapPatchURL,
 													 std::string& configURL, std::string& motdURL )

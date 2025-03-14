@@ -83,3 +83,4 @@ static inline uint32_t _lrotl(uint32_t value, int shift)
 #include "wchar_compat.h"
 #include "gdi_compat.h"
 #include "wnd_compat.h"
+#include "file_compat.h"

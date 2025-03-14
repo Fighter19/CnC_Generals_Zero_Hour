@@ -39,3 +39,5 @@ typedef size_t WPARAM;
 // Microsoft direction specifiers, used purely for documentation purposes
 #define IN
 #define OUT
+
+#define _isnan isnan
