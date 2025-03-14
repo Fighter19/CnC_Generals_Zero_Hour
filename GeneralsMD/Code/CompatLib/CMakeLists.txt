@@ -22,7 +22,7 @@ endif()
 
 target_include_directories(d3dx8 PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/Include
-    ${CMAKE_SOURCE_DIR}/extern/dxvk-native/usr/include/dxvk
+    ${dxvk_SOURCE_DIR}/include/dxvk
 )
 
 endif()
@@ -49,16 +49,16 @@ target_include_directories(CompatLib PUBLIC
 add_library(d3d8lib INTERFACE)
 find_package(glm REQUIRED)
 target_link_libraries(d3d8lib INTERFACE
-    dxvk_d3d8 d3dx8
+    dxvk_d3d8 d3dx8 dxvk_d3d9
 )
 
 target_include_directories(d3d8lib INTERFACE
-    ${CMAKE_SOURCE_DIR}/extern/dxvk-native/usr/include/dxvk
+    ${dxvk_SOURCE_DIR}/include/dxvk
 )
 
 # Search library in dxvk-native folder
 target_link_directories(d3d8lib INTERFACE
-    ${CMAKE_SOURCE_DIR}/extern/dxvk-native/usr/lib
+    ${dxvk_SOURCE_DIR}/lib
 )
 
 target_link_libraries(CompatLib PRIVATE d3d8lib)

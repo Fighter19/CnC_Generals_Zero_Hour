@@ -1,4 +1,4 @@
-name: Ubuntu
+name: Linux-64 Deploy
 on:
   push:
   pull_request:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   job:
-    name: Linux 64-bit
+    name: Linux 64-bit Deploy
     runs-on: ubuntu-24.04
 
     steps:
@@ -28,5 +28,5 @@ jobs:
       - name: Run CMake consuming CMakePreset.json and run vcpkg to build packages
         uses: lukka/run-cmake@v10
         with:
-          configurePreset: "default"
+          configurePreset: "deploy"
           generator: "Ninja"

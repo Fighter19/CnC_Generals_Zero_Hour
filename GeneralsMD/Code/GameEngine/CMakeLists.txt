@@ -44,10 +44,10 @@ add_library(GameEngine STATIC ${SOURCES_COMMON} ${SOURCES_GAMECLIENT} ${SOURCES_
 target_include_directories(GameEngine PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/Include
     ${CMAKE_CURRENT_SOURCE_DIR}/Include/Precompiled
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Libraries/Include
 )
 
 target_include_directories(GameEngine PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../Libraries/Include
     # Used in Thing.h via WWMath
     ${CMAKE_CURRENT_SOURCE_DIR}/../Libraries/Source/WWVegas
 )
@@ -59,7 +59,7 @@ if(WIN32)
     target_link_libraries(GameEngine PRIVATE d3d8lib gamespy BrowserDispatch)
 else()
     target_include_directories(GameEngine PRIVATE
-        ${CMAKE_SOURCE_DIR}/extern/dxvk-native/usr/include/dxvk
+        ${dxvk_SOURCE_DIR}/include/dxvk
     )
     target_link_libraries(GameEngine PRIVATE gamespy)
 endif()

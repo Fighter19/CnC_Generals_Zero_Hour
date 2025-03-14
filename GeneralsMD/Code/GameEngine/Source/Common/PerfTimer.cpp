@@ -37,9 +37,10 @@
 
 __forceinline void ProfileGetTime(int64_t &t)
 {
-#if __has_builtin (__builtin_readcyclecounter)
-	// This is probably only supported by Clang, but is portable otherwise
+#if defined(__has_builtin) && __has_builtin(__builtin_readcyclecounter)
 	t = __builtin_readcyclecounter();
+#elif defined(__has_builtin) && __has_builtin(__builtin_ia32_rdtsc)
+	t = __builtin_ia32_rdtsc();
 #else
   _asm
   {

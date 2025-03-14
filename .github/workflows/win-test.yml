@@ -1,4 +1,4 @@
-name: Windows-32
+name: Windows-32 Testing
 on:
   push:
   pull_request:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   job:
-    name: Windows 32-bit
+    name: Windows 32-bit Testing
     runs-on: windows-2022
     steps:
       - name: Checkout
@@ -24,12 +24,6 @@ jobs:
       - name: Run CMake consuming CMakePreset.json and run vcpkg to build packages
         uses: lukka/run-cmake@v10
         with:
-          configurePreset: "win32-release"
-          buildPreset: "win32-release"
-          packagePreset: "win32-release"
-
-      - name: Upload RTS artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: x86 Windows RTS
-          path: build/win32-release/SAGE-0.1-win32.zip
+          configurePreset: "win32-testing"
+          buildPreset: "win32-testing"
+          testPreset: "win32-testing"

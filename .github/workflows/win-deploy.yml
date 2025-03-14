@@ -1,0 +1,35 @@
+name: Windows-32 Deploy
+on:
+  push:
+  pull_request:
+    branches:
+      - develop
+      - main
+
+jobs:
+  job:
+    name: Windows 32-bit Deploy
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+        # Install latest CMake and Ninja.
+      - uses: lukka/get-cmake@latest
+
+      # Setup vcpkg: ensures vcpkg is downloaded and built.
+      - name: Setup anew (or from cache) vcpkg (and does not build any package)
+        uses: lukka/run-vcpkg@v11
+
+      - name: Run CMake consuming CMakePreset.json and run vcpkg to build packages
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: "win32-deploy"
+          buildPreset: "win32-deploy"
+          packagePreset: "win32-deploy"
+
+      - name: Upload RTS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: x86 Windows RTS
+          path: build/win32-release/SAGE-0.1-win32.zip

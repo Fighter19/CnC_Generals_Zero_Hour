@@ -194,11 +194,10 @@ __forceinline long fast_float2long_round(float f)
 		fld [f]
 		fistp [i]
 	}
-#endif
-
+#else
 	// Use simple C code instead of inline assembly
-	i = (long)f;
-
+	i = lroundf(f);
+#endif
 	return i;
 }
 

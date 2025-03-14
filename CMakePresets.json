@@ -15,18 +15,54 @@
       }
     },
     {
-      "name" : "win32-release",
-      "displayName": "Win32 Release",
+      "name": "deploy",
+      "inherits": "default",
+      "displayName": "Deploy Config",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CONFIGURATION_TYPES": "Release"
+      }
+    },
+    {
+      "name": "win32-deploy",
+      "inherits": "deploy",
+      "displayName": "Win32 Release Config",
       "generator": "Visual Studio 17 2022",
       "architecture": "Win32",
-      "binaryDir": "${sourceDir}/build/${presetName}",
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_CONFIGURATION_TYPES": "Release",
-        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreadedDLL",
-        "SAGE_USE_OPENAL": "ON",
-        "SAGE_USE_FFMPEG": "ON"
+        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreadedDLL"
+      }
+    },
+    {
+      "name": "testing",
+      "inherits": "default",
+      "displayName": "Test Config",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CONFIGURATION_TYPES": "Debug",
+        "SAGE_BUILD_TESTS": "ON",
+        "SAGE_USE_UBSAN": "ON",
+        "SAGE_USE_ASAN": "ON",
+        "SAGE_USE_GLM": "ON"
+      }
+    },
+    {
+      "name": "win32-testing",
+      "inherits": "testing",
+      "displayName": "Win32 Test Config",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "Win32",
+      "cacheVariables": {
+        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreadedDLL"
+      }
+    },
+    {
+      "name": "win64-testing",
+      "displayName": "Win32 Test Config",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "cacheVariables": {
+        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreadedDLL"
       }
     }
   ],
@@ -37,10 +73,28 @@
       "description": "Build the default configuration"
     },
     {
-      "name": "win32-release",
-      "configurePreset": "win32-release",
-      "description": "Build the win32 release configuration",
+      "name": "win32-deploy",
+      "configurePreset": "win32-deploy",
+      "description": "Build the win32 deploy configuration",
       "configuration": "Release"
+    },
+    {
+      "name": "testing",
+      "configurePreset": "testing",
+      "description": "Build the testing configuration",
+      "configuration": "Debug"
+    },
+    {
+      "name": "win32-testing",
+      "configurePreset": "win32-testing",
+      "description": "Build the win32 testing configuration",
+      "configuration": "Debug"
+    },
+    {
+      "name": "win64-testing",
+      "configurePreset": "win64-testing",
+      "description": "Build the win64 testing configuration",
+      "configuration": "Debug"
     }
   ],
   "packagePresets": [
@@ -51,11 +105,30 @@
       "description": "Package the default configuration"
     },
     {
-      "name": "win32-release",
+      "name": "win32-deploy",
       "displayName": "Win32 Release Package",
-      "configurePreset": "win32-release",
-      "generators": ["ZIP"],
-      "description": "Package the win32 release configuration"
+      "configurePreset": "win32-deploy",
+      "generators": [
+        "ZIP"
+      ],
+      "description": "Package the win32 deploy configuration"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "default",
+      "configurePreset": "testing",
+      "description": "Run the default configuration tests"
+    },
+    {
+      "name": "win32",
+      "configurePreset": "win32-testing",
+      "description": "Run the win32 configuration tests"
+    },
+    {
+      "name": "win64",
+      "configurePreset": "win64-testing",
+      "description": "Run the win64 configuration tests"
     }
   ]
 }

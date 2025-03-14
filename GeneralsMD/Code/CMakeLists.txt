@@ -30,3 +30,7 @@ if(SAGE_BUILD_TOOLS)
     add_subdirectory(Tools/Compress)
     add_subdirectory(Tools/CRCDiff)
 endif()
+
+if(SAGE_BUILD_TESTS)
+    add_subdirectory(Tests)
+endif()
