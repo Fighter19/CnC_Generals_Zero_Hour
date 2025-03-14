@@ -38,7 +38,7 @@
       "name": "win32-release",
       "configurePreset": "win32-release",
       "description": "Build the win32 release configuration",
-      "configuration": "Release"
+      "configuration": "RelWithDebInfo"
     }
   ],
   "packagePresets": [
