@@ -11,6 +11,9 @@ jobs:
     name: Linux 64-bit Testing
     runs-on: ubuntu-24.04
     steps:
+      - name: Install deps
+        run: sudo apt-get install -y nasm autoconf automake libtool pkg-config libltdl-dev
+
       - name: Checkout
         uses: actions/checkout@v4
 

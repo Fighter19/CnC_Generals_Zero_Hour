@@ -12,11 +12,11 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
+      - name: Install deps
+        run: sudo apt-get install -y nasm autoconf automake libtool pkg-config libltdl-dev
+
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Install NASM (Netwide Assembler)
-        run: sudo apt-get install -y nasm
 
         # Install latest CMake and Ninja.
       - uses: lukka/get-cmake@latest
