@@ -20,6 +20,7 @@ if(WIN32)
             "^vc.*"
             "^msvcp.*"
             "^concrt.*"
+            "^mss32\\.dll$" # Miles Sound System
         POST_EXCLUDE_REGEXES
             ".*system32/.*\.dll" # windows system dlls
         RUNTIME DESTINATION .

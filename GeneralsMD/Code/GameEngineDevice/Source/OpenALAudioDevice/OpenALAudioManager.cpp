@@ -38,7 +38,6 @@
 /*		3/9/2025 : Initial creation                                           */
 /*---------------------------------------------------------------------------*/
 
-#include <dsound.h>
 #include "Lib/BaseType.h"
 #include "OpenALAudioDevice/OpenALAudioManager.h"
 #include "OpenALAudioDevice/OpenALAudioStream.h"

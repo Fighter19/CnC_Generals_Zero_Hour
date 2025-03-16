@@ -386,7 +386,7 @@ void FFmpegVideoStream::onFrame(AVFrame *frame, int stream_idx, int stream_type,
             videoStream->m_audioBuffer = static_cast<uint8_t*>(av_realloc(videoStream->m_audioBuffer, frameSize));
             if (videoStream->m_audioBuffer == nullptr)
             {
-                DEBUG_LOG("Failed to allocate audio buffer");
+                DEBUG_LOG(("Failed to allocate audio buffer"));
                 return;
             }
 
