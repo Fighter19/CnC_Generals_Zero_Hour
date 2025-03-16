@@ -60,3 +60,13 @@ static inline uint64_t _rdtsc()
 #elif !defined(_MSC_VER)
 #error "No implementation for __debugbreak"
 #endif
+
+#if defined(_MSC_VER) 
+#define bswap32 _byteswap_ulong
+#elif defined(__has_builtin)
+#if __has_builtin(__builtin_bswap32)
+#define bswap32 __builtin_bswap32
+#else
+#error "No implementation for bswap32"
+#endif
+#endif

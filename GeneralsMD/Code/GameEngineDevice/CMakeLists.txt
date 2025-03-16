@@ -69,6 +69,16 @@ if(SAGE_USE_SDL3)
     target_compile_definitions(GameEngineDevice PUBLIC SAGE_USE_SDL3)
 endif()
 
+if(SAGE_USE_STDFS)
+    target_sources(GameEngineDevice PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source/StdDevice/Common/StdBIGFile.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source/StdDevice/Common/StdBIGFileSystem.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source/StdDevice/Common/StdLocalFile.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source/StdDevice/Common/StdLocalFileSystem.cpp
+    )
+    target_compile_definitions(GameEngineDevice PUBLIC SAGE_USE_STDFS)
+endif()
+
 if(WIN32)
     target_sources(GameEngineDevice PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Source/Win32Device/Common/Win32BIGFile.cpp
