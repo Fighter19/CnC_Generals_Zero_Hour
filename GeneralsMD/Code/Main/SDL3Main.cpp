@@ -33,6 +33,7 @@
 #include <wsi/native_wsi.h>
 
 // GLOBALS
+HWND ApplicationHWnd = NULL;
 SDL_Window *TheSDL3Window = NULL;
 Bool ApplicationIsWindowed = false;
 SDL3Mouse *TheSDL3Mouse = NULL; ///< for the WndProc() only
@@ -89,7 +90,7 @@ static Bool initializeAppWindows(Bool runWindowed) {
       SDL_CreateWindow("Game Window", startWidth, startHeight, 0);
   SDL_ShowWindow(window);
   // save our window handle for future use
-  TheSDL3Window = window;
+  ApplicationHWnd = TheSDL3Window = window;
 
   return true; // success
 }

@@ -38,6 +38,7 @@
 
 Bool  getStringFromRegistry(HKEY root, AsciiString path, AsciiString key, AsciiString& val)
 {
+#ifdef _WIN32
 	HKEY handle;
 	unsigned char buffer[256];
 	unsigned long size = 256;
@@ -55,12 +56,15 @@ Bool  getStringFromRegistry(HKEY root, AsciiString path, AsciiString key, AsciiS
 		val = (char *)buffer;
 		return TRUE;
 	}
+#endif
+
 
 	return FALSE;
 }
 
 Bool getUnsignedIntFromRegistry(HKEY root, AsciiString path, AsciiString key, UnsignedInt& val)
 {
+#ifdef _WIN32
 	HKEY handle;
 	unsigned char buffer[4];
 	unsigned long size = 4;
@@ -78,12 +82,14 @@ Bool getUnsignedIntFromRegistry(HKEY root, AsciiString path, AsciiString key, Un
 		val = *(UnsignedInt *)buffer;
 		return TRUE;
 	}
+#endif
 
 	return FALSE;
 }
 
 Bool setStringInRegistry( HKEY root, AsciiString path, AsciiString key, AsciiString val)
 {
+#ifdef _WIN32
 	HKEY handle;
 	unsigned long type;
 	unsigned long returnValue;
@@ -98,10 +104,14 @@ Bool setStringInRegistry( HKEY root, AsciiString path, AsciiString key, AsciiStr
 	}
 
 	return (returnValue == ERROR_SUCCESS);
+#else
+	return FALSE;
+#endif
 }
 
 Bool setUnsignedIntInRegistry( HKEY root, AsciiString path, AsciiString key, UnsignedInt val)
 {
+#ifdef _WIN32
 	HKEY handle;
 	unsigned long type;
 	unsigned long returnValue;
@@ -116,10 +126,14 @@ Bool setUnsignedIntInRegistry( HKEY root, AsciiString path, AsciiString key, Uns
 	}
 
 	return (returnValue == ERROR_SUCCESS);
+#else
+	return FALSE;
+#endif
 }
 
 Bool GetStringFromGeneralsRegistry(AsciiString path, AsciiString key, AsciiString& val)
 {
+#ifdef _WIN32
 	AsciiString fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Generals";
 
 	fullPath.concat(path);
@@ -130,10 +144,14 @@ Bool GetStringFromGeneralsRegistry(AsciiString path, AsciiString key, AsciiStrin
 	}
 
 	return getStringFromRegistry(HKEY_CURRENT_USER, fullPath.str(), key.str(), val);
+#else
+	return FALSE;
+#endif
 }
 
 Bool GetStringFromRegistry(AsciiString path, AsciiString key, AsciiString& val)
 {
+#ifdef _WIN32
 	AsciiString fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Command and Conquer Generals Zero Hour";
 
 	fullPath.concat(path);
@@ -144,10 +162,14 @@ Bool GetStringFromRegistry(AsciiString path, AsciiString key, AsciiString& val)
 	}
 
 	return getStringFromRegistry(HKEY_CURRENT_USER, fullPath.str(), key.str(), val);
+#else
+	return FALSE;
+#endif
 }
 
 Bool GetUnsignedIntFromRegistry(AsciiString path, AsciiString key, UnsignedInt& val)
 {
+#ifdef _WIN32
 	AsciiString fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Command and Conquer Generals Zero Hour";
 
 	fullPath.concat(path);
@@ -158,6 +180,9 @@ Bool GetUnsignedIntFromRegistry(AsciiString path, AsciiString key, UnsignedInt& 
 	}
 
 	return getUnsignedIntFromRegistry(HKEY_CURRENT_USER, fullPath.str(), key.str(), val);
+#else
+	return FALSE;
+#endif
 }
 
 AsciiString GetRegistryLanguage(void)

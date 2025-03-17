@@ -33,6 +33,10 @@
 #ifndef __WINMAIN_H_
 #define __WINMAIN_H_
 
+#ifdef SAGE_USE_SDL3
+#error "WinMain.h should not be included in SDL3 builds"
+#endif
+
 // SYSTEM INCLUDES ////////////////////////////////////////////////////////////
 #include <windows.h>
 

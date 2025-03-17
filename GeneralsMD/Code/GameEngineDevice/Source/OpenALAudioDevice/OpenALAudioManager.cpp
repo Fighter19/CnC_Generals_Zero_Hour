@@ -1435,7 +1435,7 @@ void OpenALAudioManager::openDevice(void)
 		setOn(false, AudioAffect_All);
 		return;
 	}
-	DEBUG_ASSERTLOG((checkALCError(), "Failed to create ALC context"));
+	DEBUG_ASSERTLOG(checkALCError(), ("Failed to create ALC context"));
 
 	if (!alcMakeContextCurrent(m_alcContext)) {
 		DEBUG_LOG(("Failed to make ALC context current"));

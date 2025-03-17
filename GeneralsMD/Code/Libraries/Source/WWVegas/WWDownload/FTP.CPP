@@ -34,6 +34,20 @@
 #include <direct.h>
 #else
 #include "windows_compat.h"
+#include <unistd.h>
+#define closesocket close
+#define _getcwd getcwd
+#define _chmod chmod
+#define _S_IWRITE S_IWRITE
+#define _S_IREAD S_IREAD
+#include <netdb.h>
+#define HOSTENT hostent
+#include <sys/ioctl.h>
+#define ioctlsocket ioctl
+#define SOCKET_ERROR -1
+#include <filesystem>
+// TODO: this is a hack to get the splitpath function to compile on linux
+#define _splitpath(a,b,c,d,e) (void)0
 #endif
 #include <sys/stat.h>
 #include <time.h>
@@ -41,6 +55,8 @@
 #include "ftp.h"
 #include <time.h>
 #include <errno.h>
+#include <string.h>
+#include <ctype.h>
 //#include "wlib/wstring.h"
 
 #include "DownloadDebug.h"
@@ -128,7 +144,7 @@ static bool Use_Non_Blocking_Mode(void)
 	DWORD type=0;
 	DWORD value=0;
 
-
+#ifdef _WIN32
 	// Try and open the named key
 	regRetval=RegOpenKeyEx(HKEY_LOCAL_MACHINE,"SOFTWARE\\Westwood\\Earth And Beyond Beta 2",0,KEY_READ,&regKey);
 	if (regRetval!=ERROR_SUCCESS)
@@ -145,6 +161,9 @@ static bool Use_Non_Blocking_Mode(void)
 		return(TRUE);
 
 	return(bool(value));
+#else
+	return(TRUE);
+#endif
 }
 
 
@@ -403,6 +422,7 @@ HRESULT  Cftp::ConnectToServer(LPCSTR szServerName)
 		// Start the connection process....
 		if( connect( m_iCommandSocket, (struct sockaddr *)&m_CommandSockAddr, sizeof( m_CommandSockAddr ) ) == -1 )
 		{
+			#ifdef _WIN32
 			error = WSAGetLastError();
 			if( ( error == WSAEWOULDBLOCK ) || ( error == WSAEINVAL ) || ( error == WSAEALREADY ) )
 			{
@@ -415,6 +435,9 @@ HRESULT  Cftp::ConnectToServer(LPCSTR szServerName)
 				closesocket( m_iCommandSocket );
 				return( FTP_FAILED );
 			}
+			#else
+			return FTP_FAILED;
+			#endif
 		}
 	}
 
@@ -878,7 +901,7 @@ HRESULT  Cftp::SendCommand( LPCSTR pCommand, int iSize )
 
 	if( i > 0 )
 	{
-#ifdef _DEBUG
+#if defined(_DEBUG) && defined(_WIN32)
 		OutputDebugString( "-->" );
 		OutputDebugString( pCommand );
 #endif
@@ -933,12 +956,16 @@ HRESULT  Cftp::RecvReply( LPCSTR pReplyBuffer, int iSize, int * piRetCode )
 
 		// Did the endpoint close?
 		if (readval < 0) {
+			#ifdef _WIN32
 			if ((WSAGetLastError() == WSAECONNRESET ) || ((WSAGetLastError() == WSAENOTCONN)))
 				readval=0;
 			else {
 				// nothing to read right now....
 				return(FTP_TRYING);
 			}
+			#else
+			return(FTP_TRYING);
+			#endif
 		}
 
 		if (readval == 0) {
@@ -958,7 +985,7 @@ HRESULT  Cftp::RecvReply( LPCSTR pReplyBuffer, int iSize, int * piRetCode )
 
 		// OK, we've got a line, pull it from the socket...
 		recv(m_iCommandSocket, pc, end-pc+strlen("\r\n"), 0);
-#ifdef _DEBUG
+#if defined(_DEBUG) && defined(_WIN32)
 		OutputDebugString( "<--" );
 		OutputDebugString( pc );
 #endif
@@ -1005,7 +1032,11 @@ unsigned long MyIPAddress( int sockfd )
 {
 
 	int		 test = 99;
+#ifdef _WIN32
 	int i;
+#else
+	socklen_t i;
+#endif
 	char pBuffer[ 256 ];
 	char * pAddr;
 	struct hostent * pHE;
@@ -1016,8 +1047,9 @@ unsigned long MyIPAddress( int sockfd )
 	{
 		i = sizeof( sin );
 		getsockname( sockfd, (struct sockaddr *)&sin, &i );
-
+#ifdef _WIN32
 		ip = sin.sin_addr.S_un.S_addr;
+#endif
 	}
 	else
 	{
@@ -1094,7 +1126,12 @@ int Cftp::SendNewPort( void )
 {
 	unsigned long uTemp;
 	char command[ 256 ];
-	int i, iReply;
+#ifdef _WIN32
+	int i;
+#else
+	socklen_t i;
+#endif
+	int iReply;
 
 	/* Open a socket */
 
@@ -1233,6 +1270,7 @@ int Cftp::OpenDataConnection()
 
 	if( ( iNewSocket = accept( m_iDataSocket, NULL, 0 ) ) < 0 ) 
 	{
+	#ifdef _WIN32
 		if( WSAGetLastError() != (WSAEWOULDBLOCK ) )
 		{
 			return( FTP_FAILED );
@@ -1241,6 +1279,9 @@ int Cftp::OpenDataConnection()
 		{
 			return( FTP_TRYING );
 		}
+	#else
+		return FTP_FAILED;
+	#endif
 	}
 
 	m_iDataSocket = iNewSocket;
@@ -1573,10 +1614,14 @@ HRESULT  Cftp::GetNextFileBlock( LPCSTR szLocalFileName, int * piTotalRead )
 
 		// look for all notices about endpoint closed...
 		if (read < 0) {
+			#ifdef _WIN32
 			int wsa_err=WSAGetLastError();
 
 			if ((wsa_err == WSAECONNRESET) || (wsa_err == WSAENOTCONN))
 				read = 0;		// just treat it as a close....
+			#else 
+				read = 0;
+			#endif
 		}
 
 
@@ -1640,8 +1685,9 @@ HRESULT  Cftp::GetNextFileBlock( LPCSTR szLocalFileName, int * piTotalRead )
 		// We will ignore the response because we don't know in which order the server will respond
 		SendCommand("BOGUSCOMMAND\r\n", strlen("BOGUSCOMMAND\r\n"));
 
+#ifdef _WIN32
 		OutputDebugString("File closed, waiting for response.\n");
-
+#endif
 		m_iStatus = FTPSTAT_TRANSFERREPLY;
 	}
 
@@ -1837,8 +1883,16 @@ bool Prepare_Directories(const char *rootdir, const char *filename)
 		memset(tempstr,0,256);
 		strncpy(tempstr,filename,cptr-filename);
 		sprintf(newdir,"%s\\%s",rootdir, tempstr);
+	#ifdef _WIN32
 		if (!CreateDirectory(newdir, NULL))
 			return false;
+	#else
+		std::error_code ec;
+		if(!std::filesystem::create_directory(newdir, ec))
+			return false;
+		if(ec)
+			return false;
+	#endif
 		//if ((_mkdir(newdir) == -1) && ((errno == ENOENT || errno==EACCES)))
 			//return(false);
 		cptr++;

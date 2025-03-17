@@ -209,12 +209,4 @@ class StreakLineClass : public RenderObjClass
 	StreakRendererClass		StreakRenderer;//special, per-point alpha/color/size
 };
 
-
-
-
-
-
-
-
-
-#endif SEGLINE_H
+#endif // SEGLINE_H

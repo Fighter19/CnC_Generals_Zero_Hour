@@ -36,7 +36,7 @@
 #include "Common/LocalFileSystem.h"
 #include "Win32Device/Common/Win32BIGFile.h"
 #include "Win32Device/Common/Win32BIGFileSystem.h"
-#include "Common/registry.h"
+#include "Common/Registry.h"
 
 #ifdef _INTERNAL
 // for occasional debugging...

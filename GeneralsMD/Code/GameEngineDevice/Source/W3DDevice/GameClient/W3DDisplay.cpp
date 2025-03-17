@@ -109,8 +109,11 @@ static void drawFramerateBar(void);
 #include "GameLogic/PartitionManager.h"
 #endif
 
+#ifdef SAGE_USE_SDL3
+#include "SDL3Main.h"
+#else
 #include "WinMain.h"
-
+#endif
 
 #ifndef _WIN32
 static bool IsIconic(HWND hWnd)

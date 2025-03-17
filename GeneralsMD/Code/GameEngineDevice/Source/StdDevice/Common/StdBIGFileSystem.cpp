@@ -33,9 +33,9 @@
 #include "Common/GameAudio.h"
 #include "Common/GameMemory.h"
 #include "Common/LocalFileSystem.h"
+#include "Common/Registry.h"
 #include "StdDevice/Common/StdBIGFile.h"
 #include "StdDevice/Common/StdBIGFileSystem.h"
-#include "Common/registry.h"
 
 #include <filesystem>
 #include "intrin_compat.h"

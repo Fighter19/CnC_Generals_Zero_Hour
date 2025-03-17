@@ -54,6 +54,10 @@ static unsigned int GetDoubleClickTime()
 #define MAX_PATH _MAX_PATH
 #endif
 
+#ifndef _MAX_DIR
+#define _MAX_DIR _MAX_PATH
+#endif
+
 #ifndef _MAX_FNAME
 #define _MAX_FNAME 256
 #endif

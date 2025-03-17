@@ -25,12 +25,15 @@
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#else
+#include "windows_compat.h"
 #endif
 
 #include "Registry.h"
 
 bool  getStringFromRegistry(HKEY root, std::string path, std::string key, std::string& val)
 {
+#ifdef _WIN32
 	HKEY handle;
 	unsigned char buffer[256];
 	unsigned long size = 256;
@@ -48,12 +51,14 @@ bool  getStringFromRegistry(HKEY root, std::string path, std::string key, std::s
 		val = (char *)buffer;
 		return true;
 	}
+#endif
 
 	return false;
 }
 
 bool getUnsignedIntFromRegistry(HKEY root, std::string path, std::string key, unsigned int& val)
 {
+#ifdef _WIN32
 	HKEY handle;
 	unsigned long buffer;
 	unsigned long size = sizeof(buffer);
@@ -71,12 +76,14 @@ bool getUnsignedIntFromRegistry(HKEY root, std::string path, std::string key, un
 		val = buffer;
 		return true;
 	}
+#endif
 
 	return false;
 }
 
 bool setStringInRegistry( HKEY root, std::string path, std::string key, std::string val)
 {
+#ifdef _WIN32
 	HKEY handle;
 	unsigned long type;
 	unsigned long returnValue;
@@ -91,10 +98,14 @@ bool setStringInRegistry( HKEY root, std::string path, std::string key, std::str
 	}
 
 	return (returnValue == ERROR_SUCCESS);
+#else
+	return false;
+#endif
 }
 
 bool setUnsignedIntInRegistry( HKEY root, std::string path, std::string key, unsigned int val)
 {
+#ifdef _WIN32
 	HKEY handle;
 	unsigned long type;
 	unsigned long returnValue;
@@ -109,10 +120,14 @@ bool setUnsignedIntInRegistry( HKEY root, std::string path, std::string key, uns
 	}
 
 	return (returnValue == ERROR_SUCCESS);
+#else
+	return false;
+#endif
 }
 
 bool GetStringFromRegistry(std::string path, std::string key, std::string& val)
 {
+#ifdef _WIN32
 	std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Command and Conquer Generals Zero Hour";
 
 	fullPath.append(path);
@@ -122,10 +137,14 @@ bool GetStringFromRegistry(std::string path, std::string key, std::string& val)
 	}
 
 	return getStringFromRegistry(HKEY_CURRENT_USER, fullPath.c_str(), key.c_str(), val);
+#else
+	return false;
+#endif
 }
 
 bool GetUnsignedIntFromRegistry(std::string path, std::string key, unsigned int& val)
 {
+#ifdef _WIN32
 	std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Command and Conquer Generals Zero Hour";
 
 	fullPath.append(path);
@@ -135,10 +154,14 @@ bool GetUnsignedIntFromRegistry(std::string path, std::string key, unsigned int&
 	}
 
 	return getUnsignedIntFromRegistry(HKEY_CURRENT_USER, fullPath.c_str(), key.c_str(), val);
+#else
+	return false;
+#endif
 }
 
 bool SetStringInRegistry( std::string path, std::string key, std::string val)
 {
+#ifdef _WIN32
 	std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Command and Conquer Generals Zero Hour";
 	fullPath.append(path);
 
@@ -146,10 +169,14 @@ bool SetStringInRegistry( std::string path, std::string key, std::string val)
 		return true;
 
 	return setStringInRegistry( HKEY_CURRENT_USER, fullPath, key, val );
+#else
+	return false;
+#endif
 }
 
 bool SetUnsignedIntInRegistry( std::string path, std::string key, unsigned int val)
 {
+#ifdef _WIN32
 	std::string fullPath = "SOFTWARE\\Electronic Arts\\EA Games\\Command and Conquer Generals Zero Hour";
 	fullPath.append(path);
 
@@ -157,5 +184,8 @@ bool SetUnsignedIntInRegistry( std::string path, std::string key, unsigned int v
 		return true;
 
 	return setUnsignedIntInRegistry( HKEY_CURRENT_USER, fullPath, key, val );
+#else
+	return false;
+#endif
 }
 

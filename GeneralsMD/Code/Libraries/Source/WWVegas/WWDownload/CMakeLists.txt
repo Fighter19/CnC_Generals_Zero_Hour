@@ -1,12 +1,5 @@
 set(SOURCES_WWDOWNLOAD Download.cpp FTP.CPP registry.cpp urlBuilder.cpp)
 
-if (UNIX)
-    list(REMOVE_ITEM SOURCES_WWDOWNLOAD FTP.CPP)
-    list(REMOVE_ITEM SOURCES_WWDOWNLOAD registry.cpp)
-
-    list(APPEND SOURCES_WWDOWNLOAD RegistryUnix.cpp)
-endif()
-
 add_library(WWDownload STATIC ${SOURCES_WWDOWNLOAD})
 
 target_include_directories(WWDownload PUBLIC

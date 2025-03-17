@@ -21,6 +21,8 @@
 
 
 // CFtp return codes.
+#define SEVERITY_ERROR 1
+#define FACILITY_ITF 2
 
 #define FTP_SUCCEEDED		S_OK
 #define	FTP_FAILED			MAKE_HRESULT( SEVERITY_ERROR, FACILITY_ITF, 1 )

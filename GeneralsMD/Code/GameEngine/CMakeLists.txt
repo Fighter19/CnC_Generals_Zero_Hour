@@ -5,10 +5,8 @@ file(GLOB_RECURSE SOURCES_COMMON
 # Remove Debug.cpp from the common sources for UNIX
 if(UNIX)
     list(REMOVE_ITEM SOURCES_COMMON ${CMAKE_CURRENT_SOURCE_DIR}/Source/Common/System/Debug.cpp)
-    list(REMOVE_ITEM SOURCES_COMMON ${CMAKE_CURRENT_SOURCE_DIR}/Source/Common/System/registry.cpp)
 else()
     list(REMOVE_ITEM SOURCES_COMMON ${CMAKE_CURRENT_SOURCE_DIR}/Source/Common/System/DebugUnix.cpp)
-    list(REMOVE_ITEM SOURCES_COMMON ${CMAKE_CURRENT_SOURCE_DIR}/Source/Common/System/RegistryUnix.cpp)
 endif()
 
 file(GLOB_RECURSE SOURCES_GAMECLIENT
