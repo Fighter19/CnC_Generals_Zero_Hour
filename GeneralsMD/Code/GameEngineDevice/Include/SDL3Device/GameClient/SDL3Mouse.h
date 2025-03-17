@@ -55,7 +55,11 @@
 #include "GameClient/Mouse.h"
 
 // FORWARD REFERENCES /////////////////////////////////////////////////////////
-struct SDLEvent;
+union SDL_Event;
+struct SDL_MouseMotionEvent;
+struct SDL_MouseButtonEvent;
+struct SDL_MouseWheelEvent;
+struct SDL_Cursor;
 
 // TYPE DEFINES ///////////////////////////////////////////////////////////////
 
@@ -82,7 +86,7 @@ public:
   virtual void setVisibility(Bool visible);
 
   /// add an event from a win32 window procedure
-  void addSDLEvent(SDLEvent *ev);
+  void addSDLEvent(SDL_Event *ev);
   void lostFocus(Bool state) { m_lostFocus = state; }
 
 protected:
@@ -92,7 +96,16 @@ protected:
   /// translate a win32 mouse event to our own info
   void translateEvent(UnsignedInt eventIndex, MouseIO *result);
 
-  struct SDL3MouseEvent {};
+  SDL_Cursor* loadCursorFromFile(const char* file);
+
+  struct SDL3MouseEvent
+	{
+		uint32_t type = 0;				///< SDL EventType
+    SDL_MouseMotionEvent* motion;            /**< Mouse motion event data */
+    SDL_MouseButtonEvent* button;            /**< Mouse button event data */
+    SDL_MouseWheelEvent* wheel;              /**< Mouse wheel event data */
+		uint64_t time;			///< TIME from the WM_* message
+	};
   /// this is our buffer of events that we receive via a WndProc message
   SDL3MouseEvent m_eventBuffer[Mouse::NUM_MOUSE_EVENTS];
   UnsignedInt m_nextFreeIndex; ///< insert new events at this index
