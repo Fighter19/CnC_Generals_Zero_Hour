@@ -6,10 +6,6 @@ file(GLOB_RECURSE SOURCES_GAMECLIENT
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/GameClient/*.cpp
 )
 
-if(UNIX)
-    list(REMOVE_ITEM SOURCES_GAMECLIENT ${CMAKE_CURRENT_SOURCE_DIR}/Source/GameClient/GUI/IMEManager.cpp)
-endif()
-
 file(GLOB_RECURSE SOURCES_GAMELOGIC
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/GameLogic/*.cpp
 )

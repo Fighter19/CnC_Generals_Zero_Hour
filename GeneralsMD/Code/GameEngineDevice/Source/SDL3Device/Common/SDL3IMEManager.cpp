@@ -99,7 +99,6 @@ public:
   }
 };
 
-IMEManagerInterface *TheIMEManager = NULL;
 IMEManagerInterface *CreateIMEManagerInterface(void)
 {
   return NEW SDL3IMEManager;

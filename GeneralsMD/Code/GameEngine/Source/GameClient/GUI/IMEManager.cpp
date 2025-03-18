@@ -47,8 +47,10 @@
 
 #include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
 
+#ifdef _WIN32
 #include "Windows.h"
 #include "mbstring.h"
+#endif
 
 #include "Common/Debug.h"
 #include "Common/Language.h"
@@ -90,6 +92,7 @@ extern Int	IMECandidateWindowLineSpacing;
 // IMEManager 
 //===============================
 
+#ifdef _WIN32
 class IMEManager : public IMEManagerInterface
 {
 
@@ -202,7 +205,7 @@ class IMEManager : public IMEManagerInterface
 };
 
 
-
+#endif
 
 //----------------------------------------------------------------------------
 //         Private Data                                                     
@@ -335,6 +338,7 @@ IMEManagerInterface *TheIMEManager = NULL;
 //         Private Functions                                               
 //----------------------------------------------------------------------------
 
+#ifdef _WIN32
 #ifdef DEBUG_IME
 
 //============================================================================
@@ -1612,4 +1616,4 @@ void IMEManager::updateStatusWindow( void )
 {
 
 }
-
+#endif // _WIN32

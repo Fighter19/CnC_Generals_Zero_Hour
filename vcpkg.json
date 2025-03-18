@@ -9,6 +9,11 @@
     "gli",
     "openal-soft",
     "ffmpeg",
-    "sdl3"
+    {
+      "name": "sdl3",
+      "features": [
+        "vulkan"
+      ]
+    }
   ]
 }
