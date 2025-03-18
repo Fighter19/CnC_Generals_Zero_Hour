@@ -31,6 +31,8 @@
 #ifndef __PERFTIMER_H__
 #define __PERFTIMER_H__
 
+#include "intrin_compat.h"
+
 #if defined(_DEBUG) || defined(_INTERNAL)
 	/*
 		NOTE NOTE NOTE: never check this in with this enabled, since there is a nonzero time penalty

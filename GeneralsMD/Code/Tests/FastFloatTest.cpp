@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "Lib/BaseType.h"
+#include "Common/GameMemory.h"
 
 TEST(FastFloat, Float2Long_Round)
 {

@@ -3318,6 +3318,15 @@ void operator delete[](void *p) noexcept
 	TheDynamicMemoryAllocator->freeBytes(p);
 }
 
+void operator delete(void* p, size_t sz) noexcept
+{
+   ++theLinkTester;
+   preMainInitMemoryManager();
+   DEBUG_ASSERTCRASH(TheDynamicMemoryAllocator != NULL,
+                     ("must init memory manager before calling global operator delete"));
+   TheDynamicMemoryAllocator->freeBytes(p);
+}
+
 //-----------------------------------------------------------------------------
 /**
 	overload for global operator new (MFC debug version); send requests to TheDynamicMemoryAllocator.

@@ -9,7 +9,6 @@
     "gli",
     "openal-soft",
     "ffmpeg",
-    "gtest",
     {
       "name": "sdl3",
       "default-features": false,

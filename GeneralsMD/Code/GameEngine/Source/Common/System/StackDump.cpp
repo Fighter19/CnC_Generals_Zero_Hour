@@ -570,8 +570,6 @@ void DumpExceptionInfo( unsigned int u, EXCEPTION_POINTERS* e_info )
 	{
 		DOUBLE_DEBUG (("Exception code is %x\n", e_info->ExceptionRecord->ExceptionCode));
 	}
-	Int *winMainAddr = (Int *)WinMain;
-	DOUBLE_DEBUG(("WinMain at %x\n", winMainAddr));
 	/*
 	** Match the exception type with the error string and print it out
 	*/
