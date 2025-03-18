@@ -14,7 +14,12 @@ jobs:
       X_VCPKG_ASSET_SOURCES: x-azurl,https://s3.hilton.rwth-aachen.de/assetcache,,read
     steps:
       - name: Install deps
-        run: sudo apt-get install -y nasm autoconf automake libtool pkg-config libltdl-dev
+        run: |
+          sudo apt install -y nasm autoconf automake libtool pkg-config libltdl-dev
+          sudo apt install -y libx11-dev libxft-dev libxext-dev
+          sudo apt install -y libwayland-dev libxkbcommon-dev libegl1-mesa-dev
+          sudo apt install -y libibus-1.0-dev
+          sudo apt install -y ninja-build
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,8 +45,13 @@ jobs:
       X_VCPKG_ASSET_SOURCES: x-azurl,https://s3.hilton.rwth-aachen.de/assetcache,,read
     steps:
       - name: Install deps
-        run: sudo apt-get install -y nasm autoconf automake libtool pkg-config libltdl-dev
-
+        run: |
+          sudo apt install -y nasm autoconf automake libtool pkg-config libltdl-dev
+          sudo apt install -y libx11-dev libxft-dev libxext-dev
+          sudo apt install -y libwayland-dev libxkbcommon-dev libegl1-mesa-dev
+          sudo apt install -y libibus-1.0-dev
+          sudo apt install -y ninja-build
+          
       - name: Checkout
         uses: actions/checkout@v4
 
