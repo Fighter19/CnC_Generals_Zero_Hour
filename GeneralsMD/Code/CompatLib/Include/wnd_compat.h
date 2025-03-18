@@ -1,6 +1,6 @@
 #pragma once
-
-
+#include "windows_base.h"
+#include "tchar_compat.h"
 #define GWL_STYLE 1
 
 

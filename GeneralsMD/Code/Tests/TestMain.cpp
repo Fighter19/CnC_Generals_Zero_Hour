@@ -32,10 +32,7 @@
 
 // SYSTEM INCLUDES ////////////////////////////////////////////////////////////
 #include <stdlib.h>
-#include <crtdbg.h>
-#include <eh.h>
 #include <ole2.h>
-#include <dbt.h>
 #include <gtest/gtest.h>
 
 // USER INCLUDES //////////////////////////////////////////////////////////////
@@ -58,6 +55,12 @@
 #include "GameClient/Mouse.h"
 #include "GameClient/IMEManager.h"
 #include "Common/Version.h"
+
+#ifndef _WIN32
+#include "GameNetwork/WOLBrowser/WebBrowser.h"
+WebBrowser *TheWebBrowser;
+CComModule _Module;
+#endif
 
 // GLOBALS ////////////////////////////////////////////////////////////////////
 HINSTANCE ApplicationHInstance = NULL;  ///< our application instance
@@ -88,7 +91,6 @@ int main(int argc, char **argv)
     int result = EXIT_FAILURE;
 	try {
 
-		_set_se_translator( DumpExceptionInfo ); // Hook that allows stack trace.
 		//
 		// there is something about checkin in and out the .dsp and .dsw files 
 		// that blows the working directory information away on each of the 
@@ -121,7 +123,7 @@ int main(int argc, char **argv)
 		DEBUG_LOG(("CRC message is %d\n", GameMessage::MSG_LOGIC_CRC));
 
 		// run the game main loop
-        result = RUN_ALL_TESTS();
+    result = RUN_ALL_TESTS();
 
 		delete TheVersion;
 		TheVersion = NULL;

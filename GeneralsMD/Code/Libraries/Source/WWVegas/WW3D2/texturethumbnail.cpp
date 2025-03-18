@@ -687,6 +687,7 @@ void ThumbnailManagerClass::Update_Thumbnail_File(const char* mix_file_name,bool
 		return;
 	}
 
+#ifdef _WIN32
 	if (display_message_box && !message_box_displayed) {
 		message_box_displayed=true;
 		::MessageBox(NULL,
@@ -697,6 +698,7 @@ void ThumbnailManagerClass::Update_Thumbnail_File(const char* mix_file_name,bool
 			"Updating texture thumbnails",
 			MB_OK);
 	}
+#endif
 
 	// we don't currently have a thumbnail file (either we just deleted it or it never existed, we don't care)
 	// so we must create one now.

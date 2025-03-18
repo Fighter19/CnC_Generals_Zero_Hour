@@ -85,9 +85,11 @@
 	#define _OPERATOR_NEW_DEFINED_
 
 	extern void * __cdecl operator new		(size_t size);
+	extern void * __cdecl operator new		(size_t size, const std::nothrow_t&) noexcept;
 	extern void __cdecl operator delete		(void *p) noexcept;
 
 	extern void * __cdecl operator new[]	(size_t size);
+	extern void * __cdecl operator new[]	(size_t size, const std::nothrow_t&) noexcept;
 	extern void __cdecl operator delete[]	(void *p) noexcept;
 
 	extern void __cdecl operator delete		(void *p, size_t sz) noexcept;

@@ -39,6 +39,7 @@ set(SOURCE_COMPAT
     thread_compat.cpp
     time_compat.cpp
     wchar_compat.cpp
+    wnd_compat.cpp
 )
 
 list(TRANSFORM SOURCE_COMPAT PREPEND "Source/")
@@ -65,6 +66,6 @@ target_link_directories(d3d8lib INTERFACE
     ${dxvk_SOURCE_DIR}/lib
 )
 
-target_link_libraries(CompatLib PRIVATE d3d8lib)
+target_link_libraries(CompatLib PUBLIC d3d8lib)
 
 endif()

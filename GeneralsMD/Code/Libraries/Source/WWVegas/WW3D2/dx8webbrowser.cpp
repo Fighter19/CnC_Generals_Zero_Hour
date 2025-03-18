@@ -36,10 +36,8 @@
 
 #if ENABLE_EMBEDDED_BROWSER
 
-#ifdef __clang__
-#pragma message ("DX8WebBrowser is disabled for clang")
-// include for _bstr_t
-#include <comdef.h>
+#if !defined(_MSC_VER)
+#pragma message ("DX8WebBrowser is disabled for non MSVC compilers")
 typedef class IFEBrowserEngine2 *IFEBrowserEngine2Ptr; 
 #else
 // Import the Browser Type Library
@@ -58,7 +56,7 @@ bool DX8WebBrowser::Initialize(	const char* badpageurl,
 											const char* mousefilename,
 											const char* mousebusyfilename)
 {
-#ifdef __clang__
+#if !defined(_msc_ver)
 	return false;
 #else
 	if(pBrowser == 0)
@@ -116,7 +114,7 @@ bool DX8WebBrowser::Initialize(	const char* badpageurl,
 
 void DX8WebBrowser::Shutdown()
 {
-#ifdef __clang__
+#if !defined(_msc_ver)
 	return;
 #else
 	if(pBrowser)
@@ -149,7 +147,7 @@ void DX8WebBrowser::Shutdown()
 // ******************************************************************************************
 void	DX8WebBrowser::Update(void)
 {
-#ifdef __clang__
+#if !defined(_msc_ver)
 	return;
 #else
 	if(pBrowser) pBrowser->D3DUpdate();
@@ -169,7 +167,7 @@ void	DX8WebBrowser::Update(void)
 // ******************************************************************************************
 void	DX8WebBrowser::Render(int backbufferindex)
 {
-#ifdef __clang__
+#if !defined(_msc_ver)
 	return;
 #else
 	if(pBrowser) pBrowser->D3DRender(backbufferindex);
@@ -199,7 +197,7 @@ void	DX8WebBrowser::Render(int backbufferindex)
 // ******************************************************************************************
 void	DX8WebBrowser::CreateBrowser(const char* browsername, const char* url, int x, int y, int w, int h, int updateticks, LONG options, LPDISPATCH gamedispatch)
 {
-#ifdef __clang__
+#if !defined(_msc_ver)
 	return;
 #else
 	WWDEBUG_SAY(("DX8WebBrowser::CreateBrowser - Creating browser with the name %s, url = %s, (x, y, w, h) = (%d, %d, %d, %d), update ticks = %d\n", browsername, url, x, y, h, w, updateticks));
@@ -226,7 +224,7 @@ void	DX8WebBrowser::CreateBrowser(const char* browsername, const char* url, int 
 // ******************************************************************************************
 void	DX8WebBrowser::DestroyBrowser(const char* browsername)
 {
-#ifdef __clang__
+#if !defined(_msc_ver)
 	return;
 #else
 	WWDEBUG_SAY(("DX8WebBrowser::DestroyBrowser - destroying browser %s\n", browsername));
@@ -249,7 +247,7 @@ void	DX8WebBrowser::DestroyBrowser(const char* browsername)
 // ******************************************************************************************
 bool	DX8WebBrowser::Is_Browser_Open(const char* browsername)
 {
-#ifdef __clang__
+#if !defined(_msc_ver)
 	return false;
 #else
 	if(pBrowser == 0) return false;
@@ -270,7 +268,7 @@ bool	DX8WebBrowser::Is_Browser_Open(const char* browsername)
 // ******************************************************************************************
 void	DX8WebBrowser::Navigate(const char* browsername, const char* url)
 {
-#ifdef __clang__
+#if !defined(_msc_ver)
 	return;
 #else
 	if(pBrowser == 0) return;

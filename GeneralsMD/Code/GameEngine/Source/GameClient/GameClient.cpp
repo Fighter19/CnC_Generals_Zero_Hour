@@ -1053,14 +1053,6 @@ void GameClient::allocateShadows(void)
 }
 
 #ifndef _WIN32
-struct MEMORYSTATUS
-{
-	// Total number of bytes required by the structure
-	DWORD dwLength;
-	// Number of bytes of physical memory
-	DWORD dwTotalPhys;
-};
-
 struct MEMORYSTATUSEX
 {
 	// Total number of bytes required by the structure

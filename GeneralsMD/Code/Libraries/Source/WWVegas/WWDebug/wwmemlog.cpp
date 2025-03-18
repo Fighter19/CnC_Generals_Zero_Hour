@@ -61,7 +61,7 @@
 #endif //PARAM_EDITING_ON
 #endif //STEVES_NEW_CATCHER*/
 
-#ifdef USE_FAST_ALLOCATOR
+#if 0//def USE_FAST_ALLOCATOR
 	#define ALLOC_MEMORY(n) FastAllocatorGeneral::Get_Allocator()->Alloc(n)
 	#define FREE_MEMORY(p) FastAllocatorGeneral::Get_Allocator()->Free(p)
 #else

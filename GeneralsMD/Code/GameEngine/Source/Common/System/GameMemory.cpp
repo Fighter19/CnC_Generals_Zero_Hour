@@ -3282,11 +3282,33 @@ void *operator new(size_t size)
 	return TheDynamicMemoryAllocator->allocateBytes(size, "global operator new");
 }
 
+/**
+	overload for global operator new; send requests to TheDynamicMemoryAllocator.
+*/
+void *operator new(size_t size, const std::nothrow_t&)
+{
+	++theLinkTester;
+	preMainInitMemoryManager();
+	DEBUG_ASSERTCRASH(TheDynamicMemoryAllocator != NULL, ("must init memory manager before calling global operator new"));
+	return TheDynamicMemoryAllocator->allocateBytes(size, "global operator new");
+}
+
 //-----------------------------------------------------------------------------
 /**
 	overload for global operator new[]; send requests to TheDynamicMemoryAllocator.
 */
 void *operator new[](size_t size)
+{
+	++theLinkTester;
+	preMainInitMemoryManager();
+	DEBUG_ASSERTCRASH(TheDynamicMemoryAllocator != NULL, ("must init memory manager before calling global operator new"));
+	return TheDynamicMemoryAllocator->allocateBytes(size, "global operator new[]");
+}
+
+/**
+	overload for global operator new; send requests to TheDynamicMemoryAllocator.
+*/
+void *operator new[](size_t size, const std::nothrow_t&)
 {
 	++theLinkTester;
 	preMainInitMemoryManager();
