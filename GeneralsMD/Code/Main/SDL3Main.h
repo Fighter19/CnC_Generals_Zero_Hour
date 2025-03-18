@@ -34,7 +34,7 @@
 #include "SDL3Device/GameClient/SDL3Mouse.h"
 
 // EXTERNAL ///////////////////////////////////////////////////////////////////
-extern void* ApplicationHWnd;  ///< our application window handle
+extern HWND ApplicationHWnd;  ///< our application window handle
 extern SDL3Mouse *TheSDL3Mouse;  ///< global for SDL3 mouse only!
 extern SDL_Window* TheSDL3Window;
 

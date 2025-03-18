@@ -25,4 +25,4 @@ if(WIN32)
 endif()
 
 include(GoogleTest)
-gtest_discover_tests(SageTests DISCOVERY_TIMEOUT 60)
+gtest_discover_tests(SageTests)

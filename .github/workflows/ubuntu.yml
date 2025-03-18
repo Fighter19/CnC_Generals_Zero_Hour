@@ -1,4 +1,4 @@
-name: Linux-64 Testing
+name: Linux-64
 on:
   push:
   pull_request:
@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  job:
+  testing:
     name: Linux 64-bit Testing
     runs-on: ubuntu-24.04
     env:
@@ -33,3 +33,28 @@ jobs:
           buildPreset: "testing"
           testPreset: "default"
           generator: "Ninja"
+  deploy:
+    name: Linux 64-bit Deploy
+    runs-on: ubuntu-24.04
+    env:
+      X_VCPKG_ASSET_SOURCES: x-azurl,https://s3.hilton.rwth-aachen.de/assetcache,,read
+    steps:
+      - name: Install deps
+        run: sudo apt-get install -y nasm autoconf automake libtool pkg-config libltdl-dev
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+        # Install latest CMake and Ninja.
+      - uses: lukka/get-cmake@latest
+
+      # Setup vcpkg: ensures vcpkg is downloaded and built.
+      - name: Setup anew (or from cache) vcpkg (and does not build any package)
+        uses: lukka/run-vcpkg@v11
+
+      - name: Run CMake consuming CMakePreset.json and run vcpkg to build packages
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: "deploy"
+          buildPreset: "deploy"
+          packagePreset: "deploy"

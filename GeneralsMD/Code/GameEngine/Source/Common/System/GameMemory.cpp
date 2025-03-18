@@ -113,7 +113,8 @@ DECLARE_PERF_TIMER(MemoryPoolInitFilling)
 	};
 
 	// in debug mode (but not internal), save stacktraces too
-	#if !defined(MEMORYPOOL_CHECKPOINTING) && defined(MEMORYPOOL_STACKTRACE) && defined(_DEBUG)
+	// feliwir: THIS IS WAY TOO SLOW IN ANY CONFIGURATION
+	#if 0//!defined(MEMORYPOOL_CHECKPOINTING) && defined(MEMORYPOOL_STACKTRACE) && defined(_DEBUG)
 		#define MEMORYPOOL_SINGLEBLOCK_GETS_STACKTRACE
 	#endif
 

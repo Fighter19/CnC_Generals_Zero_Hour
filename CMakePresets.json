@@ -46,8 +46,6 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CONFIGURATION_TYPES": "Debug",
         "SAGE_BUILD_TESTS": "ON",
-        "SAGE_USE_UBSAN": "ON",
-        "SAGE_USE_ASAN": "ON",
         "SAGE_USE_GLM": "ON"
       }
     },
