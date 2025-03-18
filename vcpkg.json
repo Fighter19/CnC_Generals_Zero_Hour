@@ -9,15 +9,6 @@
     "gli",
     "openal-soft",
     "ffmpeg",
-    {
-      "name": "sdl3",
-      "default-features": false,
-      "features": ["vulkan", "x11", "wayland"],
-      "platform": "linux"
-    },
-    {
-      "name": "sdl3",
-      "platform": "!linux"
-    }
+    "sdl3"
   ]
 }
