@@ -285,7 +285,7 @@ void GameResultsThreadClass::Thread_Function()
 
 //-------------------------------------------------------------------------
 
-#ifdef DEBUG_LOGGING
+#if defined(DEBUG_LOGGING) && defined(_WIN32)
 #define CASE(x) case (x): return #x;
 
 static const char *getWSAErrorString( Int error )
@@ -362,7 +362,9 @@ Int GameResultsThreadClass::sendGameResults( UnsignedInt IP, UnsignedShort port,
 	Int sock = socket( AF_INET, SOCK_STREAM, 0 );
 	if (sock < 0)
 	{
+		#ifdef _WIN32
 		DEBUG_LOG(("GameResultsThreadClass::sendGameResults() - socket() returned %d(%s)\n", sock, getWSAErrorString(sock)));
+		#endif
 		return sock;
 	}
 

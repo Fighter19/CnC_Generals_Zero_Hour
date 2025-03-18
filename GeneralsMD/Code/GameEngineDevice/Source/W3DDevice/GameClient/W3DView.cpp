@@ -754,7 +754,7 @@ void drawDebugCircle( const Coord3D & center, Real radius, Real width, Color col
   }
 }
 
-void drawDrawableExtents( Drawable *draw, void *userData );  // FORWARD DECLARATION
+static void drawDrawableExtents( Drawable *draw, void *userData );  // FORWARD DECLARATION
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
 static void drawContainedDrawable( Object *obj, void *userData )
@@ -864,7 +864,7 @@ static void drawDrawableExtents( Drawable *draw, void *userData )
 }  // end drawDrawableExtents
 
 
-void drawAudioLocations( Drawable *draw, void *userData );
+static void drawAudioLocations( Drawable *draw, void *userData );
 // ------------------------------------------------------------------------------------------------
 // Helper for drawAudioLocations
 // ------------------------------------------------------------------------------------------------
@@ -957,7 +957,7 @@ static void drawAudioRadii( const Drawable * drawable )
     if ( ambientInfo == NULL )
     {
       // I don't think that's right...
-      OutputDebugString( ("Playing sound has NULL AudioEventInfo?\n" ) );
+      DEBUG_LOG( ("Playing sound has NULL AudioEventInfo?\n" ) );
       
       if ( TheAudio != NULL )
       {

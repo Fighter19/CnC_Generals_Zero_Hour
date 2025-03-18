@@ -26,7 +26,7 @@
 
 #include "Common/StackDump.h"
 
-#if defined(_DEBUG) || defined(_INTERNAL) || defined(IG_DEBUG_STACKTRACE)
+#if (defined(_DEBUG) || defined(_INTERNAL) || defined(IG_DEBUG_STACKTRACE)) && defined(_WIN32)
 
 #pragma pack(push, 8)
 
@@ -648,6 +648,7 @@ void DumpExceptionInfo( unsigned int u, EXCEPTION_POINTERS* e_info )
 #pragma pack(pop)
 
 #else
+AsciiString g_LastErrorDump;
 
 void StackDumpFromAddresses(void** addresses, unsigned int count, void (*callback)(const char*))
 {

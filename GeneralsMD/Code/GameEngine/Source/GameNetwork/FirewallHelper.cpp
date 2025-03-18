@@ -690,7 +690,9 @@ Bool FirewallHelperClass::detectionBeginUpdate() {
 		struct hostent *host_info = gethostbyname(temp_name);
 
 		if (!host_info) {
+			#ifdef _WIN32
 			DEBUG_LOG(("gethostbyname failed! Error code %d\n", WSAGetLastError()));
+			#endif
 			break;
 		}
 

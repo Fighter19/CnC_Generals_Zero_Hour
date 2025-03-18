@@ -81,6 +81,10 @@ elseif(UNIX)
   add_definitions(-D_UNIX)
 endif()
 
+if(NOT MSVC)
+  set( CMAKE_CXX_FLAGS_DEBUG "-D_DEBUG" )
+endif()
+
 include(FetchContent)
 if(SAGE_USE_BINK)
   FetchContent_Declare(

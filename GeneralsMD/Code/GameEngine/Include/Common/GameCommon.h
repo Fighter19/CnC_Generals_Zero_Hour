@@ -310,7 +310,7 @@ inline VeterancyLevelFlags clearVeterancyLevelFlag(VeterancyLevelFlags flags, Ve
 }
 
 // ----------------------------------------------------------------------------------------------
-#define BOGUSPTR(p) ((((unsigned int)(p)) & 1) != 0)
+#define BOGUSPTR(p) ((((uintptr_t)(p)) & 1) != 0)
 
 // ----------------------------------------------------------------------------------------------
 #define MAKE_DLINK_HEAD(OBJCLASS, LISTNAME)																						\

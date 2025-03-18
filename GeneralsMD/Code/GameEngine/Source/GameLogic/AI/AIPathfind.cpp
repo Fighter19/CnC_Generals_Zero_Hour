@@ -55,7 +55,9 @@
 
 #define no_INTENSE_DEBUG
 
+#ifdef _WIN32
 #define DEBUG_QPF
+#endif
 
 #ifdef INTENSE_DEBUG
 #include "GameLogic/ScriptEngine.h"
@@ -5946,8 +5948,8 @@ void Pathfinder::processPathfindQueue(void)
 			m_queuePRHead = 0;
 		}
 	}
-	if (pathsFound>0) {
 #ifdef DEBUG_QPF
+	if (pathsFound>0) {
 #if defined _DEBUG || defined _INTERNAL
 		QueryPerformanceCounter((LARGE_INTEGER *)&endTime64);
 		timeToUpdate = ((double)(endTime64-startTime64) / (double)(freq64));
@@ -5958,8 +5960,8 @@ void Pathfinder::processPathfindQueue(void)
 			DEBUG_LOG(("\n"));
 		}
 #endif
-#endif
 	}
+#endif
 #if defined _DEBUG || defined _INTERNAL
 	doDebugIcons();
 #endif

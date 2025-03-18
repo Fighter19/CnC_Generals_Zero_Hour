@@ -1689,7 +1689,7 @@ void SphereMeshClass::Generate(float radius, int slices, int stacks)
 	}
 
 	// Make Sure ptr is where I expect it to be
-	WWASSERT(((int)out) == ((int)(tri_poly + face_ct)));
+	WWASSERT(((intptr_t)out) == ((intptr_t)(tri_poly + face_ct)));
 
 	//
 	//	Fill in the DCG array

@@ -151,9 +151,10 @@ inline HWND getThreadHWND()
 int MessageBoxWrapper( LPCSTR lpText, LPCSTR lpCaption, UINT uType )
 {
 	HWND threadHWND = getThreadHWND();
+	#ifdef _WIN32
 	if (!threadHWND)
 		return (uType & MB_ABORTRETRYIGNORE)?IDIGNORE:IDYES;
-
+	#endif
 	return ::MessageBox(threadHWND, lpText, lpCaption, uType);
 }
 
@@ -225,10 +226,12 @@ static void doLogOutput(const char *buffer)
 	}
 
 	// log message to dev studio output window
+#ifdef _WIN32
 	if (theDebugFlags & DEBUG_FLAG_LOG_TO_CONSOLE)
 	{
 		::OutputDebugString(buffer);
 	}
+#endif
 }
 #endif
 
@@ -241,8 +244,9 @@ static void doLogOutput(const char *buffer)
 // ----------------------------------------------------------------------------
 static int doCrashBox(const char *buffer, Bool logResult)
 {
-	int result;
+	int result = 0;
 
+#ifdef _WIN32
 	if (!ignoringAsserts()) {
 		result = MessageBoxWrapper(buffer, "Assertion Failure", MB_ABORTRETRYIGNORE|MB_TASKMODAL|MB_ICONWARNING|MB_DEFBUTTON3);
 		//result = MessageBoxWrapper(buffer, "Assertion Failure", MB_ABORTRETRYIGNORE|MB_TASKMODAL|MB_ICONWARNING);
@@ -274,6 +278,7 @@ static int doCrashBox(const char *buffer, Bool logResult)
 #endif
 			break;
 	}
+#endif
 	return result;
 }
 
@@ -564,7 +569,7 @@ void SimpleProfiler::stop()
 {
 	if (m_startThisSession != 0) 
 	{
-		__int64 stop;
+		int64_t stop;
 		QueryPerformanceCounter((LARGE_INTEGER*)&stop);
 		m_totalThisSession = stop - m_startThisSession;
 		m_totalAllSessions += stop - m_startThisSession;
@@ -744,7 +749,9 @@ void ReleaseCrashLocalized(const AsciiString& p, const AsciiString& m)
 
 	if (TheSystemIsUnicode) 
 	{
+		#ifdef _WIN32
 		::MessageBoxW(NULL, mesg.str(), prompt.str(), MB_OK|MB_SYSTEMMODAL|MB_ICONERROR);
+		#endif
 	} 
 	else 
 	{
@@ -755,7 +762,9 @@ void ReleaseCrashLocalized(const AsciiString& p, const AsciiString& m)
 		mesgA.translate(mesg);
 		//Make sure main window is not TOP_MOST
 		::SetWindowPos(ApplicationHWnd, HWND_NOTOPMOST, 0, 0, 0, 0,SWP_NOSIZE |SWP_NOMOVE);
+		#ifdef _WIN32
 		::MessageBoxA(NULL, mesgA.str(), promptA.str(), MB_OK|MB_TASKMODAL|MB_ICONERROR);
+		#endif
 	}
 
 	char prevbuf[ _MAX_PATH ];

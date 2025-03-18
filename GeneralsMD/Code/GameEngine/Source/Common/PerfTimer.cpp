@@ -65,7 +65,8 @@ void GetPrecisionTimerTicksPerSec(Int64* t)
 }
 
 //Kris: Plugged in Martin's code to optimize timer setup.
-#define HOFFESOMMER_REPLACEMENT_CODE
+//feliwir: Disabled this to not use QPC on lunux
+// #define HOFFESOMMER_REPLACEMENT_CODE
 
 //-------------------------------------------------------------------------------------------------
 void InitPrecisionTimer()
@@ -74,7 +75,7 @@ void InitPrecisionTimer()
 
   // measure clock cycles 3 times for 20 msec each
   // then take the 2 counts that are closest, average
-  _int64 n[ 3 ];
+  int64_t n[ 3 ];
   for( int k = 0; k < 3; k++ )
   {
     // wait for end of current tick
@@ -82,7 +83,7 @@ void InitPrecisionTimer()
     while( timeGetTime() < timeEnd ); //do nothing
  
     // get cycles
-    _int64 start, startQPC, endQPC;
+    int64_t start, startQPC, endQPC;
     QueryPerformanceCounter( (LARGE_INTEGER *)&startQPC );
     ProfileGetTime( start );
     timeEnd += 20;
@@ -103,9 +104,9 @@ void InitPrecisionTimer()
   }
  
   // find two closest values
-  _int64 d01 = n[ 1 ] - n[ 0 ];
-	_int64 d02 = n[ 2 ] - n[ 0 ];
-	_int64 d12 = n[ 2 ] - n[ 1 ];
+  int64_t d01 = n[ 1 ] - n[ 0 ];
+	int64_t d02 = n[ 2 ] - n[ 0 ];
+	int64_t d12 = n[ 2 ] - n[ 1 ];
 
   if( d01 < 0 )
 	{
@@ -120,7 +121,7 @@ void InitPrecisionTimer()
 		d12 = -d12;
 	}
 
-  _int64 avg;
+  int64_t avg;
   if( d01 < d02 )
   {
     avg = d01 < d12 ? n[ 0 ] + n[ 1 ] : n[ 1 ] + n[ 2 ];

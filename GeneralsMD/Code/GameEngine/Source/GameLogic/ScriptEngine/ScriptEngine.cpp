@@ -7588,7 +7588,7 @@ Bool ScriptEngine::evaluateConditions( Script *pScript, Team *thisTeam, Player *
 	OrCondition *pConditionHead = pScript->getOrCondition();
 	Bool testValue = false;
 
-#ifdef DEBUG_LOGGING
+#if defined(DEBUG_LOGGING) && defined(_WIN32)
 #define COLLECT_CONDITION_EVAL_TIMES
 #endif
 #ifdef COLLECT_CONDITION_EVAL_TIMES

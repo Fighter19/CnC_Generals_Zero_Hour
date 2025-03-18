@@ -53,7 +53,7 @@
 
 //-------------------------------------------------------------------------
 
-#ifdef DEBUG_LOGGING
+#if defined(DEBUG_LOGGING) && defined(_WIN32)
 
 #define CASE(x) case (x): return #x;
 

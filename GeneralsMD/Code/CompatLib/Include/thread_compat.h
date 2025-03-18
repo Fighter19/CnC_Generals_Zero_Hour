@@ -7,4 +7,4 @@ typedef uint32_t (*start_routine)(void *);
 
 THREAD_ID GetCurrentThreadId();
 void* CreateThread(void *lpSecure, size_t dwStackSize, start_routine lpStartAddress, void *lpParameter, unsigned long dwCreationFlags, unsigned long *lpThreadId);
-void TerminateThread(void *hThread, unsigned long dwExitCode);
+int TerminateThread(void *hThread, unsigned long dwExitCode);

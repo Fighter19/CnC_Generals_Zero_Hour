@@ -39,6 +39,7 @@ bool GameInFocus = false;
 #ifdef _DEBUG
 void __cdecl Print_Win32Error(unsigned long win32Error)
 {
+#ifdef _WIN32
 	LPVOID lpMsgBuf;
 	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
 			FORMAT_MESSAGE_IGNORE_INSERTS, NULL, win32Error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
@@ -46,6 +47,7 @@ void __cdecl Print_Win32Error(unsigned long win32Error)
 
 	WWDEBUG_SAY(("Win32 Error: %s\n", (const char*)lpMsgBuf));
 	LocalFree(lpMsgBuf);
+#endif
 }
 #endif
 

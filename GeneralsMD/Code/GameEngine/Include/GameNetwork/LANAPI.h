@@ -37,6 +37,8 @@
 #include "GameNetwork/LANPlayer.h"
 #include "GameNetwork/LANGameInfo.h"
 
+#define MAX_COMPUTERNAME_LENGTH 256
+
 //static const Int g_lanPlayerNameLength = 20;
 static const Int g_lanPlayerNameLength = 12; // reduced length because of game option length
 //static const Int g_lanLoginNameLength = 16;

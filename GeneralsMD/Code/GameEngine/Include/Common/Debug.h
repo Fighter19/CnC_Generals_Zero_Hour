@@ -48,6 +48,8 @@
 #ifndef __DEBUG_H_
 #define __DEBUG_H_
 
+#include <cstdint>
+
 class AsciiString;
 
 #if defined(_DEBUG) && defined(_INTERNAL)
@@ -85,7 +87,7 @@ class AsciiString;
 #if defined(ALLOW_DEBUG_UTILS) && !defined(DEBUG_STACKTRACE) && !defined(DISABLE_DEBUG_STACKTRACE)
 	#define DEBUG_STACKTRACE 1
 #endif
-#if defined(ALLOW_DEBUG_UTILS) && !defined(DEBUG_PROFILE) && !defined(DISABLE_DEBUG_PROFILE)
+#if defined(ALLOW_DEBUG_UTILS) && !defined(DEBUG_PROFILE) && !defined(DISABLE_DEBUG_PROFILE) && defined(_WIN32)
 	#define DEBUG_PROFILE 1
 #endif
 
@@ -210,10 +212,10 @@ DEBUG_EXTERN_C void ReleaseCrashLocalized(const AsciiString& p, const AsciiStrin
 class SimpleProfiler
 {
 private:
-	__int64 m_freq;
-	__int64 m_startThisSession;
-	__int64 m_totalThisSession;
-	__int64 m_totalAllSessions;
+	int64_t m_freq;
+	int64_t m_startThisSession;
+	int64_t m_totalThisSession;
+	int64_t m_totalAllSessions;
 	int			m_numSessions;
 
 public:

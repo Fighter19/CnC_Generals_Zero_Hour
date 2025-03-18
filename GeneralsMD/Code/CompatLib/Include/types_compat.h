@@ -41,3 +41,4 @@ typedef size_t WPARAM;
 #define OUT
 
 #define _isnan isnan
+#define _finite isfinite

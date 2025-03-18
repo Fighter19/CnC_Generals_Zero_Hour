@@ -196,8 +196,7 @@ void SDL3Mouse::translateEvent( UnsignedInt eventIndex, MouseIO *result )
 		default:
 		{
 
-			DEBUG_CRASH(( "translateEvent: Unknown Win32 mouse event [%d,%d,%d]\n",
-							 msg, wParam, lParam ));
+			DEBUG_CRASH(( "translateEvent: Unknown SDL3 mouse event [%i]\n", type ));
 			return;
 
 		}  // end default

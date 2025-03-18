@@ -50,7 +50,7 @@
 #pragma warning (push, 3)	// (gth) system headers complain at warning level 4...
 #endif
 
-#if _WIN32
+#ifdef _WIN32
 #ifndef _WINDOWS_
 #include "windows.h"
 #endif

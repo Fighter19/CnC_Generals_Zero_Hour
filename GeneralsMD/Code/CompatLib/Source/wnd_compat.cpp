@@ -11,6 +11,11 @@ void AdjustWindowRect(RECT *pRect, DWORD dwStyle, BOOL bMenu)
 
 }
 
+BOOL ShowWindow(HWND hWnd, int nCmdShow)
+{
+  return TRUE;
+}
+
 void SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags)
 {
 
@@ -44,9 +49,9 @@ void SetDeviceGammaRamp(HDC hDC, LPVOID lpRamp)
 
 }
 
-void MessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
+int MessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 {
-
+  return 0;
 }
 
 void SetCursor(void *hCursor)

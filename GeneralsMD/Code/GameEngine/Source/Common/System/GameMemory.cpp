@@ -209,7 +209,6 @@ static Bool theMainInitFlag = false;
 static Int roundUpMemBound(Int i);
 static void *sysAllocateDoNotZero(Int numBytes);
 static void sysFree(void* p);
-static void memset32(void* ptr, Int value, Int bytesToFill);
 #ifdef MEMORYPOOL_STACKTRACE
 static void doStackDumpOutput(const char* m);
 static void doStackDump(void **stacktrace, int size);
@@ -246,7 +245,7 @@ static void* sysAllocateDoNotZero(Int numBytes)
 		#ifdef USE_FILLER_VALUE
 		{
 			USE_PERF_TIMER(MemoryPoolInitFilling)
-			::memset32(p, s_initFillerValue, ::GlobalSize(p));
+			::memset(p, s_initFillerValue, ::GlobalSize(p));
 		}
 		#endif
 		theTotalSystemAllocationInBytes += ::GlobalSize(p);
@@ -269,30 +268,12 @@ static void sysFree(void* p)
 #ifdef MEMORYPOOL_DEBUG
 		{
 			USE_PERF_TIMER(MemoryPoolDebugging)
-			::memset32(p, GARBAGE_FILL_VALUE, ::GlobalSize(p));
+			::memset(p, GARBAGE_FILL_VALUE, ::GlobalSize(p));
 			theTotalSystemAllocationInBytes -= ::GlobalSize(p);
 		}
 #endif
 		::GlobalFree(p);
 	}
-}
-
-// ----------------------------------------------------------------------------
-/** 
-	fills memory with a 32-bit value (note: assumes the ptr is 4-byte-aligned)
-*/
-static void memset32(void* ptr, Int value, Int bytesToFill)
-{
-	Int wordsToFill = bytesToFill>>2;
-	bytesToFill -= (wordsToFill<<2);
-
-	Int *p = (Int*)ptr;
-	for (++wordsToFill; --wordsToFill; )
-		*p++ = value;
-
-	Byte *b = (Byte *)p;
-	for (++bytesToFill; --bytesToFill; )
-		*b++ = (Byte)value;
 }
 
 #ifdef MEMORYPOOL_STACKTRACE
@@ -1061,7 +1042,7 @@ void MemoryPoolSingleBlock::debugMarkBlockAsFree()
 {
 	USE_PERF_TIMER(MemoryPoolDebugging)
 
-	::memset32(getUserDataNoDbg(), GARBAGE_FILL_VALUE, m_logicalSize);
+	::memset(getUserDataNoDbg(), GARBAGE_FILL_VALUE, m_logicalSize);
 	m_debugLiteralTagString = FREE_SINGLEBLOCK_TAG_STRING;
 	#ifdef MEMORYPOOL_INTENSE_VERIFY
 	debugVerifyBlock();
@@ -1684,7 +1665,7 @@ void* MemoryPool::allocateBlockDoNotZeroImplementation(DECLARE_LITERALSTRING_ARG
 	#ifdef USE_FILLER_VALUE
 	{
 		USE_PERF_TIMER(MemoryPoolInitFilling)
-		::memset32(block->getUserData(), s_initFillerValue, getAllocationSize());
+		::memset(block->getUserData(), s_initFillerValue, getAllocationSize());
 	}
 	#endif
 #endif
@@ -2242,14 +2223,14 @@ void *DynamicMemoryAllocator::allocateBytesDoNotZeroImplementation(Int numBytes 
 	#ifdef USE_FILLER_VALUE
 	{
 		USE_PERF_TIMER(MemoryPoolInitFilling)
-		::memset32(result, s_initFillerValue, numBytes);
+		::memset(result, s_initFillerValue, numBytes);
 	}
 	#endif
 #endif
 
-#if defined(_DEBUG) || defined(_INTERNAL)
+#if !defined(NDEBUG) || defined(_INTERNAL)
   // check alignment
-  if (unsigned(result)&3)
+  if (uintptr_t(result)&3)
     throw ERROR_OUT_OF_MEMORY;
 #endif
 

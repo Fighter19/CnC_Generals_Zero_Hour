@@ -5026,8 +5026,9 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 		//-----------------------------------------------------------------------------------------
 		case GameMessage::MSG_META_DEBUG_OBJECT_ID_PERFORMANCE:
 		{
-			static __int64 startTime64;
-			static __int64 endTime64,freq64;
+			static int64_t startTime64;
+			static int64_t endTime64,freq64;
+			#ifdef _WIN32
 			QueryPerformanceCounter((LARGE_INTEGER *)&startTime64);
 			QueryPerformanceFrequency((LARGE_INTEGER *)&freq64);
 			Int numberLookups = 10000;
@@ -5068,6 +5069,7 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 			timeToUpdate = ((double)(endTime64-startTime64) / (double)(freq64));
 
 			TheInGameUI->message( UnicodeString(L"Time to run %d ObjectID lookups is %f.  Next index is %d."), numberLookups, timeToUpdate, (Int)TheGameLogic->getObjectIDCounter() );
+			#endif
 
 			break;
 		}
@@ -5076,8 +5078,9 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 		//-----------------------------------------------------------------------------------------
 		case GameMessage::MSG_META_DEBUG_DRAWABLE_ID_PERFORMANCE:
 		{
-			static __int64 startTime64;
-			static __int64 endTime64,freq64;
+			static int64_t startTime64;
+			static int64_t endTime64,freq64;
+			#ifdef _WIN32
 			QueryPerformanceCounter((LARGE_INTEGER *)&startTime64);
 			QueryPerformanceFrequency((LARGE_INTEGER *)&freq64);
 			Int numberLookups = 10000;
@@ -5118,6 +5121,7 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 			timeToUpdate = ((double)(endTime64-startTime64) / (double)(freq64));
 
 			TheInGameUI->message( UnicodeString(L"Time to run %d DrawableID lookups is %f.  Next index is %d."), numberLookups, timeToUpdate, (Int)TheGameClient->getDrawableIDCounter() );
+			#endif
 
 			break;
 		}

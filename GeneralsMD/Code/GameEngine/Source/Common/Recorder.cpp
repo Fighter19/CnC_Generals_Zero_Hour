@@ -84,7 +84,7 @@ void RecorderClass::logGameStart(AsciiString options)
 		fseek(m_file, fileSize, SEEK_SET);
 	DEBUG_ASSERTCRASH(res == 0, ("Could not seek to end of file!"));
 
-#if defined(_DEBUG) || defined(_INTERNAL)
+#if (defined(_DEBUG) || defined(_INTERNAL)) && defined(_WIN32)
 	if (TheNetwork && TheGlobalData->m_saveStats)
 	{
 		//if (TheLAN)
@@ -145,7 +145,7 @@ void RecorderClass::logPlayerDisconnect(UnicodeString player, Int slot)
 		fseek(m_file, fileSize, SEEK_SET);
 	DEBUG_ASSERTCRASH(res == 0, ("Could not seek to end of file!"));
 
-#if defined(_DEBUG) || defined(_INTERNAL)
+#if (defined(_DEBUG) || defined(_INTERNAL)) && defined(_WIN32)
 	if (TheGlobalData->m_saveStats)
 	{
 		unsigned long bufSize = MAX_COMPUTERNAME_LENGTH + 1;
@@ -190,7 +190,7 @@ void RecorderClass::logCRCMismatch( void )
 		fseek(m_file, fileSize, SEEK_SET);
 	DEBUG_ASSERTCRASH(res == 0, ("Could not seek to end of file!"));
 
-#if defined(_DEBUG) || defined(_INTERNAL)
+#if (defined(_DEBUG) || defined(_INTERNAL)) && defined(_WIN32)
 	if (TheGlobalData->m_saveStats)
 	{
 		m_wasDesync = TRUE;
@@ -244,7 +244,7 @@ void RecorderClass::logGameEnd( void )
 		fseek(m_file, fileSize, SEEK_SET);
 	DEBUG_ASSERTCRASH(res == 0, ("Could not seek to end of file!"));
 
-#if defined(_DEBUG) || defined(_INTERNAL)
+#if (defined(_DEBUG) || defined(_INTERNAL)) && defined(_WIN32)
 	if (TheNetwork && TheGlobalData->m_saveStats)
 	{
 		//if (TheLAN)
@@ -288,7 +288,7 @@ void RecorderClass::logGameEnd( void )
 
 void RecorderClass::cleanUpReplayFile( void )
 {
-#if defined(_DEBUG) || defined(_INTERNAL)
+#if (defined(_DEBUG) || defined(_INTERNAL)) && defined(_WIN32)
 	if (TheGlobalData->m_saveStats)
 	{
 		char fname[_MAX_PATH+1];

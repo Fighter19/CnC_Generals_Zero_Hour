@@ -190,12 +190,16 @@ Bool Transport::update( void )
 	{
 		retval = FALSE;
 	}
+	#ifdef _WIN32
 	DEBUG_ASSERTLOG(retval, ("WSA error is %s\n", GetWSAErrorString(WSAGetLastError()).str()));
+	#endif
 	if (doSend() == FALSE && m_udpsock && m_udpsock->GetStatus() == UDP::ADDRNOTAVAIL)
 	{
 		retval = FALSE;
 	}
+	#ifdef _WIN32
 	DEBUG_ASSERTLOG(retval, ("WSA error is %s\n", GetWSAErrorString(WSAGetLastError()).str()));
+	#endif
 	return retval;
 }
 
@@ -335,7 +339,7 @@ Bool Transport::doRecv()
 
 		for (int i=0; i<MAX_MESSAGES; ++i)
 		{
-#if defined(_DEBUG) || defined(_INTERNAL)
+#if (defined(_DEBUG) || defined(_INTERNAL)) && defined(_WIN32)
 			// Latency simulation
 			if (m_useLatency)
 			{
@@ -365,7 +369,7 @@ Bool Transport::doRecv()
 					memcpy(&m_inBuffer[i], buf, len);
 					break;
 				}
-#if defined(_DEBUG) || defined(_INTERNAL)
+#if (defined(_DEBUG) || defined(_INTERNAL)) && defined(_WIN32)
 			}
 #endif
 		}

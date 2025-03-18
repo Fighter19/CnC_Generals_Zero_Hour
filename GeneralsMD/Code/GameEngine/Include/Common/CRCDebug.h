@@ -45,7 +45,7 @@
 #include "GameLogic/GameLogic.h"
 #include "Lib/BaseType.h"
 #include "WWMath/vector3.h"
-#include "wwmath/matrix3d.h"
+#include "WWMath/matrix3d.h"
 
 	#define AS_INT(x) (*(Int *)(&x))
 	#define DUMPVEL DUMPCOORD3DNAMED(&m_vel, "m_vel")

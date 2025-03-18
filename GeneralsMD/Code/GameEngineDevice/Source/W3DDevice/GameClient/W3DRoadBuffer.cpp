@@ -1440,7 +1440,7 @@ void W3DRoadBuffer::checkLinkBefore(Int ndx)
 		} else if (m_roads[checkNdx].m_pt2.loc == loc2) {
 #ifdef _DEBUG
 			if (m_roads[checkNdx].m_pt2.count!=1) {
-				::OutputDebugString("fooey.\n");
+				DEBUG_LOG(("fooey.\n"));
 			}
 			DEBUG_ASSERTLOG(m_roads[checkNdx].m_pt2.count==1, ("Bad count\n"));
 #endif
@@ -1493,7 +1493,7 @@ void W3DRoadBuffer::checkLinkAfter(Int ndx)
 #ifdef _DEBUG
 			DEBUG_ASSERTLOG(m_roads[checkNdx].m_pt1.count==1, ("Wrong m_pt1.count.\n"));
 			if ( m_roads[checkNdx].m_pt1.count!=1) {
-				::OutputDebugString("Wrong m_pt1.count.\n");
+				DEBUG_LOG(("Wrong m_pt1.count.\n"));
 			}
 #endif
 			flipTheRoad(&m_roads[checkNdx]);

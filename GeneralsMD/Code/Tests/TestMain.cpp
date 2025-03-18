@@ -104,7 +104,7 @@ int main(int argc, char **argv)
 		TheMemoryPoolCriticalSection = &critSec4;
 		TheDebugLogCriticalSection = &critSec5;
 
-		#ifdef _DEBUG
+		#if defined(_DEBUG) && defined(_WIN32)
 			// Turn on Memory heap tracking
 			int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
 			tmpFlag |= (_CRTDBG_LEAK_CHECK_DF|_CRTDBG_ALLOC_MEM_DF);

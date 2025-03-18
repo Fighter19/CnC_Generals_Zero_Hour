@@ -30,7 +30,7 @@ void* CreateThread(void *lpSecure, size_t dwStackSize, start_routine lpStartAddr
 	return (void*)thread_id;
 }
 
-void TerminateThread(void *hThread, unsigned long dwExitCode)
+int TerminateThread(void *hThread, unsigned long dwExitCode)
 {
-	pthread_cancel((pthread_t)hThread);
+	return pthread_cancel((pthread_t)hThread);
 }

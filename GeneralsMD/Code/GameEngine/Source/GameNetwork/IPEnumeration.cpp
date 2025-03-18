@@ -79,7 +79,9 @@ EnumeratedIP * IPEnumeration::getAddresses( void )
 	char hostname[256];
 	if (gethostname(hostname, sizeof(hostname)))
 	{
+		#ifdef _WIN32
 		DEBUG_LOG(("Failed call to gethostname; WSAGetLastError returned %d\n", WSAGetLastError()));
+		#endif
 		return NULL;
 	}
 	DEBUG_LOG(("Hostname is '%s'\n", hostname));
@@ -88,7 +90,9 @@ EnumeratedIP * IPEnumeration::getAddresses( void )
 	hostent* hostEnt = gethostbyname(hostname);
 	if (hostEnt == NULL)
 	{
+		#ifdef _WIN32
 		DEBUG_LOG(("Failed call to gethostnyname; WSAGetLastError returned %d\n", WSAGetLastError()));
+		#endif
 		return NULL;
 	}
 	
@@ -181,7 +185,9 @@ AsciiString IPEnumeration::getMachineName( void )
 	char hostname[256];
 	if (gethostname(hostname, sizeof(hostname)))
 	{
+		#ifdef _WIN32
 		DEBUG_LOG(("Failed call to gethostname; WSAGetLastError returned %d\n", WSAGetLastError()));
+		#endif
 		return NULL;
 	}
 
