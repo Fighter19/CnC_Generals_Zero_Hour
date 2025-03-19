@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       X_VCPKG_ASSET_SOURCES: x-azurl,https://s3.hilton.rwth-aachen.de/assetcache,,read
+      VCPKG_DEFAULT_TRIPLET: x64-linux-dynamic
     steps:
       - name: Install deps
         run: |
@@ -44,6 +45,7 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       X_VCPKG_ASSET_SOURCES: x-azurl,https://s3.hilton.rwth-aachen.de/assetcache,,read
+      VCPKG_DEFAULT_TRIPLET: x64-linux-dynamic
     steps:
       - name: Install deps
         run: |
@@ -75,4 +77,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: x64 Linux RTS
-          path: build/deploy/SAGE-*-Linux.tar.gz
+          path: build/deploy/SAGE-*-Linux.zip
