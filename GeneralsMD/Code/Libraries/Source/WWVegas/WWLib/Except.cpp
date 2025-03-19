@@ -1246,6 +1246,8 @@ int Stack_Walk(unsigned long *return_addresses, int num_addresses, CONTEXT *cont
 
 	unsigned long reg_eip, reg_ebp, reg_esp;
 
+
+#ifndef _WIN32
 	__asm {
 here:
 		lea	eax,here
@@ -1253,6 +1255,7 @@ here:
 		mov	reg_ebp,ebp
 		mov	reg_esp,esp
 	}
+#endif
 
 	stack_frame.AddrPC.Mode = AddrModeFlat;
 	stack_frame.AddrPC.Offset = reg_eip;

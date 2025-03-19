@@ -442,7 +442,7 @@ void GameEngine::init( int argc, char *argv[] )
 	DEBUG_LOG(("%s", Buf));////////////////////////////////////////////////////////////////////////////
 	#endif/////////////////////////////////////////////////////////////////////////////////////////////
 		initSubsystem(TheAudio,"TheAudio", createAudioManager(), NULL);
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(_WIN64)
 		if (!TheAudio->isMusicAlreadyLoaded())
 			setQuitting(TRUE);
 #endif

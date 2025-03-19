@@ -81,7 +81,7 @@ void StackDump(void (*callback)(const char*))
 	}
 
 	InitSymbolInfo();
-
+#ifndef _WIN64
 	DWORD myeip,myesp,myebp;
 
 _asm
@@ -97,6 +97,7 @@ MYEIP1:
 
 
 	MakeStackTrace(myeip,myesp,myebp, 2, callback);
+#endif
 }
 
 
@@ -357,6 +358,7 @@ void FillStackAddresses(void**addresses, unsigned int count, unsigned int skip)
     gsContext.ContextFlags = CONTEXT_FULL;
 
 	DWORD myeip,myesp,myebp;
+#ifndef _WIN64
 _asm
 {
 MYEIP2:
@@ -368,6 +370,7 @@ MYEIP2:
  mov dword ptr [myebp] , eax
  xor eax,eax
 }
+#endif
 memset(&stack_frame, 0, sizeof(STACKFRAME));
 stack_frame.AddrPC.Mode = AddrModeFlat;
 stack_frame.AddrPC.Offset = myeip;
@@ -549,7 +552,6 @@ void DumpExceptionInfo( unsigned int u, EXCEPTION_POINTERS* e_info )
 	};
 
 	DEBUG_LOG( ("Dump exception info\n") );
-	CONTEXT *context = e_info->ContextRecord;
 	/*
 	** The following are set for access violation only
 	*/
@@ -599,6 +601,7 @@ void DumpExceptionInfo( unsigned int u, EXCEPTION_POINTERS* e_info )
 
 	DOUBLE_DEBUG (("\nStack Dump:\n"));
 #ifndef _WIN64
+    CONTEXT* context = e_info->ContextRecord;
 	StackDumpFromContext(context->Eip, context->Esp, context->Ebp, NULL);
 
 	DOUBLE_DEBUG (("\nDetails:\n"));

@@ -88,12 +88,14 @@ unsigned long Get_CPU_Clock(unsigned long & high)
 {
 	int h;
 	int l;
+#if defined(_WIN32) && !defined(_WIN64)
 	__asm {
 		_emit 0Fh
 		_emit 31h
 		mov	[h],edx
 		mov	[l],eax
 	}
+#endif
 	high = h;
 	return(l);
 }
