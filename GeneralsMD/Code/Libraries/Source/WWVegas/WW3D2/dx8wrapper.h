@@ -81,8 +81,10 @@ const unsigned MAX_SHADOW_MAPS=1;
 
 #define prevVer
 #define nextVer
+#ifdef __volatile
+#undef __volatile
+#endif
 #define __volatile unsigned
-
 
 enum {
 	BUFFER_TYPE_DX8,
