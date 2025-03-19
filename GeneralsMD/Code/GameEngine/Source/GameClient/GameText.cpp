@@ -57,6 +57,13 @@
 #include "Common/FileSystem.h"
 
 
+static_assert(sizeof(WideChar) == sizeof(wchar_t), "WideChar and wchar_t must be the same size");
+#ifdef _WIN32
+static_assert(sizeof(WideChar) == 2, "WideChar is expected to be 2 bytes on Windows");
+#else 
+static_assert(sizeof(WideChar) == 4, "WideChar is expected to be 4 bytes on non-Windows platforms");
+#endif
+
 #ifdef _INTERNAL
 // for occasional debugging...
 //#pragma optimize("", off)
@@ -968,7 +975,16 @@ Bool GameTextManager::parseCSF( const Char *filename )
 
 			if ( len )
 			{
+#ifdef _WIN32
 				file->read ( m_tbuffer, len*sizeof(WideChar) );
+#else
+				int16_t convert_buffer[MAX_UITEXT_LENGTH*2];
+				file->read ( convert_buffer, len*sizeof(int16_t) );
+				for (int i = 0; i < len; i++)
+				{
+					m_tbuffer[i] = convert_buffer[i];
+				}
+#endif
 			}
 
 			if ( num == 0 )
@@ -983,7 +999,12 @@ Bool GameTextManager::parseCSF( const Char *filename )
 				
 					while ( *ptr )
 					{
+						#ifdef _WIN32
 						*ptr = ~*ptr;
+						#else 
+						// only negate the lower 16 bits (32-bit widechar)
+						*ptr = ~*ptr & 0x0000FFFF;
+						#endif
 						ptr++;
 					}
 				}
