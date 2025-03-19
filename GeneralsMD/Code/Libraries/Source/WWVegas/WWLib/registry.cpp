@@ -85,7 +85,7 @@ RegistryClass::RegistryClass( const char * sub_key, bool create ) :
 
 	if (ERROR_SUCCESS == result) {
 		IsValid = true;
-		Key = (int)key;
+		Key = (intptr_t)key;
 	}
 #endif
 }

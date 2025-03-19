@@ -368,7 +368,7 @@ void Dump_Exception_Info(EXCEPTION_POINTERS *e_info)
 		do {
 			function_name = ImagehelpFunctionNames[count];
 			if (function_name) {
-				*fptr = (unsigned long) GetProcAddress(imagehelp, function_name);
+                *fptr = (uintptr_t)GetProcAddress(imagehelp, function_name);
 				fptr++;
 				count++;
 			}
@@ -682,7 +682,7 @@ void Dump_Exception_Info(EXCEPTION_POINTERS *e_info)
 #define Esp Rsp
 #endif
 
-	unsigned long *stackptr = (unsigned long*) context->Esp;
+	uintptr_t* stackptr = (uintptr_t*)context->Esp;
 
 	for (int j=0 ; j<2048 ; j++) {
 		if (IsBadReadPtr(stackptr, 4)) {
