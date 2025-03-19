@@ -294,7 +294,11 @@ bool DX8Wrapper::Init(void * hwnd, bool lite)
 	Invalidate_Cached_Render_States();
 
 	if (!lite) {
+	#ifdef _WIN32
 		D3D8Lib = LoadLibrary("D3D8.DLL");
+	#else
+		D3D8Lib = LoadLibrary("libdxvk_d3d8.so");
+	#endif
 
 		if (D3D8Lib == NULL) return false;	// Return false at this point if init failed
 

@@ -34,13 +34,10 @@
 
 // GLOBALS
 HINSTANCE ApplicationHInstance;  ///< our application instance
-HWND ApplicationHWnd = NULL;
-SDL_Window *TheSDL3Window = NULL;
+HWND ApplicationHWnd = NULL; ///< our application window handle
 Bool ApplicationIsWindowed = false;
-CComModule _Module;
-Win32Mouse *TheWin32Mouse = NULL;
-DWORD TheMessageTime =
-    0; ///< For getting the time that a message was posted from Windows.
+Win32Mouse *TheWin32Mouse= NULL;  ///< for the WndProc() only
+DWORD TheMessageTime = 0;	///< For getting the time that a message was posted from Windows.
 
 const Char *g_strFile = "data\\Generals.str";
 const Char *g_csfFile = "data\\%s\\Generals.csf";
@@ -51,24 +48,21 @@ static HANDLE GeneralsMutex = NULL;
 #define DEFAULT_XRESOLUTION 800
 #define DEFAULT_YRESOLUTION 600
 
+// SDL3 specific
 #include "GameNetwork/WOLBrowser/WebBrowser.h"
 WebBrowser *TheWebBrowser;
+SDL_Window *TheSDL3Window = NULL;
+CComModule _Module;
 
-GameEngine *CreateGameEngine(void) {
-  SDL3GameEngine *engine;
-
-  engine = NEW SDL3GameEngine;
-  // game engine may not have existed when app got focus so make sure it
-  // knows about current focus state.
-  engine->setIsActive(true);
-
-  return engine;
-
-} // end CreateGameEngine
-
-static Bool initializeAppWindows(Bool runWindowed) {
-  DWORD windowStyle;
+static Bool initializeAppWindows(Bool runWindowed) 
+{
   Int startWidth = DEFAULT_XRESOLUTION, startHeight = DEFAULT_YRESOLUTION;
+  SDL_InitSubSystem(SDL_INIT_VIDEO);
+  if(!SDL_Vulkan_LoadLibrary(nullptr))
+  {
+    DEBUG_LOG(("Failed to load Vulkan library"));
+    return false;
+  }
 
   if (runWindowed) {
     // Makes the normal debug 800x600 window center in the screen.
@@ -77,10 +71,12 @@ static Bool initializeAppWindows(Bool runWindowed) {
   }
 
   SDL_Window *window =
-      SDL_CreateWindow("Game Window", startWidth, startHeight, 0);
+      SDL_CreateWindow("Command and Conquer Generals", startWidth, startHeight, SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
   SDL_ShowWindow(window);
   // save our window handle for future use
   ApplicationHWnd = TheSDL3Window = window;
+
+  setenv("DXVK_WSI_DRIVER", "SDL3", 1);
 
   return true; // success
 }
@@ -94,16 +90,41 @@ int main(int argc, char *argv[]) {
   if (initializeAppWindows(ApplicationIsWindowed) == false)
     return 0;
 
+  // start the log
+  DEBUG_INIT(DEBUG_FLAGS_DEFAULT);
+  initMemoryManager();
+
+  // Set up version info
+  TheVersion = NEW Version;
+
   // initialize the game engine using factory function
-  TheGameEngine = CreateGameEngine();
-  TheGameEngine->init(argc, argv);
+  GameMain(argc, argv);
 
-  // run it
-  TheGameEngine->execute();
+  delete TheVersion;
+  TheVersion = NULL;
 
-  // since execute() returned, we are exiting the game
-  delete TheGameEngine;
-  TheGameEngine = NULL;
+#ifdef MEMORYPOOL_DEBUG
+  TheMemoryPoolFactory->debugMemoryReport(REPORT_POOLINFO | REPORT_POOL_OVERFLOW | REPORT_SIMPLE_LEAKS, 0, 0);
+#endif
+#if defined(_DEBUG) || defined(_INTERNAL)
+  TheMemoryPoolFactory->memoryPoolUsageReport("AAAMemStats");
+#endif
+
+  // close the log
+  shutdownMemoryManager();
+  DEBUG_SHUTDOWN();
 
 	return 0;
 }
+
+GameEngine *CreateGameEngine(void) {
+  SDL3GameEngine *engine;
+
+  engine = NEW SDL3GameEngine;
+  // game engine may not have existed when app got focus so make sure it
+  // knows about current focus state.
+  engine->setIsActive(true);
+
+  return engine;
+
+} // end CreateGameEngine
