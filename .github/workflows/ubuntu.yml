@@ -35,6 +35,7 @@ jobs:
         uses: lukka/run-cmake@v10
         with:
           configurePreset: "testing"
+          configurePresetAdditionalArgs: "['-DSAGE_USE_SDL3=ON']"
           buildPreset: "testing"
           testPreset: "default"
           generator: "Ninja"

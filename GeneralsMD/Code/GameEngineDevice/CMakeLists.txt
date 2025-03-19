@@ -63,6 +63,7 @@ if(SAGE_USE_SDL3)
         ${CMAKE_CURRENT_SOURCE_DIR}/Source/SDL3Device/Common/SDL3GameEngine.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Source/SDL3Device/Common/SDL3IMEManager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Source/SDL3Device/Common/SDL3OSDisplay.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source/SDL3Device/GameClient/SDL3Keyboard.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Source/SDL3Device/GameClient/SDL3Mouse.cpp
     )
     find_package(SDL3 REQUIRED)

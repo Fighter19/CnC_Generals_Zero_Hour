@@ -7,6 +7,7 @@ typedef void *HANDLE;
 typedef HANDLE HWND;
 typedef HANDLE HINSTANCE;
 typedef HANDLE HKEY;
+typedef HANDLE HDC;
 typedef int32_t HRESULT;
 
 typedef int BOOL;

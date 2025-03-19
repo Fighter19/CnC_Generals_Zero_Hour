@@ -30,3 +30,5 @@ static size_t GlobalSize(void *ptr)
   #error "GlobalSize not implemented for this platform"
 #endif
 }
+
+struct MEMORYSTATUS;

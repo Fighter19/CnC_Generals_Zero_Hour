@@ -1,9 +1,8 @@
 #pragma once
-#include "windows_base.h"
 #include "tchar_compat.h"
 #define GWL_STYLE 1
 
-
+struct RECT;
 DWORD GetWindowLong(HWND hWnd, int nIndex);
 void AdjustWindowRect(RECT *pRect, DWORD dwStyle, BOOL bMenu);
 

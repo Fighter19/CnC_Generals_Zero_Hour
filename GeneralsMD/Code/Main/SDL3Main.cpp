@@ -33,10 +33,12 @@
 #include <wsi/native_wsi.h>
 
 // GLOBALS
+HINSTANCE ApplicationHInstance;  ///< our application instance
 HWND ApplicationHWnd = NULL;
 SDL_Window *TheSDL3Window = NULL;
 Bool ApplicationIsWindowed = false;
-SDL3Mouse *TheSDL3Mouse = NULL; ///< for the WndProc() only
+CComModule _Module;
+Win32Mouse *TheWin32Mouse = NULL;
 DWORD TheMessageTime =
     0; ///< For getting the time that a message was posted from Windows.
 
@@ -51,18 +53,6 @@ static HANDLE GeneralsMutex = NULL;
 
 #include "GameNetwork/WOLBrowser/WebBrowser.h"
 WebBrowser *TheWebBrowser;
-
-AsciiString GetRegistryLanguage(void) {
-#pragma message("Support for multiple languages not yet implemented")
-
-  return "english";
-}
-
-UnsignedInt GetRegistryVersion(void) {
-#pragma message("Version is not being encoded in registry on this platform")
-
-  return 0;
-}
 
 GameEngine *CreateGameEngine(void) {
   SDL3GameEngine *engine;

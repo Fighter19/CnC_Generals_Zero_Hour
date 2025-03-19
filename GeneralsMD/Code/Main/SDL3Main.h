@@ -35,7 +35,6 @@
 
 // EXTERNAL ///////////////////////////////////////////////////////////////////
 extern HWND ApplicationHWnd;  ///< our application window handle
-extern SDL3Mouse *TheSDL3Mouse;  ///< global for SDL3 mouse only!
 extern SDL_Window* TheSDL3Window;
 
 #endif  // end __WINMAIN_H_

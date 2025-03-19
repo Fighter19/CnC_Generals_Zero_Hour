@@ -89,6 +89,11 @@
 //#pragma MESSAGE("************************************** WARNING, optimization disabled for debugging purposes")
 #endif
 
+#ifndef _WIN32
+// Include the DXVK compat header for MEMORYSTATUS
+#include "windows_base.h"
+#endif
+
 #define DRAWABLE_HASH_SIZE	8192
 
 /// The GameClient singleton instance

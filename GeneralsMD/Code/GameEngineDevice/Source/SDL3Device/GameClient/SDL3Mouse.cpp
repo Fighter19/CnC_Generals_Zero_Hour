@@ -35,7 +35,7 @@
 #include <SDL3/SDL_events.h>
 
 // EXTERN /////////////////////////////////////////////////////////////////////////////////////////
-extern SDL3Mouse *TheSDL3Mouse;
+
 
 SDL_Cursor* cursorResources[Mouse::NUM_MOUSE_CURSORS][MAX_2D_CURSOR_DIRECTIONS];
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -231,9 +231,6 @@ SDL3Mouse::SDL3Mouse( void )
 //-------------------------------------------------------------------------------------------------
 SDL3Mouse::~SDL3Mouse( void )
 {
-
-	// remove our global reference that was for the WndProc() only
-	TheSDL3Mouse = NULL;
 
 }  // end ~SDL3Mouse
 

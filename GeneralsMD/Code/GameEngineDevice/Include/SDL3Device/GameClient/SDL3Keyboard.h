@@ -22,7 +22,7 @@
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: Language.h ///////////////////////////////////////////////////////////
+// FILE: SDL3Keyboard.h ////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 //                                                                          
 //                       Westwood Studios Pacific.                          
@@ -34,76 +34,64 @@
 //
 // Project:    RTS3
 //
-// File name:  Language.h
+// File name:  SDL3Keyboard.h
 //
-// Created:    Colin Day, June 2001
+// Created:    Stephan Vedder, March 2025
 //
-// Desc:       Header for dealing with multiple languages
+// Desc:       Device implementation of the keyboard interface on Win32
+//						 using Microsoft Direct Input
 //
 //-----------------------------------------------------------------------------
 ///////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-#ifndef __LANGUAGE_H_
-#define __LANGUAGE_H_
+#ifndef __SDL3KEYBOARD_H_
+#define __SDL3KEYBOARD_H_
 
 // SYSTEM INCLUDES ////////////////////////////////////////////////////////////
 
 // USER INCLUDES //////////////////////////////////////////////////////////////
+#include "GameClient/Keyboard.h"
 
 // FORWARD REFERENCES /////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
 // TYPE DEFINES ///////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
 
-// IMPORTANT: Make sure this enum is identical to the one in Noxstring tool
-typedef enum
+// class SDL3Keyboard --------------------------------------------------
+/** Class for interfacing with the keyboard using SDL3 as the
+	* implementation */
+//-----------------------------------------------------------------------------
+class SDL3Keyboard : public Keyboard
 {
 
-	LANGUAGE_ID_US = 0,
-	LANGUAGE_ID_UK,
-	LANGUAGE_ID_GERMAN,
-	LANGUAGE_ID_FRENCH,
-	LANGUAGE_ID_SPANISH,
-	LANGUAGE_ID_ITALIAN,
-	LANGUAGE_ID_JAPANESE,
-	LANGUAGE_ID_JABBER,
-	LANGUAGE_ID_KOREAN,
-	LANGUAGE_ID_UNKNOWN
+public:
 
-} LanguageID;
+	SDL3Keyboard( void );
+	virtual ~SDL3Keyboard( void );
 
-#define GameStrcpy wcscpy
-#define GameStrncpy wcsncpy
-#define GameStrlen wcslen
-#define GameStrcat wcscat
-#define GameStrcmp wcscmp
-#define GameStrncmp wcsncmp
-#define GameStricmp wcsicmp
-#define GameStrnicmp wcsnicmp
-#define GameStrtok wcstok
-#define GameSprintf swprintf
-#define GameVsprintf vswprintf
-/// @todo -- add a non-malloc-based string dup func #define GameStrdup wcsdup
-#define GameAtoi(S) wcstol( (S), NULL, 10)
-#define GameAtod(S) wcstod( (S), NULL )
-#define GameItoa _itow
-#define GameSscanf swscanf
-#define GameStrstr wcsstr 
-#define GameStrchr wcschr
-#define GameIsDigit iswdigit
-#define GameIsAscii iswascii
-#define GameIsAlNum iswalnum
-#define GameIsAlpha iswalpha
-#define GameArrayEnd(array) (array)[(sizeof(array)/sizeof((array)[0]))-1] = 0
+	// extend methods from the base class
+	virtual void init( void );		///< initialize the keyboard, extending init functionality
+	virtual void reset( void );		///< Reset the keybaord system
+	virtual void update( void );  ///< update call, extending update functionality
+	virtual Bool getCapsState( void );		///< get state of caps lock key, return TRUE if down
 
+protected:
+
+	// extended methods from the base class
+	virtual void getKey( KeyboardIO *key );  ///< get a single key event
+
+	//-----------------------------------------------------------------------------------------------
+
+	// new methods to this derived class
+	void openKeyboard( void );  ///< create direct input keyboard
+	void closeKeyboard( void );  ///< release direct input keyboard
+ 
+};  // end class SDL3Keyboard
 
 // INLINING ///////////////////////////////////////////////////////////////////
 
 // EXTERNALS //////////////////////////////////////////////////////////////////
-extern LanguageID OurLanguage;  ///< our current language definition
 
-#endif // __LANGUAGE_H_
+#endif // __SDL3KEYBOARD_H_
 
