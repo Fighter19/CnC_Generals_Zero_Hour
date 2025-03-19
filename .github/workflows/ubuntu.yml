@@ -67,5 +67,12 @@ jobs:
         uses: lukka/run-cmake@v10
         with:
           configurePreset: "deploy"
+          configurePresetAdditionalArgs: "['-DSAGE_USE_SDL3=ON']"
           buildPreset: "deploy"
           packagePreset: "deploy"
+
+      - name: Upload RTS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: x64 Linux RTS
+          path: build/deploy/SAGE-*-Linux.tar.gz
