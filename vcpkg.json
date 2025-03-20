@@ -9,6 +9,8 @@
     "gli",
     "openal-soft",
     "ffmpeg",
+    "freetype",
+    "fontconfig",
     {
       "name": "sdl3",
       "features": [

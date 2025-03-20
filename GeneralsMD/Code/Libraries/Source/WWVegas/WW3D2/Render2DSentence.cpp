@@ -41,6 +41,25 @@
 #include "wwmemlog.h"
 #include "dx8wrapper.h"
 
+#ifdef SAGE_USE_FREETYPE
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+static void LogFtError(const char *text, FT_Error error)
+{
+#if 1 //def FT_CONFIG_OPTION_ERROR_STRINGS
+    DEBUG_LOG(("%s: %s\n", text, FT_Error_String(error)));
+#else
+		DEBUG_LOG((text));
+#endif
+}
+#endif
+
+#ifdef SAGE_USE_FONTCONFIG
+#include <fontconfig/fontconfig.h>
+#endif
+
+
 #ifdef _INTERNAL
 // for occasional debugging...
 //#pragma optimize("", off)
@@ -1192,12 +1211,14 @@ Render2DSentenceClass::Build_Sentence (const WCHAR *text, int *hkX, int *hkY)
 //
 ////////////////////////////////////////////////////////////////////////////////////
 FontCharsClass::FontCharsClass (void) :
+#ifdef _WIN32
 	OldGDIFont(	NULL ),
 	OldGDIBitmap( NULL ),
 	GDIFont( NULL ),
 	GDIBitmap( NULL ),
 	GDIBitmapBits ( NULL ),
 	MemDC( NULL ),
+#endif
 	CurrPixelOffset( 0 ),
 	PointSize( 0 ),
 	CharHeight( 0 ),
@@ -1208,6 +1229,26 @@ FontCharsClass::FontCharsClass (void) :
 {
 	AlternateUnicodeFont = NULL;
 	::memset( ASCIICharArray, 0, sizeof (ASCIICharArray) );
+#ifdef SAGE_USE_FONTCONFIG
+	if (FcInit() == FcTrue) {
+		FC = FcInitLoadConfigAndFonts();
+		if (FC == nullptr) {
+			DEBUG_LOG(("Failed to load fontconfig config & fonts"));
+		}
+	}
+	else
+	{
+		DEBUG_LOG(("Failed to initialize fontconfig"));
+	}
+#endif
+
+#ifdef SAGE_USE_FREETYPE
+	FT_Error error = FT_Init_FreeType(&FtLibrary);
+	if (error != FT_Err_Ok) {
+		DEBUG_LOG(("Failed to initialize freetype library"));
+	}
+#endif
+
 	return ;
 }
 
@@ -1224,8 +1265,19 @@ FontCharsClass::~FontCharsClass (void)
 		BufferList.Delete(0);
 	}
 
+#ifdef SAGE_USE_FREETYPE
+	Free_Freetype_Font();
+#endif
+#ifdef _WIN32
 	Free_GDI_Font();
+#endif
 	Free_Character_Arrays();
+#ifdef SAGE_USE_FONTCONFIG
+	if (FC != nullptr) {
+			FcConfigDestroy(FC);
+	}
+	FcFini();
+#endif
 	return ;
 }
 
@@ -1258,10 +1310,16 @@ FontCharsClass::Get_Char_Data (WCHAR ch)
 	//	If the character wasn't found, then add it to our list
 	//
 	if ( retval == NULL ) {
+#ifdef SAGE_USE_FREETYPE
+		retval = Store_Freetype_Char( ch );
+#elif defined(_WIN32)
 		retval = Store_GDI_Char( ch );
+#else 
+		#pragma message("No font system defined")
+#endif
 	}
 
-	WWASSERT( retval->Value == ch );
+	//WWASSERT( retval->Value == ch );
 	return retval;
 }
 
@@ -1339,7 +1397,80 @@ FontCharsClass::Blit_Char (WCHAR ch, uint16 *dest_ptr, int dest_stride, int x, i
 	return ;
 }
 
+#ifdef SAGE_USE_FREETYPE
+const FontCharsClassCharDataStruct *FontCharsClass::Store_Freetype_Char(WCHAR ch)
+{
+    DEBUG_ASSERTCRASH(FtFace != nullptr, ("FreetypeFace not initialized"));
+    FT_UInt glyph_index = FT_Get_Char_Index(FtFace, ch);
+    // load glyph image into the slot (erase previous one)
+    FT_Error error = FT_Load_Glyph(FtFace, glyph_index, FT_LOAD_DEFAULT);
+    if (error) {
+        DEBUG_LOG(("Failed to load character(%i) from font\n", ch));
+        return nullptr;
+    }
+    // convert to an anti-aliased bitmap
+    error = FT_Render_Glyph(FtFace->glyph, FT_RENDER_MODE_NORMAL);
+    if (error) {
+			DEBUG_LOG(("Failed to render character(%i) from font\n", ch));
+			return nullptr;
+    }
+    int x_pos = 0;
+    if (ch == 'W') {
+        x_pos = 1;
+    }
+    unsigned int char_width = FtFace->glyph->advance.x >> 6;
+    // Sometimes for some reason the bitmap is wider than the advancement.
+    // This does not work with this font rendering approach
+    if (char_width < FtFace->glyph->bitmap.width + FtFace->glyph->bitmap_left) {
+        char_width = FtFace->glyph->bitmap.width + FtFace->glyph->bitmap_left;
+    }
+    char_width += PixelOverlap + x_pos;
 
+		//
+		//	Get a pointer to the surface that this character should use
+		//
+    Update_Current_Buffer(char_width);
+    uint16* curr_buffer_p = BufferList[BufferList.Count () - 1]->Buffer;
+		curr_buffer_p += CurrPixelOffset;
+    // We might need a memset
+
+    int x_offset = FtFace->glyph->bitmap_left;
+    int descent = CharHeight - CharAscent;
+    int y_offset = (CharHeight - FtFace->glyph->bitmap_top) - descent;
+
+    // Render the bitmap
+    for (unsigned int row = 0; row < FtFace->glyph->bitmap.rows; row++) {
+        int index = row * FtFace->glyph->bitmap.pitch;
+        int dst_index = (y_offset + row) * char_width;
+        for (unsigned int col = 0u; col < FtFace->glyph->bitmap.width; col++) {
+            uint8_t pixel_value = FtFace->glyph->bitmap.buffer[index + col];
+            uint16_t pixel_color = 0;
+
+            if (pixel_value != 0) {
+                pixel_color = 0x0FFF;
+            }
+
+            curr_buffer_p[dst_index + x_offset + col] = pixel_color | ((pixel_value >> 4) << 12);
+        }
+    }
+
+    FontCharsClassCharDataStruct *char_data = new FontCharsClassCharDataStruct;
+    char_data->Value = ch;
+    char_data->Width = (int16_t)char_width;
+    char_data->Buffer = BufferList[BufferList.Count () - 1]->Buffer + CurrPixelOffset;
+
+    if (ch < 256) {
+        ASCIICharArray[ch] = char_data;
+    } else {
+        UnicodeCharArray[ch - FirstUnicodeChar] = char_data;
+    }
+
+    CurrPixelOffset += (char_width * CharHeight);
+    return char_data;
+}
+#endif
+
+#ifdef _WIN32
 ////////////////////////////////////////////////////////////////////////////////////
 //
 //	Store_GDI_Char
@@ -1359,17 +1490,13 @@ FontCharsClass::Store_GDI_Char (WCHAR ch)
 	if (ch == 'W') {
 		xOrigin = 1;
 	}
-#ifdef _WIN32
 	::ExtTextOutW( MemDC, xOrigin, 0, ETO_OPAQUE, &rect, &ch, 1, NULL);
-#endif
 
 	//
 	//	Get the size of the character we just drew
 	//
 	SIZE char_size = { 0 };
-#ifdef _WIN32
 	::GetTextExtentPoint32W( MemDC, &ch, 1, &char_size );	
-#endif
 	char_size.cx += PixelOverlap + xOrigin;
 	//
 	//	Get a pointer to the surface that this character should use
@@ -1470,7 +1597,7 @@ FontCharsClass::Store_GDI_Char (WCHAR ch)
 	//
 	return char_data;
 }
-
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1507,7 +1634,128 @@ FontCharsClass::Update_Current_Buffer (int char_width)
 	return ;
 }
 
+#ifdef SAGE_USE_FONTCONFIG
+bool FontCharsClass::Locate_Font_FontConfig(const char *font_name, StringClass &font_file_path)
+{
+    if (FC == nullptr) {
+        return false;
+    }
 
+    FcPattern *pattern = FcNameParse(reinterpret_cast<const FcChar8 *>(font_name));
+    FcConfigSubstitute(FC, pattern, FcMatchPattern);
+    FcDefaultSubstitute(pattern);
+
+    // Find the font
+    FcResult result;
+    FcPattern *font = FcFontMatch(FC, pattern, &result);
+    if (font != nullptr) {
+        FcChar8 *file = NULL;
+        if (FcPatternGetString(font, FC_FILE, 0, &file) == FcResultMatch) {
+            font_file_path = reinterpret_cast<char *>(file);
+        }
+        FcPatternDestroy(font);
+    }
+
+    FcPatternDestroy(pattern);
+    return result == FcResultMatch;
+}
+#endif
+
+bool FontCharsClass::Locate_Font(const char *font_name, StringClass &font_file_path)
+{
+#if defined(SAGE_USE_FONTCONFIG)
+    return Locate_Font_FontConfig(font_name, font_file_path);
+#elif defined PLATFORM_WINDOWS
+    return Locate_Font_WinRegistry(font_name, font_file_path);
+#else
+    return false;
+#endif
+}
+
+#ifdef SAGE_USE_FREETYPE
+void FontCharsClass::Create_Freetype_Font(const char *font_name)
+{
+    bool doingGenerals = false;
+
+    if (std::strcmp(font_name, "Generals") == 0) {
+        font_name = "Arial";
+        doingGenerals = true;
+    }
+
+	//
+	//	Calculate the height of the font in logical units
+	//
+	const int dotsPerInch = 96; // always use 96.	jba.
+	int font_height = FT_MulDiv (PointSize, dotsPerInch, 72);
+
+	int fontWidth = 0; // use font default.
+	if (doingGenerals) {
+		//fontWidth = -font_height*0.35f; //2 pixels tighter.
+		fontWidth = -font_height*0.40f; // one pixel tighter
+	}
+	PixelOverlap = (-font_height)/8;
+
+	// Sanity check in case of perversion. :)
+	if (PixelOverlap<0) PixelOverlap = 0;
+	if (PixelOverlap>4) PixelOverlap = 4;
+
+	//
+	//	Locate the font
+	//
+	StringClass font_file_path;
+	if (!Locate_Font(font_name, font_file_path)) {
+			DEBUG_LOG(("Failed to locate font: %s\n", font_name));
+			font_name = "Arial";
+			DEBUG_LOG(("Trying '%s' as a fallback\n", font_name));
+			if (!Locate_Font(font_name, font_file_path)) {
+					DEBUG_LOG(("Failed to find fallback font: %s\n", font_name));
+					return;
+			}
+	}
+
+	//
+	//	Create the Freetype font
+	//
+	FT_Error error = FT_New_Face(FtLibrary, font_file_path, 0, &FtFace);
+	if (error != FT_Err_Ok) {
+			LogFtError("Failed to load Freetype face from file", error);
+			return;
+	}
+
+	error = FT_Set_Pixel_Sizes(FtFace, 0, font_height);
+	if (error != FT_Err_Ok) {
+			LogFtError("Failed to set character size", error);
+			return;
+	}
+
+	// Use the same metric calculation as Wine does in their GDI emulation layer
+	// See https://github.com/NVIDIA/winex_lgpl/blob/master/winex/dlls/gdi/freetype.c#L3027
+	if (FT_IS_SCALABLE(FtFace)) {
+			CharAscent = FT_MulFix(FtFace->ascender, FtFace->size->metrics.y_scale) >> 6;
+			int descent = -FT_MulFix(FtFace->descender, FtFace->size->metrics.y_scale) >> 6;
+			CharHeight = CharAscent + descent;
+			CharOverhang = 0;
+	} else {
+			DEBUG_LOG(("Require a scalable font. Font=%s\n", font_name));
+	}
+
+	if (doingGenerals) {
+		CharOverhang = 0;
+	}
+}
+
+void FontCharsClass::Free_Freetype_Font()
+{
+	if (FtFace != nullptr) {
+			FT_Done_Face(FtFace);
+	}
+	if (FtLibrary != nullptr) {
+			FT_Done_FreeType(FtLibrary);
+	}
+}
+#endif
+
+#ifdef _WIN32
 ////////////////////////////////////////////////////////////////////////////////////
 //
 //	Create_GDI_Font
@@ -1516,7 +1764,6 @@ FontCharsClass::Update_Current_Buffer (int char_width)
 void
 FontCharsClass::Create_GDI_Font (const char *font_name)
 {
-#ifdef _WIN32
 	HDC screen_dc = ::GetDC ((HWND)WW3D::Get_Window());
 
 	const char *fontToUseForGenerals = "Arial";
@@ -1608,7 +1855,6 @@ FontCharsClass::Create_GDI_Font (const char *font_name)
 	if (doingGenerals) {
 		CharOverhang = 0;
 	}
-#endif
 }
 
 
@@ -1620,7 +1866,6 @@ FontCharsClass::Create_GDI_Font (const char *font_name)
 void
 FontCharsClass::Free_GDI_Font (void)
 {
-#ifdef _WIN32
 	//
 	//	Select the old font back into the DC and delete
 	// our font object
@@ -1648,10 +1893,9 @@ FontCharsClass::Free_GDI_Font (void)
 		::DeleteDC( MemDC );
 		MemDC = NULL;
 	}
-#endif
 	return ;
 }
-
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1676,7 +1920,11 @@ FontCharsClass::Initialize_GDI_Font (const char *font_name, int point_size, bool
 	//
 	//	Create the actual font object
 	//
+#ifdef SAGE_USE_FREETYPE
+	Create_Freetype_Font (font_name);
+#elif defined(_WIN32)
 	Create_GDI_Font (font_name);
+#endif
 	return ;
 }
 
