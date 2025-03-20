@@ -145,6 +145,24 @@ Bool GetStringFromGeneralsRegistry(AsciiString path, AsciiString key, AsciiStrin
 
 	return getStringFromRegistry(HKEY_CURRENT_USER, fullPath.str(), key.str(), val);
 #else
+	AsciiString envVariable = "CNC_GENERALS_";
+	// Convert key to uppercase
+	char buffer[256] = { 0 };
+	const char* keyStr = key.str();
+	int i = 0;
+	while(keyStr[i] != 0)
+	{
+		buffer[i] = toupper(keyStr[i]);
+		i++;
+	}
+	envVariable.concat(buffer);
+	const char* envValue = getenv(envVariable.str());
+	if (envValue)
+	{
+		val = envValue;
+		return TRUE;
+	}
+
 	return FALSE;
 #endif
 }
@@ -163,6 +181,24 @@ Bool GetStringFromRegistry(AsciiString path, AsciiString key, AsciiString& val)
 
 	return getStringFromRegistry(HKEY_CURRENT_USER, fullPath.str(), key.str(), val);
 #else
+	AsciiString envVariable = "CNC_ZH_";
+	// Convert key to uppercase
+	char buffer[256] = { 0 };
+	const char* keyStr = key.str();
+	int i = 0;
+	while(keyStr[i] != 0)
+	{
+		buffer[i] = toupper(keyStr[i]);
+		i++;
+	}
+	envVariable.concat(buffer);
+	const char* envValue = getenv(envVariable.str());
+	if (envValue)
+	{
+		val = envValue;
+		return TRUE;
+	}
+
 	return FALSE;
 #endif
 }
