@@ -226,12 +226,14 @@ static void doLogOutput(const char *buffer)
 	}
 
 	// log message to dev studio output window
-#ifdef _WIN32
 	if (theDebugFlags & DEBUG_FLAG_LOG_TO_CONSOLE)
 	{
+	#ifdef _WIN32
 		::OutputDebugString(buffer);
+	#else
+		printf("%s", buffer);
+	#endif
 	}
-#endif
 }
 #endif
 
