@@ -75,7 +75,7 @@ class FFmpegVideoStream : public VideoStream
 		bool m_good = true;
 		bool m_gotFrame = false;
 		AVFrame *m_frame = nullptr;
-    	SwsContext *m_swsContext = nullptr;
+    SwsContext *m_swsContext = nullptr;
 		FFmpegFile*				m_ffmpegFile;														///< Bink streaming handle;
 		Char					*m_memFile;													///< Pointer to memory resident file
 		uint64_t				m_startTime = 0;												///< Time the stream started		
@@ -113,7 +113,7 @@ class FFmpegVideoPlayer : public VideoPlayer
 
 	protected:
 
-		VideoStreamInterface* createStream( FFmpegFile* file );
+		VideoStreamInterface* createStream( File* file );
 
 	public:
 

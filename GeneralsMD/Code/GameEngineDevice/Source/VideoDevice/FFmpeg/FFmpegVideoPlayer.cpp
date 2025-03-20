@@ -198,7 +198,7 @@ void	FFmpegVideoPlayer::regainFocus( void )
 // FFmpegVideoPlayer::createStream
 //============================================================================
 
-VideoStreamInterface* FFmpegVideoPlayer::createStream( FFmpegFile* file )
+VideoStreamInterface* FFmpegVideoPlayer::createStream( File* file )
 {
 
 	if ( file == NULL )
@@ -206,7 +206,14 @@ VideoStreamInterface* FFmpegVideoPlayer::createStream( FFmpegFile* file )
 		return NULL;
 	}
 
-	FFmpegVideoStream *stream = NEW FFmpegVideoStream(file);
+    FFmpegFile* ffmpegHandle = NEW FFmpegFile();
+    if(!ffmpegHandle->open(file))
+    {
+        delete ffmpegHandle;
+        return NULL;
+    }
+
+	FFmpegVideoStream *stream = NEW FFmpegVideoStream(ffmpegHandle);
 
 	if ( stream )
 	{
@@ -246,18 +253,7 @@ VideoStreamInterface*	FFmpegVideoPlayer::open( AsciiString movieTitle )
             DEBUG_ASSERTLOG(!file, ("opened bink file %s\n", filePath));
             if (file)
             {
-                FFmpegFile* ffmpegHandle = NEW FFmpegFile();
-                if(!ffmpegHandle->open(file))
-                {
-                    delete ffmpegHandle;
-                    return NULL;
-                }
-
-                DEBUG_ASSERTLOG(!ffmpegHandle, ("opened bink file %s\n", filePath));
-                if (ffmpegHandle)
-                {
-                    return createStream( ffmpegHandle );
-                }
+                return createStream( file );
             }
 		}
 
@@ -274,17 +270,7 @@ VideoStreamInterface*	FFmpegVideoPlayer::open( AsciiString movieTitle )
 		}
 
 		DEBUG_LOG(("FFmpegVideoPlayer::createStream() - About to create stream\n"));
-		FFmpegFile* ffmpegHandle = NEW FFmpegFile();
-        if(!ffmpegHandle->open(file))
-        {
-            delete ffmpegHandle;
-            return NULL;
-        }
-
-        if (ffmpegHandle)
-        {
-            stream = createStream( ffmpegHandle );
-        }
+        stream = createStream( file );
 	}
 
 	return stream;	
