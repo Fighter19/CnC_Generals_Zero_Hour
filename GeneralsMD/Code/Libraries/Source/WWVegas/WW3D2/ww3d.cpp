@@ -309,7 +309,7 @@ WW3DErrorType WW3D::Init(void *hwnd, char *defaultpal, bool lite)
 	** Initialize the animation-triggered sound system
 	*/
 	if (!lite) {
-		AnimatedSoundMgrClass::Initialize ();
+		// AnimatedSoundMgrClass::Initialize ();
 		IsInitted = true;
 	}
 	WWDEBUG_SAY(("WW3D Init completed\n"));
@@ -376,7 +376,7 @@ WW3DErrorType WW3D::Shutdown(void)
 	/*
 	** Release the animation-triggered sound data
 	*/
-	AnimatedSoundMgrClass::Shutdown ();
+	// AnimatedSoundMgrClass::Shutdown ();
 
 	IsInitted = false;
 	return WW3D_ERROR_OK;

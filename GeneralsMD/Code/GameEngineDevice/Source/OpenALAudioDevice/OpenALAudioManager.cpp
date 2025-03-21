@@ -416,7 +416,7 @@ Bool OpenALAudioManager::checkALError()
 	if (errorCode != 0) {
 #ifndef NDEBUG
 		auto errorMsg = alGetString(errorCode);
-		DEBUG_ASSERTLOG(("OpenAL error: %s", errorMsg));
+		DEBUG_ASSERTLOG(false, ("OpenAL error: %s", errorMsg));
 #endif
 		return false;
 	}
@@ -432,7 +432,7 @@ Bool OpenALAudioManager::checkALCError()
 	if (errorCode != 0) {
 #ifndef NDEBUG
 		auto errorMsg = alcGetString(m_alcDevice, errorCode);
-		DEBUG_ASSERTLOG(("ALC error: %s", errorMsg));
+		DEBUG_ASSERTLOG(false, ("ALC error: %s", errorMsg));
 #endif
 		return false;
 	}

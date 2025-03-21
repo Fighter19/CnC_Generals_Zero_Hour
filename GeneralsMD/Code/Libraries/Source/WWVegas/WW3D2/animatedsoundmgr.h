@@ -44,6 +44,8 @@
 #ifndef __ANIMATEDSOUNDMGR_H
 #define __ANIMATEDSOUNDMGR_H
 
+#if noWWAUDIO // removing dependency on WWAUDIO
+
 #include "simplevec.h"
 #include "vector.h"
 #include "hashtemplate.h"
@@ -134,3 +136,4 @@ private:
 
 
 #endif //__ANIMATEDSOUNDMGR_H
+#endif

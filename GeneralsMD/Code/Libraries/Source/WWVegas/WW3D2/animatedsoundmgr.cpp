@@ -37,6 +37,7 @@
 // MBL Update for CNC3 INCURSION - 10.23.2002 - Expanded param handling, Added STOP command
 //
 
+#if noWWAUDIO // removing dependency on WWAUDIO
 #include <string.h>	// stricmp()
 #include "animatedsoundmgr.h"
 #include "INI.H"
@@ -561,3 +562,4 @@ void AnimatedSoundMgrClass::Set_Sound_Library(SoundLibraryBridgeClass* library)
 {
 	SoundLibrary = library;
 }
+#endif // noWWAUDIO

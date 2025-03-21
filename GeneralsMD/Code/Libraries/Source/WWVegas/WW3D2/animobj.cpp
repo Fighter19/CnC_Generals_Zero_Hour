@@ -491,11 +491,11 @@ void Animatable3DObjClass::Set_Animation(HAnimClass * motion, float frame, int m
 		else
 			ModeAnim.animDirection = -1.0f;	//reverse animation playback
  
-		const char* sound_name = AnimatedSoundMgrClass::Get_Embedded_Sound_Name(motion);
-		if (sound_name) {
-			int bone_index = Get_Bone_Index(sound_name);
-			motion->Set_Embedded_Sound_Bone_Index(bone_index);
-		}
+		// const char* sound_name = AnimatedSoundMgrClass::Get_Embedded_Sound_Name(motion);
+		// if (sound_name) {
+		// 	int bone_index = Get_Bone_Index(sound_name);
+		// 	motion->Set_Embedded_Sound_Bone_Index(bone_index);
+		// }
 	} else {
 		CurMotionMode = BASE_POSE;
 		Release();
@@ -539,20 +539,20 @@ void Animatable3DObjClass::Set_Animation
 
 	if ( ModeInterp.Motion0 != NULL ) {
 		ModeInterp.Motion0->Add_Ref();
-		const char* sound_name = AnimatedSoundMgrClass::Get_Embedded_Sound_Name(motion0);
-		if (sound_name) {
-			int bone_index = Get_Bone_Index(sound_name);
-			motion0->Set_Embedded_Sound_Bone_Index(bone_index);
-		}
+		// const char* sound_name = AnimatedSoundMgrClass::Get_Embedded_Sound_Name(motion0);
+		// if (sound_name) {
+		// 	int bone_index = Get_Bone_Index(sound_name);
+		// 	motion0->Set_Embedded_Sound_Bone_Index(bone_index);
+		// }
 	}
 
 	if ( ModeInterp.Motion1 != NULL ) {
 		ModeInterp.Motion1->Add_Ref();
-		const char* sound_name = AnimatedSoundMgrClass::Get_Embedded_Sound_Name(motion1);
-		if (sound_name) {
-			int bone_index = Get_Bone_Index(sound_name);
-			motion1->Set_Embedded_Sound_Bone_Index(bone_index);
-		}
+		// const char* sound_name = AnimatedSoundMgrClass::Get_Embedded_Sound_Name(motion1);
+		// if (sound_name) {
+		// 	int bone_index = Get_Bone_Index(sound_name);
+		// 	motion1->Set_Embedded_Sound_Bone_Index(bone_index);
+		// }
 	}
 }
 
@@ -585,11 +585,11 @@ void Animatable3DObjClass::Set_Animation
 		for (int index = 0; index < count; index ++) {				
 			HAnimClass *motion = anim_combo->Peek_Motion(index);
 
-			const char* sound_name = AnimatedSoundMgrClass::Get_Embedded_Sound_Name(motion);
-			if (sound_name) {
-				int bone_index = Get_Bone_Index(sound_name);
-				motion->Set_Embedded_Sound_Bone_Index(bone_index);
-			}
+			// const char* sound_name = AnimatedSoundMgrClass::Get_Embedded_Sound_Name(motion);
+			// if (sound_name) {
+			// 	int bone_index = Get_Bone_Index(sound_name);
+			// 	motion->Set_Embedded_Sound_Bone_Index(bone_index);
+			// }
 		}
 	}
 }						 
@@ -801,28 +801,28 @@ void Animatable3DObjClass::Update_Sub_Object_Transforms(void)
 			}
 			Anim_Update(Transform,ModeAnim.Motion,ModeAnim.Frame);
 			
-			/*
-			**	Play any sounds that are triggered by this frame of animation
-			*/
-			if ( ModeAnim.Motion->Has_Embedded_Sounds() ) {
-				ModeAnim.PrevFrame = AnimatedSoundMgrClass::Trigger_Sound(ModeAnim.Motion, ModeAnim.PrevFrame, ModeAnim.Frame, HTree->Get_Transform(ModeAnim.Motion->Get_Embedded_Sound_Bone_Index()));
-			}
+			// /*
+			// **	Play any sounds that are triggered by this frame of animation
+			// */
+			// if ( ModeAnim.Motion->Has_Embedded_Sounds() ) {
+			// 	ModeAnim.PrevFrame = AnimatedSoundMgrClass::Trigger_Sound(ModeAnim.Motion, ModeAnim.PrevFrame, ModeAnim.Frame, HTree->Get_Transform(ModeAnim.Motion->Get_Embedded_Sound_Bone_Index()));
+			// }
 			break;
 
 		case DOUBLE_ANIM:
 			Blend_Update(Transform,ModeInterp.Motion0,ModeInterp.Frame0,
 				ModeInterp.Motion1,ModeInterp.Frame1,ModeInterp.Percentage);
 
-			/*
-			**	Play any sounds that are triggered by this frame of animation
-			*/
-			if ( ModeInterp.Motion0->Has_Embedded_Sounds() ) {
-				ModeInterp.PrevFrame0 = AnimatedSoundMgrClass::Trigger_Sound(ModeInterp.Motion0, ModeInterp.PrevFrame0, ModeInterp.Frame0, HTree->Get_Transform(ModeInterp.Motion0->Get_Embedded_Sound_Bone_Index()));
-			}
+			// /*
+			// **	Play any sounds that are triggered by this frame of animation
+			// */
+			// if ( ModeInterp.Motion0->Has_Embedded_Sounds() ) {
+			// 	ModeInterp.PrevFrame0 = AnimatedSoundMgrClass::Trigger_Sound(ModeInterp.Motion0, ModeInterp.PrevFrame0, ModeInterp.Frame0, HTree->Get_Transform(ModeInterp.Motion0->Get_Embedded_Sound_Bone_Index()));
+			// }
 
-			if ( ModeInterp.Motion1->Has_Embedded_Sounds() ) {
-				ModeInterp.PrevFrame1 = AnimatedSoundMgrClass::Trigger_Sound(ModeInterp.Motion1, ModeInterp.PrevFrame1, ModeInterp.Frame1, HTree->Get_Transform(ModeInterp.Motion1->Get_Embedded_Sound_Bone_Index()));
-			}
+			// if ( ModeInterp.Motion1->Has_Embedded_Sounds() ) {
+			// 	ModeInterp.PrevFrame1 = AnimatedSoundMgrClass::Trigger_Sound(ModeInterp.Motion1, ModeInterp.PrevFrame1, ModeInterp.Frame1, HTree->Get_Transform(ModeInterp.Motion1->Get_Embedded_Sound_Bone_Index()));
+			// }
 
   			break;
 
@@ -838,9 +838,9 @@ void Animatable3DObjClass::Update_Sub_Object_Transforms(void)
 				HAnimClass *motion = ModeCombo.AnimCombo->Peek_Motion(index);
 
 				if ( motion != NULL && motion->Has_Embedded_Sounds() ) {
-					float prev_frame = AnimatedSoundMgrClass::Trigger_Sound(motion, ModeCombo.AnimCombo->Get_Prev_Frame(index),
-																				ModeCombo.AnimCombo->Get_Frame(index), HTree->Get_Transform(motion->Get_Embedded_Sound_Bone_Index()));
-					ModeCombo.AnimCombo->Set_Prev_Frame(index, prev_frame);
+					// float prev_frame = AnimatedSoundMgrClass::Trigger_Sound(motion, ModeCombo.AnimCombo->Get_Prev_Frame(index),
+					// 															ModeCombo.AnimCombo->Get_Frame(index), HTree->Get_Transform(motion->Get_Embedded_Sound_Bone_Index()));
+					// ModeCombo.AnimCombo->Set_Prev_Frame(index, prev_frame);
 				}
 				
 			}
