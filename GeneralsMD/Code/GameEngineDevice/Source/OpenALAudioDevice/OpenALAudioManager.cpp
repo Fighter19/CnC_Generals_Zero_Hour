@@ -2908,6 +2908,7 @@ void OpenALAudioManager::processRequest(AudioRequest* req)
 void* OpenALAudioManager::getHandleForBink(void)
 {
 	if (!m_binkAudio) {
+		DEBUG_LOG(("Creating Bink audio stream\n"));
 		m_binkAudio = NEW OpenALAudioStream;
 	}
 	return m_binkAudio;
@@ -2917,6 +2918,7 @@ void* OpenALAudioManager::getHandleForBink(void)
 void OpenALAudioManager::releaseHandleForBink(void)
 {
 	if (m_binkAudio) {
+		DEBUG_LOG(("Releasing Bink audio stream\n"));
 		delete m_binkAudio;
 		m_binkAudio = NULL;
 	}

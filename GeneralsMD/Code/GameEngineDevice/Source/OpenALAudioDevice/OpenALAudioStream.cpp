@@ -67,6 +67,10 @@ void OpenALAudioStream::reset()
 {
     alSourceRewind(m_source);
     alSourcei(m_source, AL_BUFFER, 0);
+    m_current_buffer_idx = 0;
+    for (int i = 0; i < AL_STREAM_BUFFER_COUNT; i++) {
+        alSourceUnqueueBuffers(m_source, 1, &m_buffers[i]);
+    }
 }
 
 bool OpenALAudioStream::isPlaying()
