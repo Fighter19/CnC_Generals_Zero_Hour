@@ -5,7 +5,6 @@ on:
     branches:
       - develop
       - main
-      - linux-ci-tgz
 
 jobs:
   testing:
@@ -76,4 +75,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: x64 Linux RTS
-          path: build/linux64-deploy/SAGE-*-Linux.zip
+          path: build/linux64-deploy/SAGE-*-Linux.tar.gz
