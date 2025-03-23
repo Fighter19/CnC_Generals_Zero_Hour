@@ -357,9 +357,9 @@ void FillStackAddresses(void**addresses, unsigned int count, unsigned int skip)
     memset(&gsContext, 0, sizeof(CONTEXT));
     gsContext.ContextFlags = CONTEXT_FULL;
 
-	DWORD myeip,myesp,myebp;
 #ifndef _WIN64
-_asm
+    DWORD myeip, myesp, myebp;
+    _asm
 {
 MYEIP2:
  mov eax, MYEIP2
@@ -370,7 +370,6 @@ MYEIP2:
  mov dword ptr [myebp] , eax
  xor eax,eax
 }
-#endif
 memset(&stack_frame, 0, sizeof(STACKFRAME));
 stack_frame.AddrPC.Mode = AddrModeFlat;
 stack_frame.AddrPC.Offset = myeip;
@@ -378,6 +377,7 @@ stack_frame.AddrStack.Mode = AddrModeFlat;
 stack_frame.AddrStack.Offset = myesp;
 stack_frame.AddrFrame.Mode = AddrModeFlat;
 stack_frame.AddrFrame.Offset = myebp;
+#endif
 
 {
 /*

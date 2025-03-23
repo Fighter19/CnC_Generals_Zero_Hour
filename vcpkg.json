@@ -12,9 +12,9 @@
     "freetype",
     "fontconfig",
     {
-      "name": "sdl3",
+      "name": "tracy",
       "features": [
-        "vulkan"
+        "gui-tools"
       ]
     }
   ]

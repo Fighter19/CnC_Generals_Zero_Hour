@@ -197,7 +197,7 @@ static Waypoint * findNamedWaypoint(AsciiString name)
 // ------------------------------------------------------------------------------------------------
 void setFPMode( void )
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(_WIN64)
   // Set floating point round mode to CHOP, which only comes
   // into play when precision is exceeded.  This is necessary
   // for the fast float to int routines used elsewhere in the

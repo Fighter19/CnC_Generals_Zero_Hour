@@ -75,6 +75,10 @@
 #include "Common/Debug.h"
 #include "Common/Errors.h"
 
+#ifdef SAGE_USE_TRACY
+#include "tracy/Tracy.hpp"
+#endif
+
 // MACROS //////////////////////////////////////////////////////////////////
 
 #ifdef MEMORYPOOL_DEBUG

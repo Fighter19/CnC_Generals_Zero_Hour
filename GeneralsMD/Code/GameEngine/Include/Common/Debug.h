@@ -50,6 +50,10 @@
 
 #include <cstdint>
 
+#ifdef SAGE_USE_TRACY
+#include "tracy/Tracy.hpp"
+#endif
+
 class AsciiString;
 
 #if defined(_DEBUG) && defined(_INTERNAL)
@@ -153,7 +157,9 @@ class AsciiString;
 
 	#define DEBUG_LOG(m)						do { { DebugLog m ; } } while (0)
 	#define DEBUG_ASSERTLOG(c, m)		do { { if (!(c)) DebugLog m ; } } while (0)
-
+//#elif defined(SAGE_USE_TRACY)
+//	#define DEBUG_LOG(m)  do { { char buffer[1024]; snprintf() } } while (0) TracyMessage(m)
+//	#define DEBUG_ASSERTLOG(c, m) do { if (!(c)) TracyMessage(m); } while (0)
 #else
 
 	#define DEBUG_LOG(m)						((void)0)

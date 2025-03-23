@@ -12,6 +12,16 @@ target_include_directories(WWDebug PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../WWLib
 )
 
+if(SAGE_USE_TRACY)
+    find_package(Tracy REQUIRED)
+    target_link_libraries(WWDebug PUBLIC
+        Tracy::TracyClient
+    )
+    target_compile_definitions(WWDebug PUBLIC
+        -DSAGE_USE_TRACY
+    )
+endif()
+
 if(UNIX)
     target_compile_definitions(WWDebug PUBLIC
         -D_UNIX

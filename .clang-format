@@ -1,0 +1,8 @@
+SortIncludes: false
+BasedOnStyle: Microsoft
+PointerAlignment: Left
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+AllowShortEnumsOnASingleLine: true
+AlignConsecutiveAssignments: true
+AlignConsecutiveMacros: true
+AlignArrayOfStructures: Left

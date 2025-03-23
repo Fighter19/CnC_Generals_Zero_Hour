@@ -55,6 +55,10 @@ typedef signed long long _int64;
 #define ENABLE_WWPROFILE	
 #endif
 
+#ifdef SAGE_USE_TRACY
+#include "tracy/Tracy.hpp"
+#endif
+
 extern unsigned WWProfile_Get_System_Time();	// timeGetTime() wrapper
 class FileClass;
 			
@@ -266,6 +270,9 @@ public:
 #ifdef ENABLE_WWPROFILE
 #define	WWPROFILE( name )						WWProfileSampleClass _wwprofile( name, false )
 #define	WWROOTPROFILE( name )				WWProfileSampleClass _wwprofile( name, true )
+#elif SAGE_USE_TRACY
+#define	WWPROFILE( name ) ZoneScopedN( name )
+#define	WWROOTPROFILE( name )	ZoneScopedN( name )
 #else
 #define	WWPROFILE( name )
 #define	WWROOTPROFILE( name )

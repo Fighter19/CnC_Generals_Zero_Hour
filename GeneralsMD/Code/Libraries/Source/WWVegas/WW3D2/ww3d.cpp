@@ -794,6 +794,10 @@ WW3DErrorType WW3D::Begin_Render(bool clear,bool clearz,const Vector3 & color, f
 		return(WW3D_ERROR_OK);
 	}
 
+#ifdef SAGE_USE_TRACY
+    FrameMark;
+#endif
+
 	WWPROFILE("WW3D::Begin_Render");
 	WWASSERT(IsInitted);
 	HRESULT hr;

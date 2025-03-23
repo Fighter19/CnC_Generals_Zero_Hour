@@ -58,6 +58,10 @@
 #ifdef MEMORYPOOL_STACKTRACE
 	#include "Common/StackDump.h"
 #endif
+#ifdef SAGE_USE_TRACY
+#include "tracy/Tracy.hpp"
+#include "tracy/Tracy.hpp"
+#endif
 
 #ifdef MEMORYPOOL_DEBUG
 DECLARE_PERF_TIMER(MemoryPoolDebugging)
@@ -254,6 +258,9 @@ static void* sysAllocateDoNotZero(Int numBytes)
 			thePeakSystemAllocationInBytes = theTotalSystemAllocationInBytes;
 	}
 #endif
+#ifdef SAGE_USE_TRACY
+	TracyAlloc(p, numBytes);
+#endif
 	return p;
 }
 
@@ -272,6 +279,9 @@ static void sysFree(void* p)
 			::memset(p, GARBAGE_FILL_VALUE, ::GlobalSize(p));
 			theTotalSystemAllocationInBytes -= ::GlobalSize(p);
 		}
+#endif
+#ifdef SAGE_USE_TRACY
+        TracyFree(p);
 #endif
 		::GlobalFree(p);
 	}
