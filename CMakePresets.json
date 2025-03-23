@@ -160,6 +160,9 @@
       "displayName": "Linux Release Package",
       "configurePreset": "linux64-deploy",
       "inherits": "deploy",
+      "generators": [
+        "TGZ"
+      ],
       "description": "Package the linux deploy configuration"
     }
   ],
