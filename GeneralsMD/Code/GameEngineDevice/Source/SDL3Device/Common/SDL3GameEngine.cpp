@@ -33,6 +33,7 @@
 #include "SDL3Device/GameClient/SDL3Mouse.h"
 #include "SDL3Device/GameClient/SDL3Keyboard.h"
 #include "Common/PerfTimer.h"
+#include "Common/GlobalData.h"
 
 #include "GameNetwork/LANAPICallbacks.h"
 
@@ -114,6 +115,13 @@ void SDL3GameEngine::update( void )
     AudioAffect aa = (AudioAffect)0x10;
 		TheAudio->setVolume(TheAudio->getVolume( aa ), aa );
 
+	}
+
+	int currentWidth = 0, currentHeight = 0;
+	SDL_GetWindowSize(TheSDL3Window, &currentWidth, &currentHeight);
+
+	if (currentWidth != TheGlobalData->m_xResolution || currentHeight != TheGlobalData->m_yResolution) {
+		SDL_SetWindowSize(TheSDL3Window, TheGlobalData->m_xResolution, TheGlobalData->m_yResolution);
 	}
 
 	// allow windows to perform regular windows maintenance stuff like msgs
