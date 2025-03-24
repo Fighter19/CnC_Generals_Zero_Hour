@@ -33,7 +33,6 @@
 #include "SDL3Device/GameClient/SDL3Mouse.h"
 #include "SDL3Device/GameClient/SDL3Keyboard.h"
 #include "Common/PerfTimer.h"
-#include "Common/GlobalData.h"
 
 #include "GameNetwork/LANAPICallbacks.h"
 
