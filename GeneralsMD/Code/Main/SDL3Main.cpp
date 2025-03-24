@@ -71,7 +71,7 @@ static Bool initializeAppWindows(Bool runWindowed)
   }
 
   SDL_Window *window =
-      SDL_CreateWindow("Command and Conquer Generals", startWidth, startHeight, SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
+      SDL_CreateWindow("Command and Conquer Generals", startWidth, startHeight, SDL_WINDOW_VULKAN);
   SDL_ShowWindow(window);
   // save our window handle for future use
   ApplicationHWnd = TheSDL3Window = window;
