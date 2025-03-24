@@ -414,7 +414,7 @@ Bool OpenALAudioManager::checkALError()
 {
 	ALenum errorCode = alGetError();
 	if (errorCode != 0) {
-#ifndef NDEBUG
+#ifdef _DEBUG
 		auto errorMsg = alGetString(errorCode);
 		DEBUG_ASSERTLOG(false, ("OpenAL error: %s", errorMsg));
 #endif
@@ -471,6 +471,7 @@ void OpenALAudioManager::init()
 	// We should now know how many samples we want to load
 	openDevice();
 	m_audioCache->setMaxSize(getAudioSettings()->m_maxCacheSize);
+	alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -899,7 +900,7 @@ void OpenALAudioManager::playAudioEvent(AudioEventRTS* event)
 void OpenALAudioManager::stopAudioEvent(AudioHandle handle)
 {
 #ifdef INTENSIVE_AUDIO_DEBUG
-	DEBUG_LOG(("MILES (%d) - Processing stop request: %d\n", TheGameLogic->getFrame(), handle));
+	DEBUG_LOG(("OPENAL (%d) - Processing stop request: %d\n", TheGameLogic->getFrame(), handle));
 #endif
 
 	std::list<PlayingAudio*>::iterator it;
@@ -1072,11 +1073,6 @@ PlayingAudio* OpenALAudioManager::allocatePlayingAudio(void)
 //-------------------------------------------------------------------------------------------------
 void OpenALAudioManager::releaseOpenALHandles(PlayingAudio* release)
 {
-	if (release->m_buffer)
-	{
-		alDeleteBuffers(1, &release->m_buffer);
-		release->m_buffer = 0;
-	}
 	if (release->m_source)
 	{
 		alDeleteSources(1, &release->m_source);
@@ -2627,7 +2623,7 @@ void OpenALAudioManager::closeAnySamplesUsingFile(const void* fileToClose)
 //-------------------------------------------------------------------------------------------------
 void OpenALAudioManager::setDeviceListenerPosition(void)
 {
-	ALfloat listenerOri[] = { m_listenerOrientation.x, m_listenerOrientation.y, m_listenerOrientation.z, 0.0f, 0.0f, -1.0f };
+	ALfloat listenerOri[] = { m_listenerOrientation.x, m_listenerOrientation.y, m_listenerOrientation.z, 0.0f, 0.0f, 1.0f };
 	alListener3f(AL_POSITION, m_listenerPosition.x, m_listenerPosition.y, m_listenerPosition.z);
 	alListenerfv(AL_ORIENTATION, listenerOri);
 }
@@ -2668,39 +2664,6 @@ Real OpenALAudioManager::getEffectiveVolume(AudioEventRTS* event) const
 		if (event->isPositionalAudio())
 		{
 			volume *= m_sound3DVolume;
-			Coord3D distance = m_listenerPosition;
-			const Coord3D* pos = event->getCurrentPosition();
-			if (pos)
-			{
-				distance.sub(pos);
-				Real objMinDistance;
-				Real objMaxDistance;
-
-				if (event->getAudioEventInfo()->m_type & ST_GLOBAL)
-				{
-					objMinDistance = TheAudio->getAudioSettings()->m_globalMinRange;
-					objMaxDistance = TheAudio->getAudioSettings()->m_globalMaxRange;
-				}
-				else
-				{
-					objMinDistance = event->getAudioEventInfo()->m_minDistance;
-					objMaxDistance = event->getAudioEventInfo()->m_maxDistance;
-				}
-
-				Real objDistance = distance.length();
-				if (objDistance > objMinDistance)
-				{
-					volume *= 1 / (objDistance / objMinDistance);
-				}
-				if (objDistance >= objMaxDistance)
-				{
-					volume = 0.0f;
-				}
-				//else if( objDistance > objMinDistance )
-				//{
-				//	volume *= 1.0f - (objDistance - objMinDistance) / (objMaxDistance - objMinDistance);
-				//}
-			}
 		}
 		else
 		{
@@ -2772,26 +2735,15 @@ void OpenALAudioManager::playStream(AudioEventRTS* event, ALuint source)
 void* OpenALAudioManager::playSample(AudioEventRTS* event, PlayingAudio* audio)
 {
 	// Load the file in
-	void* fileBuffer = NULL;
-	fileBuffer = loadFileForRead(event);
-	if (fileBuffer) {
-		uint8_t* data = nullptr;
-		UnsignedInt size = 0;
-		UnsignedInt freq = 0;
-		UnsignedInt channels = 1;
-		UnsignedInt bitPerSample = 16;
-#ifdef SAGE_USE_FFMPEG
-		OpenALAudioFileCache::getWaveData(fileBuffer, data, size, freq, channels, bitPerSample);
-#endif
-		alGenBuffers(1, &audio->m_buffer);
-		DEBUG_ASSERTLOG(checkALError(), ("Failed to generate buffer"));
-		alBufferData(audio->m_buffer, getALFormat(channels, bitPerSample), data, size, freq);
+	void* bufferHandle = loadFileForRead(event);
+	if (bufferHandle) {
         DEBUG_ASSERTLOG(checkALError(), ("Failed to buffer data"));
-		alSourcei(audio->m_source, AL_BUFFER, audio->m_buffer);
+		alSourcei(audio->m_source, AL_BUFFER, (ALuint)(uintptr_t)bufferHandle);
 		alSourcePlay(audio->m_source);
+		checkALError();
 	}
 
-	return fileBuffer;
+	return bufferHandle;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -2813,6 +2765,10 @@ void* OpenALAudioManager::playSample3D(AudioEventRTS* event, PlayingAudio* sampl
 				alSourcef(source, AL_REFERENCE_DISTANCE, event->getAudioEventInfo()->m_minDistance);
 				alSourcef(source, AL_MAX_DISTANCE, event->getAudioEventInfo()->m_maxDistance);
 			}
+
+			Real pitch = event->getPitchShift() != 0.0f ? event->getPitchShift() : 1.0f;
+			alSourcef(source, AL_PITCH, pitch);
+			alSourcef(source, AL_ROLLOFF_FACTOR, 0.5f);
 
 			// Set the position of the sample here
 			Real x = pos->x;

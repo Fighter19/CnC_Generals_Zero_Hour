@@ -71,6 +71,7 @@ class OpenALAudioManager : public AudioManager
 {
 friend class OpenALAudioStream;
 friend class FFmpegVideoStream;
+friend class OpenALAudioFileCache;
 
 public:
 #if defined(_DEBUG) || defined(_INTERNAL)

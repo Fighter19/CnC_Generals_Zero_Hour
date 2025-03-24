@@ -34,7 +34,6 @@
 struct PlayingAudio
 {
 	ALuint m_source;
-	ALuint m_buffer;
 
 	PlayingAudioType m_type;
 	volatile PlayingStatus m_status;	// This member is adjusted by another running thread.
@@ -50,19 +49,19 @@ struct PlayingAudio
 		m_requestStop(false),
 		m_cleanupAudioEventRTS(true),
 		m_source(0),
-		m_buffer(0),
 		m_framesFaded(0)
 	{ }
 };
 
 struct OpenAudioFile
 {
-	FFmpegFile* m_ffmpegFile;
-	uint8_t* m_file;
-	UnsignedInt m_openCount;
-	UnsignedInt m_fileSize;
-
-	Bool m_compressed;	// if the file was compressed, then we need to free it with a miles function.
+	ALuint m_buffer = 0;
+	FFmpegFile* m_ffmpegFile = NULL;
+	UnsignedInt m_openCount = 0;
+	UnsignedInt m_fileSize = 0;
+	UnsignedInt m_channels = 0;
+	UnsignedInt m_bitsPerSample = 0;
+	UnsignedInt m_freq = 0;
 
 	// Note: OpenAudioFile does not own this m_eventInfo, and should not delete it.
 	const AudioEventInfo* m_eventInfo;	// Not mutable, unlike the one on AudioEventRTS.
@@ -108,7 +107,6 @@ protected:
 
 	// FFmpeg related
 	Bool decodeFFmpeg(OpenAudioFile* fileToDecode);
-	void fillWaveData(OpenAudioFile* fileToFill);
 
 	OpenFilesHash m_openFiles;
 	UnsignedInt m_currentlyUsedSize;
