@@ -68,6 +68,11 @@
 
 #include <AL/alext.h>
 
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavutil/avutil.h>
+}
+
 #ifdef _INTERNAL
 //#pragma optimize("", off)
 //#pragma MESSAGE("************************************** WARNING, optimization disabled for debugging purposes")
@@ -732,25 +737,87 @@ void OpenALAudioManager::playAudioEvent(AudioEventRTS* event)
 			}
 		}
 
-		ALuint source;
+		File* file = TheFileSystem->openFile(fileToPlay.str());
+		if (!file) {
+			DEBUG_LOG(("Failed to open file: %s\n", fileToPlay.str()));
+			releasePlayingAudio(audio);
+			return;
+		}
+
+		FFmpegFile* ffmpegFile = NEW FFmpegFile();
+		if (!ffmpegFile->open(file))
+		{
+			DEBUG_LOG(("Failed to open FFmpeg file: %s\n", fileToPlay.str()));
+			releasePlayingAudio(audio);
+			return;
+		}
+
+		OpenALAudioStream* stream;
 		if (!handleToKill || foundSoundToReplace) {
-			alGenSources(1, &source);
+			stream = new OpenALAudioStream;
+			// When we need more data ask FFmpeg for more data.
+			stream->setRequireDataCallback([ffmpegFile, stream]() {
+				ffmpegFile->decodePacket();
+				});
+			
+			// When we receive a frame from FFmpeg, send it to OpenAL.
+			ffmpegFile->setFrameCallback([stream](AVFrame* frame, int stream_idx, int stream_type, void* user_data) {
+				if (stream_type != AVMEDIA_TYPE_AUDIO) {
+					return;
+				}
+
+				DEBUG_LOG(("Received audio frame\n"));
+
+				AVSampleFormat sampleFmt = static_cast<AVSampleFormat>(frame->format);
+				const int bytesPerSample = av_get_bytes_per_sample(sampleFmt);
+				ALenum format = OpenALAudioManager::getALFormat(frame->ch_layout.nb_channels, bytesPerSample * 8);
+				const int frameSize =
+					av_samples_get_buffer_size(NULL, frame->ch_layout.nb_channels, frame->nb_samples, sampleFmt, 1);
+				uint8_t* frameData = frame->data[0];
+
+				// We need to interleave the samples if the format is planar
+				if (av_sample_fmt_is_planar(static_cast<AVSampleFormat>(frame->format))) {
+					uint8_t* audioBuffer = static_cast<uint8_t*>(av_malloc(frameSize));
+
+					// Write the samples into our audio buffer
+					for (int sample_idx = 0; sample_idx < frame->nb_samples; sample_idx++)
+					{
+						int byte_offset = sample_idx * bytesPerSample;
+						for (int channel_idx = 0; channel_idx < frame->ch_layout.nb_channels; channel_idx++)
+						{
+							uint8_t* dst = &audioBuffer[byte_offset * frame->ch_layout.nb_channels + channel_idx * bytesPerSample];
+							uint8_t* src = &frame->data[channel_idx][byte_offset];
+							memcpy(dst, src, bytesPerSample);
+						}
+					}
+					stream->bufferData(audioBuffer, frame->linesize[0], format, bytesPerSample);
+					av_freep(&audioBuffer);
+				}
+				else
+					stream->bufferData(frameData, frame->linesize[0], format, bytesPerSample);
+			});
+
+			// Decode 4 packets before starting the stream.
+			for (int i = 0; i < 4; i++) {
+				ffmpegFile->decodePacket();
+			}
 		}
 		else {
-			source = NULL;
+			stream = NULL;
 		}
 
 		// Put this on here, so that the audio event RTS will be cleaned up regardless.
 		audio->m_audioEventRTS = event;
-		audio->m_source = source;
+		audio->m_stream = stream;
+		audio->m_ffmpegFile = ffmpegFile;
 		audio->m_type = PAT_Stream;
 
-		if (source) {
+		if (stream) {
 			if ((info->m_soundType == AT_Streaming) && event->getUninterruptable()) {
 				setDisallowSpeech(TRUE);
 			}
 			// AIL_set_stream_volume_pan(stream, curVolume, 0.5f);
-			playStream(event, source);
+			playStream(event, stream);
 			m_playingStreams.push_back(audio);
 			audio = NULL;
 		}
@@ -1558,7 +1625,7 @@ void OpenALAudioManager::notifyOfAudioCompletion(UnsignedInt audioCompleted, Uns
 
 	if (playing->m_type == PAT_Stream) {
 		if (playing->m_audioEventRTS->getAudioEventInfo()->m_soundType == AT_Music) {
-			playStream(playing->m_audioEventRTS, playing->m_source);
+			playStream(playing->m_audioEventRTS, playing->m_stream);
 
 			return;
 		}
@@ -2357,6 +2424,8 @@ void OpenALAudioManager::processPlayingList(void)
 				adjustPlayingVolume(playing);
 			}
 
+			playing->m_stream->update();
+
 			++it;
 		}
 	}
@@ -2716,19 +2785,19 @@ Bool OpenALAudioManager::startNextLoop(PlayingAudio* looping)
 }
 
 //-------------------------------------------------------------------------------------------------
-void OpenALAudioManager::playStream(AudioEventRTS* event, ALuint source)
+void OpenALAudioManager::playStream(AudioEventRTS* event, OpenALAudioStream* stream)
 {
 	// Force it to the beginning
 	if (event->getAudioEventInfo()->m_soundType == AT_Music) {
-		alSourcei(source, AL_LOOPING, AL_TRUE);
+		alSourcei(stream->getSource(), AL_LOOPING, AL_TRUE);
 	}
 
-	alSourcePlay(source);
+	stream->play();
 	if (event->getAudioEventInfo()->m_soundType == AT_Music) {
 		// Need to stop/fade out the old music here.
 	}
 
-	// TODO: streaming
+	checkALError();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -2737,7 +2806,7 @@ void* OpenALAudioManager::playSample(AudioEventRTS* event, PlayingAudio* audio)
 	// Load the file in
 	void* bufferHandle = loadFileForRead(event);
 	if (bufferHandle) {
-        DEBUG_ASSERTLOG(checkALError(), ("Failed to buffer data"));
+		alSourcei(audio->m_source, AL_SOURCE_RELATIVE, AL_TRUE);
 		alSourcei(audio->m_source, AL_BUFFER, (ALuint)(uintptr_t)bufferHandle);
 		alSourcePlay(audio->m_source);
 		checkALError();
@@ -2751,7 +2820,7 @@ void* OpenALAudioManager::playSample3D(AudioEventRTS* event, PlayingAudio* sampl
 {
 	const Coord3D* pos = getCurrentPositionFromEvent(event);
 	if (pos) {
-		void* handle = playSample(event, sample3D);
+		void* handle = loadFileForRead(event);
 		const AudioSettings* audioSettings = getAudioSettings();
 
 		if (handle) {
@@ -2775,6 +2844,7 @@ void* OpenALAudioManager::playSample3D(AudioEventRTS* event, PlayingAudio* sampl
 			Real y = pos->y;
 			Real z = pos->z;
 			alSource3f(source, AL_POSITION, x, y, z);
+			alSourcei(source, AL_BUFFER, (ALuint)handle);
 
 			// Start playback
 			alSourcePlay(source);

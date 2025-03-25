@@ -58,8 +58,9 @@ void OpenALAudioStream::update()
     ALint num_queued;
     alGetSourcei(m_source, AL_BUFFERS_QUEUED, &num_queued);
     DEBUG_LOG(("Having %i buffers queued\n", num_queued));
-    if (num_queued == 1) {
-        // TODO: we could invoke a callback here, asking for more audio data
+    if (num_queued <= (AL_STREAM_BUFFER_COUNT / 4) && m_requireDataCallback) {
+        // Ask for more data to be buffered
+        m_requireDataCallback();
     }
 }
 

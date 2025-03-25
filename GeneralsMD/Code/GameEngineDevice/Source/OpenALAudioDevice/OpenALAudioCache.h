@@ -34,6 +34,8 @@
 struct PlayingAudio
 {
 	ALuint m_source;
+	OpenALAudioStream* m_stream = nullptr;
+	FFmpegFile* m_ffmpegFile = nullptr;
 
 	PlayingAudioType m_type;
 	volatile PlayingStatus m_status;	// This member is adjusted by another running thread.

@@ -173,7 +173,7 @@ protected:
 	// Looping functions
 	Bool startNextLoop(PlayingAudio *looping);
 
-	void playStream(AudioEventRTS *event, ALuint stream);
+	void playStream(AudioEventRTS *event, OpenALAudioStream* stream);
 	// Returns the file handle for attachment to the PlayingAudio structure
 	void *playSample(AudioEventRTS *event, PlayingAudio *audio);
 	void *playSample3D(AudioEventRTS *event, PlayingAudio * audio);
