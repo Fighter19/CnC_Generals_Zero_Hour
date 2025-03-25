@@ -865,6 +865,16 @@ AsciiString GameState::getMapLeafName(const AsciiString& in) const
 	}
 	else
 	{
+		const char* linuxSepP = strrchr(in.str(), '/');
+		if (linuxSepP)
+		{
+			// This is similar to the above p, but checking for the linux case as well
+			// This is not done via a ifdef mainly because some of the paths can have combinations
+			// This seems to be due to the mix in here and then elsewhere in the code having //
+			++linuxSepP;
+			DEBUG_ASSERTCRASH( linuxSepP != NULL && *linuxSepP != 0, ("GameState::xfer - Illegal map name encountered\n") );
+			return linuxSepP;
+		}
 		return in;
 	}
 }
@@ -874,7 +884,9 @@ static const char* findLastBackslashInRangeInclusive(const char* start, const ch
 {
 	while (end >= start)
 	{
-		if (*end == '\\')
+		// On Linux, we can see either one, since alot of the paths are combinations
+		// This will allow us to find the map internal names it's looking for, like in MapUtil'
+		if (*end == '\\' || *end == '/')
 			return end;
 		--end;
 	}
@@ -968,6 +980,7 @@ AsciiString GameState::portableMapPathToRealMapPath(const AsciiString& in) const
 		// the save dir ends with "\\"
 		prefix = getSaveDirectory();
 		prefix.concat(getMapLeafName(in));
+		// Adding these to the individual ones, because the save case will not work on Linux with a toLower
 	}
 	else if (in.startsWithNoCase(PORTABLE_MAPS))
 	{
@@ -975,6 +988,7 @@ AsciiString GameState::portableMapPathToRealMapPath(const AsciiString& in) const
 		prefix = TheMapCache->getMapDir();
 		prefix.concat("\\");
 		prefix.concat(getMapLeafAndDirName(in));
+		prefix.toLower();
 	}
 	else if (in.startsWithNoCase(PORTABLE_USER_MAPS))
 	{
@@ -982,6 +996,7 @@ AsciiString GameState::portableMapPathToRealMapPath(const AsciiString& in) const
 		prefix = TheMapCache->getUserMapDir();
 		prefix.concat("\\");
 		prefix.concat(getMapLeafAndDirName(in));
+		prefix.toLower();
 	}
 	else
 	{
@@ -990,7 +1005,10 @@ AsciiString GameState::portableMapPathToRealMapPath(const AsciiString& in) const
 		// uncaught exceptions crash us. better to just use a bad path.
 		prefix = in;
 	}
+#ifdef _WIN32
+	// Putting this behind a windows flag, as on Linux, the real disk paths are case sensitive for saves
 	prefix.toLower();
+#endif
 	return prefix;
 }
 
@@ -1376,10 +1394,16 @@ void GameState::iterateSaveFiles( IterateSaveFileCallback callback, void *userDa
 	// restore the current directory
 	SetCurrentDirectory( currentDirectory );
 #else
+	// save the current directory
+	std::filesystem::path currentDirectory = std::filesystem::current_path();
+
+	// Change to the save directory; This is done because code like GameStateMap requires the saves to be a relative path
+	std::filesystem::current_path(getSaveDirectory().str());
+
 	// iterate all items in the directory
 	std::filesystem::directory_iterator end_itr;
 	std::error_code ec;
-	for (std::filesystem::directory_iterator itr(getSaveDirectory().str(), ec); itr != end_itr; ++itr)
+	for (std::filesystem::directory_iterator itr(".", ec); itr != end_itr; ++itr)
 	{
 		if (std::filesystem::is_regular_file(itr->status()))
 		{
@@ -1392,6 +1416,9 @@ void GameState::iterateSaveFiles( IterateSaveFileCallback callback, void *userDa
 			}
 		}
 	}
+
+	// Change back to the original directory
+	std::filesystem::current_path(currentDirectory);
 #endif
 }  // end iterateSaveFiles
 
