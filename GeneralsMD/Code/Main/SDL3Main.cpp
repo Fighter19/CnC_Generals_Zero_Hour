@@ -33,11 +33,11 @@
 #include <wsi/native_wsi.h>
 
 // GLOBALS
-HINSTANCE ApplicationHInstance;  ///< our application instance
-HWND ApplicationHWnd = NULL; ///< our application window handle
+HINSTANCE ApplicationHInstance; ///< our application instance
+HWND ApplicationHWnd = NULL;    ///< our application window handle
 Bool ApplicationIsWindowed = false;
-Win32Mouse *TheWin32Mouse= NULL;  ///< for the WndProc() only
-DWORD TheMessageTime = 0;	///< For getting the time that a message was posted from Windows.
+Win32Mouse *TheWin32Mouse = NULL; ///< for the WndProc() only
+DWORD TheMessageTime = 0; ///< For getting the time that a message was posted from Windows.
 
 const Char *g_strFile = "data\\Generals.str";
 const Char *g_csfFile = "data\\%s\\Generals.csf";
@@ -53,13 +53,22 @@ static HANDLE GeneralsMutex = NULL;
 WebBrowser *TheWebBrowser;
 SDL_Window *TheSDL3Window = NULL;
 CComModule _Module;
+SDL_Window *SplashWindow = NULL;
+SDL_Surface *SplashSurface = NULL;
 
-static Bool initializeAppWindows(Bool runWindowed) 
-{
+static void postInit() {
+  if (SplashWindow) {
+    SDL_DestroyWindow(SplashWindow);
+    SplashWindow = NULL;
+  }
+  if (TheSDL3Window)
+    SDL_ShowWindow(TheSDL3Window);
+}
+
+static Bool initializeAppWindows(Bool runWindowed) {
   Int startWidth = DEFAULT_XRESOLUTION, startHeight = DEFAULT_YRESOLUTION;
   SDL_InitSubSystem(SDL_INIT_VIDEO);
-  if(!SDL_Vulkan_LoadLibrary(nullptr))
-  {
+  if (!SDL_Vulkan_LoadLibrary(nullptr)) {
     DEBUG_LOG(("Failed to load Vulkan library"));
     return false;
   }
@@ -70,14 +79,38 @@ static Bool initializeAppWindows(Bool runWindowed)
     startHeight = DEFAULT_YRESOLUTION;
   }
 
-  SDL_Window *window =
-      SDL_CreateWindow("Command and Conquer Generals", startWidth, startHeight, SDL_WINDOW_VULKAN);
-  SDL_ShowWindow(window);
+  TheSDL3Window = SDL_CreateWindow(
+      "Command and Conquer Generals", startWidth, startHeight,
+      SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN);
+  if(!TheSDL3Window) {
+    DEBUG_LOG(("Failed to create window"));
+    return false;
+  }
+
   // save our window handle for future use
-  ApplicationHWnd = TheSDL3Window = window;
+  ApplicationHWnd = TheSDL3Window;
+
+  // Center the window
+  SDL_SetWindowPosition(TheSDL3Window, SDL_WINDOWPOS_CENTERED,
+                        SDL_WINDOWPOS_CENTERED);
 
   setenv("DXVK_WSI_DRIVER", "SDL3", 1);
 
+  SplashWindow =
+      SDL_CreateWindow("Splash", SplashSurface->w, SplashSurface->h,
+                       SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALWAYS_ON_TOP);
+  if (SplashWindow) {
+    // Center the window
+    SDL_SetWindowPosition(SplashWindow, SDL_WINDOWPOS_CENTERED,
+                          SDL_WINDOWPOS_CENTERED);
+
+    SDL_Renderer* ren = SDL_CreateRenderer(SplashWindow, SDL_SOFTWARE_RENDERER);
+    SDL_Texture* splashTexture = SDL_CreateTextureFromSurface(ren, SplashSurface);
+    SDL_RenderTexture(ren, splashTexture, NULL, NULL);
+    SDL_RenderPresent(ren);
+    SDL_DestroySurface(SplashSurface);
+    SplashSurface = NULL;
+  }
   return true; // success
 }
 
@@ -85,6 +118,8 @@ int main(int argc, char *argv[]) {
 #ifdef _PROFILE
   Profile::StartRange("init");
 #endif
+
+  SplashSurface = SDL_LoadBMP("Install_Final.bmp");
 
   // register windows class and create application window
   if (initializeAppWindows(ApplicationIsWindowed) == false)
@@ -97,14 +132,14 @@ int main(int argc, char *argv[]) {
   // Set up version info
   TheVersion = NEW Version;
 
-  // initialize the game engine using factory function
   GameMain(argc, argv);
 
   delete TheVersion;
   TheVersion = NULL;
 
 #ifdef MEMORYPOOL_DEBUG
-  TheMemoryPoolFactory->debugMemoryReport(REPORT_POOLINFO | REPORT_POOL_OVERFLOW | REPORT_SIMPLE_LEAKS, 0, 0);
+  TheMemoryPoolFactory->debugMemoryReport(
+      REPORT_POOLINFO | REPORT_POOL_OVERFLOW | REPORT_SIMPLE_LEAKS, 0, 0);
 #endif
 #if defined(_DEBUG) || defined(_INTERNAL)
   TheMemoryPoolFactory->memoryPoolUsageReport("AAAMemStats");
@@ -114,7 +149,7 @@ int main(int argc, char *argv[]) {
   shutdownMemoryManager();
   DEBUG_SHUTDOWN();
 
-	return 0;
+  return 0;
 }
 
 GameEngine *CreateGameEngine(void) {
@@ -124,6 +159,7 @@ GameEngine *CreateGameEngine(void) {
   // game engine may not have existed when app got focus so make sure it
   // knows about current focus state.
   engine->setIsActive(true);
+  engine->setPostInitCallback(&postInit);
 
   return engine;
 

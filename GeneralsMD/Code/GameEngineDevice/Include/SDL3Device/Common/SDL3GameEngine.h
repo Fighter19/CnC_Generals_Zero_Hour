@@ -27,6 +27,9 @@
 #else
 #error "No audio device defined"
 #endif
+
+#include <functional>
+
 class SDL3GameEngine : public GameEngine
 {
 public:
@@ -34,10 +37,12 @@ public:
   virtual ~SDL3GameEngine() override;
 
   virtual void init(void) override;
+  virtual void init(int argc, char** argv) override;
   virtual void reset(void) override;
   virtual void update(void) override;
   virtual void serviceWindowsOS(void) override;
 
+  void setPostInitCallback(std::function<void()> callback) { m_postInitCallback = callback; }
   // Factories
 protected:
   virtual GameLogic *createGameLogic(void) override;
@@ -51,6 +56,8 @@ protected:
   virtual Radar *createRadar(void) override;
   virtual AudioManager *createAudioManager(void) override;
   virtual ParticleSystemManager *createParticleSystemManager(void) override;
+
+  std::function<void()> m_postInitCallback;
 };
 
 // INLINE -----------------------------------------------------------------------------------------

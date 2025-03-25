@@ -64,6 +64,23 @@ void SDL3GameEngine::init( void )
 	// extending functionality
 	GameEngine::init();
 
+	// notify SDLMain that we are done initializing
+	if(m_postInitCallback)
+	{
+		m_postInitCallback();
+	}
+}  // end init
+
+void SDL3GameEngine::init( int argc, char** argv )
+{
+	// extending functionality
+	GameEngine::init(argc, argv);
+
+	// notify SDLMain that we are done initializing
+	if(m_postInitCallback)
+	{
+		m_postInitCallback();
+	}
 }  // end init
 
 //-------------------------------------------------------------------------------------------------
@@ -131,9 +148,6 @@ void SDL3GameEngine::serviceWindowsOS( void )
 {
 	// Let SDL fill it's event queue
 	SDL_PumpEvents();
-
-	// Until we refactor the way keyboards are handled,
-	// we can't pop the events here, or we need to filter the keyboard events
 
 	SDL_Event event;
 	while(SDL_PollEvent(&event)) {
