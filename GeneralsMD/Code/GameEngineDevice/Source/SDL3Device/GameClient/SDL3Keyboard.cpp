@@ -106,6 +106,14 @@ static KeyDefType ConvertSDLKey(SDL_Keycode keycode)
 			return KEY_RCTRL;
 		case SDLK_LSHIFT:
 			return KEY_LSHIFT;
+		case SDLK_UP:
+			return KEY_UP;
+		case SDLK_DOWN:
+			return KEY_DOWN;
+		case SDLK_LEFT:
+			return KEY_LEFT;
+		case SDLK_RIGHT:
+			return KEY_RIGHT;
 		default:
 			break;
 	}
