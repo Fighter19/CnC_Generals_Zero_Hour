@@ -114,7 +114,7 @@ static Bool initializeAppWindows(Bool runWindowed, Bool runSplash) {
       SDL_CreateWindow("Splash", SplashSurface->w, SplashSurface->h,
                        SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALWAYS_ON_TOP);
   } else if (TheSDL3Window) {
-    // If we aren't going to show the splash screen, go ahead and show the empty window'
+    // If we aren't going to show the splash screen, go ahead and show the empty window
     SDL_ShowWindow(TheSDL3Window);
   }
 
