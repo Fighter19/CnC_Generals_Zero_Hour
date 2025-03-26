@@ -182,8 +182,8 @@ void SDL3Mouse::translateEvent( UnsignedInt eventIndex, MouseIO *result )
 		// ------------------------------------------------------------------------
 		case SDL_EVENT_MOUSE_WHEEL:
 		{	
-			// note the short cast here to keep signed information in tact
-			result->wheelPos =  mouseWheelEvent.y;
+			// Wheel delta to match to Windows behavior of the scroll wheel
+			result->wheelPos =  mouseWheelEvent.y * 120;
 			result->pos.x = mouseWheelEvent.mouse_x;
 			result->pos.y = mouseWheelEvent.mouse_y;
 			break;
