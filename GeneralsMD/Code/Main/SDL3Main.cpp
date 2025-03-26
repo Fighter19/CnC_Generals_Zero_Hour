@@ -32,13 +32,11 @@
 #define DXVK_WSI_SDL3 1
 #include <wsi/native_wsi.h>
 
-#include <algorithm>
-#include <string_view>
-
 // GLOBALS
 HINSTANCE ApplicationHInstance; ///< our application instance
 HWND ApplicationHWnd = NULL;    ///< our application window handle
 Bool ApplicationIsWindowed = false;
+Bool ShowSplashScreen = true;
 Win32Mouse *TheWin32Mouse = NULL; ///< for the WndProc() only
 DWORD TheMessageTime = 0; ///< For getting the time that a message was posted from Windows.
 
@@ -68,14 +66,57 @@ static void postInit() {
     SDL_ShowWindow(TheSDL3Window);
 }
 
-bool hasFlag(int argc, char* argv[], std::string_view flag) {
-  std::string expected = "-" + std::string(flag);
-  for (int i = 1; i < argc; ++i) {
-    if (argv[i] == expected) {
-      return true;
-    }
+char *nextParam(char *newSource, const char *seps)
+{
+  static char *source = NULL;
+  if (newSource)
+  {
+    source = newSource;
   }
-  return false;
+  if (!source)
+  {
+    return NULL;
+  }
+
+  // find first separator
+  char *first = source;//strpbrk(source, seps);
+  if (first)
+  {
+    // go past separator
+    char *firstSep = strpbrk(first, seps);
+    char firstChar[2] = {0,0};
+    if (firstSep == first)
+    {
+      firstChar[0] = *first;
+      while (*first == firstChar[0]) first++;
+    }
+
+    // find end
+    char *end;
+    if (firstChar[0])
+      end = strpbrk(first, firstChar);
+    else
+      end = strpbrk(first, seps);
+
+    // trim string & save next start pos
+    if (end)
+    {
+      source = end+1;
+      *end = 0;
+
+      if (!*source)
+        source = NULL;
+    }
+    else
+    {
+      source = NULL;
+    }
+
+    if (first && !*first)
+      first = NULL;
+  }
+
+  return first;
 }
 
 static Bool initializeAppWindows(Bool runWindowed, Bool runSplash) {
@@ -139,14 +180,41 @@ int main(int argc, char *argv[]) {
 #endif
 
   // This is similar to WinMain, where it looked up a few cmd line arguments before using the CommandLine module
-  Bool runSplash = !hasFlag(argc, argv, "nosplash");
+  // Combine argv into a single string like lpCmdLine
+  std::string cmdline;
+  for (int i = 1; i < argc; ++i) {
+    if (i > 1) cmdline += " ";
+    if (strchr(argv[i], ' ')) {
+      cmdline += "\"";
+      cmdline += argv[i];
+      cmdline += "\"";
+    } else {
+      cmdline += argv[i];
+    }
+  }
 
-  if(runSplash) {
+  char *cmdlineCStr = strdup(cmdline.c_str()); // Ensure mutable
+  char *token = nextParam(cmdlineCStr, "\" ");
+
+  int local_argc = 1;
+  char *local_argv[20];
+  local_argv[0] = NULL;
+
+  while (local_argc < 20 && token != NULL) {
+    local_argv[local_argc++] = token;
+
+    if (strcasecmp(token, "-nosplash") == 0)
+      ShowSplashScreen = false;
+
+    token = nextParam(NULL, "\" ");
+  }
+
+  if(ShowSplashScreen) {
     SplashSurface = SDL_LoadBMP("Install_Final.bmp");
   }
 
   // register windows class and create application window
-  if (initializeAppWindows(ApplicationIsWindowed, runSplash) == false)
+  if (initializeAppWindows(ApplicationIsWindowed, ShowSplashScreen) == false)
     return 0;
 
   // start the log
