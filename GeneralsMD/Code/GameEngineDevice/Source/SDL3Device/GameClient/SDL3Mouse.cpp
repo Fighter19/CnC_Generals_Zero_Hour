@@ -117,8 +117,8 @@ void SDL3Mouse::translateEvent( UnsignedInt eventIndex, MouseIO *result )
 	result->leftFrame = result->middleFrame = result->rightFrame = 0;
 	result->pos.x = result->pos.y = result->wheelPos = 0;
 
-	// Time is the same for all events
-	result->time = m_eventBuffer[ eventIndex ].common.timestamp;
+	// Time is the same for all events; from nanoseconds
+	result->time = m_eventBuffer[ eventIndex ].common.timestamp / 1000000;
 	
 	switch( type )
 	{
