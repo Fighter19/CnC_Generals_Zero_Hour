@@ -126,20 +126,25 @@ void SDL3Mouse::translateEvent( UnsignedInt eventIndex, MouseIO *result )
 		// ------------------------------------------------------------------------
 		case SDL_EVENT_MOUSE_BUTTON_DOWN:
 		{
-			// TODO: detect double click
+			MouseButtonState buttonState = MBS_Down;
+
+			if (mouseBtnEvent.clicks == 2) {
+				buttonState = MBS_DoubleClick;
+			}
+
 			if (mouseBtnEvent.button == SDL_BUTTON_LEFT)
 			{
-				result->leftState = MBS_Down;
+				result->leftState = buttonState;
 				result->leftFrame = frame;
 			}
 			else if (mouseBtnEvent.button == SDL_BUTTON_RIGHT)
 			{
-				result->rightState = MBS_Down;
+				result->rightState = buttonState;
 				result->rightFrame = frame;
 			}
 			else if (mouseBtnEvent.button == SDL_BUTTON_MIDDLE)
 			{
-				result->middleState = MBS_Down;
+				result->middleState = buttonState;
 				result->middleFrame = frame;
 			}
 			result->pos.x = mouseBtnEvent.x;
