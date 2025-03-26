@@ -138,10 +138,12 @@ int main(int argc, char *argv[]) {
   Profile::StartRange("init");
 #endif
 
-  SplashSurface = SDL_LoadBMP("Install_Final.bmp");
-
   // This is similar to WinMain, where it looked up a few cmd line arguments before using the CommandLine module
   Bool runSplash = !hasFlag(argc, argv, "nosplash");
+
+  if(runSplash) {
+    SplashSurface = SDL_LoadBMP("Install_Final.bmp");
+  }
 
   // register windows class and create application window
   if (initializeAppWindows(ApplicationIsWindowed, runSplash) == false)
