@@ -32,6 +32,9 @@
 #define DXVK_WSI_SDL3 1
 #include <wsi/native_wsi.h>
 
+#include <algorithm>
+#include <string_view>
+
 // GLOBALS
 HINSTANCE ApplicationHInstance; ///< our application instance
 HWND ApplicationHWnd = NULL;    ///< our application window handle
@@ -65,7 +68,17 @@ static void postInit() {
     SDL_ShowWindow(TheSDL3Window);
 }
 
-static Bool initializeAppWindows(Bool runWindowed) {
+bool hasFlag(int argc, char* argv[], std::string_view flag) {
+  std::string expected = "-" + std::string(flag);
+  for (int i = 1; i < argc; ++i) {
+    if (argv[i] == expected) {
+      return true;
+    }
+  }
+  return false;
+}
+
+static Bool initializeAppWindows(Bool runWindowed, Bool runSplash) {
   Int startWidth = DEFAULT_XRESOLUTION, startHeight = DEFAULT_YRESOLUTION;
   SDL_InitSubSystem(SDL_INIT_VIDEO);
   if (!SDL_Vulkan_LoadLibrary(nullptr)) {
@@ -96,9 +109,12 @@ static Bool initializeAppWindows(Bool runWindowed) {
 
   setenv("DXVK_WSI_DRIVER", "SDL3", 1);
 
-  SplashWindow =
+  if (runSplash) {
+    SplashWindow =
       SDL_CreateWindow("Splash", SplashSurface->w, SplashSurface->h,
                        SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALWAYS_ON_TOP);
+  }
+
   if (SplashWindow) {
     // Center the window
     SDL_SetWindowPosition(SplashWindow, SDL_WINDOWPOS_CENTERED,
@@ -121,8 +137,11 @@ int main(int argc, char *argv[]) {
 
   SplashSurface = SDL_LoadBMP("Install_Final.bmp");
 
+  // This is similar to WinMain, where it looked up a few cmd line arguments before using the CommandLine module
+  Bool runSplash = !hasFlag(argc, argv, "nosplash");
+
   // register windows class and create application window
-  if (initializeAppWindows(ApplicationIsWindowed) == false)
+  if (initializeAppWindows(ApplicationIsWindowed, runSplash) == false)
     return 0;
 
   // start the log
