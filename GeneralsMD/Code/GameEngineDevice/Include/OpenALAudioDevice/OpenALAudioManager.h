@@ -206,10 +206,7 @@ protected:
 	void adjustPlayingVolume(PlayingAudio *audio);
 
 	void stopAllSpeech(void);
-	static Bool checkALError();
     static ALenum getALFormat(uint8_t channels, uint8_t bitsPerSample);
-	Bool checkALCError();
-
 protected:
 	AsciiString m_alDevicesList[AL_MAX_PLAYBACK_DEVICES];
 	int m_alMaxDevicesIndex;

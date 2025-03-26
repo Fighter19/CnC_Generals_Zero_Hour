@@ -17,12 +17,9 @@ OpenALAudioStream::~OpenALAudioStream()
     // Unbind the buffers first
     alSourceStop(m_source);
     alSourcei(m_source, AL_BUFFER, 0);
-    DEBUG_ASSERTLOG(OpenALAudioManager::checkALError(), ("Failed to unbind buffers"));
     alDeleteSources(1, &m_source);
-    DEBUG_ASSERTLOG(OpenALAudioManager::checkALError(), ("Failed to delete source"));
     // Now delete the buffers
     alDeleteBuffers(AL_STREAM_BUFFER_COUNT, m_buffers);
-    DEBUG_ASSERTLOG(OpenALAudioManager::checkALError(), ("Failed to delete buffers"));
 }
 
 bool OpenALAudioStream::bufferData(uint8_t *data, size_t data_size, ALenum format, int samplerate)
@@ -58,7 +55,7 @@ void OpenALAudioStream::update()
     ALint num_queued;
     alGetSourcei(m_source, AL_BUFFERS_QUEUED, &num_queued);
     DEBUG_LOG(("Having %i buffers queued\n", num_queued));
-    if (num_queued <= (AL_STREAM_BUFFER_COUNT / 4) && m_requireDataCallback) {
+    if (num_queued < AL_STREAM_BUFFER_COUNT && m_requireDataCallback) {
         // Ask for more data to be buffered
         m_requireDataCallback();
     }
@@ -69,9 +66,6 @@ void OpenALAudioStream::reset()
     alSourceRewind(m_source);
     alSourcei(m_source, AL_BUFFER, 0);
     m_current_buffer_idx = 0;
-    for (int i = 0; i < AL_STREAM_BUFFER_COUNT; i++) {
-        alSourceUnqueueBuffers(m_source, 1, &m_buffers[i]);
-    }
 }
 
 bool OpenALAudioStream::isPlaying()

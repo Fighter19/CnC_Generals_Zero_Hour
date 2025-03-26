@@ -80,6 +80,8 @@ extern "C" {
 
 enum { INFINITE_LOOP_COUNT = 1000000 };
 
+#define LOAD_ALC_PROC(N) N = reinterpret_cast<decltype(N)>(alcGetProcAddress(m_alcDevice, #N))
+
 //-------------------------------------------------------------------------------------------------
 OpenALAudioManager::OpenALAudioManager() :
 	m_providerCount(0),
@@ -412,36 +414,26 @@ void OpenALAudioManager::audioDebugDisplay(DebugDisplayInterface* dd, void*, FIL
 }
 #endif
 
-/**
- * Check for OpenAL errors
- */
-Bool OpenALAudioManager::checkALError()
+// Debug callback for OpenAL errors
+static void AL_APIENTRY debugCallbackAL(ALenum source, ALenum type, ALuint id,
+	ALenum severity, ALsizei length, const ALchar* message, void* userParam ) AL_API_NOEXCEPT17
 {
-	ALenum errorCode = alGetError();
-	if (errorCode != 0) {
-#ifdef _DEBUG
-		auto errorMsg = alGetString(errorCode);
-		DEBUG_ASSERTLOG(false, ("OpenAL error: %s", errorMsg));
-#endif
-		return false;
+	switch (severity)
+	{
+	case AL_DEBUG_SEVERITY_HIGH_EXT:
+		DEBUG_LOG(("OpenAL Error: %s", message));
+		break;
+	case AL_DEBUG_SEVERITY_MEDIUM_EXT:
+		DEBUG_LOG(("OpenAL Warning: %s", message));
+		break;
+	case AL_DEBUG_SEVERITY_LOW_EXT:
+		DEBUG_LOG(("OpenAL Info: %s", message));
+		break;
+	default:
+		DEBUG_LOG(("OpenAL Message: %s", message));
+		break;
 	}
-	return true;
-}
 
-/**
- * Check for OpenAL errors
- */
-Bool OpenALAudioManager::checkALCError()
-{
-	ALCenum errorCode = alcGetError(m_alcDevice);
-	if (errorCode != 0) {
-#ifndef NDEBUG
-		auto errorMsg = alcGetString(m_alcDevice, errorCode);
-		DEBUG_ASSERTLOG(false, ("ALC error: %s", errorMsg));
-#endif
-		return false;
-	}
-	return true;
 }
 
 ALenum OpenALAudioManager::getALFormat(uint8_t channels, uint8_t bitsPerSample)
@@ -797,9 +789,10 @@ void OpenALAudioManager::playAudioEvent(AudioEventRTS* event)
 					stream->bufferData(frameData, frame->linesize[0], format, bytesPerSample);
 			});
 
-			// Decode 4 packets before starting the stream.
-			for (int i = 0; i < 4; i++) {
-				ffmpegFile->decodePacket();
+			// Decode packets before starting the stream.
+			for (int i = 0; i < AL_STREAM_BUFFER_COUNT; i++) {
+				if (!ffmpegFile->decodePacket())
+					break;
 			}
 		}
 		else {
@@ -1145,6 +1138,16 @@ void OpenALAudioManager::releaseOpenALHandles(PlayingAudio* release)
 		alDeleteSources(1, &release->m_source);
 		release->m_source = 0;
 	}
+	if (release->m_stream)
+	{
+		delete release->m_stream;
+		release->m_stream = NULL;
+	}
+	if (release->m_ffmpegFile)
+	{
+		delete release->m_ffmpegFile;
+		release->m_ffmpegFile = NULL;
+	}
 
 	release->m_type = PAT_INVALID;
 }
@@ -1282,10 +1285,10 @@ void OpenALAudioManager::adjustPlayingVolume(PlayingAudio* audio)
 	}
 	else if (audio->m_type == PAT_Stream) {
 		if (audio->m_audioEventRTS->getAudioEventInfo()->m_soundType == AT_Music) {
-			alSourcef(audio->m_source, AL_GAIN, m_musicVolume * desiredVolume);
+			alSourcef(audio->m_stream->getSource(), AL_GAIN, m_musicVolume * desiredVolume);
 		}
 		else {
-			alSourcef(audio->m_source, AL_GAIN, m_speechVolume * desiredVolume);
+			alSourcef(audio->m_stream->getSource(), AL_GAIN, m_speechVolume * desiredVolume);
 		}
 	}
 }
@@ -1498,12 +1501,18 @@ void OpenALAudioManager::openDevice(void)
 		setOn(false, AudioAffect_All);
 		return;
 	}
-	DEBUG_ASSERTLOG(checkALCError(), ("Failed to create ALC context"));
 
 	if (!alcMakeContextCurrent(m_alcContext)) {
 		DEBUG_LOG(("Failed to make ALC context current"));
 		setOn(false, AudioAffect_All);
 		return;
+	}
+
+	if (alcIsExtensionPresent(m_alcDevice, "ALC_EXT_debug")) {
+		auto alDebugMessageCallbackEXT = LPALDEBUGMESSAGECALLBACKEXT{};
+		LOAD_ALC_PROC(alDebugMessageCallbackEXT);
+		alEnable(AL_DEBUG_OUTPUT_EXT);
+		alDebugMessageCallbackEXT(debugCallbackAL, nullptr);
 	}
 
 	selectProvider(TheAudio->getProviderIndex(m_pref3DProvider));
@@ -2514,7 +2523,7 @@ void OpenALAudioManager::processFadingList(void)
 
 		case PAT_Stream:
 		{
-			alSourcef(playing->m_source, AL_GAIN, volume);
+			alSourcef(playing->m_stream->getSource(), AL_GAIN, volume);
 			break;
 		}
 
@@ -2796,8 +2805,6 @@ void OpenALAudioManager::playStream(AudioEventRTS* event, OpenALAudioStream* str
 	if (event->getAudioEventInfo()->m_soundType == AT_Music) {
 		// Need to stop/fade out the old music here.
 	}
-
-	checkALError();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -2809,7 +2816,6 @@ void* OpenALAudioManager::playSample(AudioEventRTS* event, PlayingAudio* audio)
 		alSourcei(audio->m_source, AL_SOURCE_RELATIVE, AL_TRUE);
 		alSourcei(audio->m_source, AL_BUFFER, (ALuint)(uintptr_t)bufferHandle);
 		alSourcePlay(audio->m_source);
-		checkALError();
 	}
 
 	return bufferHandle;
@@ -2844,7 +2850,7 @@ void* OpenALAudioManager::playSample3D(AudioEventRTS* event, PlayingAudio* sampl
 			Real y = pos->y;
 			Real z = pos->z;
 			alSource3f(source, AL_POSITION, x, y, z);
-			alSourcei(source, AL_BUFFER, (ALuint)handle);
+			alSourcei(source, AL_BUFFER, (ALuint)(uintptr_t)handle);
 
 			// Start playback
 			alSourcePlay(source);
