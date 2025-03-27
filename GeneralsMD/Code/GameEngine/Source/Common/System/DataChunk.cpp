@@ -62,6 +62,8 @@ Bool CachedFileInputStream::open(AsciiString path)
 			file = NULL;
 		}
 		m_pos=0;
+	} else {
+		DEBUG_LOG(("CachedFileInputStream::open - file not found %s\n", path.str()));
 	}
 
 	if (CompressionManager::isDataCompressed(m_buffer, m_size) == 0)
