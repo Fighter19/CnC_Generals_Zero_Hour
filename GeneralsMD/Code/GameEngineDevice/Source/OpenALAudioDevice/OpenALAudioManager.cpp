@@ -658,7 +658,7 @@ void OpenALAudioManager::resumeAudio(AudioAffect which)
 						continue;
 					}
 				}
-				alSourcePause(playing->m_source);
+				alSourcePlay(playing->m_stream->getSource());
 			}
 		}
 	}
@@ -2396,6 +2396,7 @@ void OpenALAudioManager::processPlayingList(void)
 						Real y = pos->y;
 						Real z = pos->z;
 						alSource3f(playing->m_source, AL_POSITION, x, y, z);
+						DEBUG_LOG(("Updating 3D sound position for %s to %f, %f, %f", playing->m_audioEventRTS->getEventName().str(), x, y, z));
 					}
 				}
 			}
@@ -2704,6 +2705,7 @@ void OpenALAudioManager::setDeviceListenerPosition(void)
 	ALfloat listenerOri[] = { m_listenerOrientation.x, m_listenerOrientation.y, m_listenerOrientation.z, 0.0f, 0.0f, 1.0f };
 	alListener3f(AL_POSITION, m_listenerPosition.x, m_listenerPosition.y, m_listenerPosition.z);
 	alListenerfv(AL_ORIENTATION, listenerOri);
+	DEBUG_LOG(("Listener Position: %f, %f, %f", m_listenerPosition.x, m_listenerPosition.y, m_listenerPosition.z));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -2798,7 +2800,7 @@ void OpenALAudioManager::playStream(AudioEventRTS* event, OpenALAudioStream* str
 {
 	// Force it to the beginning
 	if (event->getAudioEventInfo()->m_soundType == AT_Music) {
-		alSourcei(stream->getSource(), AL_LOOPING, AL_TRUE);
+		//alSourcei(stream->getSource(), AL_LOOPING, AL_TRUE);
 	}
 
 	stream->play();
@@ -2851,6 +2853,7 @@ void* OpenALAudioManager::playSample3D(AudioEventRTS* event, PlayingAudio* sampl
 			Real z = pos->z;
 			alSource3f(source, AL_POSITION, x, y, z);
 			alSourcei(source, AL_BUFFER, (ALuint)(uintptr_t)handle);
+			DEBUG_LOG(("Playing 3D sample '%s' at %f, %f, %f\n", event->getEventName().str(), x, y, z));
 
 			// Start playback
 			alSourcePlay(source);
