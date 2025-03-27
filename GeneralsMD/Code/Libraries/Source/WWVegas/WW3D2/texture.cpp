@@ -125,7 +125,11 @@ TextureBaseClass::~TextureBaseClass(void)
 
 	if (D3DTexture) 
 	{
+#ifdef _WIN32
+		// Theory here is that DXVK or something else may be releasing this already?
+		// Releasing here on Linux (like on exiting the game, causes a crash)
 		D3DTexture->Release();
+#endif
 		D3DTexture = NULL;
 	}
 
