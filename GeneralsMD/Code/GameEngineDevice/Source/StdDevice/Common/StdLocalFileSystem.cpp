@@ -52,9 +52,16 @@ File * StdLocalFileSystem::openFile(const Char *filename, Int access /* = 0 */)
 		return NULL;
 	}
 
-	// Convert the filename to a std::filesystem::path and pass that
+	std::string fixedFilename(filename);
+
+#ifndef _WIN32
 	// Replace backslashes with forward slashes on unix
-	std::filesystem::path path(filename);
+	std::replace(fixedFilename.begin(), fixedFilename.end(), '\\', '/');
+#endif
+
+	// Convert the filename to a std::filesystem::path and pass that
+	// make_preferred does not convert from Windows to Linux (see https://en.cppreference.com/w/cpp/filesystem/path/make_preferred)
+	std::filesystem::path path(fixedFilename);
 	path = path.make_preferred();
 
 	if (access & File::WRITE) {
