@@ -7,9 +7,7 @@ OpenALAudioStream::OpenALAudioStream()
     alGenBuffers(AL_STREAM_BUFFER_COUNT, m_buffers);
 
     // Make stream ignore positioning
-    alSource3i(m_source, AL_POSITION, 0, 0, 0);
     alSourcei(m_source, AL_SOURCE_RELATIVE, AL_TRUE);
-    alSourcei(m_source, AL_ROLLOFF_FACTOR, 0);
 
     DEBUG_LOG(("OpenALAudioStream created: %i\n", m_source));
 }
@@ -48,35 +46,9 @@ bool OpenALAudioStream::bufferData(uint8_t *data, size_t data_size, ALenum forma
 
 void OpenALAudioStream::update()
 {
-    ALint sourceState, looping, sourceType, sampleOffset;
-    float pitch;
+    ALint sourceState;
     alGetSourcei(m_source, AL_SOURCE_STATE, &sourceState);
-    switch(sourceState) {
-        case AL_PLAYING:
-            DEBUG_LOG(("Source is playing\n"));
-            break;
-        case AL_PAUSED:
-            DEBUG_LOG(("Source is paused\n"));
-            break;
-        case AL_STOPPED:
-            DEBUG_LOG(("Source is stopped\n"));
-            break;
-        default:
-            DEBUG_LOG(("Unknown source state: %i\n", sourceState));
-            break;
-    }
-    alGetSourcei(m_source, AL_LOOPING, &looping);
-    DEBUG_LOG(("Source is looping: %i\n", looping));
 
-    alGetSourcei(m_source, AL_SOURCE_TYPE, &sourceType);
-    DEBUG_LOG(("Source type: %i\n", sourceType));
-
-    alGetSourcei(m_source, AL_SAMPLE_OFFSET, &sampleOffset);
-    DEBUG_LOG(("Sample offset: %i\n", sampleOffset));
-
-    alGetSourcef(m_source, AL_PITCH, &pitch);
-    DEBUG_LOG(("Pitch: %f\n", pitch));
-       
     ALint processed;
     alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &processed);
     DEBUG_LOG(("%i buffers have been processed\n", processed));
@@ -91,7 +63,14 @@ void OpenALAudioStream::update()
     DEBUG_LOG(("Having %i buffers queued\n", num_queued));
     if (num_queued < AL_STREAM_BUFFER_COUNT && m_requireDataCallback) {
         // Ask for more data to be buffered
-        m_requireDataCallback();
+        while (num_queued < AL_STREAM_BUFFER_COUNT) {
+            m_requireDataCallback();
+        	num_queued++;
+        }
+    }
+
+    if (sourceState == AL_STOPPED) {
+		   play();
     }
 }
 

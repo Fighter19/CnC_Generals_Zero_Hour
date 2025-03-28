@@ -782,11 +782,11 @@ void OpenALAudioManager::playAudioEvent(AudioEventRTS* event)
 							memcpy(dst, src, bytesPerSample);
 						}
 					}
-					stream->bufferData(audioBuffer, frame->linesize[0], format, bytesPerSample);
+					stream->bufferData(audioBuffer, frameSize, format, frame->sample_rate);
 					av_freep(&audioBuffer);
 				}
 				else
-					stream->bufferData(frameData, frame->linesize[0], format, bytesPerSample);
+					stream->bufferData(frameData, frameSize, format, frame->sample_rate);
 			});
 
 			// Decode packets before starting the stream.
