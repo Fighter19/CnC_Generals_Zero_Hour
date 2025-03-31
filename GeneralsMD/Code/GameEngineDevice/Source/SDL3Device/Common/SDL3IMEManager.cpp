@@ -1,4 +1,6 @@
 #include "GameClient/IMEManager.h"
+#include "GameClient/GameWindowManager.h"
+#include "GameClient/GameWindow.h"
 
 class SDL3IMEManager : public IMEManagerInterface
 {
@@ -26,9 +28,11 @@ public:
 
   virtual void attach(GameWindow *window) override
   {
+    m_window = window;
   }
   virtual void detatch(void) override
   {
+    m_window = nullptr;
   }
   virtual void enable(void) override
   {
@@ -42,11 +46,11 @@ public:
   }
   virtual Bool isAttachedTo(GameWindow *window) override
   {
-    return false;
+    return window == m_window;
   }
   virtual GameWindow *getWindow(void) override
   {
-    return NULL;
+    return m_window;
   }
   virtual Bool isComposing(void) override
   {
@@ -97,6 +101,9 @@ public:
   {
     return 0;
   }
+
+private:
+  GameWindow *m_window = nullptr;
 };
 
 IMEManagerInterface *CreateIMEManagerInterface(void)
