@@ -26,6 +26,7 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
+#include <SDL3_image/SDL_image.h>
 
 #include <d3d8.h>
 
@@ -139,6 +140,15 @@ static Bool initializeAppWindows(Bool runWindowed, Bool runSplash) {
   if(!TheSDL3Window) {
     DEBUG_LOG(("Failed to create window"));
     return false;
+  }
+
+  SDL_IOStream* icoStream = SDL_IOFromFile("GeneralsZH.ico", "rb");
+  if (icoStream) {
+    SDL_Surface* icon = IMG_LoadICO_IO(icoStream);
+    if (icon) {
+      SDL_SetWindowIcon(TheSDL3Window, icon);
+      SDL_DestroySurface(icon);
+    }
   }
 
   // save our window handle for future use
