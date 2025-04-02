@@ -37,7 +37,6 @@
 #include "SDL3Device/GameClient/SDL3Keyboard.h"
 #include "GameClient/IMEManager.h"
 #include "GameClient/GameWindowManager.h"
-#include "GameClient/GameWindowManager.h"
 
 #include <SDL3/SDL.h>
 
