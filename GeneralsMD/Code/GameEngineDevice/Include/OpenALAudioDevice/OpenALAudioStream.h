@@ -24,6 +24,7 @@
 #include "always.h"
 #include <AL/al.h>
 #include <stdint.h>
+#include <functional>
 
 #define AL_STREAM_BUFFER_COUNT 32
 
@@ -32,6 +33,9 @@ class OpenALAudioStream final
 public:
     OpenALAudioStream();
     ~OpenALAudioStream();
+
+    void setRequireDataCallback(std::function<void()> callback) { m_requireDataCallback = callback; }
+    ALuint getSource() const { return m_source; }
 
     bool bufferData(uint8_t *data, size_t data_size, ALenum format, int samplerate);
     bool isPlaying();
@@ -45,6 +49,7 @@ public:
     void setVolume(float vol) { alSourcef(m_source, AL_GAIN, vol); }
 
 protected:
+    std::function<void()> m_requireDataCallback = nullptr;
     ALuint m_source = 0;
     ALuint m_buffers[AL_STREAM_BUFFER_COUNT] = {};
     unsigned int m_current_buffer_idx = 0;

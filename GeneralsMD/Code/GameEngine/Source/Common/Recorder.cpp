@@ -56,13 +56,59 @@ Int REPLAY_CRC_INTERVAL = 100;
 const char *replayExtention = ".rep";
 const char *lastReplayFileName = "00000000";	// a name the user is unlikely to ever type, but won't cause panic & confusion
 
+static_assert(sizeof(Bool) == 1, "Bool size is not 1 byte");
+static_assert(sizeof(SYSTEMTIME) == 16, "SYSTEMTIME size is not 16 bytes");
+static const size_t SIZE_OF_TIME = 4;
+
 static time_t startTime;
 static const UnsignedInt startTimeOffset = 6;
-static const UnsignedInt endTimeOffset = startTimeOffset + sizeof(time_t);
-static const UnsignedInt framesOffset = endTimeOffset + sizeof(time_t);
+static const UnsignedInt endTimeOffset = startTimeOffset + SIZE_OF_TIME;
+static const UnsignedInt framesOffset = endTimeOffset + SIZE_OF_TIME;
 static const UnsignedInt desyncOffset = framesOffset + sizeof(UnsignedInt);
 static const UnsignedInt quitEarlyOffset = desyncOffset + sizeof(Bool);
 static const UnsignedInt disconOffset = quitEarlyOffset + sizeof(Bool);
+
+#ifndef _WIN32
+#define fgetwc custom_fgetwc
+static inline Int custom_fgetwc(FILE *file)
+{
+	Int c = -1;
+	uint16_t read_char = 0;
+	long old_pos = ftell(file);
+	fread(&read_char, sizeof(uint16_t), 1, file);
+	c = read_char;
+	if (read_char == 0xFFFF)
+	{
+		fseek(file, old_pos, SEEK_SET);
+		c = -1;
+	}
+	return c;
+}
+#endif
+
+static inline void write_wstring(FILE *file, const wchar_t *str)
+{
+#ifndef _WIN32
+	if (str)
+	{
+		while (*str)
+		{
+			uint16_t write_char = *str++;
+			fwrite(&write_char, sizeof(uint16_t), 1, file);
+		}
+		uint16_t write_char = 0x0;
+		fwrite(&write_char, sizeof(uint16_t), 1, file);
+	}
+	else
+	{
+		uint16_t write_char = 0x0;
+		fwrite(&write_char, sizeof(uint16_t), 1, file);
+	}
+#else
+	fwprintf(file, L"%ws", str);
+	fputwc(0x0, file);
+#endif
+}
 
 void RecorderClass::logGameStart(AsciiString options)
 {
@@ -75,7 +121,7 @@ void RecorderClass::logGameStart(AsciiString options)
 	if (!fseek(m_file, startTimeOffset, SEEK_SET))
 	{
 		// save off start time
-		fwrite(&startTime, sizeof(time_t), 1, m_file);
+		fwrite(&startTime, SIZE_OF_TIME, 1, m_file);
 	}
 	// move back to end of stream
 #ifdef DEBUG_CRASHING
@@ -229,7 +275,7 @@ void RecorderClass::logGameEnd( void )
 	if (!fseek(m_file, endTimeOffset, SEEK_SET))
 	{
 		// save off end time
-		fwrite(&t, sizeof(time_t), 1, m_file);
+		fwrite(&t, SIZE_OF_TIME, 1, m_file);
 	}
 	// move to appropriate offset
 	if (!fseek(m_file, framesOffset, SEEK_SET))
@@ -558,8 +604,8 @@ void RecorderClass::startRecording(GameDifficulty diff, Int originalGameMode, In
 	// **** if this changes, change the LAN code above ****
 	//
 	time_t t = 0;
-	fwrite(&t, sizeof(time_t), 1, m_file);	// reserve space for start time
-	fwrite(&t, sizeof(time_t), 1, m_file);	// reserve space for end time
+	fwrite(&t, SIZE_OF_TIME, 1, m_file);	// reserve space for start time
+	fwrite(&t, SIZE_OF_TIME, 1, m_file);	// reserve space for end time
 
 	UnsignedInt frames = 0;
 	fwrite(&frames, sizeof(UnsignedInt), 1, m_file);	// reserve space for duration in frames
@@ -575,8 +621,7 @@ void RecorderClass::startRecording(GameDifficulty diff, Int originalGameMode, In
 	// Print out the name of the replay.
 	UnicodeString replayName;
 	replayName = TheGameText->fetch("GUI:LastReplay");
-	fwprintf(m_file, L"%ws", replayName.str());
-	fputwc(0, m_file);
+	write_wstring(m_file, replayName.str());
 
 	// Date and Time
 	SYSTEMTIME systemTime;
@@ -587,10 +632,8 @@ void RecorderClass::startRecording(GameDifficulty diff, Int originalGameMode, In
 	UnicodeString versionString = TheVersion->getUnicodeVersion();
 	UnicodeString versionTimeString = TheVersion->getUnicodeBuildTime();
 	UnsignedInt versionNumber = TheVersion->getVersionNumber();
-	fwprintf(m_file, L"%ws", versionString.str());
-	fputwc(0, m_file);
-	fwprintf(m_file, L"%ws", versionTimeString.str());
-	fputwc(0, m_file);
+	write_wstring(m_file, versionString.str());
+	write_wstring(m_file, versionTimeString.str());
 	fwrite(&versionNumber, sizeof(UnsignedInt), 1, m_file);
 	fwrite(&(TheGlobalData->m_exeCRC), sizeof(UnsignedInt), 1, m_file);
 	fwrite(&(TheGlobalData->m_iniCRC), sizeof(UnsignedInt), 1, m_file);
@@ -836,8 +879,10 @@ Bool RecorderClass::readReplayHeader(ReplayHeader& header)
 	}
 
 	// read in some stats
-	fread(&header.startTime, sizeof(time_t), 1, m_file);
-	fread(&header.endTime, sizeof(time_t), 1, m_file);
+	header.startTime = 0;
+	fread(&header.startTime, SIZE_OF_TIME, 1, m_file);
+	header.endTime = 0;
+	fread(&header.endTime, SIZE_OF_TIME, 1, m_file);
 
 	fread(&header.frameDuration, sizeof(UnsignedInt), 1, m_file);
 
@@ -1171,8 +1216,9 @@ UnicodeString RecorderClass::readUnicodeString() {
 	Int c = fgetwc(m_file);
 	if (c == EOF) {
 		str[index] = 0;
+	} else {
+		str[index] = c;
 	}
-	str[index] = c;
 
 	while (index < 1024 && str[index] != 0) {
 		++index;

@@ -1398,7 +1398,13 @@ void GameState::iterateSaveFiles( IterateSaveFileCallback callback, void *userDa
 	std::filesystem::path currentDirectory = std::filesystem::current_path();
 
 	// Change to the save directory; This is done because code like GameStateMap requires the saves to be a relative path
-	std::filesystem::current_path(getSaveDirectory().str());
+	std::filesystem::path saveDir = getSaveDirectory().str();
+	if (!std::filesystem::exists(saveDir))
+	{
+		return;
+	}
+
+	std::filesystem::current_path(saveDir);
 
 	// iterate all items in the directory
 	std::filesystem::directory_iterator end_itr;

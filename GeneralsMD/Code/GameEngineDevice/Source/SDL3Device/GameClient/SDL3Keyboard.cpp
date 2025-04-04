@@ -35,6 +35,8 @@
 #include "GameClient/KeyDefs.h"
 #include "GameClient/Keyboard.h"
 #include "SDL3Device/GameClient/SDL3Keyboard.h"
+#include "GameClient/IMEManager.h"
+#include "GameClient/GameWindowManager.h"
 
 #include <SDL3/SDL.h>
 
@@ -141,6 +143,18 @@ void SDL3Keyboard::getKey( KeyboardIO *key )
 		{
 			key->key = ConvertSDLKey(event.key.key);
 			key->state = KEY_STATE_DOWN;
+
+			if (TheIMEManager && TheIMEManager->getWindow())
+			{
+				SDL_Keycode sym = event.key.key;
+
+				// Only inject if it's a printable ASCII character
+				if (sym >= 32 && sym <= 126)
+				{
+					WideChar wchar = static_cast<WideChar>(sym);
+					TheWindowManager->winSendInputMsg(TheIMEManager->getWindow(), GWM_IME_CHAR, wchar, 0);
+				}
+			}
 		}
 		else if(event.type == SDL_EVENT_KEY_UP)
 		{

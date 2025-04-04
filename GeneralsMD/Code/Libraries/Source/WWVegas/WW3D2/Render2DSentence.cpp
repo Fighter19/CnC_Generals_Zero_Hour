@@ -1292,6 +1292,16 @@ FontCharsClass::Get_Char_Data (WCHAR ch)
 {
 	const FontCharsClassCharDataStruct *retval = NULL;
 
+	// Ensure that the range can properly be checked
+	static_assert(!(((wchar_t)-1 == -1) && (sizeof(wchar_t) == 2)), "wchar_t is signed and 2 bytes");
+
+	// Ensure is a valid character
+	if (ch < 0 || ch > 0xFFFF) 
+	{
+		DEBUG_LOG(("Invalid character %d", ch));
+		return NULL;
+	}
+
 	if ( ch < 256 ) 
 	{
 		retval = ASCIICharArray[ch];

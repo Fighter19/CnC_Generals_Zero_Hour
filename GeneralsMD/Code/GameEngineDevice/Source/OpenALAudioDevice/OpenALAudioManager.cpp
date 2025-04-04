@@ -68,12 +68,19 @@
 
 #include <AL/alext.h>
 
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavutil/avutil.h>
+}
+
 #ifdef _INTERNAL
 //#pragma optimize("", off)
 //#pragma MESSAGE("************************************** WARNING, optimization disabled for debugging purposes")
 #endif
 
 enum { INFINITE_LOOP_COUNT = 1000000 };
+
+#define LOAD_ALC_PROC(N) N = reinterpret_cast<decltype(N)>(alcGetProcAddress(m_alcDevice, #N))
 
 //-------------------------------------------------------------------------------------------------
 OpenALAudioManager::OpenALAudioManager() :
@@ -407,36 +414,26 @@ void OpenALAudioManager::audioDebugDisplay(DebugDisplayInterface* dd, void*, FIL
 }
 #endif
 
-/**
- * Check for OpenAL errors
- */
-Bool OpenALAudioManager::checkALError()
+// Debug callback for OpenAL errors
+static void AL_APIENTRY debugCallbackAL(ALenum source, ALenum type, ALuint id,
+	ALenum severity, ALsizei length, const ALchar* message, void* userParam ) AL_API_NOEXCEPT17
 {
-	ALenum errorCode = alGetError();
-	if (errorCode != 0) {
-#ifndef NDEBUG
-		auto errorMsg = alGetString(errorCode);
-		DEBUG_ASSERTLOG(false, ("OpenAL error: %s", errorMsg));
-#endif
-		return false;
+	switch (severity)
+	{
+	case AL_DEBUG_SEVERITY_HIGH_EXT:
+		DEBUG_LOG(("OpenAL Error: %s", message));
+		break;
+	case AL_DEBUG_SEVERITY_MEDIUM_EXT:
+		DEBUG_LOG(("OpenAL Warning: %s", message));
+		break;
+	case AL_DEBUG_SEVERITY_LOW_EXT:
+		DEBUG_LOG(("OpenAL Info: %s", message));
+		break;
+	default:
+		DEBUG_LOG(("OpenAL Message: %s", message));
+		break;
 	}
-	return true;
-}
 
-/**
- * Check for OpenAL errors
- */
-Bool OpenALAudioManager::checkALCError()
-{
-	ALCenum errorCode = alcGetError(m_alcDevice);
-	if (errorCode != 0) {
-#ifndef NDEBUG
-		auto errorMsg = alcGetString(m_alcDevice, errorCode);
-		DEBUG_ASSERTLOG(false, ("ALC error: %s", errorMsg));
-#endif
-		return false;
-	}
-	return true;
 }
 
 ALenum OpenALAudioManager::getALFormat(uint8_t channels, uint8_t bitsPerSample)
@@ -471,6 +468,7 @@ void OpenALAudioManager::init()
 	// We should now know how many samples we want to load
 	openDevice();
 	m_audioCache->setMaxSize(getAudioSettings()->m_maxCacheSize);
+	alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -660,7 +658,7 @@ void OpenALAudioManager::resumeAudio(AudioAffect which)
 						continue;
 					}
 				}
-				alSourcePause(playing->m_source);
+				alSourcePlay(playing->m_stream->getSource());
 			}
 		}
 	}
@@ -731,25 +729,88 @@ void OpenALAudioManager::playAudioEvent(AudioEventRTS* event)
 			}
 		}
 
-		ALuint source;
+		File* file = TheFileSystem->openFile(fileToPlay.str());
+		if (!file) {
+			DEBUG_LOG(("Failed to open file: %s\n", fileToPlay.str()));
+			releasePlayingAudio(audio);
+			return;
+		}
+
+		FFmpegFile* ffmpegFile = NEW FFmpegFile();
+		if (!ffmpegFile->open(file))
+		{
+			DEBUG_LOG(("Failed to open FFmpeg file: %s\n", fileToPlay.str()));
+			releasePlayingAudio(audio);
+			return;
+		}
+
+		OpenALAudioStream* stream;
 		if (!handleToKill || foundSoundToReplace) {
-			alGenSources(1, &source);
+			stream = new OpenALAudioStream;
+			// When we need more data ask FFmpeg for more data.
+			stream->setRequireDataCallback([ffmpegFile, stream]() {
+				ffmpegFile->decodePacket();
+				});
+			
+			// When we receive a frame from FFmpeg, send it to OpenAL.
+			ffmpegFile->setFrameCallback([stream](AVFrame* frame, int stream_idx, int stream_type, void* user_data) {
+				if (stream_type != AVMEDIA_TYPE_AUDIO) {
+					return;
+				}
+
+				DEBUG_LOG(("Received audio frame\n"));
+
+				AVSampleFormat sampleFmt = static_cast<AVSampleFormat>(frame->format);
+				const int bytesPerSample = av_get_bytes_per_sample(sampleFmt);
+				ALenum format = OpenALAudioManager::getALFormat(frame->ch_layout.nb_channels, bytesPerSample * 8);
+				const int frameSize =
+					av_samples_get_buffer_size(NULL, frame->ch_layout.nb_channels, frame->nb_samples, sampleFmt, 1);
+				uint8_t* frameData = frame->data[0];
+
+				// We need to interleave the samples if the format is planar
+				if (av_sample_fmt_is_planar(static_cast<AVSampleFormat>(frame->format))) {
+					uint8_t* audioBuffer = static_cast<uint8_t*>(av_malloc(frameSize));
+
+					// Write the samples into our audio buffer
+					for (int sample_idx = 0; sample_idx < frame->nb_samples; sample_idx++)
+					{
+						int byte_offset = sample_idx * bytesPerSample;
+						for (int channel_idx = 0; channel_idx < frame->ch_layout.nb_channels; channel_idx++)
+						{
+							uint8_t* dst = &audioBuffer[byte_offset * frame->ch_layout.nb_channels + channel_idx * bytesPerSample];
+							uint8_t* src = &frame->data[channel_idx][byte_offset];
+							memcpy(dst, src, bytesPerSample);
+						}
+					}
+					stream->bufferData(audioBuffer, frameSize, format, frame->sample_rate);
+					av_freep(&audioBuffer);
+				}
+				else
+					stream->bufferData(frameData, frameSize, format, frame->sample_rate);
+			});
+
+			// Decode packets before starting the stream.
+			for (int i = 0; i < AL_STREAM_BUFFER_COUNT; i++) {
+				if (!ffmpegFile->decodePacket())
+					break;
+			}
 		}
 		else {
-			source = NULL;
+			stream = NULL;
 		}
 
 		// Put this on here, so that the audio event RTS will be cleaned up regardless.
 		audio->m_audioEventRTS = event;
-		audio->m_source = source;
+		audio->m_stream = stream;
+		audio->m_ffmpegFile = ffmpegFile;
 		audio->m_type = PAT_Stream;
 
-		if (source) {
+		if (stream) {
 			if ((info->m_soundType == AT_Streaming) && event->getUninterruptable()) {
 				setDisallowSpeech(TRUE);
 			}
 			// AIL_set_stream_volume_pan(stream, curVolume, 0.5f);
-			playStream(event, source);
+			playStream(event, stream);
 			m_playingStreams.push_back(audio);
 			audio = NULL;
 		}
@@ -899,7 +960,7 @@ void OpenALAudioManager::playAudioEvent(AudioEventRTS* event)
 void OpenALAudioManager::stopAudioEvent(AudioHandle handle)
 {
 #ifdef INTENSIVE_AUDIO_DEBUG
-	DEBUG_LOG(("MILES (%d) - Processing stop request: %d\n", TheGameLogic->getFrame(), handle));
+	DEBUG_LOG(("OPENAL (%d) - Processing stop request: %d\n", TheGameLogic->getFrame(), handle));
 #endif
 
 	std::list<PlayingAudio*>::iterator it;
@@ -1072,15 +1133,20 @@ PlayingAudio* OpenALAudioManager::allocatePlayingAudio(void)
 //-------------------------------------------------------------------------------------------------
 void OpenALAudioManager::releaseOpenALHandles(PlayingAudio* release)
 {
-	if (release->m_buffer)
-	{
-		alDeleteBuffers(1, &release->m_buffer);
-		release->m_buffer = 0;
-	}
 	if (release->m_source)
 	{
 		alDeleteSources(1, &release->m_source);
 		release->m_source = 0;
+	}
+	if (release->m_stream)
+	{
+		delete release->m_stream;
+		release->m_stream = NULL;
+	}
+	if (release->m_ffmpegFile)
+	{
+		delete release->m_ffmpegFile;
+		release->m_ffmpegFile = NULL;
 	}
 
 	release->m_type = PAT_INVALID;
@@ -1219,10 +1285,10 @@ void OpenALAudioManager::adjustPlayingVolume(PlayingAudio* audio)
 	}
 	else if (audio->m_type == PAT_Stream) {
 		if (audio->m_audioEventRTS->getAudioEventInfo()->m_soundType == AT_Music) {
-			alSourcef(audio->m_source, AL_GAIN, m_musicVolume * desiredVolume);
+			alSourcef(audio->m_stream->getSource(), AL_GAIN, m_musicVolume * desiredVolume);
 		}
 		else {
-			alSourcef(audio->m_source, AL_GAIN, m_speechVolume * desiredVolume);
+			alSourcef(audio->m_stream->getSource(), AL_GAIN, m_speechVolume * desiredVolume);
 		}
 	}
 }
@@ -1435,12 +1501,18 @@ void OpenALAudioManager::openDevice(void)
 		setOn(false, AudioAffect_All);
 		return;
 	}
-	DEBUG_ASSERTLOG(checkALCError(), ("Failed to create ALC context"));
 
 	if (!alcMakeContextCurrent(m_alcContext)) {
 		DEBUG_LOG(("Failed to make ALC context current"));
 		setOn(false, AudioAffect_All);
 		return;
+	}
+
+	if (alcIsExtensionPresent(m_alcDevice, "ALC_EXT_debug")) {
+		auto alDebugMessageCallbackEXT = LPALDEBUGMESSAGECALLBACKEXT{};
+		LOAD_ALC_PROC(alDebugMessageCallbackEXT);
+		alEnable(AL_DEBUG_OUTPUT_EXT);
+		alDebugMessageCallbackEXT(debugCallbackAL, nullptr);
 	}
 
 	selectProvider(TheAudio->getProviderIndex(m_pref3DProvider));
@@ -1562,7 +1634,7 @@ void OpenALAudioManager::notifyOfAudioCompletion(UnsignedInt audioCompleted, Uns
 
 	if (playing->m_type == PAT_Stream) {
 		if (playing->m_audioEventRTS->getAudioEventInfo()->m_soundType == AT_Music) {
-			playStream(playing->m_audioEventRTS, playing->m_source);
+			playStream(playing->m_audioEventRTS, playing->m_stream);
 
 			return;
 		}
@@ -2324,6 +2396,7 @@ void OpenALAudioManager::processPlayingList(void)
 						Real y = pos->y;
 						Real z = pos->z;
 						alSource3f(playing->m_source, AL_POSITION, x, y, z);
+						DEBUG_LOG(("Updating 3D sound position for %s to %f, %f, %f", playing->m_audioEventRTS->getEventName().str(), x, y, z));
 					}
 				}
 			}
@@ -2360,6 +2433,8 @@ void OpenALAudioManager::processPlayingList(void)
 			{
 				adjustPlayingVolume(playing);
 			}
+
+			playing->m_stream->update();
 
 			++it;
 		}
@@ -2449,7 +2524,7 @@ void OpenALAudioManager::processFadingList(void)
 
 		case PAT_Stream:
 		{
-			alSourcef(playing->m_source, AL_GAIN, volume);
+			alSourcef(playing->m_stream->getSource(), AL_GAIN, volume);
 			break;
 		}
 
@@ -2627,9 +2702,10 @@ void OpenALAudioManager::closeAnySamplesUsingFile(const void* fileToClose)
 //-------------------------------------------------------------------------------------------------
 void OpenALAudioManager::setDeviceListenerPosition(void)
 {
-	ALfloat listenerOri[] = { m_listenerOrientation.x, m_listenerOrientation.y, m_listenerOrientation.z, 0.0f, 0.0f, -1.0f };
+	ALfloat listenerOri[] = { m_listenerOrientation.x, m_listenerOrientation.y, m_listenerOrientation.z, 0.0f, 0.0f, 1.0f };
 	alListener3f(AL_POSITION, m_listenerPosition.x, m_listenerPosition.y, m_listenerPosition.z);
 	alListenerfv(AL_ORIENTATION, listenerOri);
+	DEBUG_LOG(("Listener Position: %f, %f, %f", m_listenerPosition.x, m_listenerPosition.y, m_listenerPosition.z));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -2668,39 +2744,6 @@ Real OpenALAudioManager::getEffectiveVolume(AudioEventRTS* event) const
 		if (event->isPositionalAudio())
 		{
 			volume *= m_sound3DVolume;
-			Coord3D distance = m_listenerPosition;
-			const Coord3D* pos = event->getCurrentPosition();
-			if (pos)
-			{
-				distance.sub(pos);
-				Real objMinDistance;
-				Real objMaxDistance;
-
-				if (event->getAudioEventInfo()->m_type & ST_GLOBAL)
-				{
-					objMinDistance = TheAudio->getAudioSettings()->m_globalMinRange;
-					objMaxDistance = TheAudio->getAudioSettings()->m_globalMaxRange;
-				}
-				else
-				{
-					objMinDistance = event->getAudioEventInfo()->m_minDistance;
-					objMaxDistance = event->getAudioEventInfo()->m_maxDistance;
-				}
-
-				Real objDistance = distance.length();
-				if (objDistance > objMinDistance)
-				{
-					volume *= 1 / (objDistance / objMinDistance);
-				}
-				if (objDistance >= objMaxDistance)
-				{
-					volume = 0.0f;
-				}
-				//else if( objDistance > objMinDistance )
-				//{
-				//	volume *= 1.0f - (objDistance - objMinDistance) / (objMaxDistance - objMinDistance);
-				//}
-			}
 		}
 		else
 		{
@@ -2753,45 +2796,31 @@ Bool OpenALAudioManager::startNextLoop(PlayingAudio* looping)
 }
 
 //-------------------------------------------------------------------------------------------------
-void OpenALAudioManager::playStream(AudioEventRTS* event, ALuint source)
+void OpenALAudioManager::playStream(AudioEventRTS* event, OpenALAudioStream* stream)
 {
 	// Force it to the beginning
 	if (event->getAudioEventInfo()->m_soundType == AT_Music) {
-		alSourcei(source, AL_LOOPING, AL_TRUE);
+		//alSourcei(stream->getSource(), AL_LOOPING, AL_TRUE);
 	}
 
-	alSourcePlay(source);
+	stream->play();
 	if (event->getAudioEventInfo()->m_soundType == AT_Music) {
 		// Need to stop/fade out the old music here.
 	}
-
-	// TODO: streaming
 }
 
 //-------------------------------------------------------------------------------------------------
 void* OpenALAudioManager::playSample(AudioEventRTS* event, PlayingAudio* audio)
 {
 	// Load the file in
-	void* fileBuffer = NULL;
-	fileBuffer = loadFileForRead(event);
-	if (fileBuffer) {
-		uint8_t* data = nullptr;
-		UnsignedInt size = 0;
-		UnsignedInt freq = 0;
-		UnsignedInt channels = 1;
-		UnsignedInt bitPerSample = 16;
-#ifdef SAGE_USE_FFMPEG
-		OpenALAudioFileCache::getWaveData(fileBuffer, data, size, freq, channels, bitPerSample);
-#endif
-		alGenBuffers(1, &audio->m_buffer);
-		DEBUG_ASSERTLOG(checkALError(), ("Failed to generate buffer"));
-		alBufferData(audio->m_buffer, getALFormat(channels, bitPerSample), data, size, freq);
-        DEBUG_ASSERTLOG(checkALError(), ("Failed to buffer data"));
-		alSourcei(audio->m_source, AL_BUFFER, audio->m_buffer);
+	void* bufferHandle = loadFileForRead(event);
+	if (bufferHandle) {
+		alSourcei(audio->m_source, AL_SOURCE_RELATIVE, AL_TRUE);
+		alSourcei(audio->m_source, AL_BUFFER, (ALuint)(uintptr_t)bufferHandle);
 		alSourcePlay(audio->m_source);
 	}
 
-	return fileBuffer;
+	return bufferHandle;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -2799,7 +2828,7 @@ void* OpenALAudioManager::playSample3D(AudioEventRTS* event, PlayingAudio* sampl
 {
 	const Coord3D* pos = getCurrentPositionFromEvent(event);
 	if (pos) {
-		void* handle = playSample(event, sample3D);
+		void* handle = loadFileForRead(event);
 		const AudioSettings* audioSettings = getAudioSettings();
 
 		if (handle) {
@@ -2814,11 +2843,17 @@ void* OpenALAudioManager::playSample3D(AudioEventRTS* event, PlayingAudio* sampl
 				alSourcef(source, AL_MAX_DISTANCE, event->getAudioEventInfo()->m_maxDistance);
 			}
 
+			Real pitch = event->getPitchShift() != 0.0f ? event->getPitchShift() : 1.0f;
+			alSourcef(source, AL_PITCH, pitch);
+			alSourcef(source, AL_ROLLOFF_FACTOR, 0.5f);
+
 			// Set the position of the sample here
 			Real x = pos->x;
 			Real y = pos->y;
 			Real z = pos->z;
 			alSource3f(source, AL_POSITION, x, y, z);
+			alSourcei(source, AL_BUFFER, (ALuint)(uintptr_t)handle);
+			DEBUG_LOG(("Playing 3D sample '%s' at %f, %f, %f\n", event->getEventName().str(), x, y, z));
 
 			// Start playback
 			alSourcePlay(source);
@@ -2908,6 +2943,7 @@ void OpenALAudioManager::processRequest(AudioRequest* req)
 void* OpenALAudioManager::getHandleForBink(void)
 {
 	if (!m_binkAudio) {
+		DEBUG_LOG(("Creating Bink audio stream\n"));
 		m_binkAudio = NEW OpenALAudioStream;
 	}
 	return m_binkAudio;
@@ -2917,6 +2953,7 @@ void* OpenALAudioManager::getHandleForBink(void)
 void OpenALAudioManager::releaseHandleForBink(void)
 {
 	if (m_binkAudio) {
+		DEBUG_LOG(("Releasing Bink audio stream\n"));
 		delete m_binkAudio;
 		m_binkAudio = NULL;
 	}

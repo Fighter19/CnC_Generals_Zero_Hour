@@ -11,7 +11,6 @@ jobs:
     name: Linux 64-bit Testing
     runs-on: ubuntu-22.04
     env:
-      X_VCPKG_ASSET_SOURCES: x-azurl,https://s3.hilton.rwth-aachen.de/assetcache,,read
       VCPKG_DEFAULT_TRIPLET: x64-linux-dynamic
     steps:
       - name: Install deps
@@ -43,7 +42,6 @@ jobs:
     name: Linux 64-bit Deploy
     runs-on: ubuntu-22.04
     env:
-      X_VCPKG_ASSET_SOURCES: x-azurl,https://s3.hilton.rwth-aachen.de/assetcache,,read
       VCPKG_DEFAULT_TRIPLET: x64-linux-dynamic
     steps:
       - name: Install deps

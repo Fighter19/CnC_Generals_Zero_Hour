@@ -324,13 +324,18 @@ FFmpegVideoStream::FFmpegVideoStream(FFmpegFile* file)
     m_ffmpegFile->setFrameCallback(onFrame);
     m_ffmpegFile->setUserData(this);
 
+#ifdef SAGE_USE_OPENAL
+    // Release the audio handle if it's already in use
+    OpenALAudioStream* audioStream = (OpenALAudioStream*)TheAudio->getHandleForBink();
+	audioStream->reset();
+#endif
+
     // Decode until we have our first video frame
     while (m_good && m_gotFrame == false)
         m_good = m_ffmpegFile->decodePacket();
 
  #ifdef SAGE_USE_OPENAL
     // Start audio playback
-    OpenALAudioStream* audioStream = (OpenALAudioStream*)TheAudio->getHandleForBink();
     audioStream->play();
 #endif
 

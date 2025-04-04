@@ -16,6 +16,7 @@
 
 #include "always.h"
 
+#include <functional>
 #include <vector>
 
 struct AVFormatContext;
@@ -26,7 +27,7 @@ struct AVFrame;
 struct AVPacket;
 struct File;
 
-typedef void (*FFmpegFrameCallback)(AVFrame *frame, int stream_idx, int stream_type, void *user_data);
+using FFmpegFrameCallback = std::function<void(AVFrame *, int, int, void *)>;
 
 class FFmpegFile
 {

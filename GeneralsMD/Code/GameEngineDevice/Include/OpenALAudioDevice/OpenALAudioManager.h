@@ -71,6 +71,7 @@ class OpenALAudioManager : public AudioManager
 {
 friend class OpenALAudioStream;
 friend class FFmpegVideoStream;
+friend class OpenALAudioFileCache;
 
 public:
 #if defined(_DEBUG) || defined(_INTERNAL)
@@ -172,7 +173,7 @@ protected:
 	// Looping functions
 	Bool startNextLoop(PlayingAudio *looping);
 
-	void playStream(AudioEventRTS *event, ALuint stream);
+	void playStream(AudioEventRTS *event, OpenALAudioStream* stream);
 	// Returns the file handle for attachment to the PlayingAudio structure
 	void *playSample(AudioEventRTS *event, PlayingAudio *audio);
 	void *playSample3D(AudioEventRTS *event, PlayingAudio * audio);
@@ -205,10 +206,7 @@ protected:
 	void adjustPlayingVolume(PlayingAudio *audio);
 
 	void stopAllSpeech(void);
-	static Bool checkALError();
     static ALenum getALFormat(uint8_t channels, uint8_t bitsPerSample);
-	Bool checkALCError();
-
 protected:
 	AsciiString m_alDevicesList[AL_MAX_PLAYBACK_DEVICES];
 	int m_alMaxDevicesIndex;

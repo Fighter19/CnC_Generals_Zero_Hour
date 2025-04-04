@@ -64,6 +64,69 @@ File * StdLocalFileSystem::openFile(const Char *filename, Int access /* = 0 */)
 	std::filesystem::path path(fixedFilename);
 	path = path.make_preferred();
 
+#ifndef _WIN32
+	// check if the file exists to see if fixup is required
+	// if it's not found try to match disregarding case sensitivity
+	if (!std::filesystem::exists(path)) {
+		// Traverse path to try and match case-insensitively
+		std::filesystem::path parent = path.parent_path();
+		std::filesystem::path filename = path.filename();
+		std::error_code ec;
+
+		std::filesystem::path pathFixed;
+		std::filesystem::path pathCurrent;
+		for (auto& p : path)
+		{
+			std::filesystem::path pathFixedPart;
+			if (pathCurrent.empty())
+			{
+				// Load the first part of the path
+				pathFixed /= p;
+				pathCurrent /= p;
+				continue;
+			}
+
+			if (std::filesystem::exists(pathCurrent / p, ec))
+			{
+				pathFixedPart = p;
+			}
+			else
+			{
+				// Check if the subpath exists using case-insensitive comparison
+				for (auto& entry : std::filesystem::directory_iterator(pathCurrent, ec))
+				{
+					if (strcasecmp(entry.path().filename().string().c_str(), filename.string().c_str()) == 0)
+					{
+						pathFixedPart = entry.path().filename();
+						break;
+					}
+				}
+			}
+
+			if (pathFixedPart.empty())
+			{
+				// Required to allow creation of new files
+				if (!(access & File::WRITE)) 
+				{
+					DEBUG_LOG(("StdLocalFileSystem::openFile - Error finding file %s\n", filename.string().c_str()));
+					DEBUG_LOG(("StdLocalFileSystem::openFile - Got so far %s\n", pathCurrent.string().c_str()));	
+
+					file->deleteInstance();
+					return NULL;	
+				}
+
+				// Use the last known good path
+				pathFixed = p;
+			}
+
+			// Copy of the current path to mirror the current depth
+			pathFixed /= pathFixedPart;
+			pathCurrent /= p;
+		}
+		path = pathFixed;
+	}
+#endif
+
 	if (access & File::WRITE) {
 		// if opening the file for writing, we need to make sure the directory is there
 		// before we try to create the file.

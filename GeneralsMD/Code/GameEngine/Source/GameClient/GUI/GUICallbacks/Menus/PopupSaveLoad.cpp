@@ -460,6 +460,11 @@ static void setEditDescription( GameWindow *editControl )
 	else
 	{
 		const char *mapName = TheGlobalData->m_mapName.reverseFind( '\\' );
+		// For other platforms than Windows, the native path could be using '/' as a separator.
+		if( !mapName )
+		{
+			mapName = TheGlobalData->m_mapName.reverseFind( '/' );
+		}
 
 		if( mapName )
 			defaultDesc.format( L"%S", mapName + 1 );

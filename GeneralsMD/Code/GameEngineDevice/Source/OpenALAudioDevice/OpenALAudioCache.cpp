@@ -11,25 +11,6 @@ extern "C" {
 
 #include <cstring>
 
-struct WavHeader
-{
-	uint8_t riff_id[4] = { 'R', 'I', 'F', 'F' };
-	uint32_t chunk_size;
-	uint8_t wave_id[4] = { 'W', 'A', 'V', 'E' };
-	/* "fmt" sub-chunk */
-	uint8_t fmt_id[4] = { 'f', 'm', 't', ' ' }; // FMT header
-	uint32_t subchunk1_size = 16; // Size of the fmt chunk
-	uint16_t audio_format = 1; // Audio format 1=PCM
-	uint16_t channels = 1; // Number of channels 1=Mono 2=Sterio
-	uint32_t samples_per_sec = 16000; // Sampling Frequency in Hz
-	uint32_t bytes_per_sec = 16000 * 2; // bytes per second
-	uint16_t block_align = 2; // 2=16-bit mono, 4=16-bit stereo
-	uint16_t bits_per_sample = 16; // Number of bits per sample
-	/* "data" sub-chunk */
-	uint8_t subchunk2_id[4] = { 'd', 'a', 't', 'a' }; // "data"  string
-	uint32_t subchunk2_size; // Sampled data length
-};
-
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
@@ -39,7 +20,8 @@ OpenALAudioFileCache::OpenALAudioFileCache() : m_maxSize(0), m_currentlyUsedSize
 
 Bool OpenALAudioFileCache::decodeFFmpeg(OpenAudioFile* file)
 {
-	auto on_frame = [](AVFrame* frame, int stream_idx, int stream_type, void* user_data) {
+	std::vector<uint8_t> audioData;
+	auto on_frame = [&audioData](AVFrame* frame, int stream_idx, int stream_type, void* user_data) {
 		OpenAudioFile* file = static_cast<OpenAudioFile*>(user_data);
 		if (stream_type != AVMEDIA_TYPE_AUDIO) {
 			return;
@@ -50,8 +32,8 @@ Bool OpenALAudioFileCache::decodeFFmpeg(OpenAudioFile* file)
 		}
 
 		const int frame_data_size = file->m_ffmpegFile->getSizeForSamples(frame->nb_samples);
-		file->m_file = static_cast<uint8_t*>(av_realloc(file->m_file, file->m_fileSize + frame_data_size));
-		memcpy(file->m_file + file->m_fileSize, frame->data[0], frame_data_size);
+		audioData.reserve(audioData.size() + frame_data_size);
+		audioData.insert(audioData.end(), frame->data[0], frame->data[0] + frame_data_size);
 		file->m_fileSize += frame_data_size;
 		file->m_totalSamples += frame->nb_samples;
 		};
@@ -62,6 +44,10 @@ Bool OpenALAudioFileCache::decodeFFmpeg(OpenAudioFile* file)
 	// Read all packets inside the file
 	while (file->m_ffmpegFile->decodePacket()) {
 	}
+
+	// Fill the buffer with the audio data
+	alBufferData(file->m_buffer, OpenALAudioManager::getALFormat(file->m_ffmpegFile->getNumChannels(), file->m_ffmpegFile->getBytesPerSample() * 8),
+		audioData.data(), audioData.size(), file->m_ffmpegFile->getSampleRate());
 
 	// Calculate the duration in MS
 	file->m_duration = (file->m_totalSamples / (float)file->m_ffmpegFile->getSampleRate()) * 1000.0f;
@@ -99,7 +85,7 @@ void* OpenALAudioFileCache::openFile(AsciiString& filename)
 
 	if (it != m_openFiles.end()) {
 		++it->second.m_openCount;
-		return it->second.m_file;
+		return (void*)it->second.m_buffer;
 	}
 
 	// Couldn't find the file, so actually open it.
@@ -112,8 +98,7 @@ void* OpenALAudioFileCache::openFile(AsciiString& filename)
 	UnsignedInt fileSize = file->size();
 
 	OpenAudioFile openedAudioFile;
-	openedAudioFile.m_file = static_cast<uint8_t*>(av_malloc(sizeof(WavHeader)));
-	openedAudioFile.m_fileSize = sizeof(WavHeader);
+	alGenBuffers(1, &openedAudioFile.m_buffer);
 	openedAudioFile.m_ffmpegFile = new FFmpegFile();
 
 	// This transfer ownership of file
@@ -127,14 +112,15 @@ void* OpenALAudioFileCache::openFile(AsciiString& filename)
 		return nullptr;
 	}
 
-	fillWaveData(&openedAudioFile);
 	openedAudioFile.m_ffmpegFile->close();
 
 	openedAudioFile.m_fileSize = fileSize;
 	m_currentlyUsedSize += openedAudioFile.m_fileSize;
 	if (m_currentlyUsedSize > m_maxSize) {
+		DEBUG_LOG(("Audio Cache is full, trying to free some space\n"));
 		// We need to free some samples, or we're not going to be able to play this sound.
 		if (!freeEnoughSpaceForSample(openedAudioFile)) {
+			DEBUG_LOG(("Couldn't free enough space for sample\n"));
 			m_currentlyUsedSize -= openedAudioFile.m_fileSize;
 			releaseOpenAudioFile(&openedAudioFile);
 			return NULL;
@@ -142,7 +128,7 @@ void* OpenALAudioFileCache::openFile(AsciiString& filename)
 	}
 
 	m_openFiles[filename] = openedAudioFile;
-	return openedAudioFile.m_file;
+	return (void*)openedAudioFile.m_buffer;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -171,7 +157,7 @@ void* OpenALAudioFileCache::openFile(AudioEventRTS* eventToOpenFrom)
 
 	if (it != m_openFiles.end()) {
 		++it->second.m_openCount;
-		return it->second.m_file;
+		return  (void*)it->second.m_buffer;
 	}
 
 	// Couldn't find the file, so actually open it.
@@ -184,8 +170,7 @@ void* OpenALAudioFileCache::openFile(AudioEventRTS* eventToOpenFrom)
 	UnsignedInt fileSize = file->size();
 
 	OpenAudioFile openedAudioFile;
-	openedAudioFile.m_file = static_cast<uint8_t*>(av_malloc(sizeof(WavHeader)));
-	openedAudioFile.m_fileSize = sizeof(WavHeader);
+	alGenBuffers(1, &openedAudioFile.m_buffer);
 	openedAudioFile.m_eventInfo = eventToOpenFrom->getAudioEventInfo();
 	openedAudioFile.m_ffmpegFile = new FFmpegFile();
 
@@ -207,14 +192,15 @@ void* OpenALAudioFileCache::openFile(AudioEventRTS* eventToOpenFrom)
 		return nullptr;
 	}
 
-	fillWaveData(&openedAudioFile);
 	openedAudioFile.m_ffmpegFile->close();
 
 	openedAudioFile.m_fileSize = fileSize;
 	m_currentlyUsedSize += openedAudioFile.m_fileSize;
 	if (m_currentlyUsedSize > m_maxSize) {
+		DEBUG_LOG(("Audio Cache is full, trying to free some space\n"));
 		// We need to free some samples, or we're not going to be able to play this sound.
 		if (!freeEnoughSpaceForSample(openedAudioFile)) {
+			DEBUG_LOG(("Couldn't free enough space for sample\n"));
 			m_currentlyUsedSize -= openedAudioFile.m_fileSize;
 			releaseOpenAudioFile(&openedAudioFile);
 			return NULL;
@@ -222,7 +208,7 @@ void* OpenALAudioFileCache::openFile(AudioEventRTS* eventToOpenFrom)
 	}
 
 	m_openFiles[strToFind] = openedAudioFile;
-	return openedAudioFile.m_file;
+	return (void*)openedAudioFile.m_buffer;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -237,23 +223,23 @@ void OpenALAudioFileCache::closeFile(void* fileToClose)
 
 	OpenFilesHash::iterator it;
 	for (it = m_openFiles.begin(); it != m_openFiles.end(); ++it) {
-		if (it->second.m_file == fileToClose) {
+		if (it->second.m_buffer == (ALuint)(uintptr_t)fileToClose) {
 			--it->second.m_openCount;
 			return;
 		}
 	}
 }
 
-float OpenALAudioFileCache::getFileLength(void* file)
+float OpenALAudioFileCache::getFileLength(void* handle)
 {
-	if (file == nullptr) {
+	if (handle == nullptr) {
 		return 0.0f;
 	}
 
 	std::lock_guard mut(m_mutex);
 
 	for (auto it = m_openFiles.begin(); it != m_openFiles.end(); ++it) {
-		if (it->second.m_file == file) {
+		if (it->second.m_buffer == (ALuint)(uintptr_t)handle) {
 			return it->second.m_duration;
 		}
 	}
@@ -275,21 +261,21 @@ void OpenALAudioFileCache::releaseOpenAudioFile(OpenAudioFile* fileToRelease)
 {
 	if (fileToRelease->m_openCount > 0) {
 		// This thing needs to be terminated IMMEDIATELY.
-		TheAudio->closeAnySamplesUsingFile(fileToRelease->m_file);
+		TheAudio->closeAnySamplesUsingFile((const void*)fileToRelease->m_buffer);
 	}
 
-	if (fileToRelease->m_file) {
+	if (fileToRelease->m_buffer) {
 		if (fileToRelease->m_ffmpegFile) {
 			// Free FFMPEG handles
 			delete fileToRelease->m_ffmpegFile;
 		}
-		if (fileToRelease->m_file)
+		if (fileToRelease->m_buffer)
 		{
-			// Otherwise, we read it, we own it, blow it away.
-			av_free(fileToRelease->m_file);
+			// Free the OpenAL buffer
+			alDeleteBuffers(1, &fileToRelease->m_buffer);
 		}
 		fileToRelease->m_ffmpegFile = NULL;
-		fileToRelease->m_file = NULL;
+		fileToRelease->m_buffer = NULL;
 		fileToRelease->m_eventInfo = NULL;
 	}
 }
@@ -353,34 +339,4 @@ Bool OpenALAudioFileCache::freeEnoughSpaceForSample(const OpenAudioFile& sampleT
 	}
 
 	return TRUE;
-}
-
-void OpenALAudioFileCache::getWaveData(void* wave_data,
-	uint8_t*& data,
-	UnsignedInt& size,
-	UnsignedInt& freq,
-	UnsignedInt& channels,
-	UnsignedInt& bitsPerSample)
-{
-	WavHeader* header = reinterpret_cast<WavHeader*>(wave_data);
-	data = static_cast<uint8_t*>(wave_data) + sizeof(WavHeader);
-
-	size = header->subchunk2_size;
-	freq = header->samples_per_sec;
-	channels = header->channels;
-	bitsPerSample = header->bits_per_sample;
-}
-
-void OpenALAudioFileCache::fillWaveData(OpenAudioFile* open_audio)
-{
-	WavHeader wav;
-	wav.chunk_size = open_audio->m_fileSize - (offsetof(WavHeader, chunk_size) + sizeof(uint32_t));
-	wav.subchunk2_size = open_audio->m_fileSize - (offsetof(WavHeader, subchunk2_size) + sizeof(uint32_t));
-	wav.channels = open_audio->m_ffmpegFile->getNumChannels();
-	wav.bits_per_sample = open_audio->m_ffmpegFile->getBytesPerSample() * 8;
-	wav.samples_per_sec = open_audio->m_ffmpegFile->getSampleRate();
-	wav.bytes_per_sec = open_audio->m_ffmpegFile->getSampleRate() * open_audio->m_ffmpegFile->getNumChannels()
-		* open_audio->m_ffmpegFile->getBytesPerSample();
-	wav.block_align = open_audio->m_ffmpegFile->getNumChannels() * open_audio->m_ffmpegFile->getBytesPerSample();
-	memcpy(open_audio->m_file, &wav, sizeof(WavHeader));
 }
