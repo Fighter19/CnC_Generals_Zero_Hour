@@ -337,6 +337,8 @@ GameLogic::~GameLogic()
 	// clear any object TOC we might have
 	m_objectTOC.clear();
 
+	((WeatherSetting *)TheWeatherSetting.getNonOverloadedPointer())->deleteInstance();
+
 	if (m_background)
 	{
 		m_background->destroyWindows();
