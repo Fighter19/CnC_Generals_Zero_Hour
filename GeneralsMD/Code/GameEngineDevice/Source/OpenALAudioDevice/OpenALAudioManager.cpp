@@ -1155,7 +1155,7 @@ void OpenALAudioManager::releaseOpenALHandles(PlayingAudio* release)
 //-------------------------------------------------------------------------------------------------
 void OpenALAudioManager::releasePlayingAudio(PlayingAudio* release)
 {
-	if (release->m_audioEventRTS->getAudioEventInfo()->m_soundType == AT_SoundEffect) {
+	if (release->m_audioEventRTS && release->m_audioEventRTS->getAudioEventInfo()->m_soundType == AT_SoundEffect) {
 		if (release->m_type == PAT_Sample) {
 			if (release->m_source) {
 				m_sound->notifyOf2DSampleCompletion();

@@ -39,5 +39,6 @@ FARPROC GetProcAddress(HMODULE hModule, const char* lpProcName)
 
 void FreeLibrary(HMODULE hModule)
 {
-  dlclose(hModule);
+  // Currently misbehaves by unmapping regions not related to the library
+  // dlclose(hModule);
 }

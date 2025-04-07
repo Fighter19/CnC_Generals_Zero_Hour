@@ -94,7 +94,7 @@
 
 
 
-#define dont_ALLOW_ALT_F4
+#define ALLOW_ALT_F4
 
 
 #if defined(_DEBUG) || defined(_INTERNAL)

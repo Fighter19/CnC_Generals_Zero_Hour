@@ -90,12 +90,16 @@ File * StdLocalFileSystem::openFile(const Char *filename, Int access /* = 0 */)
 			{
 				pathFixedPart = p;
 			}
+			else if (std::filesystem::exists(pathFixed / p, ec))
+			{
+				pathFixedPart = p;
+			}
 			else
 			{
 				// Check if the subpath exists using case-insensitive comparison
-				for (auto& entry : std::filesystem::directory_iterator(pathCurrent, ec))
+				for (auto& entry : std::filesystem::directory_iterator(pathFixed, ec))
 				{
-					if (strcasecmp(entry.path().filename().string().c_str(), filename.string().c_str()) == 0)
+					if (strcasecmp(entry.path().filename().string().c_str(), p.string().c_str()) == 0)
 					{
 						pathFixedPart = entry.path().filename();
 						break;
