@@ -145,6 +145,7 @@ static Bool initializeAppWindows(Bool runWindowed, Bool runSplash) {
   SDL_IOStream* icoStream = SDL_IOFromFile("GeneralsZH.ico", "rb");
   if (icoStream) {
     SDL_Surface* icon = IMG_LoadICO_IO(icoStream);
+    SDL_CloseIO(icoStream);
     if (icon) {
       SDL_SetWindowIcon(TheSDL3Window, icon);
       SDL_DestroySurface(icon);
