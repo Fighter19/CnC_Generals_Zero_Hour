@@ -1450,14 +1450,13 @@ void ControlBar::update( void )
 			multiSelect = ( drawToEvaluateFor == NULL );
 
 		}  
-		else if ( TheInGameUI->getSelectCount() == 1 )
-		{
-			// get the first and only drawble in the selection list
-			drawToEvaluateFor = TheInGameUI->getAllSelectedDrawables()->front();
-		}
-			
-		Object *obj = drawToEvaluateFor ? drawToEvaluateFor->getObject() : NULL;
-		setPortraitByObject( obj );
+		else // get the first and only drawble in the selection list
+			// TheSuperHackers @fix Mauller 07/04/2025 The first access to this can return an empty list
+			if (!TheInGameUI->getAllSelectedDrawables()->empty()) {
+				drawToEvaluateFor = TheInGameUI->getAllSelectedDrawables()->front();
+				Object *obj = drawToEvaluateFor ? drawToEvaluateFor->getObject() : NULL;
+				setPortraitByObject( obj );
+			}
 		
 		return;
 	}
