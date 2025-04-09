@@ -2,7 +2,6 @@
 
 #include <pthread.h>
 #include <stdint.h>
-#include <unistd.h>  // For usleep
 #include <sched.h>   // For sched_yield
 
 typedef pthread_t THREAD_ID;
