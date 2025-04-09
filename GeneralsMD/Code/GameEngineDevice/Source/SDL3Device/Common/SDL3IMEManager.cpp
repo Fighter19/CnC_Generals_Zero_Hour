@@ -2,6 +2,10 @@
 #include "GameClient/GameWindowManager.h"
 #include "GameClient/GameWindow.h"
 
+#include <SDL3/SDL.h>
+
+extern HWND ApplicationHWnd;
+
 class SDL3IMEManager : public IMEManagerInterface
 {
 public:
@@ -28,11 +32,17 @@ public:
 
   virtual void attach(GameWindow *window) override
   {
+    if(window == NULL) {
+      SDL_StopTextInput(reinterpret_cast<SDL_Window*>(ApplicationHWnd));
+    } else {
+      SDL_StartTextInput(reinterpret_cast<SDL_Window*>(ApplicationHWnd));
+    }
     m_window = window;
   }
   virtual void detatch(void) override
   {
     m_window = nullptr;
+    SDL_StopTextInput(reinterpret_cast<SDL_Window*>(ApplicationHWnd));
   }
   virtual void enable(void) override
   {

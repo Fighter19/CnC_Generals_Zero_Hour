@@ -170,6 +170,7 @@ void SDL3GameEngine::serviceWindowsOS( void )
 			case SDL_EVENT_KEYBOARD_ADDED:
 			case SDL_EVENT_KEYBOARD_REMOVED:
 			case SDL_EVENT_KEYMAP_CHANGED:
+			case SDL_EVENT_TEXT_INPUT:
 				if(keyboard) {
 					keyboard->addSDLEvent(&event);
 				}

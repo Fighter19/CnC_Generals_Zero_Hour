@@ -116,6 +116,10 @@ static KeyDefType ConvertSDLKey(SDL_Keycode keycode)
 			return KEY_LEFT;
 		case SDLK_RIGHT:
 			return KEY_RIGHT;
+		case SDLK_PERIOD:
+			return KEY_PERIOD;
+		case SDLK_PLUS:
+			return KEY_KPPLUS;
 		default:
 			break;
 	}
@@ -139,22 +143,20 @@ void SDL3Keyboard::getKey( KeyboardIO *key )
 	{
 		SDL_Event event = m_events.front();
 		m_events.erase(m_events.begin());
-		if(event.type == SDL_EVENT_KEY_DOWN)
+		if (TheIMEManager && TheIMEManager->getWindow() && event.type == SDL_EVENT_TEXT_INPUT)
+		{
+			// Note that special characters may need additional keycode translation above.
+			const char* text = event.text.text;
+			for (int i = 0; text[i] != '\0'; ++i)
+			{
+				WideChar wchar = static_cast<WideChar>(text[i]);
+				TheWindowManager->winSendInputMsg(TheIMEManager->getWindow(), GWM_IME_CHAR, wchar, 0);
+			}
+		}
+		else if(event.type == SDL_EVENT_KEY_DOWN)
 		{
 			key->key = ConvertSDLKey(event.key.key);
 			key->state = KEY_STATE_DOWN;
-
-			if (TheIMEManager && TheIMEManager->getWindow())
-			{
-				SDL_Keycode sym = event.key.key;
-
-				// Only inject if it's a printable ASCII character
-				if (sym >= 32 && sym <= 126)
-				{
-					WideChar wchar = static_cast<WideChar>(sym);
-					TheWindowManager->winSendInputMsg(TheIMEManager->getWindow(), GWM_IME_CHAR, wchar, 0);
-				}
-			}
 		}
 		else if(event.type == SDL_EVENT_KEY_UP)
 		{
