@@ -29,9 +29,9 @@ void FormatURLFromRegistry( std::string& gamePatchURL, std::string& mapPatchURL,
 {
 	std::string sku = "GeneralsZH";
 	std::string language = "english";
-	unsigned int version = 0; // invalid version - can't get on with a corrupt reg.
-	unsigned int mapVersion = 0; // invalid version - can't get on with a corrupt reg.
-	std::string baseURL = "http://servserv.generals.ea.com/servserv/";
+	unsigned int version = 65540; // Default to 1.04, since registry does not exist. 00010004 DWORD
+	unsigned int mapVersion = 65536; // Default, since registry does not exist.
+	std::string baseURL = "http://http.server.cnc-online.net/servserv/";
 	baseURL.append(sku);
 	baseURL.append("/");
 

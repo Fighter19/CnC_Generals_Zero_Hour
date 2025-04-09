@@ -641,7 +641,7 @@ static GHTTPBool numPlayersOnlineCallback( GHTTPRequest request, GHTTPResult res
 
 void CheckOverallStats( void )
 {
-	ghttpGet("http://gamestats.gamespy.com/ccgenzh/display.html",
+	ghttpGet("http://gamestats.server.cnc-online.net/ccgenzh/display.html",
 		GHTTPFalse, overallStatsCallback, NULL);
 }
 
@@ -717,7 +717,7 @@ void HTTPThinkWrapper( void )
 {
 	if (s_asyncDNSLookupInProgress)
 	{
-		Int ret = asyncGethostbyname("servserv.generals.ea.com");
+		Int ret = asyncGethostbyname("http.server.cnc-online.net");
 		switch(ret)
 		{
 		case LOOKUP_FAILED:
@@ -774,7 +774,7 @@ void StartPatchCheck( void )
 		TheGameText->fetch("GUI:CheckingForPatches"), CancelPatchCheckCallbackAndReopenDropdown);
 
 	s_asyncDNSLookupInProgress = TRUE;
-	Int ret = asyncGethostbyname("servserv.generals.ea.com");
+	Int ret = asyncGethostbyname("http.server.cnc-online.net");
 	switch(ret)
 	{
 	case LOOKUP_FAILED:
