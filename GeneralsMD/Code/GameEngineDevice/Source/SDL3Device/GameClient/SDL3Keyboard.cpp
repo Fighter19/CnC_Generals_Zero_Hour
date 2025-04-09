@@ -145,6 +145,7 @@ void SDL3Keyboard::getKey( KeyboardIO *key )
 		m_events.erase(m_events.begin());
 		if (TheIMEManager && TheIMEManager->getWindow() && event.type == SDL_EVENT_TEXT_INPUT)
 		{
+			// Note that special characters may need additional keycode translation above.
 			const char* text = event.text.text;
 			for (int i = 0; text[i] != '\0'; ++i)
 			{
