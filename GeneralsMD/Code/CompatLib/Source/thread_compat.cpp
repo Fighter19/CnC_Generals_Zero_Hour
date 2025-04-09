@@ -30,7 +30,22 @@ void* CreateThread(void *lpSecure, size_t dwStackSize, start_routine lpStartAddr
 	return (void*)thread_id;
 }
 
+unsigned long _beginthread(void (*start_address)(void*), unsigned stack_size, void* arg)
+{
+	return (unsigned long)CreateThread(NULL, stack_size, start_address, arg, 0, NULL);
+}
+
 int TerminateThread(void *hThread, unsigned long dwExitCode)
 {
 	return pthread_cancel((pthread_t)hThread);
+}
+
+unsigned GetCurrentThreadIdCompat()
+{
+	return (unsigned)GetCurrentThreadId();
+}
+
+void SwitchThread()
+{
+	sched_yield();
 }

@@ -79,45 +79,34 @@ void __cdecl ThreadClass::Internal_Thread_Function(void* params)
 void ThreadClass::Execute()
 {
 	WWASSERT(!handle);	// Only one thread at a time!
-	#ifdef _UNIX
-		// assert(0);
-		return;
-	#else
-		handle=_beginthread(&Internal_Thread_Function,0,this);
-		SetThreadPriority((HANDLE)handle,THREAD_PRIORITY_NORMAL+thread_priority);
-		WWDEBUG_SAY(("ThreadClass::Execute: Started thread %s, thread ID is %X\n", ThreadName, handle));
-	#endif
+	handle=_beginthread(&Internal_Thread_Function,0,this);
+#ifdef _WIN32
+	SetThreadPriority((HANDLE)handle,THREAD_PRIORITY_NORMAL+thread_priority);
+#endif
+	WWDEBUG_SAY(("ThreadClass::Execute: Started thread %s, thread ID is %X\n", ThreadName, handle));
 }
 
 void ThreadClass::Set_Priority(int priority)
 {
-	#ifdef _UNIX
-		// assert(0);
-		return;
-	#else
-		thread_priority=priority;
-		if (handle) SetThreadPriority((HANDLE)handle,THREAD_PRIORITY_NORMAL+thread_priority);
-	#endif
+	thread_priority=priority;
+#ifdef _WIN32
+	if (handle) SetThreadPriority((HANDLE)handle,THREAD_PRIORITY_NORMAL+thread_priority);
+#endif
 }
 
 void ThreadClass::Stop(unsigned ms)
 {
-	#ifdef _UNIX
-		// assert(0);
-		return;
-	#else
-		running=false;
-		unsigned time=TIMEGETTIME();
-		while (handle) {
-			if ((TIMEGETTIME()-time)>ms) {
-				int res=TerminateThread((HANDLE)handle,0);
-				res;	// just to silence compiler warnings
-				WWASSERT(res);	// Thread still not killed!
-				handle=0;
-			}
-			Sleep(0);
+	running=false;
+	unsigned time=TIMEGETTIME();
+	while (handle) {
+		if ((TIMEGETTIME()-time)>ms) {
+			int res=TerminateThread((HANDLE)handle,0);
+			res;	// just to silence compiler warnings
+			WWASSERT(res);	// Thread still not killed!
+			handle=0;
 		}
-	#endif
+		Sleep(0);
+	}
 }
 
 void ThreadClass::Sleep_Ms(unsigned ms)
@@ -132,7 +121,7 @@ HANDLE test_event = ::CreateEvent (NULL, FALSE, FALSE, "");
 void ThreadClass::Switch_Thread()
 {
 	#ifdef _UNIX
-		return;
+		SwitchThread();
 	#else
 		//	::SwitchToThread ();
 		::WaitForSingleObject (test_event, 1);
@@ -143,11 +132,7 @@ void ThreadClass::Switch_Thread()
 // Return calling thread's unique thread id
 unsigned ThreadClass::_Get_Current_Thread_ID()
 {
-	#ifdef _UNIX
-		return 0;
-	#else
-		return GetCurrentThreadId();
-	#endif
+	return GetCurrentThreadId();
 }
 
 bool ThreadClass::Is_Running()
