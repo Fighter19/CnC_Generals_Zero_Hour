@@ -96,10 +96,11 @@ endif()
 
 if(SAGE_USE_GAMESPY)
   set(GS_OPENSSL FALSE)
+  set(GAMESPY_SERVER_NAME "server.cnc-online.net")
   FetchContent_Declare(
       gamespy
-      GIT_REPOSITORY https://github.com/feliwir/GamespySDK.git
-      GIT_TAG        582c79105aa851c5aa847f638722f61195b79c9b
+      GIT_REPOSITORY https://github.com/TheAssemblyArmada/GamespySDK.git
+      GIT_TAG        87d9c116749bdaaafcf320540db2d9b3aaef9442
   )
   FetchContent_MakeAvailable(gamespy)
 endif()
