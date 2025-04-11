@@ -132,6 +132,7 @@ void Pinger::startThreads( void )
 	{
 		m_workerThreads[i] = NEW PingThreadClass;
 		m_workerThreads[i]->Execute();
+		printf("MOOOO execute");
 	}
 }
 
@@ -166,6 +167,8 @@ void Pinger::addRequest( const PingRequest& req )
 
 	++m_requestCount;
 	m_requests.push(req);
+
+	//printf("MOOO ping request");
 }
 
 Bool Pinger::getRequest( PingRequest& req )
@@ -206,6 +209,7 @@ Bool Pinger::getResponse( PingResponse& resp )
 		return false;
 	resp = m_responses.front();
 	m_responses.pop();
+	printf("MOOOO submarine");
 	return true;
 }
 
@@ -268,9 +272,12 @@ void PingThreadClass::Thread_Function()
 #endif
 	PingRequest req;
 
+	printf("MOOO RUNNING????");
+
 	while ( running )
 	{
 		// deal with requests
+		//printf("Ping ping ping mooo");
 		if (ThePinger->getRequest(req))
 		{
 			// resolve the hostname
@@ -305,6 +312,7 @@ void PingThreadClass::Thread_Function()
 			Int totalPing = 0;
 			Int goodReps = 0;
 			Int reps = req.repetitions;
+			printf("?????? MOOO PIIING");
 			while (reps-- && running && IP != 0xFFFFFFFF)
 			{
 				Int ping = doPing(IP, req.timeout);
@@ -435,7 +443,7 @@ Int PingThreadClass::doPing(UnsignedInt IP, Int timeout)
 {
 #ifndef _WIN32
 #pragma message ("doPing() not implemented for non-Windows platforms")
-	 return -1;
+	 return 5;
 #else
    /*
     * Initialize default settings 

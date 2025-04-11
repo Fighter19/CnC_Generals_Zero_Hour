@@ -293,6 +293,7 @@ static GameSpyLoginPreferences *loginPref = NULL;
 
 static void startPings( void )
 {
+	printf("ASDASD MOOOO!!! startPings");
 	std::list<AsciiString> pingServers = TheGameSpyConfig->getPingServers();
 	Int timeout = TheGameSpyConfig->getPingTimeoutInMs();
 	Int reps = TheGameSpyConfig->getNumPingRepetitions();
@@ -302,6 +303,7 @@ static void startPings( void )
 		AsciiString pingServer = *it;
 		PingRequest req;
 		req.hostname = pingServer.str();
+		printf("MOOOO pint %s", pingServer.str());
 		req.repetitions = reps;
 		req.timeout = timeout;
 		ThePinger->addRequest(req);
@@ -788,7 +790,6 @@ static void checkLogin( void )
 //-------------------------------------------------------------------------------------------------
 void WOLLoginMenuUpdate( WindowLayout * layout, void *userData)
 {
-
 	// We'll only be successful if we've requested to 
 	if(isShuttingDown && TheShell->isAnimFinished() && TheTransitionHandler->isFinished())
 		shutdownComplete(layout);
@@ -798,12 +799,14 @@ void WOLLoginMenuUpdate( WindowLayout * layout, void *userData)
 		PingResponse pingResp;
 		if (ThePinger && ThePinger->getResponse(pingResp))
 		{
+			printf("????? MOOO pinger");
 			checkLogin();
 		}
 
 		PeerResponse resp;
 		if (!loggedInOK && TheGameSpyPeerMessageQueue->getResponse( resp ))
 		{
+			printf("ASDASDADS mooo %d", resp.peerResponseType);
 			switch (resp.peerResponseType)
 			{
 			case PeerResponse::PEERRESPONSE_GROUPROOM:

@@ -1181,6 +1181,8 @@ void PeerThreadClass::Thread_Function()
 	_set_se_translator( DumpExceptionInfo ); // Hook that allows stack trace.
 #endif
 
+	printf("MOOOO PEER ! 123213\n");
+
 	PEER peer;
 
 	// Setup the callbacks.
@@ -1217,8 +1219,18 @@ void PeerThreadClass::Thread_Function()
 
 	m_qmGroupRoom = 0;
 
+	// check that the game's backend is available
+	GSIACResult result; // used for backend availability check
+	GSIStartAvailableCheck(_T("ccgenzh"));
+	while ((result = GSIAvailableCheckThink()) == GSIACWaiting)
+		msleep(5);
+	printf("MOOO HERE PEER RESULT %d %d %d\n", result, GSIACWaiting, GSIACAvailable);
+	DEBUG_ASSERTCRASH( result != GSIACAvailable, ("peer backend is not available") ); // getting here?
+
 	peer = peerInitialize( &callbacks );
+	printf("MOOO HERE PEER %s\n", peer);
 	DEBUG_ASSERTCRASH( peer != NULL, ("NULL peer!") );
+
 	m_isConnected = m_isConnecting = false;
 
 	qr2_register_key(EXECRC_KEY, EXECRC_STR);
@@ -1323,6 +1335,7 @@ void PeerThreadClass::Thread_Function()
 	/////////////////
 	if(!peerSetTitle( peer , gameName, secretKey, gameName, secretKey, GetRegistryVersion(), 30, PEERTrue, pingRooms, crossPingRooms))
 	{
+		printf("MOOOO WHY????");
 		DEBUG_CRASH(("Error setting title"));
 		peerShutdown( peer );
 		peer = NULL;
