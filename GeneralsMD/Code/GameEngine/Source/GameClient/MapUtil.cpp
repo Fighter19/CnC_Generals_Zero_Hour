@@ -382,7 +382,11 @@ void MapCache::writeCacheINI( Bool userDir )
 	}
 
 	AsciiString filepath = mapDir;
+#ifdef _WIN32
 	filepath.concat('\\');
+#else
+	filepath.concat('/');
+#endif
 
 	TheFileSystem->createDirectory(mapDir);
 
@@ -570,7 +574,11 @@ Bool MapCache::loadUserMaps()
 		tempfilename = (*iter);
 		tempfilename.toLower();
 
+#ifdef _WIN32
 		const char *s = tempfilename.reverseFind('\\');
+#else
+		const char *s = tempfilename.reverseFind('/');
+#endif
 		if (!s)
 		{
 			DEBUG_CRASH(("Couldn't find \\ in map name!"));
@@ -582,7 +590,11 @@ Bool MapCache::loadUserMaps()
 			for (Int i=0; i<strlen(mapExtension); ++i)
 				fname.removeLastChar();
 
+#ifdef _WIN32
 			endingStr.format("%s\\%s%s", fname.str(), fname.str(), mapExtension);
+#else
+			endingStr.format("%s/%s%s", fname.str(), fname.str(), mapExtension);
+#endif
 
 			Bool skipMap = FALSE;
 			if (TheGlobalData->m_buildMapCache)
@@ -665,7 +677,12 @@ Bool MapCache::addMap( AsciiString dirName, AsciiString fname, FileInfo *fileInf
 			{
 				// unofficial maps or maps without names
 				AsciiString tempdisplayname;
-				tempdisplayname = fname.reverseFind('\\') + 1;
+				if(fname.reverseFind('\\')) {
+					tempdisplayname = fname.reverseFind('\\') + 1;
+				}
+				else if(fname.reverseFind('/')) {
+					tempdisplayname = fname.reverseFind('/') + 1;
+				}
 				(*this)[lowerFname].m_displayName.translate(tempdisplayname);
 				if (md.m_numPlayers >= 2)
 				{
@@ -721,7 +738,12 @@ Bool MapCache::addMap( AsciiString dirName, AsciiString fname, FileInfo *fileInf
 	{
 		DEBUG_LOG(("Missing TheKey_mapName!\n"));
 		AsciiString tempdisplayname;
-		tempdisplayname = fname.reverseFind('\\') + 1;
+		if(fname.reverseFind('\\')) {
+			tempdisplayname = fname.reverseFind('\\') + 1;
+		}
+		else if(fname.reverseFind('/')) {
+			tempdisplayname = fname.reverseFind('/') + 1;
+		}
 		md.m_displayName.translate(tempdisplayname);
 		if (md.m_numPlayers >= 2)
 		{
@@ -1156,7 +1178,12 @@ Image *getMapPreviewImage( AsciiString mapName )
 	tgaName.removeLastChar(); // m
 	tgaName.removeLastChar(); // .
 	name = tgaName;//.reverseFind('\\') + 1;
-	filename = tgaName.reverseFind('\\') + 1;
+	if(tgaName.reverseFind('\\')) {
+		filename = tgaName.reverseFind('\\') + 1;
+	}
+	else if(tgaName.reverseFind('/')) {
+		filename = tgaName.reverseFind('/') + 1;
+	}
 	//tgaName = name;
 	filename.concat(".tga");
 	tgaName.concat(".tga");
@@ -1166,7 +1193,7 @@ Image *getMapPreviewImage( AsciiString mapName )
 	for(Int i = 0; i < portableName.getLength(); ++i)
 	{
 		char c = portableName.getCharAt(i);
-		if (c == '\\' || c == ':')
+		if (c == '\\' || c == ':' || c == '/')
 			tempName.concat('_');
 		else
 			tempName.concat(c);
