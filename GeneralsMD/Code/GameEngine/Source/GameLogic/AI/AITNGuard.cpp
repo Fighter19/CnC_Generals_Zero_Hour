@@ -458,8 +458,8 @@ void AITNGuardOuterState::xfer( Xfer *xfer )
 /** Load post process */
 // ------------------------------------------------------------------------------------------------
 void AITNGuardOuterState::loadPostProcess( void )
-{						 AITNGuardOuterState
-	onEnter();
+{
+	AITNGuardOuterState::onEnter();
 }  // end loadPostProcess
 
 //--------------------------------------------------------------------------------------

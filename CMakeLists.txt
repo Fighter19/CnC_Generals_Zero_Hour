@@ -138,7 +138,7 @@ if(SAGE_USE_LZHL)
 endif()
 
 if(NOT MSVC)
-  add_compile_options(-Wuninitialized)
+  add_compile_options(-Wuninitialized -Werror=vexing-parse)
   set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG" )
 endif()
 

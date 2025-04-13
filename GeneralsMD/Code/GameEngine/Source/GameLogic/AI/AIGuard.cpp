@@ -355,6 +355,19 @@ void AIGuardMachine::loadPostProcess( void )
 }  // end loadPostProcess
 
 //-- AIGuardInnerState ----------------------------------------------------------------------------
+AIGuardInnerState::~AIGuardInnerState()
+{
+	if (m_attackState) 
+	{
+		m_attackState->deleteInstance();
+		m_attackState = NULL;
+	}
+	else if (m_enterState)
+	{
+		m_enterState->deleteInstance();
+		m_enterState = NULL;
+	}
+}
 // ------------------------------------------------------------------------------------------------
 /** CRC */
 // ------------------------------------------------------------------------------------------------
@@ -502,8 +515,8 @@ void AIGuardOuterState::xfer( Xfer *xfer )
 /** Load post process */
 // ------------------------------------------------------------------------------------------------
 void AIGuardOuterState::loadPostProcess( void )
-{						 AIGuardOuterState
-	onEnter();
+{
+	AIGuardOuterState::onEnter();
 }  // end loadPostProcess
 
 //--------------------------------------------------------------------------------------

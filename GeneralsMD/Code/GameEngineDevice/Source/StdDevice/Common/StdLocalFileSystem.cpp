@@ -49,6 +49,7 @@ File * StdLocalFileSystem::openFile(const Char *filename, Int access /* = 0 */)
 
 	// sanity check
 	if (strlen(filename) <= 0) {
+		file->deleteInstance();
 		return NULL;
 	}
 

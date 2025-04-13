@@ -82,9 +82,17 @@ enum { INFINITE_LOOP_COUNT = 1000000 };
 
 #define LOAD_ALC_PROC(N) N = reinterpret_cast<decltype(N)>(alcGetProcAddress(m_alcDevice, #N))
 
+static inline bool sourceIsStopped(ALuint source)
+{
+	ALenum state;
+	alGetSourcei(source, AL_SOURCE_STATE, &state);
+	
+	return (state == AL_STOPPED);
+}
+
 //-------------------------------------------------------------------------------------------------
 OpenALAudioManager::OpenALAudioManager() :
-	m_providerCount(0),
+	m_providerCount(1),
 	m_selectedProvider(PROVIDER_ERROR),
 	m_selectedSpeakerType(0),
 	m_lastProvider(PROVIDER_ERROR),
@@ -98,6 +106,8 @@ OpenALAudioManager::OpenALAudioManager() :
 	m_prefSpeaker(AsciiString::TheEmptyString)
 {
 	m_audioCache = NEW OpenALAudioFileCache;
+	m_provider3D[0].name = "Miles Fast 2D Positional Audio";
+	m_provider3D[0].m_isValid = true;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -522,7 +532,6 @@ void OpenALAudioManager::stopAudio(AudioAffect which)
 			playing = *it;
 			if (playing) {
 				alSourceStop(playing->m_source);
-				playing->m_status = PS_Stopped;
 			}
 		}
 	}
@@ -532,7 +541,6 @@ void OpenALAudioManager::stopAudio(AudioAffect which)
 			playing = *it;
 			if (playing) {
 				alSourceStop(playing->m_source);
-				playing->m_status = PS_Stopped;
 			}
 		}
 	}
@@ -552,7 +560,6 @@ void OpenALAudioManager::stopAudio(AudioAffect which)
 					}
 				}
 				alSourceStop(playing->m_source);
-				playing->m_status = PS_Stopped;
 			}
 		}
 	}
@@ -857,21 +864,21 @@ void OpenALAudioManager::playAudioEvent(AudioEventRTS* event)
 			}
 			else
 			{
-				source = NULL;
+				source = 0;
 			}
 			// Push it onto the list of playing things
 			audio->m_audioEventRTS = event;
 			audio->m_source = source;
-			audio->m_file = NULL;
+			audio->m_bufferHandle = 0;
 			audio->m_type = PAT_3DSample;
 			m_playing3DSounds.push_back(audio);
 
 			if (source) {
-				audio->m_file = playSample3D(event, audio);
+				audio->m_bufferHandle = playSample3D(event, audio);
 				m_sound->notifyOf3DSampleStart();
 			}
 
-			if (!audio->m_file)
+			if (!audio->m_bufferHandle)
 			{
 				m_playing3DSounds.pop_back();
 #ifdef INTENSIVE_AUDIO_DEBUG
@@ -916,22 +923,22 @@ void OpenALAudioManager::playAudioEvent(AudioEventRTS* event)
 			}
 			else
 			{
-				source = NULL;
+				source = 0;
 			}
 
 			// Push it onto the list of playing things
 			audio->m_audioEventRTS = event;
 			audio->m_source = source;
-			audio->m_file = NULL;
+			audio->m_bufferHandle = 0;
 			audio->m_type = PAT_Sample;
 			m_playingSounds.push_back(audio);
 
 			if (source) {
-				audio->m_file = playSample(event, audio);
+				audio->m_bufferHandle = playSample(event, audio);
 				m_sound->notifyOf2DSampleStart();
 			}
 
-			if (!audio->m_file) {
+			if (!audio->m_bufferHandle) {
 #ifdef INTENSIVE_AUDIO_DEBUG
 				DEBUG_LOG((" Killed (no handles available)\n"));
 #endif
@@ -1109,15 +1116,15 @@ void OpenALAudioManager::pauseAudioEvent(AudioHandle handle)
 }
 
 //-------------------------------------------------------------------------------------------------
-void* OpenALAudioManager::loadFileForRead(AudioEventRTS* eventToLoadFrom)
+ALuint OpenALAudioManager::loadBufferForRead(AudioEventRTS* eventToLoadFrom)
 {
-	return m_audioCache->openFile(eventToLoadFrom);
+	return m_audioCache->getBufferForFile(OpenFileInfo(eventToLoadFrom));
 }
 
 //-------------------------------------------------------------------------------------------------
-void OpenALAudioManager::closeFile(void* fileRead)
+void OpenALAudioManager::closeBuffer(ALuint bufferToClose)
 {
-	m_audioCache->closeFile(fileRead);
+	m_audioCache->closeBuffer(bufferToClose);
 }
 
 
@@ -1125,7 +1132,6 @@ void OpenALAudioManager::closeFile(void* fileRead)
 PlayingAudio* OpenALAudioManager::allocatePlayingAudio(void)
 {
 	PlayingAudio* aud = NEW PlayingAudio;	// poolify
-	aud->m_status = PS_Playing;
 	return aud;
 }
 
@@ -1168,7 +1174,7 @@ void OpenALAudioManager::releasePlayingAudio(PlayingAudio* release)
 		}
 	}
 	releaseOpenALHandles(release);	// forces stop of this audio
-	closeFile(release->m_file);
+	closeBuffer(release->m_bufferHandle);
 	if (release->m_cleanupAudioEventRTS) {
 		releaseAudioEventRTS(release->m_audioEventRTS);
 	}
@@ -1611,22 +1617,22 @@ void OpenALAudioManager::notifyOfAudioCompletion(UnsignedInt audioCompleted, Uns
 	playing->m_audioEventRTS->advanceNextPlayPortion();
 	if (playing->m_audioEventRTS->getNextPlayPortion() != PP_Done) {
 		if (playing->m_type == PAT_Sample) {
-			closeFile(playing->m_file);	// close it so as not to leak it.
-			playing->m_file = playSample(playing->m_audioEventRTS, playing);
+			closeBuffer(playing->m_bufferHandle);	// close it so as not to leak it.
+			playing->m_bufferHandle = playSample(playing->m_audioEventRTS, playing);
 
 			// If we don't have a file now, then we should drop to the stopped status so that 
 			// We correctly close this handle.
-			if (playing->m_file) {
+			if (playing->m_bufferHandle) {
 				return;
 			}
 		}
 		else if (playing->m_type == PAT_3DSample) {
-			closeFile(playing->m_file);	// close it so as not to leak it.
-			playing->m_file = playSample3D(playing->m_audioEventRTS, playing);
+			closeBuffer(playing->m_bufferHandle);	// close it so as not to leak it.
+			playing->m_bufferHandle = playSample3D(playing->m_audioEventRTS, playing);
 
 			// If we don't have a file now, then we should drop to the stopped status so that 
 			// We correctly close this handle.
-			if (playing->m_file) {
+			if (playing->m_bufferHandle) {
 				return;
 			}
 		}
@@ -1639,8 +1645,6 @@ void OpenALAudioManager::notifyOfAudioCompletion(UnsignedInt audioCompleted, Uns
 			return;
 		}
 	}
-
-	playing->m_status = PS_Stopped;	// it will be cleaned up on the next frame update
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1790,7 +1794,7 @@ void OpenALAudioManager::selectProvider(UnsignedInt providerNdx)
 		m_selectedProvider = PROVIDER_ERROR;
 		// try to select a failsafe
 		providerNdx = getProviderIndex("Miles Fast 2D Positional Audio");
-		//success = AIL_open_3D_provider(m_provider3D[providerNdx].id) == 0;
+		success = TRUE;
 	}
 
 	if (success)
@@ -2329,7 +2333,7 @@ void OpenALAudioManager::processPlayingList(void)
 			continue;
 		}
 
-		if (playing->m_status == PS_Stopped)
+		if (sourceIsStopped(playing->m_source))
 		{
 			//m_stoppedAudio.push_back(playing);
 			releasePlayingAudio(playing);
@@ -2354,7 +2358,7 @@ void OpenALAudioManager::processPlayingList(void)
 			continue;
 		}
 
-		if (playing->m_status == PS_Stopped)
+		if (sourceIsStopped(playing->m_source))
 		{
 			//m_stoppedAudio.push_back(playing);			
 			releasePlayingAudio(playing);
@@ -2396,7 +2400,7 @@ void OpenALAudioManager::processPlayingList(void)
 						Real y = pos->y;
 						Real z = pos->z;
 						alSource3f(playing->m_source, AL_POSITION, x, y, z);
-						//DEBUG_LOG(("Updating 3D sound position for %s to %f, %f, %f", playing->m_audioEventRTS->getEventName().str(), x, y, z));
+						DEBUG_LOG(("Updating 3D sound position for %s to %f, %f, %f\n", playing->m_audioEventRTS->getEventName().str(), x, y, z));
 					}
 				}
 			}
@@ -2421,7 +2425,7 @@ void OpenALAudioManager::processPlayingList(void)
 			continue;
 		}
 
-		if (playing->m_status == PS_Stopped)
+		if (sourceIsStopped(playing->m_source))
 		{
 			//m_stoppedAudio.push_back(playing);			
 			releasePlayingAudio(playing);
@@ -2496,7 +2500,6 @@ void OpenALAudioManager::processFadingList(void)
 		}
 
 		if (playing->m_framesFaded >= getAudioSettings()->m_fadeAudioFrames) {
-			playing->m_status = PS_Stopped;
 			playing->m_requestStop = true;
 			//m_stoppedAudio.push_back(playing);
 			releasePlayingAudio(playing);
@@ -2654,9 +2657,9 @@ Real OpenALAudioManager::getFileLengthMS(AsciiString strToLoad) const
 	float length = 0.0f;
 
 #ifdef SAGE_USE_FFMPEG
-	void* handle = m_audioCache->openFile(strToLoad);
-	length = m_audioCache->getFileLength(handle);
-	m_audioCache->closeFile(handle);
+	ALuint handle = m_audioCache->getBufferForFile(OpenFileInfo(&strToLoad));
+	length = m_audioCache->getBufferLength(handle);
+	m_audioCache->closeBuffer(handle);
 #endif
 
 	return length;
@@ -2665,6 +2668,11 @@ Real OpenALAudioManager::getFileLengthMS(AsciiString strToLoad) const
 //-------------------------------------------------------------------------------------------------
 void OpenALAudioManager::closeAnySamplesUsingFile(const void* fileToClose)
 {
+	ALuint bufferHandle = (ALuint)(uintptr_t)fileToClose;
+	if (!bufferHandle) {
+		return;
+	}
+
 	std::list<PlayingAudio*>::iterator it;
 	PlayingAudio* playing;
 
@@ -2674,7 +2682,7 @@ void OpenALAudioManager::closeAnySamplesUsingFile(const void* fileToClose)
 			continue;
 		}
 
-		if (playing->m_file == fileToClose) {
+		if (playing->m_bufferHandle == bufferHandle) {
 			releasePlayingAudio(playing);
 			it = m_playingSounds.erase(it);
 		}
@@ -2689,7 +2697,7 @@ void OpenALAudioManager::closeAnySamplesUsingFile(const void* fileToClose)
 			continue;
 		}
 
-		if (playing->m_file == fileToClose) {
+		if (playing->m_bufferHandle == bufferHandle) {
 			releasePlayingAudio(playing);
 			it = m_playing3DSounds.erase(it);
 		}
@@ -2705,7 +2713,7 @@ void OpenALAudioManager::setDeviceListenerPosition(void)
 	ALfloat listenerOri[] = { m_listenerOrientation.x, m_listenerOrientation.y, m_listenerOrientation.z, 0.0f, 0.0f, 1.0f };
 	alListener3f(AL_POSITION, m_listenerPosition.x, m_listenerPosition.y, m_listenerPosition.z);
 	alListenerfv(AL_ORIENTATION, listenerOri);
-	//DEBUG_LOG(("Listener Position: %f, %f, %f", m_listenerPosition.x, m_listenerPosition.y, m_listenerPosition.z));
+	DEBUG_LOG(("Listener Position: %f, %f, %f", m_listenerPosition.x, m_listenerPosition.y, m_listenerPosition.z));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -2757,8 +2765,8 @@ Real OpenALAudioManager::getEffectiveVolume(AudioEventRTS* event) const
 //-------------------------------------------------------------------------------------------------
 Bool OpenALAudioManager::startNextLoop(PlayingAudio* looping)
 {
-	closeFile(looping->m_file);
-	looping->m_file = NULL;
+	closeBuffer(looping->m_bufferHandle);
+	looping->m_bufferHandle = 0;
 
 	if (looping->m_requestStop) {
 		return false;
@@ -2773,8 +2781,6 @@ Bool OpenALAudioManager::startNextLoop(PlayingAudio* looping)
 			// delete the sound on completion (which would suck)
 			looping->m_cleanupAudioEventRTS = false;
 			looping->m_requestStop = true;
-			looping->m_status = PS_Stopped;
-
 
 			AudioRequest* req = allocateAudioRequest(true);
 			req->m_pendingEvent = looping->m_audioEventRTS;
@@ -2784,13 +2790,13 @@ Bool OpenALAudioManager::startNextLoop(PlayingAudio* looping)
 		}
 
 		if (looping->m_type == PAT_3DSample) {
-			looping->m_file = playSample3D(looping->m_audioEventRTS, looping);
+			looping->m_bufferHandle = playSample3D(looping->m_audioEventRTS, looping);
 		}
 		else {
-			looping->m_file = playSample(looping->m_audioEventRTS, looping);
+			looping->m_bufferHandle = playSample(looping->m_audioEventRTS, looping);
 		}
 
-		return looping->m_file != NULL;
+		return looping->m_bufferHandle != 0;
 	}
 	return false;
 }
@@ -2810,10 +2816,10 @@ void OpenALAudioManager::playStream(AudioEventRTS* event, OpenALAudioStream* str
 }
 
 //-------------------------------------------------------------------------------------------------
-void* OpenALAudioManager::playSample(AudioEventRTS* event, PlayingAudio* audio)
+ALuint OpenALAudioManager::playSample(AudioEventRTS* event, PlayingAudio* audio)
 {
 	// Load the file in
-	void* bufferHandle = loadFileForRead(event);
+	ALuint bufferHandle = loadBufferForRead(event);
 	if (bufferHandle) {
 		alSourcei(audio->m_source, AL_SOURCE_RELATIVE, AL_TRUE);
 		alSourcei(audio->m_source, AL_BUFFER, (ALuint)(uintptr_t)bufferHandle);
@@ -2824,11 +2830,11 @@ void* OpenALAudioManager::playSample(AudioEventRTS* event, PlayingAudio* audio)
 }
 
 //-------------------------------------------------------------------------------------------------
-void* OpenALAudioManager::playSample3D(AudioEventRTS* event, PlayingAudio* sample3D)
+ALuint OpenALAudioManager::playSample3D(AudioEventRTS* event, PlayingAudio* sample3D)
 {
 	const Coord3D* pos = getCurrentPositionFromEvent(event);
 	if (pos) {
-		void* handle = loadFileForRead(event);
+		ALuint handle = loadBufferForRead(event);
 		const AudioSettings* audioSettings = getAudioSettings();
 
 		if (handle) {
@@ -2852,8 +2858,8 @@ void* OpenALAudioManager::playSample3D(AudioEventRTS* event, PlayingAudio* sampl
 			Real y = pos->y;
 			Real z = pos->z;
 			alSource3f(source, AL_POSITION, x, y, z);
-			alSourcei(source, AL_BUFFER, (ALuint)(uintptr_t)handle);
-			//DEBUG_LOG(("Playing 3D sample '%s' at %f, %f, %f\n", event->getEventName().str(), x, y, z));
+			alSourcei(source, AL_BUFFER, handle);
+			DEBUG_LOG(("Playing 3D sample '%s' at %f, %f, %f\n", event->getEventName().str(), x, y, z));
 
 			// Start playback
 			alSourcePlay(source);
@@ -2861,7 +2867,7 @@ void* OpenALAudioManager::playSample3D(AudioEventRTS* event, PlayingAudio* sampl
 		return handle;
 	}
 
-	return NULL;
+	return 0;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -2914,6 +2920,16 @@ Bool OpenALAudioManager::isValidProvider(void)
 //-------------------------------------------------------------------------------------------------
 void OpenALAudioManager::initSamplePools(void)
 {
+	if (!(isOn(AudioAffect_Sound3D) && isValidProvider()))
+	{
+		return;
+	}
+
+	m_num2DSamples = getAudioSettings()->m_sampleCount2D;
+	m_num3DSamples = getAudioSettings()->m_sampleCount3D;
+
+	// Streams are basically free, so we can just allocate the appropriate number
+	m_numStreams = getAudioSettings()->m_streamCount;
 }
 
 //-------------------------------------------------------------------------------------------------

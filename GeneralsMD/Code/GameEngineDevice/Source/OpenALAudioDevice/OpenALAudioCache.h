@@ -33,14 +33,15 @@
 
 struct PlayingAudio
 {
-	ALuint m_source;
+	ALuint m_source = 0;
 	OpenALAudioStream* m_stream = nullptr;
 	FFmpegFile* m_ffmpegFile = nullptr;
 
 	PlayingAudioType m_type;
-	volatile PlayingStatus m_status;	// This member is adjusted by another running thread.
 	AudioEventRTS* m_audioEventRTS;
-	void* m_file;		// The file that was opened to play this
+
+	// The created OpenAL buffer handle for this file
+	ALuint m_bufferHandle = 0;
 	Bool m_requestStop;
 	Bool m_cleanupAudioEventRTS;
 	Int m_framesFaded;
@@ -71,6 +72,22 @@ struct OpenAudioFile
 	float m_duration = 0.0f;
 };
 
+struct OpenFileInfo
+{
+	AsciiString* filename;
+	AudioEventRTS* event;
+
+	OpenFileInfo(AsciiString *filename) : filename(filename),
+																				event(NULL)
+	{
+	}
+
+	OpenFileInfo(AudioEventRTS *event) : filename(NULL),
+																			 event(event)
+	{
+	}
+};
+
 typedef std::unordered_map< AsciiString, OpenAudioFile, rts::hash<AsciiString>, rts::equal_to<AsciiString> > OpenFilesHash;
 typedef OpenFilesHash::iterator OpenFilesHashIt;
 
@@ -81,11 +98,10 @@ public:
 
 	// Protected by mutex
 	virtual ~OpenALAudioFileCache();
-	void* openFile(AsciiString& filename);
-	void* openFile(AudioEventRTS* eventToOpenFrom);
-	void closeFile(void* fileToClose);
+	ALuint getBufferForFile(const OpenFileInfo& fileToOpenFrom);
+	void closeBuffer(ALuint bufferToClose);
 	void setMaxSize(UnsignedInt size);
-	float getFileLength(void* file);
+	float getBufferLength(ALuint handle);
 	// End Protected by mutex
 
 	// Note: These functions should be used for informational purposes only. For speed reasons,
@@ -113,5 +129,4 @@ protected:
 	OpenFilesHash m_openFiles;
 	UnsignedInt m_currentlyUsedSize;
 	UnsignedInt m_maxSize;
-	std::mutex m_mutex;
 };

@@ -161,7 +161,6 @@ private:
 	AIAttackState *m_attackState;
 	AIEnterState *m_enterState;
 };
-EMPTY_DTOR(AIGuardInnerState)
 
 //--------------------------------------------------------------------------------------
 class AIGuardIdleState : public State

@@ -58,138 +58,93 @@ Bool OpenALAudioFileCache::decodeFFmpeg(OpenAudioFile* file)
 //-------------------------------------------------------------------------------------------------
 OpenALAudioFileCache::~OpenALAudioFileCache()
 {
-	{
-		std::lock_guard mut(m_mutex);
-
-		// Free all the samples that are open.
-		OpenFilesHashIt it;
-		for (it = m_openFiles.begin(); it != m_openFiles.end(); ++it) {
-			if (it->second.m_openCount > 0) {
-				DEBUG_CRASH(("Sample '%s' is still playing, and we're trying to quit.\n", it->second.m_eventInfo->m_audioName.str()));
-			}
-
-			releaseOpenAudioFile(&it->second);
-			// Don't erase it from the map, cause it makes this whole process way more complicated, and 
-			// we're about to go away anyways.
+	// Free all the samples that are open.
+	OpenFilesHashIt it;
+	for (it = m_openFiles.begin(); it != m_openFiles.end(); ++it) {
+		if (it->second.m_openCount > 0) {
+			DEBUG_CRASH(("Sample '%s' is still playing, and we're trying to quit.\n", it->second.m_eventInfo->m_audioName.str()));
 		}
+
+		releaseOpenAudioFile(&it->second);
+		// Don't erase it from the map, cause it makes this whole process way more complicated, and 
+		// we're about to go away anyways.
 	}
-
-}
-
-void* OpenALAudioFileCache::openFile(AsciiString& filename)
-{
-	// Protect the entire openFile function
-	std::lock_guard mut(m_mutex);
-
-	auto it = m_openFiles.find(filename);
-
-	if (it != m_openFiles.end()) {
-		++it->second.m_openCount;
-		return (void*)it->second.m_buffer;
-	}
-
-	// Couldn't find the file, so actually open it.
-	File* file = TheFileSystem->openFile(filename.str());
-	if (!file) {
-		DEBUG_ASSERTLOG(filename.isEmpty(), ("Missing Audio File: '%s'\n", filename.str()));
-		return NULL;
-	}
-
-	UnsignedInt fileSize = file->size();
-
-	OpenAudioFile openedAudioFile;
-	alGenBuffers(1, &openedAudioFile.m_buffer);
-	openedAudioFile.m_ffmpegFile = new FFmpegFile();
-
-	// This transfer ownership of file
-	if (!openedAudioFile.m_ffmpegFile->open(file)) {
-		releaseOpenAudioFile(&openedAudioFile);
-		return nullptr;
-	}
-
-	if (!decodeFFmpeg(&openedAudioFile)) {
-		releaseOpenAudioFile(&openedAudioFile);
-		return nullptr;
-	}
-
-	openedAudioFile.m_ffmpegFile->close();
-
-	openedAudioFile.m_fileSize = fileSize;
-	m_currentlyUsedSize += openedAudioFile.m_fileSize;
-	if (m_currentlyUsedSize > m_maxSize) {
-		DEBUG_LOG(("Audio Cache is full, trying to free some space\n"));
-		// We need to free some samples, or we're not going to be able to play this sound.
-		if (!freeEnoughSpaceForSample(openedAudioFile)) {
-			DEBUG_LOG(("Couldn't free enough space for sample\n"));
-			m_currentlyUsedSize -= openedAudioFile.m_fileSize;
-			releaseOpenAudioFile(&openedAudioFile);
-			return NULL;
-		}
-	}
-
-	m_openFiles[filename] = openedAudioFile;
-	return (void*)openedAudioFile.m_buffer;
 }
 
 //-------------------------------------------------------------------------------------------------
-void* OpenALAudioFileCache::openFile(AudioEventRTS* eventToOpenFrom)
+ALuint OpenALAudioFileCache::getBufferForFile(const OpenFileInfo &fileInfo)
 {
-	// Protect the entire openFile function
-	std::lock_guard mut(m_mutex);
+	AudioEventRTS *eventToOpenFrom = fileInfo.event;
 
 	AsciiString strToFind;
-	switch (eventToOpenFrom->getNextPlayPortion())
+	if (eventToOpenFrom)
 	{
-	case PP_Attack:
-		strToFind = eventToOpenFrom->getAttackFilename();
-		break;
-	case PP_Sound:
-		strToFind = eventToOpenFrom->getFilename();
-		break;
-	case PP_Decay:
-		strToFind = eventToOpenFrom->getDecayFilename();
-		break;
-	case PP_Done:
-		return NULL;
+		switch (eventToOpenFrom->getNextPlayPortion())
+		{
+		case PP_Attack:
+			strToFind = eventToOpenFrom->getAttackFilename();
+			break;
+		case PP_Sound:
+			strToFind = eventToOpenFrom->getFilename();
+			break;
+		case PP_Decay:
+			strToFind = eventToOpenFrom->getDecayFilename();
+			break;
+		case PP_Done:
+			return 0;
+		}
+	}
+	else
+	{
+		if (fileInfo.filename)
+		{
+			strToFind = *fileInfo.filename;
+		}
+		else
+		{
+			DEBUG_CRASH(("No filename to open\n"));
+			return 0;
+		}
 	}
 
 	auto it = m_openFiles.find(strToFind);
 
 	if (it != m_openFiles.end()) {
 		++it->second.m_openCount;
-		return  (void*)it->second.m_buffer;
+		return it->second.m_buffer;
 	}
 
 	// Couldn't find the file, so actually open it.
 	File* file = TheFileSystem->openFile(strToFind.str());
 	if (!file) {
 		DEBUG_ASSERTLOG(strToFind.isEmpty(), ("Missing Audio File: '%s'\n", strToFind.str()));
-		return NULL;
+		return 0;
 	}
 
 	UnsignedInt fileSize = file->size();
 
 	OpenAudioFile openedAudioFile;
 	alGenBuffers(1, &openedAudioFile.m_buffer);
-	openedAudioFile.m_eventInfo = eventToOpenFrom->getAudioEventInfo();
+	openedAudioFile.m_eventInfo = eventToOpenFrom ? eventToOpenFrom->getAudioEventInfo() : NULL;
 	openedAudioFile.m_ffmpegFile = new FFmpegFile();
 
 	// This transfer ownership of file
 	if (!openedAudioFile.m_ffmpegFile->open(file)) {
 		releaseOpenAudioFile(&openedAudioFile);
-		return nullptr;
+		return 0;
 	}
 
-	if (eventToOpenFrom->isPositionalAudio()) {
+	if (eventToOpenFrom && eventToOpenFrom->isPositionalAudio()) {
 		if (openedAudioFile.m_ffmpegFile->getNumChannels() > 1) {
 			DEBUG_CRASH(("Requested Positional Play of audio '%s', but it is in stereo.", strToFind.str()));
-			return NULL;
+			releaseOpenAudioFile(&openedAudioFile);
+			return 0;
 		}
 	}
 
 	if (!decodeFFmpeg(&openedAudioFile)) {
 		releaseOpenAudioFile(&openedAudioFile);
-		return nullptr;
+		return 0;
 	}
 
 	openedAudioFile.m_ffmpegFile->close();
@@ -203,43 +158,38 @@ void* OpenALAudioFileCache::openFile(AudioEventRTS* eventToOpenFrom)
 			DEBUG_LOG(("Couldn't free enough space for sample\n"));
 			m_currentlyUsedSize -= openedAudioFile.m_fileSize;
 			releaseOpenAudioFile(&openedAudioFile);
-			return NULL;
+			return 0;
 		}
 	}
 
 	m_openFiles[strToFind] = openedAudioFile;
-	return (void*)openedAudioFile.m_buffer;
+	return openedAudioFile.m_buffer;
 }
 
 //-------------------------------------------------------------------------------------------------
-void OpenALAudioFileCache::closeFile(void* fileToClose)
+void OpenALAudioFileCache::closeBuffer(ALuint bufferToClose)
 {
-	if (!fileToClose) {
+	if (!bufferToClose) {
 		return;
 	}
 
-	// Protect the entire closeFile function
-	std::lock_guard mut(m_mutex);
-
 	OpenFilesHash::iterator it;
 	for (it = m_openFiles.begin(); it != m_openFiles.end(); ++it) {
-		if (it->second.m_buffer == (ALuint)(uintptr_t)fileToClose) {
+		if (it->second.m_buffer == bufferToClose) {
 			--it->second.m_openCount;
 			return;
 		}
 	}
 }
 
-float OpenALAudioFileCache::getFileLength(void* handle)
+float OpenALAudioFileCache::getBufferLength(ALuint handle)
 {
-	if (handle == nullptr) {
+	if (!handle) {
 		return 0.0f;
 	}
 
-	std::lock_guard mut(m_mutex);
-
 	for (auto it = m_openFiles.begin(); it != m_openFiles.end(); ++it) {
-		if (it->second.m_buffer == (ALuint)(uintptr_t)handle) {
+		if (it->second.m_buffer == handle) {
 			return it->second.m_duration;
 		}
 	}
@@ -251,8 +201,6 @@ float OpenALAudioFileCache::getFileLength(void* handle)
 void OpenALAudioFileCache::setMaxSize(UnsignedInt size)
 {
 	// Protect the function, in case we're trying to use this value elsewhere.
-	std::lock_guard mut(m_mutex);
-
 	m_maxSize = size;
 }
 
@@ -261,23 +209,22 @@ void OpenALAudioFileCache::releaseOpenAudioFile(OpenAudioFile* fileToRelease)
 {
 	if (fileToRelease->m_openCount > 0) {
 		// This thing needs to be terminated IMMEDIATELY.
-		TheAudio->closeAnySamplesUsingFile((const void*)fileToRelease->m_buffer);
+		TheAudio->closeAnySamplesUsingFile((const void*)(uintptr_t)fileToRelease->m_buffer);
 	}
 
-	if (fileToRelease->m_buffer) {
-		if (fileToRelease->m_ffmpegFile) {
-			// Free FFMPEG handles
-			delete fileToRelease->m_ffmpegFile;
-		}
-		if (fileToRelease->m_buffer)
-		{
-			// Free the OpenAL buffer
-			alDeleteBuffers(1, &fileToRelease->m_buffer);
-		}
-		fileToRelease->m_ffmpegFile = NULL;
-		fileToRelease->m_buffer = NULL;
-		fileToRelease->m_eventInfo = NULL;
+	if (fileToRelease->m_ffmpegFile) {
+		// Free FFMPEG handles
+		delete fileToRelease->m_ffmpegFile;
 	}
+
+	if (fileToRelease->m_buffer)
+	{
+		// Free the OpenAL buffer
+		alDeleteBuffers(1, &fileToRelease->m_buffer);
+	}
+	fileToRelease->m_ffmpegFile = NULL;
+	fileToRelease->m_buffer = 0;
+	fileToRelease->m_eventInfo = NULL;
 }
 
 //-------------------------------------------------------------------------------------------------
