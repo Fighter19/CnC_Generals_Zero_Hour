@@ -1362,7 +1362,13 @@ void PeerThreadClass::Thread_Function()
 	chatSetLocalIP(preferredIP);
 
 	UnsignedInt preferredQRPort = 0;
-	AsciiString selectedQRPort = pref["GameSpyQRPort"];
+	AsciiString selectedQRPort = "";
+
+	auto it = pref.find("GameSpyQRPort");
+	if (it != pref.end()) {
+		selectedQRPort = it->second;
+	}
+
 	if (selectedQRPort.isNotEmpty())
 	{
 		preferredQRPort = atoi(selectedQRPort.str());
@@ -2454,6 +2460,15 @@ void gameStartedCallback( PEER peer, SBServer server, const char *message, void 
 
 void playerMessageCallback(PEER peer, const char * nick, const char * message, MessageType messageType, void * param)
 {
+	if (strstr(message, "Login failed") != NULL) {
+		DEBUG_LOG(("playerMessageCallback, message says login failed"));
+
+		PeerResponse resp;
+		resp.peerResponseType = PeerResponse::PEERRESPONSE_DISCONNECT;
+		resp.discon.reason = DISCONNECT_GP_LOGIN_SERVER_AUTH_FAILED;
+		return;
+	}
+
 	PeerResponse resp;
 	resp.peerResponseType = PeerResponse::PEERRESPONSE_MESSAGE;
 	resp.nick = nick;

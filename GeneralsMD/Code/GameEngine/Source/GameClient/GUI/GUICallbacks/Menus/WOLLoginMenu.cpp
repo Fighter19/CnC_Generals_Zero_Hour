@@ -301,9 +301,15 @@ static void startPings( void )
 	for (std::list<AsciiString>::const_iterator it = pingServers.begin(); it != pingServers.end(); ++it)
 	{
 		AsciiString pingServer = *it;
+		pingServer.trim();
+		if (pingServer.isEmpty())
+		{
+			continue;
+		}
+
 		PingRequest req;
-		req.hostname = pingServer.str();
-		printf("MOOOO pint %s", pingServer.str());
+		req.hostname = std::string(pingServer.str());
+		printf("MOOOO pint %s\n", req.hostname.c_str());
 		req.repetitions = reps;
 		req.timeout = timeout;
 		ThePinger->addRequest(req);

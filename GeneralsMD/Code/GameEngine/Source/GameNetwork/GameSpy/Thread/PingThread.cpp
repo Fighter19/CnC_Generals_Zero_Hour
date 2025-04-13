@@ -47,7 +47,7 @@
 
 //-------------------------------------------------------------------------
 
-static const Int NumWorkerThreads = 10;
+static const Int NumWorkerThreads = 1;
 
 typedef std::queue<PingRequest> RequestQueue;
 typedef std::queue<PingResponse> ResponseQueue;
@@ -303,6 +303,7 @@ void PingThreadClass::Thread_Function()
 					//   callback.
 					IP = 0xFFFFFFFF;   // flag for IP resolve failed
 				}
+				fflush(stdout);
 				hostNode = (in_addr *) hostStruct->h_addr;
 				IP = hostNode->s_addr;
 				DEBUG_LOG(("pinging %s IP = %s\n", hostnameBuffer, inet_ntoa(*hostNode) ));

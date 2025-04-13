@@ -128,6 +128,9 @@ Bool UserPreferences::load(AsciiString fname)
 	m_filename = TheGlobalData->getPath_UserData();
 	m_filename.concat(fname);
 
+	printf("MOOO TEST FILENAME: %s", m_filename.str());
+	fflush(stdout);
+
 	FILE *fp = fopen(m_filename.str(), "r");
 	if (fp)
 	{
@@ -137,9 +140,17 @@ Bool UserPreferences::load(AsciiString fname)
 			AsciiString line = buf;
 			line.trim();
 
+			if (line.isEmpty())
+				continue;
+
 			AsciiString key, val;
 			line.nextToken(&key, "=");
-			val = line.str() + 1;
+
+			const char* delimPos = strchr(line.str(), '=');
+			if (delimPos)
+				val = delimPos + 1;
+			else
+				val = "";
 
 			key.trim();
 			val.trim();
