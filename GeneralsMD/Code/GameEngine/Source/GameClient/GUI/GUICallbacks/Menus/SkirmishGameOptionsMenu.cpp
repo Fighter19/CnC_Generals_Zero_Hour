@@ -70,6 +70,7 @@
 #include "WWDownload/Registry.h"
 
 #include "Common/CopyProtection.h"
+#include "GameNetwork/GameSpy/ThreadUtils.h"
 
 #ifdef _INTERNAL
 // for occasional debugging...
@@ -211,7 +212,7 @@ UnicodeString SkirmishPreferences::getUserName(void)
 		return ret;
 	}
 
-	ret = QuotedPrintableToUnicodeString(it->second);
+	ret.translate(it->second);
 	ret.trim();
 	if (ret.isEmpty())
 	{
@@ -356,7 +357,8 @@ Bool SkirmishPreferences::write(void)
 
 	(*this)["Map"] = TheSkirmishGameInfo->getMap();
 
-	(*this)["UserName"] = UnicodeStringToQuotedPrintable(TheSkirmishGameInfo->getConstSlot(0)->getName());
+	AsciiString username = WideCharStringToMultiByte(TheSkirmishGameInfo->getConstSlot(0)->getName().str()).c_str();
+	(*this)["UserName"] = username;
 
   setStartingCash( TheSkirmishGameInfo->getStartingCash() );
   setSuperweaponRestricted( TheSkirmishGameInfo->getSuperweaponRestriction() != 0 );
