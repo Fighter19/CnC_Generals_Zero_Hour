@@ -57,7 +57,10 @@ std::filesystem::path StdLocalFileSystem::fixFilenameFromWindowsPath(const Char 
 	// check if the file exists to see if fixup is required
 	// if it's not found try to match disregarding case sensitivity
 	// For cases where a write is happening, we should check if the parent path exists, if so, let it through, since the file may not exist yet.
-	if (!std::filesystem::exists(path) && !std::filesystem::exists(path.parent_path())) {
+
+	if (!std::filesystem::exists(path) &&
+		((!(access & File::WRITE)) || ((access & File::WRITE) && !std::filesystem::exists(path.parent_path()))))
+	{
 		// Traverse path to try and match case-insensitively
 		std::filesystem::path parent = path.parent_path();
 		std::filesystem::path filename = path.filename();
