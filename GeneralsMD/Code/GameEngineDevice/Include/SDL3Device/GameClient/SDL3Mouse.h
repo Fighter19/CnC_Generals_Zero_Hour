@@ -90,6 +90,8 @@ protected:
   /// get the next event available in the buffer
   virtual UnsignedByte getMouseEvent(MouseIO *result, Bool flush);
 
+  static void scaleMouseCoordinates(int rawX, int rawY, Uint32 windowID, int& scaledX, int& scaledY);
+
   /// translate a win32 mouse event to our own info
   void translateEvent(UnsignedInt eventIndex, MouseIO *result);
 
