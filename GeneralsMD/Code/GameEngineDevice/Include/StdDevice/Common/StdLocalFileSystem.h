@@ -31,6 +31,7 @@
 #ifndef __STDLOCALFILESYSTEM_H
 #define __STDLOCALFILESYSTEM_H
 #include "Common/LocalFileSystem.h"
+#include <filesystem>
 
 class StdLocalFileSystem : public LocalFileSystem
 {
@@ -41,6 +42,8 @@ public:
 	virtual void init();
 	virtual void reset();
 	virtual void update();
+
+	std::filesystem::path fixFilenameFromWindowsPath(const Char *filename, Int access) const;
 
 	virtual File * openFile(const Char *filename, Int access = 0);	///< open the given file.
 	virtual Bool doesFileExist(const Char *filename) const;								///< does the given file exist?
