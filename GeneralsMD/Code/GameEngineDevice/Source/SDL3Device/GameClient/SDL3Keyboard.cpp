@@ -40,6 +40,9 @@
 
 #include <SDL3/SDL.h>
 
+#include <locale>
+#include <codecvt>
+
 // DEFINES ////////////////////////////////////////////////////////////////////////////////////////
 enum { KEYBOARD_BUFFER_SIZE = 256 };
 
@@ -146,11 +149,17 @@ void SDL3Keyboard::getKey( KeyboardIO *key )
 		if (TheIMEManager && TheIMEManager->getWindow() && event.type == SDL_EVENT_TEXT_INPUT)
 		{
 			// Note that special characters may need additional keycode translation above.
-			const char* text = event.text.text;
-			for (int i = 0; text[i] != '\0'; ++i)
+
+			std::string utf8Str(event.text.text);
+			std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
+			std::u16string utf16Str = converter.from_bytes(utf8Str);
+			UnicodeString uStr(reinterpret_cast<const WideChar*>(utf16Str.c_str()));
+
+			int len = uStr.getLength();
+			for (int i = 0; i < len; i++)
 			{
-				WideChar wchar = static_cast<WideChar>(text[i]);
-				TheWindowManager->winSendInputMsg(TheIMEManager->getWindow(), GWM_IME_CHAR, wchar, 0);
+				WideChar wc = uStr.getCharAt(i);
+				TheWindowManager->winSendInputMsg(TheIMEManager->getWindow(), GWM_IME_CHAR, wc, 0);
 			}
 		}
 		else if(event.type == SDL_EVENT_KEY_DOWN)

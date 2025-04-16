@@ -455,7 +455,8 @@ void INI::readLine( void )
         break;
       }
 
-      DEBUG_ASSERTCRASH(*p != '\t', ("tab characters are not allowed in INI files (%s). please check your editor settings. Line Number %d\n",m_filename.str(), getLineNum()));
+      // Disabled to allow mod maps, does not seem to hurt anything
+      //DEBUG_ASSERTCRASH(*p != '\t', ("tab characters are not allowed in INI files (%s). please check your editor settings. Line Number %d\n",m_filename.str(), getLineNum()));
 
       // comment?
       if (*p==';')

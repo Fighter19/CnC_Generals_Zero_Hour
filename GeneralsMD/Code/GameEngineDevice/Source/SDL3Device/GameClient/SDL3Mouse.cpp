@@ -31,6 +31,7 @@
 #include "Common/File.h"
 #include "Common/FileSystem.h"
 #include "GameClient/GameClient.h"
+#include "GameClient/Display.h"
 #include "SDL3Device/GameClient/SDL3Mouse.h"
 
 #include <SDL3/SDL_events.h>
@@ -258,6 +259,28 @@ UnsignedByte SDL3Mouse::getMouseEvent( MouseIO *result, Bool flush )
 
 }  // end getMouseEvent
 
+void SDL3Mouse::scaleMouseCoordinates(int rawX, int rawY, Uint32 windowID, int& scaledX, int& scaledY)
+{
+	SDL_Window* window = SDL_GetWindowFromID(windowID);
+	if (!window) {
+		scaledX = rawX;
+		scaledY = rawY;
+		return;
+	}
+
+	int windowWidth = 0, windowHeight = 0;
+	SDL_GetWindowSize(window, &windowWidth, &windowHeight);
+
+	int internalWidth = TheDisplay->getWidth();
+	int internalHeight = TheDisplay->getHeight();
+
+	float factorX = static_cast<float>(internalWidth) / windowWidth;
+	float factorY = static_cast<float>(internalHeight) / windowHeight;
+
+	scaledX = static_cast<int>(rawX * factorX);
+	scaledY = static_cast<int>(rawY * factorY);
+}
+
 //-------------------------------------------------------------------------------------------------
 /** Translate a win32 mouse event to our own event info */
 //-------------------------------------------------------------------------------------------------
@@ -286,6 +309,7 @@ void SDL3Mouse::translateEvent( UnsignedInt eventIndex, MouseIO *result )
 
 	// Time is the same for all events; from nanoseconds
 	result->time = m_eventBuffer[ eventIndex ].common.timestamp / 1000000;
+	int scaledX = 0, scaledY = 0;
 	
 	switch( type )
 	{
@@ -314,8 +338,11 @@ void SDL3Mouse::translateEvent( UnsignedInt eventIndex, MouseIO *result )
 				result->middleState = buttonState;
 				result->middleFrame = frame;
 			}
-			result->pos.x = mouseBtnEvent.x;
-			result->pos.y = mouseBtnEvent.y;
+
+			scaleMouseCoordinates(mouseBtnEvent.x, mouseBtnEvent.y, mouseBtnEvent.windowID, scaledX, scaledY);
+			result->pos.x = scaledX;
+			result->pos.y = scaledY;
+
 			break;
 
 		}
@@ -337,16 +364,20 @@ void SDL3Mouse::translateEvent( UnsignedInt eventIndex, MouseIO *result )
 				result->middleState = MBS_Up;
 				result->middleFrame = frame;
 			}
-			result->pos.x = mouseBtnEvent.x;
-			result->pos.y = mouseBtnEvent.y;
+
+			scaleMouseCoordinates(mouseBtnEvent.x, mouseBtnEvent.y, mouseBtnEvent.windowID, scaledX, scaledY);
+			result->pos.x = scaledX;
+			result->pos.y = scaledY;
+
 			break;
 		}  
 
 		// ------------------------------------------------------------------------
 		case SDL_EVENT_MOUSE_MOTION:
 		{
-			result->pos.x = mouseMotionEvent.x;
-			result->pos.y = mouseMotionEvent.y;
+			scaleMouseCoordinates(mouseMotionEvent.x, mouseMotionEvent.y, mouseMotionEvent.windowID, scaledX, scaledY);
+			result->pos.x = scaledX;
+			result->pos.y = scaledY;
 			break;
 
 		}  // end mouse move
@@ -356,8 +387,11 @@ void SDL3Mouse::translateEvent( UnsignedInt eventIndex, MouseIO *result )
 		{	
 			// Wheel delta to match to Windows behavior of the scroll wheel
 			result->wheelPos =  mouseWheelEvent.y * 120;
-			result->pos.x = mouseWheelEvent.mouse_x;
-			result->pos.y = mouseWheelEvent.mouse_y;
+
+			scaleMouseCoordinates(mouseWheelEvent.mouse_x, mouseWheelEvent.mouse_y, mouseWheelEvent.windowID, scaledX, scaledY);
+			result->pos.x = scaledX;
+			result->pos.y = scaledY;
+
 			break;
 
 		}  // end mouse wheel

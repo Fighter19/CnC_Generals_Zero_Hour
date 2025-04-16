@@ -152,7 +152,12 @@ void INI::parseMapCacheDefinition( INI* ini )
 	{
 		// maps without localized name tags
 		AsciiString tempdisplayname;
-		tempdisplayname = name.reverseFind('\\') + 1;
+		if(name.reverseFind('\\')) {
+			tempdisplayname = name.reverseFind('\\') + 1;
+		}
+		else if(name.reverseFind('/')) {
+			tempdisplayname = name.reverseFind('/') + 1;
+		}
 		md.m_displayName.translate(tempdisplayname);
 		if (md.m_numPlayers >= 2)
 		{
