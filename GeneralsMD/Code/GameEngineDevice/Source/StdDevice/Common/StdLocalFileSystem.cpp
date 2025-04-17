@@ -32,6 +32,8 @@
 #include "StdDevice/Common/StdLocalFileSystem.h"
 #include "StdDevice/Common/StdLocalFile.h"
 
+#include <filesystem>
+
 StdLocalFileSystem::StdLocalFileSystem() : LocalFileSystem() 
 {
 }
@@ -39,7 +41,7 @@ StdLocalFileSystem::StdLocalFileSystem() : LocalFileSystem()
 StdLocalFileSystem::~StdLocalFileSystem() {
 }
 
-std::filesystem::path StdLocalFileSystem::fixFilenameFromWindowsPath(const Char *filename, Int access) const
+static std::filesystem::path fixFilenameFromWindowsPath(const Char *filename, Int access)
 {
 	std::string fixedFilename(filename);
 
@@ -138,7 +140,7 @@ File * StdLocalFileSystem::openFile(const Char *filename, Int access /* = 0 */)
 		return NULL;
 	}
 
-	std::filesystem::path path = this->fixFilenameFromWindowsPath(filename, access);
+	std::filesystem::path path = fixFilenameFromWindowsPath(filename, access);
 
 	if(path.empty()) {
 		file->deleteInstance();
@@ -204,7 +206,7 @@ void StdLocalFileSystem::reset()
 //DECLARE_PERF_TIMER(StdLocalFileSystem_doesFileExist)
 Bool StdLocalFileSystem::doesFileExist(const Char *filename) const
 {
-	std::filesystem::path path = this->fixFilenameFromWindowsPath(filename, 0);
+	std::filesystem::path path = fixFilenameFromWindowsPath(filename, 0);
 	if(path.empty()) {
 		return FALSE;
 	}
@@ -286,7 +288,7 @@ void StdLocalFileSystem::getFileListInDirectory(const AsciiString& currentDirect
 
 Bool StdLocalFileSystem::getFileInfo(const AsciiString& filename, FileInfo *fileInfo) const 
 {
-	std::filesystem::path path = this->fixFilenameFromWindowsPath(filename.str(), 0);
+	std::filesystem::path path = fixFilenameFromWindowsPath(filename.str(), 0);
 
 	if(path.empty()) {
 		return FALSE;
