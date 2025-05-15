@@ -1,57 +1,127 @@
+![Linux-64 Build Status](https://github.com/Fighter19/CnC_Generals_Zero_Hour/actions/workflows/ubuntu.yml/badge.svg)
+![Windows-32 Build Status](https://github.com/Fighter19/CnC_Generals_Zero_Hour/actions/workflows/win32.yml/badge.svg)
 
 # Command & Conquer Generals (inc. Zero Hour) Source Code
 
-This repository includes source code for Command & Conquer Generals, and its expansion pack Zero Hour. This release provides support to the Steam Workshop for both games ([C&C Generals](https://steamcommunity.com/workshop/browse/?appid=2229870) and [C&C Generals - Zero Hour](https://steamcommunity.com/workshop/browse/?appid=2732960)).
+This repository includes source code for Command & Conquer Generals, and its expansion pack Zero Hour.
 
+It contains adjustments to allow building with modern toolchains,
+on a wider variety of systems. As such it has been tested on Windows x86, Windows x64,
+Linux x64 and Linux ARM64.
+
+Focus of the repository is on allowing the game to operate smoothly on Linux-based setups.
+
+The main focus of this repository is *NOT* backwards compatibility,
+but feature development, as well as bug fixing.
+
+Cross-play between 64-bit versions of this fork is also a goal.
+Toolings, such as the WorldBuilder or other build tools are not the focus of this repository.
+
+Patches aside from the focus are still appreciated, but issue reports regarding those,
+might be left open.
+
+## Features
+
+What's working:
+- Campaigns and Skirmish for Zero Hour
+- Most sound effects
+- Support for modern toolchains
+- Works on a Raspberry Pi 5 (with a few graphics glitches)
+- Support for Linux x64 and ARM64
+- Support for SDL3
+- Animated cursors
+
+What's not working:
+- Generals base game only
+- Music tracks and longer voice lines
+- Multiplayer
+- Probably a variety of other bugs
+
+## Running the Game
+
+To run the game, you need to have the original game files. You can use them from a CD installation or use the Steam version.
+1. Obtain an executable either by downloading the latest artifact from the CI or by building it yourself.
+2. Add the library path of the game to your `LD_LIBRARY_PATH` environment variable. This is required for the game to find its shared libraries, such as DXVK or SDL3. (libdxvk_d3d8.so needs to be loadable)
+   ```sh
+   cd [folder-with-RTS-executable]
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib
+   ```
+3. Set the current working directory to the folder containing the game files.
+    ```sh
+    cd [folder-with-game-files] # e.g. ~/.steam/steam/steamapps/common/Command & Conquer Generals - Zero Hour
+    [path-to-executable]/RTS -win
+    ```
+
+Omit the `-win` flag to run the game in fullscreen mode.
 
 ## Dependencies
 
-If you wish to rebuild the source code and tools successfully you will need to find or write new replacements (or remove the code using them entirely) for the following libraries;
+To build this project on a Debian or Ubuntu machine, install the following dependencies:
 
-- DirectX SDK (Version 9.0 or higher) (expected path `\Code\Libraries\DirectX\`)
-- STLport (4.5.3) - (expected path `\Code\Libraries\STLport-4.5.3`)
-- 3DSMax 4 SDK - (expected path `\Code\Libraries\Max4SDK\`)
-- NVASM - (expected path `\Code\Tools\NVASM\`)
-- BYTEmark - (expected path `\Code\Libraries\Source\Benchmark`)
-- RAD Miles Sound System SDK - (expected path `\Code\Libraries\Source\WWVegas\Miles6\`)
-- RAD Bink SDK - (expected path `\Code\GameEngineDevice\Include\VideoDevice\Bink`)
-- SafeDisk API - (expected path `\Code\GameEngine\Include\Common\SafeDisk` and `\Code\Tools\Launcher\SafeDisk\`)
-- Miles Sound System "Asimp3" - (expected path `\Code\Libraries\WPAudio\Asimp3`)
-- GameSpy SDK - (expected path `\Code\Libraries\Source\GameSpy\`)
-- ZLib (1.1.4) - (expected path `\Code\Libraries\Source\Compression\ZLib\`)
-- LZH-Light (1.0) - (expected path `\Code\Libraries\Source\Compression\LZHCompress\CompLibSource` and `CompLibHeader`)
+Install the required build tools and libraries by running the following commands:
+
+```sh
+sudo apt install nasm autoconf automake libtool pkg-config libltdl-dev
+sudo apt install ninja-build
+sudo apt install python3-jinja2
+```
+
+Make sure to install VCPKG, if you haven't already.
+```sh
+cd [your-workspace]
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+export VCPKG_ROOT=$(pwd)
+./bootstrap-vcpkg.sh
+export PATH="$PATH:$VCPKG_ROOT"
+```
+
+Make sure to export the PATH variable, each time you need to run vcpkg.
+This is usually only required during the configuration via CMake.
 
 
-## Compiling (Win32 Only)
+## Compiling
 
 To use the compiled binaries, you must own the game. The C&C Ultimate Collection is available for purchase on [EA App](https://www.ea.com/en-gb/games/command-and-conquer/command-and-conquer-the-ultimate-collection/buy/pc) or [Steam](https://store.steampowered.com/bundle/39394/Command__Conquer_The_Ultimate_Collection/).
 
-The quickest way to build all configurations in the project is to open `rts.dsw` in Microsoft Visual Studio C++ 6.0 (SP6 recommended for binary matching to Generals patch 1.08 and Zero Hour patch 1.04) and select Build -> Batch Build, then hit the “Rebuild All” button.
+To compile the source code, follow these steps:
 
-If you wish to compile the code under a modern version of Microsoft Visual Studio, you can convert the legacy project file to a modern MSVC solution by opening `rts.dsw` in Microsoft Visual Studio .NET 2003, and then opening the newly created project and solution file in MSVC 2015 or newer.
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/Fighter19/CnC_Generals_Zero_Hour.git
+2. Change to the project directory:
+   ```sh
+   cd CnC_Generals_Zero_Hour
+   ```
 
-NOTE: As modern versions of MSVC enforce newer revisions of the C++ standard, you will need to make extensive changes to the codebase before it successfully compiles, even more so if you plan on compiling for the Win64 platform.
+From here on, you can use either VSCode with the CMake extension, or the command line.
 
-When the workspace has finished building, the compiled binaries will be copied to the folder called `/Run/` found in the root of each games directory. 
+### Building with CMake
+3. Create a build directory:
+   ```sh
+   mkdir build
+   cd build
+   ```
+4. Configure the project:
+   ```sh
+   cmake --preset=default -DVCPKG_INSTALL_OPTIONS="--allow-unsupported" -DSAGE_USE_SDL3=ON ../
+    ```
+5. Build the project:
+    ```sh
+    cmake --build . --config Release
+    ```
 
+You can use the `--preset` flag to specify a preset defined in the `CMakePresets.json` file. On our CI we build the Linux package with `linux64-deploy` and the Windows package with `win32-deploy`.
 
-## Known Issues
+### Building with Visual Studio Code
 
-Windows has a policy where executables that contain words “version”, “update” or “install” in their filename will require UAC Elevation to run. This will affect “versionUpdate” and “buildVersionUpdate” projects from running as post-build events. Renaming the output binary name for these projects to not include these words should resolve the issue for you.
-
-
-## STLport
-STLport will require changes to successfully compile this source code. The file [stlport.diff](stlport.diff) has been provided for you so you can review and apply these changes. Please make sure you are using STLport 4.5.3 before attempting to apply the patch.
-
+Building with Visual Studio Code is straight-forward. Opening the project with the C++ Extension Pack installed,
+should automatically execute vcpkg to install the dependencies.
+You can then use the CMake extension to build the project.
 
 ## Contributing
 
-This repository will not be accepting contributions (pull requests, issues, etc). If you wish to create changes to the source code and encourage collaboration, please create a fork of the repository under your GitHub user/organization space.
-
-
-## Support
-
-This repository is for preservation purposes only and is archived without support. 
+This repository is currently accepting contributions (pull requests, issues, etc).
 
 
 ## License
