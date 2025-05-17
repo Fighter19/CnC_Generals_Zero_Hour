@@ -90,7 +90,15 @@ static KeyDefType ConvertSDLKey(SDL_Keycode keycode)
 	}
 	else if (keycode >= SDLK_0 && keycode <= SDLK_9)
 	{
-		return (KeyDefType)(KEY_0 + (keycode - SDLK_0));
+		//SDL has 0 as first number keycode but Generals has it as last number keycode
+		if (keycode == SDLK_0)
+		{
+			return KEY_0;
+		}
+		else
+		{
+			return (KeyDefType)(KEY_1 + (keycode - SDLK_1));
+		}
 	}
 
 	switch (keycode)
