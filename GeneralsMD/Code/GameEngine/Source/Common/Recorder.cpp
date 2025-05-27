@@ -1528,7 +1528,11 @@ void RecorderClass::cullBadCommands() {
  */
 AsciiString RecorderClass::getReplayDir() 
 {
+#ifdef _WIN32
+	const char* replayDir = "Replays\\";
+#else
 	const char* replayDir = "Replays/";
+#endif
 
 	AsciiString tmp = TheGlobalData->getPath_UserData();
 	tmp.concat(replayDir);
