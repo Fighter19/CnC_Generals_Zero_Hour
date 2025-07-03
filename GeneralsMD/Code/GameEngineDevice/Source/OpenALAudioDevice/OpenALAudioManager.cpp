@@ -451,16 +451,16 @@ static void AL_APIENTRY debugCallbackAL(ALenum source, ALenum type, ALuint id,
 	switch (severity)
 	{
 	case AL_DEBUG_SEVERITY_HIGH_EXT:
-		DEBUG_LOG(("OpenAL Error: %s", message));
+		DEBUG_LOG(("OpenAL Error: %s\n", message));
 		break;
 	case AL_DEBUG_SEVERITY_MEDIUM_EXT:
-		DEBUG_LOG(("OpenAL Warning: %s", message));
+		DEBUG_LOG(("OpenAL Warning: %s\n", message));
 		break;
 	case AL_DEBUG_SEVERITY_LOW_EXT:
-		DEBUG_LOG(("OpenAL Info: %s", message));
+		DEBUG_LOG(("OpenAL Info: %s\n", message));
 		break;
 	default:
-		DEBUG_LOG(("OpenAL Message: %s", message));
+		DEBUG_LOG(("OpenAL Message: %s\n", message));
 		break;
 	}
 
@@ -2414,7 +2414,7 @@ void OpenALAudioManager::processPlayingList(void)
 						Real y = pos->y;
 						Real z = pos->z;
 						alSource3f(playing->m_source, AL_POSITION, x, y, z);
-						DEBUG_LOG(("Updating 3D sound position for %s to %f, %f, %f\n", playing->m_audioEventRTS->getEventName().str(), x, y, z));
+						// DEBUG_LOG(("Updating 3D sound position for %s to %f, %f, %f\n", playing->m_audioEventRTS->getEventName().str(), x, y, z));
 					}
 				}
 			}
@@ -2727,7 +2727,7 @@ void OpenALAudioManager::setDeviceListenerPosition(void)
 	ALfloat listenerOri[] = { m_listenerOrientation.x, m_listenerOrientation.y, m_listenerOrientation.z, 0.0f, 0.0f, 1.0f };
 	alListener3f(AL_POSITION, m_listenerPosition.x, m_listenerPosition.y, m_listenerPosition.z);
 	alListenerfv(AL_ORIENTATION, listenerOri);
-	DEBUG_LOG(("Listener Position: %f, %f, %f", m_listenerPosition.x, m_listenerPosition.y, m_listenerPosition.z));
+	DEBUG_LOG(("Listener Position: %f, %f, %f\n", m_listenerPosition.x, m_listenerPosition.y, m_listenerPosition.z));
 }
 
 //-------------------------------------------------------------------------------------------------
