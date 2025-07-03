@@ -815,12 +815,6 @@ void OpenALAudioManager::playAudioEvent(AudioEventRTS* event)
 				else
 					stream->bufferData(frameData, frameSize, format, frame->sample_rate);
 			});
-
-			// Decode packets before starting the stream.
-			for (int i = 0; i < AL_STREAM_BUFFER_COUNT; i++) {
-				if (!ffmpegFile->decodePacket())
-					break;
-			}
 		}
 		else {
 			stream = NULL;
