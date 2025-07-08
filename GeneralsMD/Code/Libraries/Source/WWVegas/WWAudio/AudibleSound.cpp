@@ -1012,6 +1012,36 @@ AudibleSoundClass::On_Loop_End (void)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //
+//	Restart_Loop
+//
+////////////////////////////////////////////////////////////////////////////////////////////////
+void
+AudibleSoundClass::Restart_Loop (void)
+{
+	MMSLockClass lock;
+
+	// Reset the timestamp to current time for a fresh loop
+	m_Timestamp = ::GetTickCount ();
+	
+	// Reset the current position to the start offset
+	m_CurrentPosition = m_StartOffset * m_Length;
+	
+	// If we have a valid handle, restart the sample playing
+	if (m_SoundHandle != NULL) {
+		m_SoundHandle->Start_Sample ();
+		
+		// If we have a start offset, seek to that position
+		if (m_CurrentPosition > 0) {
+			Seek (m_CurrentPosition);
+		}
+	}
+
+	return ;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+//
 //	Determine_Real_Volume
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////
