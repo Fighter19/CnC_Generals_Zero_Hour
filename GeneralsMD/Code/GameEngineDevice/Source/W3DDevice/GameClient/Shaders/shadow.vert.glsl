@@ -1,9 +1,9 @@
 #version 460
-// Compatible with DXVK layout
+// Compatible with DXVK layout (set changed from 2 to 1, for SDL)
 
 invariant gl_Position;
 
-layout(set = 2, binding = 0, std140) uniform D3D9FixedFunctionVS
+layout(set = 1, binding = 0, std140) uniform D3D9FixedFunctionVS
 {
     layout(row_major) mat4 WorldView;
     layout(row_major) mat4 Normal;
