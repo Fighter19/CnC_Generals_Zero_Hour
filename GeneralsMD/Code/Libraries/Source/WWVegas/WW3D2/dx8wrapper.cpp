@@ -88,6 +88,17 @@
 extern SDL_Window* TheSDL3WindowVulkan;
 SDL_GPUDevice *SDLGPUDevice = NULL;
 
+struct D3D9FixedFunctionVS
+{
+	Matrix4x4 WorldView;
+	Matrix4x4 Normal;
+	Matrix4x4 InverseView;
+	Matrix4x4 Projection;
+	Matrix4x4 TexcoordTransform[8];
+	Vector4 ViewportInfo_InverseOffset;
+	Vector4 ViewportInfo_InverseExtent;
+};
+
 class SDL3Wrapper
 {
 public:
@@ -244,6 +255,12 @@ public:
 		// TODO: Create depth buffer texture and pass
 		depthTargetInfo.texture = NULL; // No depth buffer for now
 		depthTargetInfo.cycle = false;
+
+		D3D9FixedFunctionVS vsConstants = {};
+		vsConstants.ViewportInfo_InverseOffset = Vector4(-1.0,1.0,0.0,0.0);
+		vsConstants.ViewportInfo_InverseExtent = Vector4(2.0 / 800, -2.0 / 600, 1.0, 1.0);
+
+		SDL_PushGPUVertexUniformData(CurrentGPUCommandBuffer, 0, &vsConstants, sizeof(vsConstants));
 
 		CurrentGPUPass = SDL_BeginGPURenderPass(CurrentGPUCommandBuffer, &colorTargetInfo, 1, NULL /*&depthTargetInfo*/);
 		if (!CurrentGPUPass)
