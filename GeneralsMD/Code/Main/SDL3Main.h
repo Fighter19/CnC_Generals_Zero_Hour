@@ -36,6 +36,7 @@
 // EXTERNAL ///////////////////////////////////////////////////////////////////
 extern HWND ApplicationHWnd;  ///< our application window handle
 extern SDL_Window* TheSDL3Window;
+extern SDL_Window* TheSDL3WindowVulkan;
 
 #endif  // end __WINMAIN_H_
 

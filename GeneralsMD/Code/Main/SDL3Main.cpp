@@ -56,6 +56,7 @@ static HANDLE GeneralsMutex = NULL;
 #include "GameNetwork/WOLBrowser/WebBrowser.h"
 WebBrowser *TheWebBrowser;
 SDL_Window *TheSDL3Window = NULL;
+SDL_Window *TheSDL3WindowVulkan = NULL; ///< Vulkan window, if used
 CComModule _Module;
 SDL_Window *SplashWindow = NULL;
 SDL_Surface *SplashSurface = NULL;
@@ -143,6 +144,18 @@ static Bool initializeAppWindows(Bool runWindowed, Bool runSplash) {
     DEBUG_LOG(("Failed to create window"));
     return false;
   }
+
+  TheSDL3WindowVulkan = SDL_CreateWindow(
+      "Command and Conquer Generals Vulkan", startWidth, startHeight,
+      SDL_WINDOW_VULKAN | SDL_WINDOW_HIDDEN);
+  if(!TheSDL3WindowVulkan) {
+    DEBUG_LOG(("Failed to create Vulkan window"));
+    SDL_DestroyWindow(TheSDL3Window);
+    TheSDL3Window = NULL;
+    return false;
+  }
+
+  SDL_ShowWindow(TheSDL3WindowVulkan);
 
   SDL_IOStream* icoStream = SDL_IOFromFile("GeneralsZH.ico", "rb");
   if (icoStream) {

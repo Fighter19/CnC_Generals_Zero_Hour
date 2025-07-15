@@ -63,6 +63,8 @@
 #include "dx8indexbuffer.h"
 #include "vertmaterial.h"
 
+#include "SDL3/SDL.h"
+
 /*
 ** Registry value names
 */

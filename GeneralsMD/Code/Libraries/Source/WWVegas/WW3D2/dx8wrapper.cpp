@@ -83,6 +83,195 @@
 
 #include "shdlib.h"
 
+#include "default_shader.h"
+
+extern SDL_Window* TheSDL3WindowVulkan;
+SDL_GPUDevice *SDLGPUDevice = NULL;
+
+class SDL3Wrapper
+{
+public:
+	bool Init(void *hwnd, bool lite = false)
+	{
+		return false;
+	}
+	void Shutdown(void)
+	{
+	}
+	bool CreateDevice(void)
+	{
+		SDLGPUDevice = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV, false, NULL);
+		if (SDLGPUDevice == NULL)
+		{
+			WWDEBUG_SAY(("Failed to create SDL GPU device: %s\n", SDL_GetError()));
+			return false;
+		}
+
+		if (!SDL_ClaimWindowForGPUDevice(SDLGPUDevice, TheSDL3WindowVulkan))
+		{
+			WWDEBUG_SAY(("Failed to claim SDL GPU device for window: %s\n", SDL_GetError()));
+			SDL_DestroyGPUDevice(SDLGPUDevice);
+			SDLGPUDevice = NULL;
+			return false;
+		}
+
+		CurrentGPUCommandBuffer = SDL_AcquireGPUCommandBuffer(SDLGPUDevice);
+		if (!CurrentGPUCommandBuffer)
+		{
+			WWDEBUG_SAY(("Failed to acquire command buffer for SDL GPU device: %s\n", SDL_GetError()));
+			SDL_DestroyGPUDevice(SDLGPUDevice);
+			SDLGPUDevice = NULL;
+			return false;
+		}
+
+		DefaultPipeline = CreateDefaultPipeline();
+
+		SDL_GPUBufferCreateInfo vertexBufferCreateInfo = {};
+		vertexBufferCreateInfo.usage = SDL_GPU_BUFFERUSAGE_VERTEX;
+		vertexBufferCreateInfo.size = 4 * sizeof(float) * 4; // 4 vertices, each with 4 floats (x, y, z, w)
+		// vertexBufferCreateInfo.props = SDL_CreateProperties();
+		DefaultVertexBuffer = SDL_CreateGPUBuffer(SDLGPUDevice, &vertexBufferCreateInfo);
+
+		// SDL_DestroyProperties(vertexBufferCreateInfo.props);
+
+		return true;
+	}
+	// BeginScene
+	void BeginScene(void)
+	{
+		// BeginScene doesn't actually do anything,
+		// so SDL doesn't care about it
+		CurrentGPUCommandBuffer = SDL_AcquireGPUCommandBuffer(SDLGPUDevice);
+		if (!CurrentGPUCommandBuffer)
+		{
+			WWDEBUG_SAY(("Failed to acquire GPU command buffer for DX8Wrapper::Begin_Scene()"));
+			return;
+		}
+
+		SDL_GPUTexture *swapChainTexture = NULL;
+		Uint32 textureWidth = 0;
+		Uint32 textureHeight = 0;
+		if (!SDL_WaitAndAcquireGPUSwapchainTexture(CurrentGPUCommandBuffer, TheSDL3WindowVulkan, &swapChainTexture, &textureWidth, &textureHeight))
+		{
+			WWDEBUG_SAY(("Failed to acquire GPU swapchain texture for DX8Wrapper::Begin_Scene()"));
+			return;
+		}
+
+		if (!swapChainTexture)
+		{
+			WWDEBUG_SAY(("No swapchain texture available for DX8Wrapper::Begin_Scene()"));
+			SDL_CancelGPUCommandBuffer(CurrentGPUCommandBuffer);
+			return;
+		}
+
+		SDL_GPUColorTargetInfo colorTargetInfo = {};
+		colorTargetInfo.clear_color.a = 1.0f;
+		colorTargetInfo.clear_color.r = 1.0f;
+		colorTargetInfo.clear_color.g = 0.0f;
+		colorTargetInfo.clear_color.b = 1.0f;
+		colorTargetInfo.load_op = SDL_GPU_LOADOP_CLEAR;
+		colorTargetInfo.store_op = SDL_GPU_STOREOP_STORE;
+		colorTargetInfo.texture = swapChainTexture;
+
+		SDL_GPUDepthStencilTargetInfo depthTargetInfo = {};
+		depthTargetInfo.clear_depth = 1.0f;
+		depthTargetInfo.load_op = SDL_GPU_LOADOP_CLEAR;
+		depthTargetInfo.store_op = SDL_GPU_STOREOP_DONT_CARE;
+		depthTargetInfo.stencil_load_op = SDL_GPU_LOADOP_DONT_CARE;
+		depthTargetInfo.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
+		// TODO: Create depth buffer texture and pass
+		depthTargetInfo.texture = NULL; // No depth buffer for now
+		depthTargetInfo.cycle = false;
+
+		CurrentGPUPass = SDL_BeginGPURenderPass(CurrentGPUCommandBuffer, &colorTargetInfo, 1, NULL /*&depthTargetInfo*/);
+		if (!CurrentGPUPass)
+		{
+			WWDEBUG_SAY(("Failed to begin GPU render pass for DX8Wrapper::Begin_Scene()"));
+			SDL_CancelGPUCommandBuffer(CurrentGPUCommandBuffer);
+			return;
+		}
+
+		SDL_BindGPUGraphicsPipeline(CurrentGPUPass, DefaultPipeline);
+
+		SDL_GPUBufferBinding vertexBinding;
+		// Currently the viewport quad
+		vertexBinding.buffer = DefaultVertexBuffer;
+		vertexBinding.offset = 0;
+		SDL_BindGPUVertexBuffers(CurrentGPUPass, 0, &vertexBinding, 1);
+		SDL_DrawGPUPrimitives(CurrentGPUPass, 4, SDL_GPU_PRIMITIVETYPE_TRIANGLESTRIP, 0, 0);
+	}
+
+	void EndScene(void)
+	{
+		SDL_EndGPURenderPass(CurrentGPUPass);
+		SDL_SubmitGPUCommandBuffer(CurrentGPUCommandBuffer);
+		CurrentGPUPass = NULL;
+	}
+
+private:
+	SDL_GPUShader *LoadDefaultShader(bool bIsVertex)
+	{
+		SDL_GPUShaderCreateInfo createInfo;
+		createInfo.num_samplers = 0;
+		createInfo.num_uniform_buffers = 0;
+		createInfo.num_storage_buffers = 0;
+		createInfo.num_storage_textures = 0;
+		createInfo.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
+		createInfo.entrypoint = "main";
+		if (bIsVertex)
+		{
+			// Used to pass window size
+			createInfo.num_uniform_buffers = 1;
+			createInfo.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+		}
+
+		createInfo.code = defaultShaderCode;
+		createInfo.code_size = sizeof(defaultShaderCode);
+
+		return SDL_CreateGPUShader(SDLGPUDevice, &createInfo);
+	}
+
+	SDL_GPUGraphicsPipeline *CreateDefaultPipeline()
+	{
+		SDL_GPUGraphicsPipelineCreateInfo pipelineCreateInfo = {0};
+
+		pipelineCreateInfo.target_info.num_color_targets = 1;
+		static const SDL_GPUColorTargetDescription colorTargetDescription = {
+				.format = SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM,
+				.blend_state = {
+						// Apply shadow blending directly to the color target
+						// (Ignore dst color and just use pure color, then add to dst)
+						.src_color_blendfactor = SDL_GPU_BLENDFACTOR_DST_COLOR,
+						.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ZERO,
+						.color_blend_op = SDL_GPU_BLENDOP_ADD,
+						.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_DST_COLOR,
+						.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ZERO,
+						.alpha_blend_op = SDL_GPU_BLENDOP_ADD,
+						.color_write_mask = SDL_GPU_COLORCOMPONENT_R | SDL_GPU_COLORCOMPONENT_G | SDL_GPU_COLORCOMPONENT_B,
+						// Set to true, when shadow should be blended
+						// For now we use the shadow shaders as default
+						.enable_blend = false,
+						.enable_color_write_mask = false,
+				},
+		};
+		pipelineCreateInfo.target_info.color_target_descriptions = &colorTargetDescription;
+
+		pipelineCreateInfo.vertex_shader = LoadDefaultShader(true);
+		pipelineCreateInfo.fragment_shader = LoadDefaultShader(false);
+
+		return SDL_CreateGPUGraphicsPipeline(SDLGPUDevice, &pipelineCreateInfo);
+	}
+
+	//SDL_GPUShader *DefaultFragmentShader = NULL;
+	//SDL_GPUShader *DefaultVertexShader = NULL;
+	SDL_GPUGraphicsPipeline *DefaultPipeline = NULL;
+
+	SDL_GPUCommandBuffer *CurrentGPUCommandBuffer = NULL;
+
+	SDL_GPUBuffer *DefaultVertexBuffer = NULL;
+	SDL_GPURenderPass *CurrentGPUPass = NULL;
+} TheSDL3Wrapper;
+
 const int DEFAULT_RESOLUTION_WIDTH = 640;
 const int DEFAULT_RESOLUTION_HEIGHT = 480;
 const int DEFAULT_BIT_DEPTH = 32;
@@ -287,6 +476,7 @@ bool DX8Wrapper::Init(void * hwnd, bool lite)
 
 	D3DInterface = NULL;
 	D3DDevice = NULL;
+	TheSDL3Wrapper.Init(hwnd, lite);
 
 	WWDEBUG_SAY(("Reset DX8Wrapper statistics\n"));
 	Reset_Statistics();
@@ -332,6 +522,11 @@ void DX8Wrapper::Shutdown(void)
 
 		Set_Render_Target ((IDirect3DSurface8 *)NULL);
 		Release_Device();
+	}
+
+	if (SDLGPUDevice) {
+		SDL_DestroyGPUDevice(SDLGPUDevice);
+		SDLGPUDevice = NULL;
 	}
 
 	if (D3DInterface) {
@@ -613,6 +808,8 @@ bool DX8Wrapper::Create_Device(void)
 				return false;
 		}
 	}
+
+	TheSDL3Wrapper.CreateDevice();
 
 	/*
 	** Initialize all subsystems
@@ -1691,6 +1888,7 @@ void DX8Wrapper::Begin_Scene(void)
 #endif
 	
 	DX8CALL(BeginScene());
+	TheSDL3Wrapper.BeginScene();
 
 	DX8WebBrowser::Update();
 }
@@ -1740,6 +1938,8 @@ void DX8Wrapper::End_Scene(bool flip_frames)
 			DX8_ErrorCode(hr);
 		}
 	}
+
+	TheSDL3Wrapper.EndScene();
 
 	// Each frame, release all of the buffers and textures.
 	Set_Vertex_Buffer(NULL);
