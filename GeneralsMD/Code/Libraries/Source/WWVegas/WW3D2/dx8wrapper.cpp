@@ -124,15 +124,77 @@ public:
 			return false;
 		}
 
-		DefaultPipeline = CreateDefaultPipeline();
-
+		// Create a default vertex buffer for rendering a viewport quad
 		SDL_GPUBufferCreateInfo vertexBufferCreateInfo = {};
 		vertexBufferCreateInfo.usage = SDL_GPU_BUFFERUSAGE_VERTEX;
-		vertexBufferCreateInfo.size = 4 * sizeof(float) * 4; // 4 vertices, each with 4 floats (x, y, z, w)
+		vertexBufferCreateInfo.size = 4 * sizeof(float) * 8; // 4 vertices, each with 8 floats (x, y, z, w, r, g, b, a)
 		// vertexBufferCreateInfo.props = SDL_CreateProperties();
 		DefaultVertexBuffer = SDL_CreateGPUBuffer(SDLGPUDevice, &vertexBufferCreateInfo);
 
 		// SDL_DestroyProperties(vertexBufferCreateInfo.props);
+
+		// Start of uploading a quad to the GPU
+		SDL_GPUTransferBufferCreateInfo transferBufferCreateInfo = {};
+		transferBufferCreateInfo.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+		transferBufferCreateInfo.size = 4 * sizeof(float) * 8; // 4 vertices, each with 4 floats (x, y, z, w)
+		SDL_GPUTransferBuffer *pTransferBuffer = SDL_CreateGPUTransferBuffer(SDLGPUDevice, &transferBufferCreateInfo);
+		if (!pTransferBuffer)
+		{
+			WWDEBUG_SAY(("Failed to create transfer buffer for SDL GPU device: %s\n", SDL_GetError()));
+			SDL_DestroyGPUDevice(SDLGPUDevice);
+			SDLGPUDevice = NULL;
+			return false;
+		}
+
+		void *data = SDL_MapGPUTransferBuffer(SDLGPUDevice, pTransferBuffer, false);
+		if (!data)
+		{
+			WWDEBUG_SAY(("Failed to map transfer buffer for SDL GPU device: %s\n", SDL_GetError()));
+			SDL_ReleaseGPUTransferBuffer(SDLGPUDevice, pTransferBuffer);
+			SDL_DestroyGPUDevice(SDLGPUDevice);
+			SDLGPUDevice = NULL;
+			return false;
+		}
+
+		float quadVertices[] = {
+			// x, y, z, w, r, g, b, a
+			800, 600, 0.0, 1.0, 0.63, 0.63, 0.63, 1.0,
+			800, 0.0, 0.0, 1.0, 0.63, 0.63, 0.63, 1.0,
+			0.0, 600, 0.0, 1.0, 0.63, 0.63, 0.63, 1.0,
+			0.0, 0.0, 0.0, 1.0, 0.63, 0.63, 0.63, 1.0,
+		};
+
+		memcpy(data, quadVertices, sizeof(quadVertices));	
+		SDL_UnmapGPUTransferBuffer(SDLGPUDevice, pTransferBuffer);
+
+		SDL_GPUCopyPass *pCopyPass = SDL_BeginGPUCopyPass(CurrentGPUCommandBuffer);
+		if (!pCopyPass)
+		{
+			WWDEBUG_SAY(("Failed to begin GPU copy pass for SDL GPU device: %s\n", SDL_GetError()));
+			SDL_ReleaseGPUTransferBuffer(SDLGPUDevice, pTransferBuffer);
+			SDL_DestroyGPUDevice(SDLGPUDevice);
+			SDLGPUDevice = NULL;
+			return false;
+		}
+
+		SDL_GPUTransferBufferLocation srcLocation = {};
+		srcLocation.transfer_buffer = pTransferBuffer;
+		srcLocation.offset = 0;
+
+		SDL_GPUBufferRegion dstRegion = {};
+		dstRegion.buffer = DefaultVertexBuffer;
+		dstRegion.offset = 0;
+		dstRegion.size = 4 * sizeof(float) * 8; // 4 vertices, each with 8 floats (x, y, z, w, r, g, b, a)
+		static_assert(4 * sizeof(float) * 8 == sizeof(quadVertices), "Size mismatch for quad vertices");
+
+		SDL_UploadToGPUBuffer(pCopyPass, &srcLocation, &dstRegion, false);
+		SDL_EndGPUCopyPass(pCopyPass);
+		SDL_SubmitGPUCommandBuffer(CurrentGPUCommandBuffer);
+
+		SDL_ReleaseGPUTransferBuffer(SDLGPUDevice, pTransferBuffer);
+		// End of uploading a quad to the GPU
+
+		DefaultPipeline = CreateDefaultPipeline();
 
 		return true;
 	}
@@ -198,7 +260,7 @@ public:
 		vertexBinding.buffer = DefaultVertexBuffer;
 		vertexBinding.offset = 0;
 		SDL_BindGPUVertexBuffers(CurrentGPUPass, 0, &vertexBinding, 1);
-		SDL_DrawGPUPrimitives(CurrentGPUPass, 4, SDL_GPU_PRIMITIVETYPE_TRIANGLESTRIP, 0, 0);
+		SDL_DrawGPUPrimitives(CurrentGPUPass, 4, 1, 0, 0);
 	}
 
 	void EndScene(void)
@@ -255,6 +317,31 @@ private:
 				},
 		};
 		pipelineCreateInfo.target_info.color_target_descriptions = &colorTargetDescription;
+
+		SDL_GPUVertexBufferDescription vertexBufferDescription = {};
+		vertexBufferDescription.pitch = 8 * sizeof(float); // 4 floats per vertex
+		vertexBufferDescription.slot = 0;
+		vertexBufferDescription.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
+		vertexBufferDescription.instance_step_rate = 0;
+		
+		SDL_GPUVertexAttribute vertexAttributes[2] = {};
+		vertexAttributes[0].location = 0; // Position
+		vertexAttributes[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4;
+		vertexAttributes[0].offset = 0;
+		vertexAttributes[0].buffer_slot = 0;
+
+		vertexAttributes[1].location = 12; // Color
+		vertexAttributes[1].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4;
+		vertexAttributes[1].offset = 4 * sizeof(float); // After position
+		vertexAttributes[1].buffer_slot = 0;
+
+		pipelineCreateInfo.vertex_input_state = {};
+		pipelineCreateInfo.vertex_input_state.num_vertex_buffers = 1;
+		pipelineCreateInfo.vertex_input_state.vertex_buffer_descriptions = &vertexBufferDescription;
+		pipelineCreateInfo.vertex_input_state.num_vertex_attributes = 2;
+		pipelineCreateInfo.vertex_input_state.vertex_attributes = vertexAttributes; 
+
+		pipelineCreateInfo.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLESTRIP;
 
 		pipelineCreateInfo.vertex_shader = LoadDefaultShader(true);
 		pipelineCreateInfo.fragment_shader = LoadDefaultShader(false);
