@@ -403,7 +403,7 @@ void W3DRadar::drawSingleBeaconEvent( Int pixelX, Int pixelY, Int width, Int hei
 		eventSize = minEventSize;
 
 	// compute how much "angle" we will add to each point to make it rotate as it's getting small
-	addAngle = -totalAnglesToSpin * (frameDiff / TIME_FROM_FULL_SIZE_TO_SMALL_SIZE);
+	addAngle = -totalAnglesToSpin * CustomFloat(frameDiff / TIME_FROM_FULL_SIZE_TO_SMALL_SIZE);
 
 	// create a triangle around the event
 	angle = 0.0f - addAngle;
@@ -502,7 +502,7 @@ void W3DRadar::drawSingleGenericEvent( Int pixelX, Int pixelY, Int width, Int he
 		eventSize = minEventSize;
 
 	// compute how much "angle" we will add to each point to make it rotate as it's getting small
-	addAngle = totalAnglesToSpin * (frameDiff / TIME_FROM_FULL_SIZE_TO_SMALL_SIZE);
+	addAngle = totalAnglesToSpin * Real(frameDiff / TIME_FROM_FULL_SIZE_TO_SMALL_SIZE);
 
 	// create a triangle around the event
 	angle = 0.0f - addAngle;

@@ -266,10 +266,10 @@ void AudioManager::init()
 	m_sound = NEW SoundManager;
 
 	// Set our system volumes from the user's preferred settings, not the defaults.
-	m_systemMusicVolume = getAudioSettings() ? getAudioSettings()->m_preferredMusicVolume : 0.55f;
-	m_systemSoundVolume = getAudioSettings() ? getAudioSettings()->m_preferredSoundVolume : 0.75f;
-	m_systemSound3DVolume = getAudioSettings() ? getAudioSettings()->m_preferred3DSoundVolume: 0.75f;
-	m_systemSpeechVolume = getAudioSettings() ? getAudioSettings()->m_preferredSpeechVolume : 0.55f;
+	m_systemMusicVolume = getAudioSettings() ? getAudioSettings()->m_preferredMusicVolume : (Real)0.55f;
+	m_systemSoundVolume = getAudioSettings() ? getAudioSettings()->m_preferredSoundVolume : (Real)0.75f;
+	m_systemSound3DVolume = getAudioSettings() ? getAudioSettings()->m_preferred3DSoundVolume: (Real)0.75f;
+	m_systemSpeechVolume = getAudioSettings() ? getAudioSettings()->m_preferredSpeechVolume : (Real)0.55f;
 
 	m_scriptMusicVolume = 1.0f;
 	m_scriptSoundVolume = 1.0f;
@@ -1147,7 +1147,7 @@ void INI::parseAudioSettingsDefinition( INI *ini )
 	TheAudio->setPreferredSpeaker(prefs.getSpeakerType());
 
 	Real relative2DVolume = TheAudio->getAudioSettings()->m_relative2DVolume;
-	relative2DVolume = MIN( 1.0f, MAX( -1.0f, relative2DVolume ) );
+	relative2DVolume = MIN( (Real)1.0f, MAX( (Real)-1.0f, relative2DVolume ) );
 
 	TheAudio->friend_getAudioSettings()->m_preferredSoundVolume		= prefs.getSoundVolume() / 100.0f;
 	TheAudio->friend_getAudioSettings()->m_preferred3DSoundVolume	= prefs.get3DSoundVolume() / 100.0f;

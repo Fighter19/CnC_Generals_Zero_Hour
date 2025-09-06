@@ -85,11 +85,11 @@ void BezFwdIterator::start(void)
 
 	int i = 3;
 	while (i--) {
-		float a = cVec[i].x;
-		float b = cVec[i].y;
-		float c = cVec[i].z;
+		Real a = cVec[i].x;
+		Real b = cVec[i].y;
+		Real c = cVec[i].z;
 
-		float *pD, *pDD, *pDDD;
+		Real *pD, *pDD, *pDDD;
 
 		if (i == 2) {
 			pD = &mDq.z;

@@ -116,7 +116,7 @@ inline Real QSin(Real a)
    register int index = REAL_TO_INT((angle/QUARTER_CIRCLE) * TheQuickTanTableCount);
    register Real x = TheQuickSinTable[index];
 
-   return x * sgn;
+   return x * (Real)sgn;
 
   /*
    Real remainder = node - index;

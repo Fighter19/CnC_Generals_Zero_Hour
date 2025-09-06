@@ -139,7 +139,7 @@ void W3DRopeDraw::tossSegments()
 //-------------------------------------------------------------------------------------------------
 void W3DRopeDraw::initRopeParms(Real length, Real width, const RGBColor& color, Real wobbleLen, Real wobbleAmp, Real wobbleRate)
 { 
-	m_maxLen = max(1.0f, length);
+	m_maxLen = max(Real(1.0f), length);
 	m_curLen = 0.0f;
 	m_width = width;
 	m_color = color;
@@ -189,7 +189,7 @@ void W3DRopeDraw::doDrawModule(const Matrix3D* transformMtx)
 		Real deflection = Sin(m_curWobblePhase) * m_wobbleAmp;
 		const Coord3D* pos = getDrawable()->getPosition();
 		Vector3 start(pos->x, pos->y, pos->z + m_curZOffset);
-		Real eachLen = m_curLen / m_segments.size();
+		Real eachLen = m_curLen / Real(m_segments.size());
 		for (std::vector<SegInfo>::iterator it = m_segments.begin(); it != m_segments.end(); ++it)
 		{
 			Vector3 end(pos->x + deflection*it->wobbleAxisX, pos->y + deflection*it->wobbleAxisY, start.Z - eachLen);

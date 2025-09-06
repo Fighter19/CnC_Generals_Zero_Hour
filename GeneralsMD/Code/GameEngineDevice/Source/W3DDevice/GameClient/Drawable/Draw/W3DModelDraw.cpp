@@ -1238,7 +1238,7 @@ static void parseAnimation(INI* ini, void *instance, void * /*store*/, const voi
 	animName.toLower();
 
 	const char* distanceCoveredToken = ini->getNextTokenOrNull();
-	Real distanceCovered = distanceCoveredToken ? INI::scanReal(distanceCoveredToken) : 0;
+	Real distanceCovered = distanceCoveredToken ? INI::scanReal(distanceCoveredToken) : (Real)0;
 	DEBUG_ASSERTCRASH(!(animType == ANIM_IDLE && distanceCovered != 0), ("You should not specify nonzero DistanceCovered values for Idle Anims"));
 
 	const char* timesToRepeatToken = ini->getNextTokenOrNull();
@@ -4161,8 +4161,10 @@ void W3DModelDraw::xfer( Xfer *xfer )
 
 				// get animation info
 				Int mode, numFrames;
-				Real frame, dummy;
-				HAnimClass *anim = hlod->Peek_Animation_And_Info( frame, numFrames, mode, dummy );
+				float fp32_frame, fp32_dummy;
+				HAnimClass *anim = hlod->Peek_Animation_And_Info( fp32_frame, numFrames, mode, fp32_dummy );
+				Real frame = fp32_frame;
+				Real dummy = fp32_dummy;
 
 				// animation data is present
 				Bool present = anim ? TRUE : FALSE;

@@ -49,36 +49,38 @@
 #include "bittype.h"
 #endif
 
+#include "../WWMath/CustomFloat.h"
+
 /*
 ** Some useful structures for writing/writing (safe from changes).
 ** The chunk IO classes contain code for reading and writing these.
 */
 struct IOVector2Struct
 {
-	float32		X;
-	float32		Y;
+	CustomFloat		X;
+	CustomFloat		Y;
 };
 
 struct IOVector3Struct
 {
-	float32		X;							// X,Y,Z coordinates
-	float32		Y;
-	float32		Z;
+	CustomFloat		X;							// X,Y,Z coordinates
+	CustomFloat		Y;
+	CustomFloat		Z;
 };
 
 static_assert(sizeof(IOVector3Struct) == 12, "IOVector3Struct size is not 12 bytes");
 
 struct IOVector4Struct
 {
-	float32		X;
-	float32		Y;
-	float32		Z;
-	float32		W;
+	CustomFloat		X;
+	CustomFloat		Y;
+	CustomFloat		Z;
+	CustomFloat		W;
 };
 
 struct IOQuaternionStruct
 {
-	float32		Q[4];
+	CustomFloat		Q[4];
 };
 
 

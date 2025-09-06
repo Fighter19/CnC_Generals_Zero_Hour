@@ -248,7 +248,7 @@ Real GeometryInfo::getMaxHeightBelowPosition() const
 // given an object with this geom, located at 'pos', where is the "center" of the geometry?
 Real GeometryInfo::getZDeltaToCenterPosition() const
 {
-	return (m_type == GEOMETRY_SPHERE) ? 0.0f : (m_height * 0.5f);
+	return (m_type == GEOMETRY_SPHERE) ? Real(0.0f) : (m_height * 0.5f);
 }
 
 //=============================================================================
