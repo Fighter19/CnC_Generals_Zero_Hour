@@ -46,6 +46,7 @@
 #include "always.h"
 #include "vector.h"
 #include "wwdebug.h"
+#include "CustomFloat.h"
 
 
 /*
@@ -56,11 +57,11 @@
 ** do a slight optimization which makes this a normal fixed size array that
 ** we've determined is "big enough".
 */
-class StateVectorClass : public DynamicVectorClass<float> 
+class StateVectorClass : public DynamicVectorClass<CustomFloat> 
 {
 public:
 	void Reset(void) { ActiveCount = 0; }
-	void Resize(int size) { if (size > VectorMax) { DynamicVectorClass<float>::Resize(size); } }
+	void Resize(int size) { if (size > VectorMax) { DynamicVectorClass<CustomFloat>::Resize(size); } }
 };
 
 
@@ -99,7 +100,7 @@ public:
 	** This function works similarly to the Set_State function in that it passes you
 	** the index to start reading from and you pass it back the index to continue from.
 	*/
-	virtual int		Compute_Derivatives(float t,StateVectorClass * test_state,StateVectorClass * dydt,int start_index = 0) = 0;
+	virtual int		Compute_Derivatives(CustomFloat t,StateVectorClass * test_state,StateVectorClass * dydt,int start_index = 0) = 0;
 
 };
 
@@ -123,10 +124,10 @@ class IntegrationSystem
 {
 public:
 
-	static void Euler_Integrate(ODESystemClass * sys,float dt);
-	static void	Midpoint_Integrate(ODESystemClass * sys,float dt);
-	static void	Runge_Kutta_Integrate(ODESystemClass * sys,float dt);
-	static void Runge_Kutta5_Integrate(ODESystemClass * odesys,float dt);
+	static void Euler_Integrate(ODESystemClass * sys,CustomFloat dt);
+	static void	Midpoint_Integrate(ODESystemClass * sys,CustomFloat dt);
+	static void	Runge_Kutta_Integrate(ODESystemClass * sys,CustomFloat dt);
+	static void Runge_Kutta5_Integrate(ODESystemClass * odesys,CustomFloat dt);
 
 };
 

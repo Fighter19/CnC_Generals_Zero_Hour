@@ -93,7 +93,7 @@ void LineSegClass::Set(const LineSegClass & that,const Matrix3D & tm)
  *=============================================================================================*/
 void LineSegClass::Set_Random(const Vector3 & min,const Vector3 & max)
 {
-	float frac;
+	CustomFloat frac;
 
 	frac = WWMath::Random_Float();
 	P0.X = min.X + frac * (max.X - min.X);
@@ -134,7 +134,7 @@ Vector3 LineSegClass::Find_Point_Closest_To(const Vector3 &pos) const
 {
 	// Get a vector from one line endpoint to point in question.
 	Vector3 v_0_pos = (pos - P0);
-	float dotprod = Vector3::Dot_Product(Dir, v_0_pos);
+	CustomFloat dotprod = Vector3::Dot_Product(Dir, v_0_pos);
 					
 	// Check to see if point is past either of the endpoints.
 	// (Unable to draw a perpendicular line from the point to the line segment.)
@@ -167,9 +167,9 @@ LineSegClass::Find_Intersection
 (
 	const LineSegClass &	other_line,
 	Vector3 *				p1,
-	float	*					fraction1,
+	CustomFloat	*					fraction1,
 	Vector3 *				p2,
-	float *					fraction2
+	CustomFloat *					fraction2
 ) const
 {
 	bool retval = false;
@@ -177,33 +177,33 @@ LineSegClass::Find_Intersection
 #ifdef ALLOW_TEMPORARIES
 	Vector3 cross1 = Vector3::Cross_Product (Dir, other_line.Dir);
 	Vector3 cross2 = Vector3::Cross_Product (other_line.P0 - P0, other_line.Dir);
-	float top1		= cross2 * cross1;
-	float bottom1	= cross1 * cross1;
+	CustomFloat top1		= cross2 * cross1;
+	CustomFloat bottom1	= cross1 * cross1;
 
 	Vector3 cross3 = Vector3::Cross_Product (other_line.Dir, Dir);
 	Vector3 cross4 = Vector3::Cross_Product (P0 - other_line.P0, Dir);
-	float top2		= cross4 * cross3;
-	float bottom2	= cross3 * cross3;
+	CustomFloat top2		= cross4 * cross3;
+	CustomFloat bottom2	= cross3 * cross3;
 #else
 	Vector3 cross1, cross2, cross3, cross4;
 
 	Vector3::Cross_Product(Dir, other_line.Dir, &cross1);
 	Vector3::Cross_Product(other_line.P0 - P0, other_line.Dir, &cross2);
-	float top1		= Vector3::Dot_Product(cross2, cross1);
-	float bottom1	= Vector3::Dot_Product(cross1, cross1);
+	CustomFloat top1		= Vector3::Dot_Product(cross2, cross1);
+	CustomFloat bottom1	= Vector3::Dot_Product(cross1, cross1);
 
 	Vector3::Cross_Product(other_line.Dir, Dir, &cross3);
 	Vector3::Cross_Product(P0 - other_line.P0, Dir, &cross4);
-	float top2		= Vector3::Dot_Product(cross4, cross3);
-	float bottom2	= Vector3::Dot_Product(cross3, cross3);
+	CustomFloat top2		= Vector3::Dot_Product(cross4, cross3);
+	CustomFloat bottom2	= Vector3::Dot_Product(cross3, cross3);
 #endif
 	
 	//
 	//	If either of the divisors are 0, then the lines are parallel
 	//
 	if (bottom1 != 0 && bottom2 != 0) {		
-		float length1 = top1 / bottom1;
-		float length2 = top2 / bottom2;
+		CustomFloat length1 = top1 / bottom1;
+		CustomFloat length2 = top2 / bottom2;
 
 		//
 		//	Calculate the closest points on both lines.

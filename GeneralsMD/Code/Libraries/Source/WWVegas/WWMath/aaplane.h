@@ -56,19 +56,19 @@ public:
 	enum AxisEnum { XNORMAL = 0, YNORMAL = 1, ZNORMAL = 2 };
 
 	AAPlaneClass(void)																		{ }
-	AAPlaneClass(AxisEnum normal,float dist) : Normal(normal),Dist(dist)		{ }
+	AAPlaneClass(AxisEnum normal,CustomFloat dist) : Normal(normal),Dist(dist)		{ }
 
-	void Set(AxisEnum normal,float dist);
+	void Set(AxisEnum normal,CustomFloat dist);
 	void Get_Normal(Vector3 * normal) const;
 
 public:
 
 	AxisEnum			Normal;
-	float				Dist;
+	CustomFloat				Dist;
 
 };
 
-inline void AAPlaneClass::Set(AxisEnum normal,float dist)
+inline void AAPlaneClass::Set(AxisEnum normal,CustomFloat dist)
 {
 	Normal = normal;
 	Dist = dist;

@@ -990,7 +990,7 @@ void AABTreeNodeClass::Compute_Local_Bounding_Box(void)
 	Box.Init(box);
 }
 
-float AABTreeNodeClass::Compute_Volume(void)
+CustomFloat AABTreeNodeClass::Compute_Volume(void)
 {
 	return Box.Volume();
 }
@@ -1457,8 +1457,8 @@ void AABTreeNodeClass::Compute_Score
 	/*
 	** Compute the cost.
 	*/
-	float back_cost = sc->BackBox.Volume() * sc->BackCount;
-	float front_cost = sc->FrontBox.Volume() * sc->FrontCount;
+	CustomFloat back_cost = sc->BackBox.Volume() * sc->BackCount;
+	CustomFloat front_cost = sc->FrontBox.Volume() * sc->FrontCount;
 	
 	sc->Cost = front_cost + back_cost;
 	

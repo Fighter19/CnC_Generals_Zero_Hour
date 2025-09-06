@@ -65,7 +65,7 @@ public:
 	enum { FRONT = 0, BACK, ON };
 
 	Vector3	N;			// Normal of the plane
-	float		D;			// Distance along the normal from the origin
+	CustomFloat		D;			// Distance along the normal from the origin
 
 	PlaneClass(void) : N(0.0f,0.0f,1.0f), D(0.0f) { }
 
@@ -76,17 +76,17 @@ public:
 	** normal,point - compute plane with normal, containing point
 	** p1,p2,p3 - compute plane containing three points
 	*/
-	PlaneClass(float nx,float ny,float nz,float dist);
-	PlaneClass(const Vector3 & normal,float dist);
+	PlaneClass(CustomFloat nx,CustomFloat ny,CustomFloat nz,CustomFloat dist);
+	PlaneClass(const Vector3 & normal,CustomFloat dist);
 	PlaneClass(const Vector3 & normal,const Vector3 & point);
 	PlaneClass(const Vector3 & point1,const Vector3 & point2,const Vector3 & point3);
 
-	inline void Set(float a,float b,float c,float d);
-	inline void Set(const Vector3 & normal,float dist);
+	inline void Set(CustomFloat a,CustomFloat b,CustomFloat c,CustomFloat d);
+	inline void Set(const Vector3 & normal,CustomFloat dist);
 	inline void Set(const Vector3 & normal,const Vector3 & point);
 	inline void Set(const Vector3 & point1,const Vector3 & point2,const Vector3 & point3);
 
-	bool Compute_Intersection(const Vector3 & p0,const Vector3 & p1,float * set_t) const;
+	bool Compute_Intersection(const Vector3 & p0,const Vector3 & p1,CustomFloat * set_t) const;
 	bool In_Front(const Vector3 & point) const;
 	bool In_Front(const SphereClass & sphere) const;
 	bool In_Front_Or_Intersecting(const SphereClass & sphere) const;
@@ -94,12 +94,12 @@ public:
 	static void Intersect_Planes(const PlaneClass & a, const PlaneClass & b, Vector3 *line_dir, Vector3 *line_point);
 };
 
-inline PlaneClass::PlaneClass(float nx,float ny,float nz,float dist) 
+inline PlaneClass::PlaneClass(CustomFloat nx,CustomFloat ny,CustomFloat nz,CustomFloat dist) 
 {
 	Set(nx,ny,nz,dist);
 }
 	
-inline PlaneClass::PlaneClass(const Vector3 & normal,float dist) 
+inline PlaneClass::PlaneClass(const Vector3 & normal,CustomFloat dist) 
 {
 	Set(normal,dist);
 }
@@ -114,7 +114,7 @@ inline PlaneClass::PlaneClass(const Vector3 & point1, const Vector3 & point2, co
 	Set(point1,point2,point3);
 }
 
-inline void PlaneClass::Set(float a,float b,float c,float d)
+inline void PlaneClass::Set(CustomFloat a,CustomFloat b,CustomFloat c,CustomFloat d)
 {
 	N.X = a;
 	N.Y = b;
@@ -122,7 +122,7 @@ inline void PlaneClass::Set(float a,float b,float c,float d)
 	D = d;
 }
 
-inline void PlaneClass::Set(const Vector3 & normal,float dist) 
+inline void PlaneClass::Set(const Vector3 & normal,CustomFloat dist) 
 {
 	N = normal;
 	D = dist;
@@ -153,9 +153,9 @@ inline void PlaneClass::Set(const Vector3 & point1, const Vector3 & point2, cons
 	}
 }
 
-inline bool PlaneClass::Compute_Intersection(const Vector3 & p0,const Vector3 & p1,float * set_t) const
+inline bool PlaneClass::Compute_Intersection(const Vector3 & p0,const Vector3 & p1,CustomFloat * set_t) const
 {
-	float num,den;
+	CustomFloat num,den;
 	den = Vector3::Dot_Product(N,p1-p0);
 
 	/*
@@ -182,14 +182,14 @@ inline bool PlaneClass::Compute_Intersection(const Vector3 & p0,const Vector3 & 
 
 inline bool PlaneClass::In_Front(const Vector3 & point) const
 {
-	float dist = Vector3::Dot_Product(point,N);
+	CustomFloat dist = Vector3::Dot_Product(point,N);
 	return (dist > D);
 }
 
 // This function returns true if the sphere is in front of the plane.
 inline bool PlaneClass::In_Front(const SphereClass & sphere) const
 {
-	float dist = Vector3::Dot_Product(sphere.Center,N);
+	CustomFloat dist = Vector3::Dot_Product(sphere.Center,N);
 	return ((dist - D) >= sphere.Radius);
 }
 
@@ -197,7 +197,7 @@ inline bool PlaneClass::In_Front(const SphereClass & sphere) const
 // (i.e. if the sphere is entirely in front of the plane or if it intersects the plane).
 inline bool PlaneClass::In_Front_Or_Intersecting(const SphereClass & sphere) const
 {
-	float dist = Vector3::Dot_Product(sphere.Center , N);
+	CustomFloat dist = Vector3::Dot_Product(sphere.Center , N);
 	return ((D - dist) < sphere.Radius);
 }
 
@@ -215,13 +215,13 @@ inline void PlaneClass::Intersect_Planes(const PlaneClass & a, const PlaneClass 
 	if (abs_dir.X > abs_dir.Y) {
 		if (abs_dir.X > abs_dir.Z) {
 			// X largest
-			float ool = 1.0f / line_dir->X;
+			CustomFloat ool = (CustomFloat)1.0f / line_dir->X;
 			line_point->Y = (b.N.Z * a.D - a.N.Z * b.D) * ool;
 			line_point->Z = (a.N.Y * b.D - b.N.Y * a.D) * ool;
 			line_point->X = 0.0f;
 		} else {
 			// Z largest
-			float ool = 1.0f / line_dir->Z;
+			CustomFloat ool = (CustomFloat)1.0f / line_dir->Z;
 			line_point->X = (b.N.Y * a.D - a.N.Y * b.D) * ool;
 			line_point->Y = (a.N.X * b.D - b.N.X * a.D) * ool;
 			line_point->Z = 0.0f;
@@ -229,13 +229,13 @@ inline void PlaneClass::Intersect_Planes(const PlaneClass & a, const PlaneClass 
 	} else {
 		if (abs_dir.Y > abs_dir.Z) {
 			// Y largest
-			float ool = 1.0f / line_dir->Y;
+			CustomFloat ool = (CustomFloat)1.0f / line_dir->Y;
 			line_point->Z = (b.N.X * a.D - a.N.X * b.D) * ool;
 			line_point->X = (a.N.Z * b.D - b.N.Z * a.D) * ool;
 			line_point->Y = 0.0f;
 		} else {
 			// Z largest
-			float ool = 1.0f / line_dir->Z;
+			CustomFloat ool = (CustomFloat)1.0f / line_dir->Z;
 			line_point->X = (b.N.Y * a.D - a.N.Y * b.D) * ool;
 			line_point->Y = (a.N.X * b.D - b.N.X * a.D) * ool;
 			line_point->Z = 0.0f;

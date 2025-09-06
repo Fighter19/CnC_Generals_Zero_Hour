@@ -147,7 +147,7 @@ struct BTCollisionStruct
 	}
 
 	bool						StartBad;			// Inital configuration is intersecting?
-	float						MaxFrac;				// Longest move allowed so far
+	CustomFloat						MaxFrac;				// Longest move allowed so far
 
 	int						AxisId;				// Last separating axis
 	int						Side;					// which side of the interval
@@ -160,8 +160,8 @@ struct BTCollisionStruct
 
 	Vector3					D;						// Vector from the center of the box to v0
 	Vector3					Move;					// Move vector relative to stationary triangle
-	float						AE[3][3];			// Dot products of the Basis vectors and edges
-	float						AN[3];				// Dot products of the Basis vectors and the normal
+	CustomFloat						AE[3][3];			// Dot products of the Basis vectors and edges
+	CustomFloat						AN[3];				// Dot products of the Basis vectors and the normal
 	Vector3					AxE[3][3];			// Cross products of the Basis vectors and edges
 
 	Vector3					E[3];					// edge vectors for the triangle 
@@ -200,7 +200,7 @@ static BTCollisionStruct CollisionContext;
  *=============================================================================================*/
 static inline bool aabtri_separation_test
 (
-	float lp,float leb0,float leb1
+	CustomFloat lp,CustomFloat leb0,CustomFloat leb1
 )	
 {
 	/*
@@ -215,7 +215,7 @@ static inline bool aabtri_separation_test
 	**   - Else 
 	**     - Accept entire move since I'm not moving towards
 	*/
-	float eps = 0.0f;
+	CustomFloat eps = 0.0f;
 	if (lp - leb0 <= 0.0f) {
 		eps = COLLISION_EPSILON * CollisionContext.TestAxis.Length();	// trying to only compute epsilon if I have to
 	}
@@ -223,7 +223,7 @@ static inline bool aabtri_separation_test
 	if (lp - leb0 > -eps) {
 		CollisionContext.StartBad = false;
 		if (leb1 - leb0 > 0.0f) {
-			float frac = (lp-leb0)/(leb1-leb0);	
+			CustomFloat frac = (lp-leb0)/(leb1-leb0);	
 			if (frac >= 1.0f) {
 				/* moving toward but not hitting triangle */ 
 				CollisionContext.AxisId = CollisionContext.TestAxisId;
@@ -267,12 +267,12 @@ static inline bool aabtri_separation_test
  *=============================================================================================*/
 static inline bool aabtri_check_axis(void)
 {
-	float		dist;						// separation along the axis
-	float		axismove;				// size of the move along the axis.
-	float		leb0;						// initial coordinate of the leading edge of the box
-	float		leb1;						// final coordinate of the leading edge of the box
-	float		lp;						// leading edge of the polygon.
-	float		tmp;						// temporary
+	CustomFloat		dist;						// separation along the axis
+	CustomFloat		axismove;				// size of the move along the axis.
+	CustomFloat		leb0;						// initial coordinate of the leading edge of the box
+	CustomFloat		leb1;						// final coordinate of the leading edge of the box
+	CustomFloat		lp;						// leading edge of the polygon.
+	CustomFloat		tmp;						// temporary
 
 	dist = Vector3::Dot_Product(CollisionContext.D,CollisionContext.TestAxis);
 	axismove = Vector3::Dot_Product(CollisionContext.Move,CollisionContext.TestAxis);
@@ -321,15 +321,15 @@ static inline bool aabtri_check_axis(void)
  *=============================================================================================*/
 static inline bool aabtri_check_cross_axis
 (
-	float						dp,
+	CustomFloat						dp,
 	int						dpi,
-	float						leb0
+	CustomFloat						leb0
 )
 {
-	float		p0;						// distance from box center to vertex 0
-	float		axismove;				// size of the move along the axis.
-	float		leb1;						// final coordinate of the leading edge of the box
-	float		lp;						// leading edge of the polygon.
+	CustomFloat		p0;						// distance from box center to vertex 0
+	CustomFloat		axismove;				// size of the move along the axis.
+	CustomFloat		leb1;						// final coordinate of the leading edge of the box
+	CustomFloat		lp;						// leading edge of the polygon.
 
 	p0 = Vector3::Dot_Product(CollisionContext.D,CollisionContext.TestAxis);
 	axismove = Vector3::Dot_Product(CollisionContext.Move,CollisionContext.TestAxis);
@@ -375,15 +375,15 @@ static inline bool aabtri_check_cross_axis
  *=============================================================================================*/
 static inline bool aabtri_check_basis_axis
 (
-	float leb0,
-	float dp1,
-	float dp2
+	CustomFloat leb0,
+	CustomFloat dp1,
+	CustomFloat dp2
 )
 {
-	float		dist;						// separation along the axis
-	float		axismove;				// size of the move along the axis.
-	float		leb1;						// final coordinate of the leading edge of the box
-	float		lp;						// leading edge of the polygon.
+	CustomFloat		dist;						// separation along the axis
+	CustomFloat		axismove;				// size of the move along the axis.
+	CustomFloat		leb1;						// final coordinate of the leading edge of the box
+	CustomFloat		lp;						// leading edge of the polygon.
 
 	dist = Vector3::Dot_Product(CollisionContext.D,CollisionContext.TestAxis);
 	axismove = Vector3::Dot_Product(CollisionContext.Move,CollisionContext.TestAxis);
@@ -430,11 +430,11 @@ static inline bool aabtri_check_basis_axis
  *=============================================================================================*/
 static inline bool aabtri_check_normal_axis(void)
 {
-	float		dist;						// separation along the axis
-	float		axismove;				// size of the move along the axis.
-	float		leb0;						// initial coordinate of the leading edge of the box
-	float		leb1;						// final coordinate of the leading edge of the box
-	float		lp;						// leading edge of the polygon.
+	CustomFloat		dist;						// separation along the axis
+	CustomFloat		axismove;				// size of the move along the axis.
+	CustomFloat		leb0;						// initial coordinate of the leading edge of the box
+	CustomFloat		leb1;						// final coordinate of the leading edge of the box
+	CustomFloat		lp;						// leading edge of the polygon.
 
 	dist = Vector3::Dot_Product(CollisionContext.D,CollisionContext.TestAxis);
 	axismove = Vector3::Dot_Product(CollisionContext.Move,CollisionContext.TestAxis);
@@ -471,7 +471,7 @@ static inline bool aabtri_check_normal_axis(void)
  * HISTORY:                                                                                    *
  *   4/8/99     GTH : Created.                                                                 *
  *=============================================================================================*/
-static inline float eval_side(float val,int side)
+static inline CustomFloat eval_side(CustomFloat val,int side)
 {
 	if (val > 0.0f) {
 		return side;
@@ -600,7 +600,7 @@ bool CollisionMath::Collide
 {
 	TRACK_COLLISION_AABOX_TRI;
 
-	float dp,leb0;
+	CustomFloat dp,leb0;
 
 	CollisionContext.Init(box,move,tri,Vector3(0,0,0));
 
@@ -879,8 +879,8 @@ struct AABTIntersectStruct
 
 
 	Vector3					D;						// Vector from the center of the box to v0
-	float						AE[3][3];			// Dot products of the Basis vectors and edges
-	float						AN[3];				// Dot products of the Basis vectors and the normal
+	CustomFloat						AE[3][3];			// Dot products of the Basis vectors and edges
+	CustomFloat						AN[3];				// Dot products of the Basis vectors and the normal
 	Vector3					AxE[3][3];			// Cross produts of the Basis vectors and edges
 
 	Vector3					E[3];					// edge vectors for the triangle 
@@ -916,12 +916,12 @@ static AABTIntersectStruct IntersectContext;
 static inline bool aabtri_intersect_cross_axis
 (
 	Vector3 &					axis,
-	float							dp,
-	float							leb0
+	CustomFloat							dp,
+	CustomFloat							leb0
 )
 {
-	float		p0;						// distance from box center to vertex 0
-	float		lp;						// leading edge of the polygon.
+	CustomFloat		p0;						// distance from box center to vertex 0
+	CustomFloat		lp;						// leading edge of the polygon.
 
 	p0 = Vector3::Dot_Product(IntersectContext.D,axis);
 
@@ -958,13 +958,13 @@ static inline bool aabtri_intersect_cross_axis
 static inline bool aabtri_intersect_basis_axis
 (
 	Vector3 &					axis,
-	float							leb0,
-	float							dp1,
-	float							dp2
+	CustomFloat							leb0,
+	CustomFloat							dp1,
+	CustomFloat							dp2
 )
 {
-	float		dist;						// separation along the axis
-	float		lp;						// leading edge of the polygon.
+	CustomFloat		dist;						// separation along the axis
+	CustomFloat		lp;						// leading edge of the polygon.
 
 	dist = Vector3::Dot_Product(IntersectContext.D,axis);
 
@@ -1005,9 +1005,9 @@ static inline bool aabtri_intersect_normal_axis
 	Vector3 &					axis
 )
 {
-	float		dist;						// separation along the axis
-	float		leb0;						// initial coordinate of the leading edge of the box
-	float		lp;						// leading edge of the polygon.
+	CustomFloat		dist;						// separation along the axis
+	CustomFloat		leb0;						// initial coordinate of the leading edge of the box
+	CustomFloat		lp;						// leading edge of the polygon.
 
 	dist = Vector3::Dot_Product(IntersectContext.D,axis);
 
@@ -1041,7 +1041,7 @@ static inline bool aabtri_intersect_normal_axis
 bool CollisionMath::Intersection_Test(const AABoxClass & box,const TriClass & tri)
 {
 	Vector3 axis;
-	float dp,leb0;
+	CustomFloat dp,leb0;
 
 	IntersectContext.Init(box,tri);
 

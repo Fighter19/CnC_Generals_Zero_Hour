@@ -79,9 +79,9 @@ OBBoxClass::OBBoxClass(const Vector3 * /*points*/, int /*n*/)
 	int i;
 
 	// compute mean and covariances of points
-	float xsum = 0.0f, ysum = 0.0f, zsum = 0.0f;;
-	float xxsum = 0.0f, xysum = 0.0f, xzsum = 0.0f;
-	float yysum = 0.0f, yzsum = 0.0f, zzsum = 0.0f;
+	CustomFloat xsum = 0.0f, ysum = 0.0f, zsum = 0.0f;;
+	CustomFloat xxsum = 0.0f, xysum = 0.0f, xzsum = 0.0f;
+	CustomFloat yysum = 0.0f, yzsum = 0.0f, zzsum = 0.0f;
 
 	for (i = 0; i < n; i++)
 	{
@@ -98,15 +98,15 @@ OBBoxClass::OBBoxClass(const Vector3 * /*points*/, int /*n*/)
 		zzsum += points[i].Z * points[i].Z;
 	}
 
-	float xmean = xsum/n;
-	float ymean = ysum/n;
-	float zmean = zsum/n;
-	float xxcov = xxsum/n - xmean*xmean;
-	float xycov = xysum/n - xmean*ymean;
-	float xzcov = xzsum/n - xmean*zmean;
-	float yycov = yysum/n - ymean*ymean;
-	float yzcov = yzsum/n - ymean*zmean;
-	float zzcov = zzsum/n - zmean*zmean;
+	CustomFloat xmean = xsum/n;
+	CustomFloat ymean = ysum/n;
+	CustomFloat zmean = zsum/n;
+	CustomFloat xxcov = xxsum/n - xmean*xmean;
+	CustomFloat xycov = xysum/n - xmean*ymean;
+	CustomFloat xzcov = xzsum/n - xmean*zmean;
+	CustomFloat yycov = yysum/n - ymean*ymean;
+	CustomFloat yzcov = yzsum/n - ymean*zmean;
+	CustomFloat zzcov = zzsum/n - zmean*zmean;
 
 	// compute eigenvectors for covariance matrix,
 	// these will be the axes.
@@ -155,19 +155,19 @@ OBBoxClass::OBBoxClass(const Vector3 * /*points*/, int /*n*/)
 	// defined to be (max|a|)*U and (max|b|)*V.  Note that since U and V
 	// are unit length and orthogonal, a = Dot(U,X-C), b = Dot(V,X-C),
 	// and c = Dot(W,X-C).
-	float amax = 0.0f, bmax = 0.0f, cmax = 0.0f;
+	CustomFloat amax = 0.0f, bmax = 0.0f, cmax = 0.0f;
 	for (i = 0; i < n; i++)
 	{
-		float dx = pt[i].x - box.center.x;
-		float dy = pt[i].y - box.center.y;
-		float dz = pt[i].z - box.center.z;
-		float absdot = float(WWMath::Fabs(U.x*dx+U.y*dy+U.z*dz));
+		CustomFloat dx = pt[i].x - box.center.x;
+		CustomFloat dy = pt[i].y - box.center.y;
+		CustomFloat dz = pt[i].z - box.center.z;
+		CustomFloat absdot = CustomFloat(WWMath::Fabs(U.x*dx+U.y*dy+U.z*dz));
 		if ( absdot > amax )
 			amax = absdot;
-		absdot = float(WWMath::Fabs(V.x*dx+V.y*dy+V.z*dz));
+		absdot = CustomFloat(WWMath::Fabs(V.x*dx+V.y*dy+V.z*dz));
 		if ( absdot > bmax )
 			bmax = absdot;
-		absdot = float(WWMath::Fabs(W.x*dx+W.y*dy+W.z*dz));
+		absdot = CustomFloat(WWMath::Fabs(W.x*dx+W.y*dy+W.z*dz));
 		if ( absdot > cmax )
 			cmax = absdot;
 	}
@@ -260,17 +260,17 @@ void OBBoxClass::Init_From_Box_Points(Vector3 * points,int num)
 	Extent.Set(0,0,0);
 
 	for (i=0; i<num; i++) {
-		float dx = points[i].X - Center.X;
-		float dy = points[i].Y - Center.Y;
-		float dz = points[i].Z - Center.Z;
+		CustomFloat dx = points[i].X - Center.X;
+		CustomFloat dy = points[i].Y - Center.Y;
+		CustomFloat dz = points[i].Z - Center.Z;
 
-		float xprj = float(WWMath::Fabs(axis0.X * dx + axis0.Y * dy + axis0.Z * dz));
+		CustomFloat xprj = CustomFloat(WWMath::Fabs(axis0.X * dx + axis0.Y * dy + axis0.Z * dz));
 		if (xprj > Extent.X) Extent.X = xprj;
 
-		float yprj = float(WWMath::Fabs(axis1.X * dx + axis1.Y * dy + axis1.Z * dz));
+		CustomFloat yprj = CustomFloat(WWMath::Fabs(axis1.X * dx + axis1.Y * dy + axis1.Z * dz));
 		if (yprj > Extent.Y) Extent.Y = yprj;
 
-		float zprj = float(WWMath::Fabs(axis2.X * dx + axis2.Y * dy + axis2.Z * dz));
+		CustomFloat zprj = CustomFloat(WWMath::Fabs(axis2.X * dx + axis2.Y * dy + axis2.Z * dz));
 		if (zprj > Extent.Z) Extent.Z = zprj;
 	}
 }
@@ -288,7 +288,7 @@ void OBBoxClass::Init_From_Box_Points(Vector3 * points,int num)
  * HISTORY:                                                                                    *
  *   4/21/98    GTH : Created.                                                                 *
  *=============================================================================================*/
-void OBBoxClass::Init_Random(float min_extent,float max_extent)
+void OBBoxClass::Init_Random(CustomFloat min_extent,CustomFloat max_extent)
 {
 	Center.Set(0,0,0);
 	
@@ -328,7 +328,7 @@ bool Oriented_Boxes_Intersect_On_Axis
 	const Vector3 & axis
 )
 {
-	float ra,rb,rsum;
+	CustomFloat ra,rb,rsum;
 
 	if (axis.Length2() < WWMATH_EPSILON) return true;
 
@@ -338,7 +338,7 @@ bool Oriented_Boxes_Intersect_On_Axis
 
 	// project the center distance onto the line:
 	Vector3 C = box1.Center - box0.Center;
-	float cdist = Vector3::Dot_Product(axis,C);
+	CustomFloat cdist = Vector3::Dot_Product(axis,C);
 
 	if ((cdist > rsum) || (cdist < -rsum)) {
 		return false;
@@ -447,10 +447,10 @@ bool Oriented_Boxes_Collide_On_Axis
 	const OBBoxClass & box1,
 	const Vector3 & v1,
 	const Vector3 & axis,
-	float dt
+	CustomFloat dt
 )
 {
-	float ra,rb,rsum;
+	CustomFloat ra,rb,rsum;
 
 	if (axis.Length2() < WWMATH_EPSILON) return true;
 
@@ -462,8 +462,8 @@ bool Oriented_Boxes_Collide_On_Axis
 	Vector3 C = box1.Center - box0.Center;
 	Vector3 V = v1 - v0;
 
-	float cdist = Vector3::Dot_Product(axis,C);
-	float vdist = cdist + dt * Vector3::Dot_Product(axis,V);
+	CustomFloat cdist = Vector3::Dot_Product(axis,C);
+	CustomFloat vdist = cdist + dt * Vector3::Dot_Product(axis,V);
 
 	if ((cdist > rsum && vdist > rsum) || (cdist < -rsum && vdist < -rsum)) {
 		return false;
@@ -490,7 +490,7 @@ bool Oriented_Boxes_Collide
 	const Vector3 & v0,
 	const OBBoxClass & box1,
 	const Vector3 & v1,
-	float dt
+	CustomFloat dt
 )
 {
 	bool intersect = true;
@@ -693,10 +693,10 @@ exit:
  *=============================================================================================*/
 bool Oriented_Box_Intersects_Tri_On_Axis(const OBBoxClass & box,const TriClass & tri,Vector3 & axis)
 {
-	float leb;		// leading edge of box (farthest point from center)
-	float lep;		// leading edge of poly (closest point to center)
-	float dist;		// distance from box center to v0
-	float tmp;
+	CustomFloat leb;		// leading edge of box (farthest point from center)
+	CustomFloat lep;		// leading edge of poly (closest point to center)
+	CustomFloat dist;		// distance from box center to v0
+	CustomFloat tmp;
 
 	if (axis.Length2() < WWMATH_EPSILON) return true;
 	

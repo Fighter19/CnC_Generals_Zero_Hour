@@ -54,7 +54,7 @@
 CollisionMath::OverlapType
 CollisionMath::Overlap_Test(const AAPlaneClass & plane,const Vector3 & point)
 {
-	float delta = point[plane.Normal] - plane.Dist;
+	CustomFloat delta = point[plane.Normal] - plane.Dist;
 	if (delta > COINCIDENCE_EPSILON) {
 		return POS;
 	} 
@@ -86,7 +86,7 @@ CollisionMath::Overlap_Test(const AAPlaneClass & plane,const TriClass & tri)
 CollisionMath::OverlapType
 CollisionMath::Overlap_Test(const AAPlaneClass & plane,const SphereClass & sphere)
 {
-	float delta = sphere.Center[plane.Normal] - plane.Dist;
+	CustomFloat delta = sphere.Center[plane.Normal] - plane.Dist;
 	if (delta > sphere.Radius) {
 		return POS;
 	} 
@@ -99,7 +99,7 @@ CollisionMath::Overlap_Test(const AAPlaneClass & plane,const SphereClass & spher
 CollisionMath::OverlapType
 CollisionMath::Overlap_Test(const AAPlaneClass & plane,const AABoxClass & box)
 {
-	float delta;
+	CustomFloat delta;
 	int mask = 0;
 
 	// check the 'min' side of the box
@@ -159,7 +159,7 @@ CollisionMath::Overlap_Test(const PlaneClass & plane,const TriClass & tri)
 CollisionMath::OverlapType
 CollisionMath::Overlap_Test(const PlaneClass & plane,const SphereClass & sphere)
 {
-	float dist = Vector3::Dot_Product(sphere.Center,plane.N) - plane.D;
+	CustomFloat dist = Vector3::Dot_Product(sphere.Center,plane.N) - plane.D;
 	if (dist > sphere.Radius) {
 		return POS;
 	} 

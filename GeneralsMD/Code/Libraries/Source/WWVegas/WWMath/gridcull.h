@@ -95,7 +95,7 @@ public:
 	virtual void		Collect_Objects(const OBBoxClass & box);
 	virtual void		Collect_Objects(const FrustumClass & frustum);
 	
-	virtual void		Re_Partition(const Vector3 & min,const Vector3 & max,float objdim);
+	virtual void		Re_Partition(const Vector3 & min,const Vector3 & max,CustomFloat objdim);
 	virtual void		Update_Culling(CullableClass * obj);
 
 	virtual void		Load(ChunkLoadClass & cload);
@@ -137,7 +137,7 @@ protected:
 
 	// Constants which control the division of space:
 	Vector3				MinCellSize;			// min dimensions for a cell (don't go below this...)
-	float					MaxObjExtent;			// max extent/radius (objects bigger than this are just put in a list)
+	CustomFloat					MaxObjExtent;			// max extent/radius (objects bigger than this are just put in a list)
 	int					TerminationCellCount;
 
 	// Constants that define the division of space
@@ -325,9 +325,9 @@ WWINLINE void GridCullSystemClass::clamp_indices_to_grid(int * i,int * j,int * k
 WWINLINE bool GridCullSystemClass::map_point_to_cell(const Vector3 & pt,int & set_i,int & set_j,int & set_k)
 {
 	Vector3 dp = pt - Origin;
-	set_i = floor(dp.X * OOCellDim.X);
-	set_j = floor(dp.Y * OOCellDim.Y);
-	set_k = floor(dp.Z * OOCellDim.Z);
+	set_i = (Int)floor(dp.X * OOCellDim.X);
+	set_j = (Int)floor(dp.Y * OOCellDim.Y);
+	set_k = (Int)floor(dp.Z * OOCellDim.Z);
 
 	if (	(set_i >= 0) && (set_j >= 0) && (set_k >= 0) && 
 			(set_i < CellCount[0]) && (set_j < CellCount[1]) && (set_k < CellCount[2])	) 
@@ -421,13 +421,13 @@ WWINLINE void	GridCullSystemClass::compute_box(int i,int j,int k,AABoxClass * se
 
 	Vector3 min,max;
 
-	min.X = Origin.X + i * CellDim.X - MaxObjExtent;
-	min.Y = Origin.Y + j * CellDim.Y - MaxObjExtent;
-	min.Z = Origin.Z + k * CellDim.Z - MaxObjExtent;
+	min.X = Origin.X + (CustomFloat)i * CellDim.X - MaxObjExtent;
+	min.Y = Origin.Y + (CustomFloat)j * CellDim.Y - MaxObjExtent;
+	min.Z = Origin.Z + (CustomFloat)k * CellDim.Z - MaxObjExtent;
 
-	max.X = min.X + CellDim.X + 2.0f*MaxObjExtent;
-	max.Y = min.Y + CellDim.Y + 2.0f*MaxObjExtent;
-	max.Z = min.Z + CellDim.Z + 2.0f*MaxObjExtent;
+	max.X = min.X + CellDim.X + (CustomFloat)2.0f*MaxObjExtent;
+	max.Y = min.Y + CellDim.Y + (CustomFloat)2.0f*MaxObjExtent;
+	max.Z = min.Z + CellDim.Z + (CustomFloat)2.0f*MaxObjExtent;
 
 	set_box->Init((min+max)*0.5f, (min-max)*0.5f);
 }	
@@ -453,13 +453,13 @@ WWINLINE void	GridCullSystemClass::compute_box(const GridCullSystemClass::Volume
 
 	Vector3 min,max;
 
-	min.X = Origin.X + vol.Min[0] * CellDim.X - MaxObjExtent;
-	min.Y = Origin.Y + vol.Min[1] * CellDim.Y - MaxObjExtent;
-	min.Z = Origin.Z + vol.Min[2] * CellDim.Z - MaxObjExtent;
+	min.X = Origin.X + (CustomFloat)vol.Min[0] * CellDim.X - MaxObjExtent;
+	min.Y = Origin.Y + (CustomFloat)vol.Min[1] * CellDim.Y - MaxObjExtent;
+	min.Z = Origin.Z + (CustomFloat)vol.Min[2] * CellDim.Z - MaxObjExtent;
 
-	max.X = Origin.X + vol.Max[0] * CellDim.X + MaxObjExtent;
-	max.Y = Origin.Y + vol.Max[1] * CellDim.Y + MaxObjExtent;
-	max.Z = Origin.Z + vol.Max[2] * CellDim.Z + MaxObjExtent;
+	max.X = Origin.X + (CustomFloat)vol.Max[0] * CellDim.X + MaxObjExtent;
+	max.Y = Origin.Y + (CustomFloat)vol.Max[1] * CellDim.Y + MaxObjExtent;
+	max.Z = Origin.Z + (CustomFloat)vol.Max[2] * CellDim.Z + MaxObjExtent;
 
 	Vector3 center((max.X+min.X)*0.5f,(max.Y+min.Y)*0.5f,(max.Z+min.Z)*0.5f);
 	Vector3 extent((max.X-min.X)*0.5f,(max.Y-min.Y)*0.5f,(max.Z-min.Z)*0.5f);

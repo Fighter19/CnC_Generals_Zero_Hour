@@ -94,7 +94,7 @@ struct IOGridParametersStruct
 	IOVector3Struct	Origin;
 	IOVector3Struct	CellDim;
 	uint32				CellCount[3];
-	float32				MaxObjExtent;
+	CustomFloat				MaxObjExtent;
 };
 
 
@@ -390,7 +390,7 @@ void GridCullSystemClass::Collect_Objects(const FrustumClass & frustum)
  * HISTORY:                                                                                    *
  *   4/27/2000  gth : Created.                                                                 *
  *=============================================================================================*/
-void GridCullSystemClass::Re_Partition(const Vector3 & input_min,const Vector3 & input_max,float objdim)
+void GridCullSystemClass::Re_Partition(const Vector3 & input_min,const Vector3 & input_max,CustomFloat objdim)
 {
 	/*
 	** grab all objects into the collection list and unlink them from the grid
@@ -447,8 +447,8 @@ void GridCullSystemClass::Re_Partition(const Vector3 & input_min,const Vector3 &
 		/*
 		** split dimension in two if possible
 		*/
-		if (CellDim[bigdim] >= 2.0f * MinCellSize[bigdim]) {
-			CellDim[bigdim] /= 2.0f;
+		if (CellDim[bigdim] >= (CustomFloat)2.0f * MinCellSize[bigdim]) {
+			CellDim[bigdim] /= (CustomFloat)2.0f;
 			CellCount[bigdim] *= 2;
 		}
 
@@ -459,16 +459,16 @@ void GridCullSystemClass::Re_Partition(const Vector3 & input_min,const Vector3 &
 			done = true;
 		}
 
-		if (	(CellDim[0] < 2.0*MinCellSize[0]) &&
-				(CellDim[1] < 2.0*MinCellSize[1]) &&
-				(CellDim[2] < 2.0*MinCellSize[2]) ) {
+		if (	(CellDim[0] < (CustomFloat)2.0*MinCellSize[0]) &&
+				(CellDim[1] < (CustomFloat)2.0*MinCellSize[1]) &&
+				(CellDim[2] < (CustomFloat)2.0*MinCellSize[2]) ) {
 			done = true;
 		}
 	}
 
-	OOCellDim.X = 1.0f / CellDim.X;
-	OOCellDim.Y = 1.0f / CellDim.Y;
-	OOCellDim.Z = 1.0f / CellDim.Z;
+	OOCellDim.X = (CustomFloat)1.0f / CellDim.X;
+	OOCellDim.Y = (CustomFloat)1.0f / CellDim.Y;
+	OOCellDim.Z = (CustomFloat)1.0f / CellDim.Z;
 
 	if (Cells != NULL) {
 		delete[] Cells;
@@ -630,9 +630,9 @@ void GridCullSystemClass::Load(ChunkLoadClass & cload)
 	Origin.Y				= params.Origin.Y;
 	Origin.Z				= params.Origin.Z;
 
-	OOCellDim.X = 1.0f / CellDim.X;
-	OOCellDim.Y = 1.0f / CellDim.Y;
-	OOCellDim.Z = 1.0f / CellDim.Z;
+	OOCellDim.X = (CustomFloat)1.0f / CellDim.X;
+	OOCellDim.Y = (CustomFloat)1.0f / CellDim.Y;
+	OOCellDim.Z = (CustomFloat)1.0f / CellDim.Z;
 
 	if (Cells != NULL) {
 		delete [] Cells;

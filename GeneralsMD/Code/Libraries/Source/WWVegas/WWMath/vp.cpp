@@ -348,7 +348,7 @@ void VectorProcessorClass::Copy(Vector4 *dst, const Vector4 *src, int count)
 	memcpy(dst,src,sizeof(Vector4)*count);
 }
 
-void VectorProcessorClass::Copy(Vector4 *dst,const Vector3 *src, const float * srca, const int count)
+void VectorProcessorClass::Copy(Vector4 *dst,const Vector3 *src, const CustomFloat * srca, const int count)
 {
 	if (count<=0) return;
 	int i;
@@ -362,7 +362,7 @@ void VectorProcessorClass::Copy(Vector4 *dst,const Vector3 *src, const float * s
 	}
 }
 
-void VectorProcessorClass::Copy(Vector4 *dst,const Vector3 *src, const float srca, const int count)
+void VectorProcessorClass::Copy(Vector4 *dst,const Vector3 *src, const CustomFloat srca, const int count)
 {
 	if (count<=0) return;
 	int i;
@@ -376,7 +376,7 @@ void VectorProcessorClass::Copy(Vector4 *dst,const Vector3 *src, const float src
 	}
 }
 
-void VectorProcessorClass::Copy(Vector4 *dst,const Vector3 &src, const float * srca, const int count)
+void VectorProcessorClass::Copy(Vector4 *dst,const Vector3 &src, const CustomFloat * srca, const int count)
 {
 	if (count<=0) return;
 	int i;
@@ -445,7 +445,7 @@ void VectorProcessorClass::CopyIndexed(unsigned char* dst, const unsigned char* 
 	}
 }
 
-void VectorProcessorClass::CopyIndexed(float* dst, float* src, const unsigned int *index, int count)
+void VectorProcessorClass::CopyIndexed(CustomFloat* dst, CustomFloat* src, const unsigned int *index, int count)
 {
 	if (count<=0) return;
 	int i;
@@ -456,7 +456,7 @@ void VectorProcessorClass::CopyIndexed(float* dst, float* src, const unsigned in
 	}
 }
 
-void VectorProcessorClass::Clamp(Vector4 *dst,const Vector4 *src, const float min, const float max, const int count)
+void VectorProcessorClass::Clamp(Vector4 *dst,const Vector4 *src, const CustomFloat min, const CustomFloat max, const int count)
 {
 	if (count<=0) return;
 	int i;
@@ -513,27 +513,27 @@ void VectorProcessorClass::MinMax(Vector3 *src, Vector3 &min, Vector3 &max, cons
 	}
 }
 
-void VectorProcessorClass::MulAdd(float * dest,float multiplier,float add,int count)
+void VectorProcessorClass::MulAdd(CustomFloat * dest,CustomFloat multiplier,CustomFloat add,int count)
 {
 	for (int i=0; i<count; i++) {
 		dest[i] = dest[i] * multiplier + add;
 	}
 }
 
-void VectorProcessorClass::DotProduct(float *dst, const Vector3 &a, const Vector3 *b,const int count)
+void VectorProcessorClass::DotProduct(CustomFloat *dst, const Vector3 &a, const Vector3 *b,const int count)
 {
 	for (int i=0; i<count; i++)
 		dst[i]=Vector3::Dot_Product(a,b[i]);
 }
 
-void VectorProcessorClass::ClampMin(float *dst, float *src, const float min, const int count)
+void VectorProcessorClass::ClampMin(CustomFloat *dst, CustomFloat *src, const CustomFloat min, const int count)
 {
 	for (int i=0; i<count; i++)
 		dst[i]=(src[i]>min?src[i]:min);
 }
 
-void VectorProcessorClass::Power(float *dst, float *src, const float pow, const int count)
+void VectorProcessorClass::Power(CustomFloat *dst, CustomFloat *src, const CustomFloat pow_val, const int count)
 {
 	for (int i=0; i<count; i++)
-		dst[i]=powf(src[i],pow);
+		dst[i]=pow(src[i],pow_val);
 }

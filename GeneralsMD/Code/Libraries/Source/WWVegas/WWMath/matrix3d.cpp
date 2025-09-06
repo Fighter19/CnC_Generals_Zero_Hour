@@ -223,17 +223,17 @@ void Matrix3D::Set_Rotation(const Matrix3x3 & m)
  *=============================================================================================*/
 void Matrix3D::Set_Rotation(const Quaternion & q)
 {
-	Row[0][0] = (float)(1.0 - 2.0 * (q[1] * q[1] + q[2] * q[2]));
-	Row[0][1] = (float)(2.0 * (q[0] * q[1] - q[2] * q[3]));
-	Row[0][2] = (float)(2.0 * (q[2] * q[0] + q[1] * q[3]));
+	Row[0][0] = ((CustomFloat)1.0 - (CustomFloat)2.0 * (q[1] * q[1] + q[2] * q[2]));
+	Row[0][1] = ((CustomFloat)2.0 * (q[0] * q[1] - q[2] * q[3]));
+	Row[0][2] = ((CustomFloat)2.0 * (q[2] * q[0] + q[1] * q[3]));
 
-	Row[1][0] = (float)(2.0 * (q[0] * q[1] + q[2] * q[3]));
-	Row[1][1] = (float)(1.0 - 2.0f * (q[2] * q[2] + q[0] * q[0]));
-	Row[1][2] = (float)(2.0 * (q[1] * q[2] - q[0] * q[3]));
+	Row[1][0] = ((CustomFloat)2.0 * (q[0] * q[1] + q[2] * q[3]));
+	Row[1][1] = ((CustomFloat)1.0 - (CustomFloat)2.0 * (q[2] * q[2] + q[0] * q[0]));
+	Row[1][2] = ((CustomFloat)2.0 * (q[1] * q[2] - q[0] * q[3]));
 
-	Row[2][0] = (float)(2.0 * (q[2] * q[0] - q[1] * q[3]));
-	Row[2][1] = (float)(2.0 * (q[1] * q[2] + q[0] * q[3]));
-	Row[2][2] =(float)(1.0 - 2.0 * (q[1] * q[1] + q[0] * q[0]));
+	Row[2][0] = ((CustomFloat)2.0 * (q[2] * q[0] - q[1] * q[3]));
+	Row[2][1] = ((CustomFloat)2.0 * (q[1] * q[2] + q[0] * q[3]));
+	Row[2][2] = ((CustomFloat)1.0 - (CustomFloat)2.0 * (q[1] * q[1] + q[0] * q[0]));
 }
 
 
@@ -249,7 +249,7 @@ void Matrix3D::Set_Rotation(const Quaternion & q)
  * HISTORY:                                                                                    * 
  *   08/11/1997 GH  : Created.                                                                 * 
  *=============================================================================================*/
-float Matrix3D::Get_X_Rotation(void) const
+CustomFloat Matrix3D::Get_X_Rotation(void) const
 {
 	return WWMath::Atan2(Row[2][1], Row[1][1]);
 }
@@ -267,7 +267,7 @@ float Matrix3D::Get_X_Rotation(void) const
  * HISTORY:                                                                                    * 
  *   08/11/1997 GH  : Created.                                                                 * 
  *=============================================================================================*/
-float Matrix3D::Get_Y_Rotation(void) const
+CustomFloat Matrix3D::Get_Y_Rotation(void) const
 {
 	return WWMath::Atan2(Row[0][2], Row[2][2]);
 }
@@ -285,7 +285,7 @@ float Matrix3D::Get_Y_Rotation(void) const
  * HISTORY:                                                                                    * 
  *   08/11/1997 GH  : Created.                                                                 * 
  *=============================================================================================*/
-float Matrix3D::Get_Z_Rotation(void) const
+CustomFloat Matrix3D::Get_Z_Rotation(void) const
 {
 	return WWMath::Atan2(Row[1][0], Row[0][0]);
 }
@@ -356,19 +356,19 @@ Vector3 Matrix3D::Inverse_Rotate_Vector(const Vector3 &vect) const
  *                                                                                             * 
  * HISTORY:                                                                                    * 
  *=============================================================================================*/
-void Matrix3D::Look_At(const Vector3 &p,const Vector3 &t,float roll)
+void Matrix3D::Look_At(const Vector3 &p,const Vector3 &t,CustomFloat roll)
 {
-	float	dx,dy,dz;	//vector from p to t
-	float	len1,len2;
-	float	sinp,cosp;	//sine and cosine of the pitch ("up-down" tilt about x)
-	float	siny,cosy;	//sine and cosine of the yaw ("left-right"tilt about z)
+	CustomFloat	dx,dy,dz;	//vector from p to t
+	CustomFloat	len1,len2;
+	CustomFloat	sinp,cosp;	//sine and cosine of the pitch ("up-down" tilt about x)
+	CustomFloat	siny,cosy;	//sine and cosine of the yaw ("left-right"tilt about z)
 
 	dx = (t[0] - p[0]);
 	dy = (t[1] - p[1]);
 	dz = (t[2] - p[2]);
 
-	len1 = (float)WWMath::Sqrt(dx*dx + dy*dy + dz*dz);
-	len2 = (float)WWMath::Sqrt(dx*dx + dy*dy);
+	len1 = (CustomFloat)WWMath::Sqrt(dx*dx + dy*dy + dz*dz);
+	len2 = (CustomFloat)WWMath::Sqrt(dx*dx + dy*dy);
 
 	if (len1 != 0.0f) {
 		sinp = dz/len1;
@@ -410,10 +410,10 @@ void Matrix3D::Look_At(const Vector3 &p,const Vector3 &t,float roll)
 // Make sure you pass in UNITIZED direction!!!
 void Matrix3D::buildTransformMatrix( const Vector3 &pos, const Vector3 &dir )
 {
-	float sinp, cosp;	// sine and cosine of the pitch ("up-down" tilt about y)
-	float siny, cosy;	// sine and cosine of the yaw ("left-right"tilt about z)
+	CustomFloat sinp, cosp;	// sine and cosine of the pitch ("up-down" tilt about y)
+	CustomFloat siny, cosy;	// sine and cosine of the yaw ("left-right"tilt about z)
 
-	float len2 = (float)sqrt( (dir.X * dir.X) + (dir.Y * dir.Y) );
+	CustomFloat len2 = (CustomFloat)sqrt( (dir.X * dir.X) + (dir.Y * dir.Y) );
 
 	sinp = dir.Z;
 	cosp = len2;
@@ -460,19 +460,19 @@ void Matrix3D::buildTransformMatrix( const Vector3 &pos, const Vector3 &dir )
  *                                                                                             * 
  * HISTORY:                                                                                    * 
  *=============================================================================================*/
-void Matrix3D::Obj_Look_At(const Vector3 &p,const Vector3 &t,float roll)
+void Matrix3D::Obj_Look_At(const Vector3 &p,const Vector3 &t,CustomFloat roll)
 {
-	float	dx,dy,dz;	//vector from p to t
-	float	len1,len2;
-	float	sinp,cosp;	//sine and cosine of the pitch ("up-down" tilt about y)
-	float	siny,cosy;	//sine and cosine of the yaw ("left-right"tilt about z)
+	CustomFloat	dx,dy,dz;	//vector from p to t
+	CustomFloat	len1,len2;
+	CustomFloat	sinp,cosp;	//sine and cosine of the pitch ("up-down" tilt about y)
+	CustomFloat	siny,cosy;	//sine and cosine of the yaw ("left-right"tilt about z)
 
 	dx = (t[0] - p[0]);
 	dy = (t[1] - p[1]);
 	dz = (t[2] - p[2]);
 
-	len1 = (float)sqrt(dx*dx + dy*dy + dz*dz);
-	len2 = (float)sqrt(dx*dx + dy*dy);
+	len1 = (CustomFloat)sqrt(dx*dx + dy*dy + dz*dz);
+	len2 = (CustomFloat)sqrt(dx*dx + dy*dy);
 
 	if (len1 != 0.0f) {
 		sinp = dz/len1;
@@ -525,7 +525,7 @@ void Matrix3D::Get_Inverse(Matrix3D & inv) const
 	Matrix4x4	mat4(*this);
 	Matrix4x4	mat4Inv;
 
-	float det;
+	CustomFloat det;
 	D3DXMatrixInverse((D3DXMATRIX *)&mat4Inv, &det, (D3DXMATRIX*)&mat4);
 
 	inv.Row[0][0]=mat4Inv[0][0];
@@ -544,20 +544,20 @@ void Matrix3D::Get_Inverse(Matrix3D & inv) const
 	inv.Row[2][3]=mat4Inv[2][3];
 #else
 	glm::mat4 mat4x4;
-	mat4x4[0][0] = Row[0][0];
-	mat4x4[1][0] = Row[0][1];
-	mat4x4[2][0] = Row[0][2];
-	mat4x4[3][0] = Row[0][3];
+	mat4x4[0][0] = (float)Row[0][0];
+	mat4x4[1][0] = (float)Row[0][1];
+	mat4x4[2][0] = (float)Row[0][2];
+	mat4x4[3][0] = (float)Row[0][3];
 
-	mat4x4[0][1] = Row[1][0];
-	mat4x4[1][1] = Row[1][1];
-	mat4x4[2][1] = Row[1][2];
-	mat4x4[3][1] = Row[1][3];
+	mat4x4[0][1] = (float)Row[1][0];
+	mat4x4[1][1] = (float)Row[1][1];
+	mat4x4[2][1] = (float)Row[1][2];
+	mat4x4[3][1] = (float)Row[1][3];
 
-	mat4x4[0][2] = Row[2][0];
-	mat4x4[1][2] = Row[2][1];
-	mat4x4[2][2] = Row[2][2];
-	mat4x4[3][2] = Row[2][3];
+	mat4x4[0][2] = (float)Row[2][0];
+	mat4x4[1][2] = (float)Row[2][1];
+	mat4x4[2][2] = (float)Row[2][2];
+	mat4x4[3][2] = (float)Row[2][3];
 
 	mat4x4[0][3] = 0.0f;
 	mat4x4[1][3] = 0.0f;
@@ -639,7 +639,7 @@ void Matrix3D::Get_Orthogonal_Inverse(Matrix3D & inv) const
 }
 
 /***********************************************************************************************
- *  Copy_3x3_Matrix(float *matrix) -- Copies a 3x3 (float[9]) matrix into this matrix          *
+ *  Copy_3x3_Matrix(CustomFloat *matrix) -- Copies a 3x3 (CustomFloat[9]) matrix into this matrix          *
  *                                                                                             *
  * INPUT:                                                                                      *
  *                                                                                             *
@@ -650,7 +650,7 @@ void Matrix3D::Get_Orthogonal_Inverse(Matrix3D & inv) const
  * HISTORY:                                                                                    *
  *   1/16/98    EHC : Created.                                                                 *
  *=============================================================================================*/
-void Matrix3D::Copy_3x3_Matrix(float matrix[3][3]) 
+void Matrix3D::Copy_3x3_Matrix(CustomFloat matrix[3][3]) 
 {
 	Row[0][0] = matrix[0][0];
 	Row[0][1] = matrix[0][1];
@@ -700,7 +700,7 @@ void Matrix3D::Multiply(const Matrix3D & A,const Matrix3D & B,Matrix3D * set_res
 	}
 
 #ifdef ALLOW_TEMPORARIES
-	float tmp1,tmp2,tmp3;
+	CustomFloat tmp1,tmp2,tmp3;
 
 	tmp1 = B[0][0];
 	tmp2 = B[1][0];
@@ -743,7 +743,7 @@ void Matrix3D::Multiply(const Matrix3D & A,const Matrix3D & B,Matrix3D * set_res
 {
 	assert(set_res != NULL);
 
-	float tmp[12];
+	CustomFloat tmp[12];
 // Check for aliased parameters, copy the 'A' matrix into a temporary if the
 // result is going into 'A'. (in this case, this function is no better than
 // the overloaded C++ operator...)
@@ -752,7 +752,7 @@ void Matrix3D::Multiply(const Matrix3D & A,const Matrix3D & B,Matrix3D * set_res
 	{
 		Matrix3D tmp;
 		Matrix3D * Aptr;
-		float tmp1,tmp2,tmp3;
+		CustomFloat tmp1,tmp2,tmp3;
 		tmp = A;
 		Aptr = &tmp;
 
@@ -1051,7 +1051,7 @@ void Matrix3D::Transform_Min_Max_AABox
 	WWASSERT(set_min != &min);
 	WWASSERT(set_max != &max);
 
-	float tmp0,tmp1;
+	CustomFloat tmp0,tmp1;
 	
 	// init the min and max to the translation of the transform
 	set_min->X = set_max->X = Row[0][3];
@@ -1175,12 +1175,12 @@ void Matrix3D::Re_Orthogonalize(void)
 	Vector3::Cross_Product(x,y,&z);
 	Vector3::Cross_Product(z,x,&y);
 
-	float len = x.Length();
+	CustomFloat len = x.Length();
 	if (len < WWMATH_EPSILON) {
 		Make_Identity();
 		return;
 	} else {
-		x *= 1.0f/len;
+		x *= (CustomFloat)1.0f/len;
 	}
 
 	len = y.Length();
@@ -1188,7 +1188,7 @@ void Matrix3D::Re_Orthogonalize(void)
 		Make_Identity();
 		return;
 	} else {
-		y *= 1.0f/len;
+		y *= (CustomFloat)1.0f/len;
 	}
 
 	len = z.Length();
@@ -1196,7 +1196,7 @@ void Matrix3D::Re_Orthogonalize(void)
 		Make_Identity();
 		return;
 	} else {
-		z *= 1.0f/len;
+		z *= (CustomFloat)1.0f/len;
 	}
 
 	Row[0][0] = x.X;
@@ -1225,7 +1225,7 @@ void Matrix3D::Re_Orthogonalize(void)
  * HISTORY:                                                                                    * 
  *   10/05/1998 NH  : Created.                                                                 * 
  *=============================================================================================*/
-void Matrix3D::Lerp(const Matrix3D &A, const Matrix3D &B, float factor, Matrix3D& result)
+void Matrix3D::Lerp(const Matrix3D &A, const Matrix3D &B, CustomFloat factor, Matrix3D& result)
 {
    assert(factor >= 0.0f);
    assert(factor <= 1.0f);
@@ -1267,16 +1267,16 @@ bool Matrix3D::Solve_Linear_System(Matrix3D & system)
 	** TODO: optimize away all unnecessary math operations!
 	*/
 	if (system[0][0] == 0.0f) return false;
-	system[0] *= 1.0f / system[0][0];				// (0,0) now equals 1.0  (row,col)
+	system[0] *= (CustomFloat)1.0f / system[0][0];				// (0,0) now equals 1.0  (row,col)
 	system[1] -= system[1][0] * system[0];			// (1,0) now equals 0.0
 	system[2] -= system[2][0] * system[0];			// (2,0) now equals 0.0
 
 	if (system[1][1] == 0.0f) return false;
-	system[1] *= 1.0f / system[1][1];				// (1,1) now equals 1.0
+	system[1] *= (CustomFloat)1.0f / system[1][1];				// (1,1) now equals 1.0
 	system[2] -= system[2][1] * system[1];			// (2,1) now equals 0.0
 
 	if (system[2][2] == 0.0f) return false;
-	system[2] *= 1.0f / system[2][2];				// (2,2) now equals 1.0, and we already have one answer
+	system[2] *= (CustomFloat)1.0f / system[2][2];				// (2,2) now equals 1.0, and we already have one answer
 
 	system[1] -= system[1][2] * system[2];			// (1,2) now equals 0.0, and we have another answer
 	system[0] -= system[0][2] * system[2];			// (0,2) now equals 0.0

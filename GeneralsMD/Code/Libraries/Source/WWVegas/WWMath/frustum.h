@@ -52,8 +52,8 @@ public:
 	void Init(			const Matrix3D & camera,
 							const Vector2 & viewport_min,
 							const Vector2 & viewport_max,
-							float znear,
-							float zfar );
+							CustomFloat znear,
+							CustomFloat zfar );
 
 	const Vector3 &	Get_Bound_Min(void) const		{ return BoundMin; }
 	const Vector3 &	Get_Bound_Max(void) const		{ return BoundMax; }

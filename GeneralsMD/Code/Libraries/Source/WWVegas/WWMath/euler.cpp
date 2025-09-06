@@ -41,7 +41,7 @@
 
 
 #include "euler.h"	
-#include <float.h>
+#include <cfloat>
 
 
 /*********************************************************************
@@ -155,7 +155,7 @@ EulerAnglesClass::EulerAnglesClass(const Matrix3D & M,int order)
  * HISTORY:                                                                                    * 
  *   08/11/1997 GH  : Created.                                                                 * 
  *=============================================================================================*/
-double EulerAnglesClass::Get_Angle(int i)
+CustomFloat EulerAnglesClass::Get_Angle(int i)
 {
 	return Angle[i];		
 }
@@ -180,7 +180,7 @@ void EulerAnglesClass::From_Matrix(const Matrix3D & M, int order)
 	_euler_unpack_order(order,i,j,k,h,n,s,f);
 
 	if (s == EULER_REPEAT_YES) {
-		double sy = sqrt(M[i][j]*M[i][j] + M[i][k]*M[i][k]);
+		CustomFloat sy = sqrt(M[i][j]*M[i][j] + M[i][k]*M[i][k]);
 
 		if (sy > 16*FLT_EPSILON) {
 
@@ -197,7 +197,7 @@ void EulerAnglesClass::From_Matrix(const Matrix3D & M, int order)
 
 	} else {
 
-		double cy = sqrt(M[i][i]*M[i][i] + M[j][i]*M[j][i]);
+		CustomFloat cy = sqrt(M[i][i]*M[i][i] + M[j][i]*M[j][i]);
 
 		if (cy > 16*FLT_EPSILON) {
 
@@ -214,31 +214,31 @@ void EulerAnglesClass::From_Matrix(const Matrix3D & M, int order)
 	}
 
 	if (n==EULER_PARITY_ODD) { Angle[0] = -Angle[0]; Angle[1] = -Angle[1]; Angle[2] = -Angle[2]; }
-	if (f==EULER_FRAME_ROTATING) { double t = Angle[0]; Angle[0] = Angle[2]; Angle[2] = t; }
+	if (f==EULER_FRAME_ROTATING) { CustomFloat t = Angle[0]; Angle[0] = Angle[2]; Angle[2] = t; }
 
 	// Trying to "clean" up the eulers, special cased for XYZr
 	if (order == EulerOrderXYZr) {
 
-		const double PI = 3.141592654;
+		const CustomFloat PI = 3.141592654;
 
-		double x2 = PI + Angle[0];
-		double y2 = PI - Angle[1];
-		double z2 = PI + Angle[2];
-				
+		CustomFloat x2 = PI + Angle[0];
+		CustomFloat y2 = PI - Angle[1];
+		CustomFloat z2 = PI + Angle[2];
+
 		if (x2 > PI) {
-			x2 = x2 - 2*PI;
+			x2 = x2 - (CustomFloat)2*PI;
 		}
 
 		if (y2 > PI) {
-			y2 = y2 - 2*PI;
+			y2 = y2 - (CustomFloat)2*PI;
 		}
 
 		if (z2 > PI) {
-			z2 = z2 - 2*PI;
+			z2 = z2 - (CustomFloat)2*PI;
 		}
 
-		double mag0 = Angle[0]*Angle[0] + Angle[1]*Angle[1] + Angle[2]*Angle[2];
-		double mag1 = x2*x2 + y2*y2 + z2*z2;
+		CustomFloat mag0 = Angle[0]*Angle[0] + Angle[1]*Angle[1] + Angle[2]*Angle[2];
+		CustomFloat mag1 = x2*x2 + y2*y2 + z2*z2;
 
 		if (mag1 < mag0) {
 			Angle[0] = x2;
@@ -266,8 +266,8 @@ void EulerAnglesClass::To_Matrix(Matrix3D & M)
 {
 	M.Make_Identity();
 
-	double a0,a1,a2;
-	double ti,tj,th,ci,cj,ch,si,sj,sh,cc,cs,sc,ss;
+	CustomFloat a0,a1,a2;
+	CustomFloat ti,tj,th,ci,cj,ch,si,sj,sh,cc,cs,sc,ss;
 	int i,j,k,h,n,s,f;
 
 	a0 = Angle[0];
@@ -276,7 +276,7 @@ void EulerAnglesClass::To_Matrix(Matrix3D & M)
 
 	_euler_unpack_order(Order,i,j,k,h,n,s,f);
 	if (f == EULER_FRAME_ROTATING) { 
-		double t = a0; a0 = a2; a2 = t; 
+		CustomFloat t = a0; a0 = a2; a2 = t; 
 	}
 	
 	if (n == EULER_PARITY_ODD) { 
@@ -294,15 +294,15 @@ void EulerAnglesClass::To_Matrix(Matrix3D & M)
 
 	if (s == EULER_REPEAT_YES) {
 
-		M[i][i] = (float)(cj);			M[i][j] = (float)(sj*si);			M[i][k] = (float)(sj*ci);
-		M[j][i] = (float)(sj*sh);		M[j][j] = (float)(-cj*ss+cc);		M[j][k] = (float)(-cj*cs-sc);
-		M[k][i] = (float)(-sj*ch);		M[k][j] = (float)(cj*sc+cs);		M[k][k] = (float)(cj*cc-ss);
+		M[i][i] = (CustomFloat)(cj);			M[i][j] = (CustomFloat)(sj*si);			M[i][k] = (CustomFloat)(sj*ci);
+		M[j][i] = (CustomFloat)(sj*sh);		M[j][j] = (CustomFloat)(-cj*ss+cc);		M[j][k] = (CustomFloat)(-cj*cs-sc);
+		M[k][i] = (CustomFloat)(-sj*ch);		M[k][j] = (CustomFloat)(cj*sc+cs);		M[k][k] = (CustomFloat)(cj*cc-ss);
 
 	} else {
 
-		M[i][i] = (float)(cj*ch);		M[i][j] = (float)(sj*sc-cs);		M[i][k] = (float)(sj*cc+ss);
-		M[j][i] = (float)(cj*sh);		M[j][j] = (float)(sj*ss+cc);		M[j][k] = (float)(sj*cs-sc);
-		M[k][i] = (float)(-sj);			M[k][j] = (float)(cj*si);			M[k][k] = (float)(cj*ci);
+		M[i][i] = (CustomFloat)(cj*ch);		M[i][j] = (CustomFloat)(sj*sc-cs);		M[i][k] = (CustomFloat)(sj*cc+ss);
+		M[j][i] = (CustomFloat)(cj*sh);		M[j][j] = (CustomFloat)(sj*ss+cc);		M[j][k] = (CustomFloat)(sj*cs-sc);
+		M[k][i] = (CustomFloat)(-sj);			M[k][j] = (CustomFloat)(cj*si);			M[k][k] = (CustomFloat)(cj*ci);
 
 	}
 }

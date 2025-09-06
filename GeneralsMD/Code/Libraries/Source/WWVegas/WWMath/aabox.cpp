@@ -40,7 +40,7 @@
 #include "aabox.h"
 #include "colmath.h"
 #include "colmathinlines.h"
-#include <float.h>
+#include <cfloat>
 
 
 /***********************************************************************************************
@@ -55,7 +55,7 @@
  * HISTORY:                                                                                    *
  *   3/17/2000  gth : Created.                                                                 *
  *=============================================================================================*/
-void AABoxClass::Init_Random(float min_center,float max_center,float min_extent,float max_extent)
+void AABoxClass::Init_Random(CustomFloat min_center,CustomFloat max_center,CustomFloat min_extent,CustomFloat max_extent)
 {
 	Center.X = min_center + WWMath::Random_Float() * (max_center - min_center);
 	Center.Y = min_center + WWMath::Random_Float() * (max_center - min_center);

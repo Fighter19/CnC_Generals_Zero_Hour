@@ -59,11 +59,11 @@ static inline void find_dominant_plane_fast(const TriClass & tri, FDPRec& info)
 	/*
 	** Find the largest component of the normal
 	*/
-	float x = WWMath::Fabs(tri.N->X);
-	float y = WWMath::Fabs(tri.N->Y);
-	float z = WWMath::Fabs(tri.N->Z);
+	CustomFloat x = WWMath::Fabs(tri.N->X);
+	CustomFloat y = WWMath::Fabs(tri.N->Y);
+	CustomFloat z = WWMath::Fabs(tri.N->Z);
 
-	float val = x;
+	CustomFloat val = x;
 	int ni = 0;
 
 	if (y > val) 
@@ -86,10 +86,10 @@ static inline void find_dominant_plane(const TriClass & tri, int * axis1,int * a
 	** Find the largest component of the normal
 	*/
 	int ni = 0;
-	float x = WWMath::Fabs(tri.N->X);
-	float y = WWMath::Fabs(tri.N->Y);
-	float z = WWMath::Fabs(tri.N->Z);
-	float val = x;
+	CustomFloat x = WWMath::Fabs(tri.N->X);
+	CustomFloat y = WWMath::Fabs(tri.N->Y);
+	CustomFloat z = WWMath::Fabs(tri.N->Z);
+	CustomFloat val = x;
 
 	if (y > val) {
 		ni = 1;
@@ -146,10 +146,10 @@ void TriClass::Find_Dominant_Plane(int * axis1,int * axis2) const
 	** Find the largest component of the normal
 	*/
 	int ni = 0;
-	float x = WWMath::Fabs(N->X);
-	float y = WWMath::Fabs(N->Y);
-	float z = WWMath::Fabs(N->Z);
-	float val = x;
+	CustomFloat x = WWMath::Fabs(N->X);
+	CustomFloat y = WWMath::Fabs(N->Y);
+	CustomFloat z = WWMath::Fabs(N->Z);
+	CustomFloat val = x;
 
 	if (y > val) {
 		ni = 1;
@@ -213,18 +213,18 @@ bool TriClass::Contains_Point(const Vector3 & ipoint) const
 	unsigned char flags;	// dummy variable passed into function and not used here
 	return Point_In_Triangle_2D(*V[0], *V[1], *V[2], ipoint, axis1, axis2, flags);
 #else
-	float u0 = ipoint[axis1] - (*V[0])[axis1];
-	float v0 = ipoint[axis2] - (*V[0])[axis2];
+	CustomFloat u0 = ipoint[axis1] - (*V[0])[axis1];
+	CustomFloat v0 = ipoint[axis2] - (*V[0])[axis2];
 
 	/*
 	** determine the 2d vectors on the dominant plane from the first vertex to the other two
 	*/
-	float u1 = (*V[1])[axis1] - (*V[0])[axis1]; 
-	float v1 = (*V[1])[axis2] - (*V[0])[axis2];
-	float	u2 = (*V[2])[axis1] - (*V[0])[axis1]; 
-	float	v2 = (*V[2])[axis2] - (*V[0])[axis2];
+	CustomFloat u1 = (*V[1])[axis1] - (*V[0])[axis1]; 
+	CustomFloat v1 = (*V[1])[axis2] - (*V[0])[axis2];
+	CustomFloat	u2 = (*V[2])[axis1] - (*V[0])[axis1]; 
+	CustomFloat	v2 = (*V[2])[axis2] - (*V[0])[axis2];
 
-	float alpha, beta;
+	CustomFloat alpha, beta;
 	bool intersect = false; 
 
 	// calculate alpha and beta as normalized (0..1) percentages across the 2d projected triangle
@@ -300,7 +300,7 @@ bool TriClass::Contains_Point(const Vector3 & ipoint) const
 	** Compute the 2D cross product of edge0 with a vector to the point
 	*/
 
-	float edge_x, edge_y, dp_x, dp_y, cross;
+	CustomFloat edge_x, edge_y, dp_x, dp_y, cross;
 	bool side0, side1, side2;
 
 	edge_x = (*V[1])[info.axis1] - (*V[0])[info.axis1];
@@ -350,7 +350,7 @@ bool TriClass::Contains_Point(const Vector3 & ipoint) const
 		
 		edge.Set((*V[vb])[axis1] - (*V[va])[axis1] , (*V[vb])[axis2] - (*V[va])[axis2]);
 		dp.Set(ipoint[axis1] - (*V[va])[axis1] , ipoint[axis2] - (*V[va])[axis2]);
-		float cross = edge.X * dp.Y - edge.Y * dp.X;
+		CustomFloat cross = edge.X * dp.Y - edge.Y * dp.X;
 		side[vi] = (cross >= 0.0f);
 	}
 

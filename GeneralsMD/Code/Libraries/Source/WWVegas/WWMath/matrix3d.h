@@ -37,8 +37,8 @@
  *---------------------------------------------------------------------------------------------* 
  * Functions:                                                                                  * 
  *   Matrix3D::Matrix3D -- Constructors for Matrix3D                                           * 
- *   Matrix3D::Set -- init a Matrix3D from an arrray of 12 floats                              *
- *   Matrix3D::Set -- Init a Matrix3D from 12 individual floats                                *
+ *   Matrix3D::Set -- init a Matrix3D from an arrray of 12 CustomFloats                              *
+ *   Matrix3D::Set -- Init a Matrix3D from 12 individual CustomFloats                                *
  *   Matrix3D::Set -- Init a matrix from 3 axis vectors and a position                         *
  *   Matrix3D::Set -- init a matrix to be a rotation about the given axis                      *
  *   Matrix3D::Set -- init a matrix to be a rotation about the given axis                      *
@@ -138,12 +138,12 @@ public:
 
 	WWINLINE explicit Matrix3D(bool init) { if (init) Make_Identity(); }
 
-	WWINLINE explicit Matrix3D(float m[12]);
+	WWINLINE explicit Matrix3D(CustomFloat m[12]);
 
 	WWINLINE explicit Matrix3D(
-		float m11,float m12,float m13,float m14,
-		float m21,float m22,float m23,float m24,
-		float m31,float m32,float m33,float m34  
+		CustomFloat m11,CustomFloat m12,CustomFloat m13,CustomFloat m14,
+		CustomFloat m21,CustomFloat m22,CustomFloat m23,CustomFloat m24,
+		CustomFloat m31,CustomFloat m32,CustomFloat m33,CustomFloat m34  
 	);
 	
 	WWINLINE explicit Matrix3D(
@@ -155,13 +155,13 @@ public:
 
 	WWINLINE explicit Matrix3D(
 		const Vector3	&axis,
-		float angle
+		CustomFloat angle
 	);
 
 	WWINLINE explicit Matrix3D(
 		const Vector3	&axis,
-		float sine,
-		float cosine
+		CustomFloat sine,
+		CustomFloat cosine
 	);
 
 	WWINLINE explicit Matrix3D(
@@ -184,12 +184,12 @@ public:
 	WWINLINE Matrix3D & operator = (const Matrix3D & m);
 
 	// Init functions
-	WWINLINE void Set(float m[12]);
+	WWINLINE void Set(CustomFloat m[12]);
 
 	WWINLINE void Set(
-		float m11,float m12,float m13,float m14,
-		float m21,float m22,float m23,float m24,
-		float m31,float m32,float m33,float m34  
+		CustomFloat m11,CustomFloat m12,CustomFloat m13,CustomFloat m14,
+		CustomFloat m21,CustomFloat m22,CustomFloat m23,CustomFloat m24,
+		CustomFloat m31,CustomFloat m32,CustomFloat m33,CustomFloat m34  
 	);
 	
 	WWINLINE void Set(
@@ -199,9 +199,9 @@ public:
 		const Vector3	&pos		// position
 	);
 
-	WWINLINE void Set(const Vector3 & axis,float angle);
+	WWINLINE void Set(const Vector3 & axis,CustomFloat angle);
 
-	WWINLINE void Set(const Vector3 & axis,float sine,float cosine);
+	WWINLINE void Set(const Vector3 & axis,CustomFloat sine,CustomFloat cosine);
 
 	void Set(const Matrix3x3 & rotation,const Vector3 & position);
 
@@ -221,79 +221,79 @@ public:
 	void Set_Rotation(const Matrix3x3 & m);
 	void Set_Rotation(const Quaternion & q);
 
-	WWINLINE float Get_X_Translation(void) const { return Row[0][3]; };
-	WWINLINE float Get_Y_Translation(void) const { return Row[1][3]; };
-	WWINLINE float Get_Z_Translation(void) const { return Row[2][3]; };
+	WWINLINE CustomFloat Get_X_Translation(void) const { return Row[0][3]; };
+	WWINLINE CustomFloat Get_Y_Translation(void) const { return Row[1][3]; };
+	WWINLINE CustomFloat Get_Z_Translation(void) const { return Row[2][3]; };
 
-	WWINLINE void Set_X_Translation(float x) { Row[0][3] = x; };
-	WWINLINE void Set_Y_Translation(float y) { Row[1][3] = y; };
-	WWINLINE void Set_Z_Translation(float z) { Row[2][3] = z; };
+	WWINLINE void Set_X_Translation(CustomFloat x) { Row[0][3] = x; };
+	WWINLINE void Set_Y_Translation(CustomFloat y) { Row[1][3] = y; };
+	WWINLINE void Set_Z_Translation(CustomFloat z) { Row[2][3] = z; };
 
 	WWINLINE void Adjust_Translation(const Vector3 & t) { Row[0][3] += t[0]; Row[1][3] += t[1]; Row[2][3] += t[2]; };
-	WWINLINE void Adjust_X_Translation(float x) { Row[0][3] += x; };
-	WWINLINE void Adjust_Y_Translation(float y) { Row[1][3] += y; };
-	WWINLINE void Adjust_Z_Translation(float z) { Row[2][3] += z; };
+	WWINLINE void Adjust_X_Translation(CustomFloat x) { Row[0][3] += x; };
+	WWINLINE void Adjust_Y_Translation(CustomFloat y) { Row[1][3] += y; };
+	WWINLINE void Adjust_Z_Translation(CustomFloat z) { Row[2][3] += z; };
 
 	// These functions will give you the approximate amount that the
 	// matrix has been rotated about a given axis.  These functions
 	// cannot be used to re-build a matrx.  Use the EulerAnglesClass
 	// to convert a matrix into a set of three Euler angles.
-	float Get_X_Rotation(void) const;
-	float Get_Y_Rotation(void) const;
-	float Get_Z_Rotation(void) const;
+	CustomFloat Get_X_Rotation(void) const;
+	CustomFloat Get_Y_Rotation(void) const;
+	CustomFloat Get_Z_Rotation(void) const;
 	
 	// Each of the transformation methods performs an
 	// "optimized" post-multiplication with the current matrix.
 	// All angles are assumed to be radians.
 	WWINLINE void	Make_Identity(void);
-	void	Translate(float x,float y,float z);
+	void	Translate(CustomFloat x,CustomFloat y,CustomFloat z);
 	void	Translate(const Vector3 &t);
-   void  Translate_X(float x);
-   void  Translate_Y(float y);
-   void  Translate_Z(float z);
-	void	Rotate_X(float theta);
-	void	Rotate_Y(float theta);
-	void 	Rotate_Z(float theta);
-	void	Rotate_X(float s,float c);
-	void	Rotate_Y(float s,float c);
-	void	Rotate_Z(float s,float c);
+   void  Translate_X(CustomFloat x);
+   void  Translate_Y(CustomFloat y);
+   void  Translate_Z(CustomFloat z);
+	void	Rotate_X(CustomFloat theta);
+	void	Rotate_Y(CustomFloat theta);
+	void 	Rotate_Z(CustomFloat theta);
+	void	Rotate_X(CustomFloat s,CustomFloat c);
+	void	Rotate_Y(CustomFloat s,CustomFloat c);
+	void	Rotate_Z(CustomFloat s,CustomFloat c);
 
 	// !!
 	// !! Use Scale methods with Extreme Caution
 	// !! The Matrix Inverse function, only works
 	// !! with Orthogonal Matrices, for optimization purposes
 	// !!
-	WWINLINE void	Scale(float scale);					 // uniform scale all 3 axis
-	WWINLINE void	Scale(float x, float y, float z); // separate input for each axis
+	WWINLINE void	Scale(CustomFloat scale);					 // uniform scale all 3 axis
+	WWINLINE void	Scale(CustomFloat x, CustomFloat y, CustomFloat z); // separate input for each axis
 	WWINLINE void	Scale(Vector3 &scale);				 // scale each axis
 
 
 	// Each of these performs an "optimized" pre-multiplication with the
 	// current matrix. All angles are assumed to be radians. The "In_Place"
 	// versions do not affect the translation part of the matrix,
-	WWINLINE void	Pre_Rotate_X(float theta);
-	WWINLINE void	Pre_Rotate_Y(float theta);
-	WWINLINE void 	Pre_Rotate_Z(float theta);
-	WWINLINE void	Pre_Rotate_X(float s,float c);
-	WWINLINE void	Pre_Rotate_Y(float s,float c);
-	WWINLINE void	Pre_Rotate_Z(float s,float c);
-	WWINLINE void	In_Place_Pre_Rotate_X(float theta);
-	WWINLINE void	In_Place_Pre_Rotate_Y(float theta);
-	WWINLINE void 	In_Place_Pre_Rotate_Z(float theta);
-	WWINLINE void	In_Place_Pre_Rotate_X(float s,float c);
-	WWINLINE void	In_Place_Pre_Rotate_Y(float s,float c);
-	WWINLINE void	In_Place_Pre_Rotate_Z(float s,float c);
+	WWINLINE void	Pre_Rotate_X(CustomFloat theta);
+	WWINLINE void	Pre_Rotate_Y(CustomFloat theta);
+	WWINLINE void 	Pre_Rotate_Z(CustomFloat theta);
+	WWINLINE void	Pre_Rotate_X(CustomFloat s,CustomFloat c);
+	WWINLINE void	Pre_Rotate_Y(CustomFloat s,CustomFloat c);
+	WWINLINE void	Pre_Rotate_Z(CustomFloat s,CustomFloat c);
+	WWINLINE void	In_Place_Pre_Rotate_X(CustomFloat theta);
+	WWINLINE void	In_Place_Pre_Rotate_Y(CustomFloat theta);
+	WWINLINE void 	In_Place_Pre_Rotate_Z(CustomFloat theta);
+	WWINLINE void	In_Place_Pre_Rotate_X(CustomFloat s,CustomFloat c);
+	WWINLINE void	In_Place_Pre_Rotate_Y(CustomFloat s,CustomFloat c);
+	WWINLINE void	In_Place_Pre_Rotate_Z(CustomFloat s,CustomFloat c);
 
 	// Points the negative Z axis at the target t.  Assumes that
 	// the "world" uses x-y as the ground and z as altitude.
 	// Used for pointing cameras at targets.
-	void	Look_At(const Vector3 &p,const Vector3 &t,float roll);
+	void	Look_At(const Vector3 &p,const Vector3 &t,CustomFloat roll);
 	
 	// Previous look_at function follows the camera coordinate convention.
 	// This one follows the object convention used in Commando and G.  I
 	// special cased this convention since it is used so much by us rather
 	// than supporting every one of the 24(?) possible conventions...
-	void	Obj_Look_At(const Vector3 &p,const Vector3 &t,float roll);
+	void	Obj_Look_At(const Vector3 &p,const Vector3 &t,CustomFloat roll);
 
 	// Create a matrix given a position and a direction (x axis will point in direction)
 	void buildTransformMatrix( const Vector3 &pos, const Vector3 &dir );
@@ -319,7 +319,7 @@ public:
 	void Get_Orthogonal_Inverse(Matrix3D & set_inverse) const;
 	
 	// used for importing SurRender matrices
-	void Copy_3x3_Matrix(float matrix[3][3]);
+	void Copy_3x3_Matrix(CustomFloat matrix[3][3]);
 
 	// Optimized Axis-Aligned Box transforms.  One for each of the common forms of
 	// axis aligned box: min,max vectors and center,extent vectors.
@@ -345,7 +345,7 @@ public:
 	int	Is_Orthogonal(void) const; 
 	void	Re_Orthogonalize(void);
 
-	static void Lerp(const Matrix3D &A, const Matrix3D &B, float factor, Matrix3D& result);
+	static void Lerp(const Matrix3D &A, const Matrix3D &B, CustomFloat factor, Matrix3D& result);
 	
 #ifdef ALLOW_TEMPORARIES
 	// nothing
@@ -418,7 +418,7 @@ bool operator != (const Matrix3D &A, const Matrix3D &B);
  * HISTORY:                                                                                    * 
  *   02/24/1997 GH  : Created.                                                                 * 
  *=============================================================================================*/
-WWINLINE Matrix3D::Matrix3D(float m[12])
+WWINLINE Matrix3D::Matrix3D(CustomFloat m[12])
 {
 	Row[0].Set(m[0],m[1],m[2],m[3]);
 	Row[1].Set(m[4],m[5],m[6],m[7]);
@@ -427,9 +427,9 @@ WWINLINE Matrix3D::Matrix3D(float m[12])
 
 WWINLINE Matrix3D::Matrix3D
 (
-	float m11,float m12,float m13,float m14,
-	float m21,float m22,float m23,float m24,
-	float m31,float m32,float m33,float m34  
+	CustomFloat m11,CustomFloat m12,CustomFloat m13,CustomFloat m14,
+	CustomFloat m21,CustomFloat m22,CustomFloat m23,CustomFloat m24,
+	CustomFloat m31,CustomFloat m32,CustomFloat m33,CustomFloat m34  
 )
 {
 	Row[0].Set(m11,m12,m13,m14);
@@ -448,12 +448,12 @@ WWINLINE Matrix3D::Matrix3D
 	Set(x,y,z,pos);
 }
 
-WWINLINE Matrix3D::Matrix3D(const Vector3 & axis,float angle)
+WWINLINE Matrix3D::Matrix3D(const Vector3 & axis,CustomFloat angle)
 {
 	Set(axis,angle);
 }
 
-WWINLINE Matrix3D::Matrix3D(const Vector3 & axis,float sine,float cosine)
+WWINLINE Matrix3D::Matrix3D(const Vector3 & axis,CustomFloat sine,CustomFloat cosine)
 {
 	Set(axis,sine,cosine);
 }
@@ -492,7 +492,7 @@ WWINLINE Matrix3D & Matrix3D::operator = (const Matrix3D & m)
 
 
 /***********************************************************************************************
- * Matrix3D::Set -- init a Matrix3D from an arrray of 12 floats                                *
+ * Matrix3D::Set -- init a Matrix3D from an arrray of 12 CustomFloats                                *
  *                                                                                             *
  * INPUT:                                                                                      *
  *                                                                                             *
@@ -503,7 +503,7 @@ WWINLINE Matrix3D & Matrix3D::operator = (const Matrix3D & m)
  * HISTORY:                                                                                    *
  *   2/24/98    GTH : Created.                                                                 *
  *=============================================================================================*/
-WWINLINE void Matrix3D::Set(float m[12])
+WWINLINE void Matrix3D::Set(CustomFloat m[12])
 {
 	Row[0].Set(m[0],m[1],m[2],m[3]);
 	Row[1].Set(m[4],m[5],m[6],m[7]);
@@ -512,7 +512,7 @@ WWINLINE void Matrix3D::Set(float m[12])
 
 
 /***********************************************************************************************
- * Matrix3D::Set -- Init a Matrix3D from 12 individual floats                                  *
+ * Matrix3D::Set -- Init a Matrix3D from 12 individual CustomFloats                                  *
  *                                                                                             *
  * INPUT:                                                                                      *
  *                                                                                             *
@@ -523,9 +523,9 @@ WWINLINE void Matrix3D::Set(float m[12])
  * HISTORY:                                                                                    *
  *   2/24/98    GTH : Created.                                                                 *
  *=============================================================================================*/
-WWINLINE void Matrix3D::Set(		float m11,float m12,float m13,float m14,
-										float m21,float m22,float m23,float m24,
-										float m31,float m32,float m33,float m34)
+WWINLINE void Matrix3D::Set(		CustomFloat m11,CustomFloat m12,CustomFloat m13,CustomFloat m14,
+										CustomFloat m21,CustomFloat m22,CustomFloat m23,CustomFloat m24,
+										CustomFloat m31,CustomFloat m32,CustomFloat m33,CustomFloat m34)
 {
 	Row[0].Set(m11,m12,m13,m14);
 	Row[1].Set(m21,m22,m23,m24);
@@ -568,10 +568,10 @@ WWINLINE void Matrix3D::Set(		const Vector3	&x,		// x-axis unit vector
  * HISTORY:                                                                                    *
  *   2/24/98    GTH : Created.                                                                 *
  *=============================================================================================*/
-WWINLINE void Matrix3D::Set(const Vector3 & axis,float angle)
+WWINLINE void Matrix3D::Set(const Vector3 & axis,CustomFloat angle)
 {
-	float c = cosf(angle);
-	float s = sinf(angle);
+	CustomFloat c = cos(angle);
+	CustomFloat s = sin(angle);
 
 	Set(axis,s,c);
 }
@@ -588,28 +588,28 @@ WWINLINE void Matrix3D::Set(const Vector3 & axis,float angle)
  * HISTORY:                                                                                    *
  *   2/24/98    GTH : Created.                                                                 *
  *=============================================================================================*/
-WWINLINE void Matrix3D::Set(const Vector3 & axis,float s,float c)
+WWINLINE void Matrix3D::Set(const Vector3 & axis,CustomFloat s,CustomFloat c)
 {
 	assert(WWMath::Fabs(axis.Length2() - 1.0f) < 0.001f);
 
 	Row[0].Set(
-		(float)(axis[0]*axis[0] + c*(1.0f - axis[0]*axis[0])),
-		(float)(axis[0]*axis[1]*(1.0f - c) - axis[2]*s),
-		(float)(axis[2]*axis[0]*(1.0f - c) + axis[1]*s),
+		(CustomFloat)(axis[0]*axis[0] + c*((CustomFloat)1.0f - axis[0]*axis[0])),
+		(CustomFloat)(axis[0]*axis[1]*((CustomFloat)1.0f - c) - axis[2]*s),
+		(CustomFloat)(axis[2]*axis[0]*((CustomFloat)1.0f - c) + axis[1]*s),
 		0.0f
 	);
 
 	Row[1].Set(
-		(float)(axis[0]*axis[1]*(1.0f - c) + axis[2]*s),
-		(float)(axis[1]*axis[1] + c*(1.0f - axis[1]*axis[1])),
-		(float)(axis[1]*axis[2]*(1.0f - c) - axis[0]*s),
+		(CustomFloat)(axis[0]*axis[1]*((CustomFloat)1.0f - c) + axis[2]*s),
+		(CustomFloat)(axis[1]*axis[1] + c*((CustomFloat)1.0f - axis[1]*axis[1])),
+		(CustomFloat)(axis[1]*axis[2]*((CustomFloat)1.0f - c) - axis[0]*s),
 		0.0f
 	);
 
 	Row[2].Set(
-		(float)(axis[2]*axis[0]*(1.0f - c) - axis[1]*s),
-		(float)(axis[1]*axis[2]*(1.0f - c) + axis[0]*s),
-		(float)(axis[2]*axis[2] + c*(1 - axis[2]*axis[2])),
+		(CustomFloat)(axis[2]*axis[0]*((CustomFloat)1.0f - c) - axis[1]*s),
+		(CustomFloat)(axis[1]*axis[2]*((CustomFloat)1.0f - c) + axis[0]*s),
+		(CustomFloat)(axis[2]*axis[2] + c*((CustomFloat)1 - axis[2]*axis[2])),
 		0.0f
 	);
 }
@@ -667,11 +667,11 @@ WWINLINE void Matrix3D::Make_Identity(void)
  * HISTORY:                                                                                    * 
  *   02/24/1997 GH  : Created.                                                                 * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::Translate(float x,float y,float z)
+WWINLINE void Matrix3D::Translate(CustomFloat x,CustomFloat y,CustomFloat z)
 {
-	Row[0][3]  += (float)(Row[0][0]*x + Row[0][1]*y + Row[0][2]*z);
-	Row[1][3]  += (float)(Row[1][0]*x + Row[1][1]*y + Row[1][2]*z);
-	Row[2][3]  += (float)(Row[2][0]*x + Row[2][1]*y + Row[2][2]*z);
+	Row[0][3]  += (CustomFloat)(Row[0][0]*x + Row[0][1]*y + Row[0][2]*z);
+	Row[1][3]  += (CustomFloat)(Row[1][0]*x + Row[1][1]*y + Row[1][2]*z);
+	Row[2][3]  += (CustomFloat)(Row[2][0]*x + Row[2][1]*y + Row[2][2]*z);
 }
 
 
@@ -707,11 +707,11 @@ WWINLINE void Matrix3D::Translate(const Vector3 &t)
  * HISTORY:                                                                                    * 
  *   07/06/1998 NH  : Created.                                                                 * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::Translate_X(float x)
+WWINLINE void Matrix3D::Translate_X(CustomFloat x)
 {
-	Row[0][3]  += (float)(Row[0][0]*x);
-	Row[1][3]  += (float)(Row[1][0]*x);
-	Row[2][3]  += (float)(Row[2][0]*x);
+	Row[0][3]  += (CustomFloat)(Row[0][0]*x);
+	Row[1][3]  += (CustomFloat)(Row[1][0]*x);
+	Row[2][3]  += (CustomFloat)(Row[2][0]*x);
 }
 
 
@@ -727,11 +727,11 @@ WWINLINE void Matrix3D::Translate_X(float x)
  * HISTORY:                                                                                    * 
  *   07/06/1998 NH  : Created.                                                                 * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::Translate_Y(float y)
+WWINLINE void Matrix3D::Translate_Y(CustomFloat y)
 {
-	Row[0][3]  += (float)(Row[0][1]*y);
-	Row[1][3]  += (float)(Row[1][1]*y);
-	Row[2][3]  += (float)(Row[2][1]*y);
+	Row[0][3]  += (CustomFloat)(Row[0][1]*y);
+	Row[1][3]  += (CustomFloat)(Row[1][1]*y);
+	Row[2][3]  += (CustomFloat)(Row[2][1]*y);
 }
 
 
@@ -747,11 +747,11 @@ WWINLINE void Matrix3D::Translate_Y(float y)
  * HISTORY:                                                                                    * 
  *   07/06/1998 NH  : Created.                                                                 * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::Translate_Z(float z)
+WWINLINE void Matrix3D::Translate_Z(CustomFloat z)
 {
-	Row[0][3]  += (float)(Row[0][2]*z);
-	Row[1][3]  += (float)(Row[1][2]*z);
-	Row[2][3]  += (float)(Row[2][2]*z);
+	Row[0][3]  += (CustomFloat)(Row[0][2]*z);
+	Row[1][3]  += (CustomFloat)(Row[1][2]*z);
+	Row[2][3]  += (CustomFloat)(Row[2][2]*z);
 }
 
 
@@ -767,25 +767,25 @@ WWINLINE void Matrix3D::Translate_Z(float z)
  * HISTORY:                                                                                    * 
  *   02/24/1997 GH  : Created.                                                                 * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::Rotate_X(float theta)
+WWINLINE void Matrix3D::Rotate_X(CustomFloat theta)
 {
-	float tmp1,tmp2;
-	float s,c;
+	CustomFloat tmp1,tmp2;
+	CustomFloat s,c;
 
-	s = sinf(theta);
-	c = cosf(theta);
+	s = sin(theta);
+	c = cos(theta);
 
 	tmp1 = Row[0][1]; tmp2 = Row[0][2];
-	Row[0][1] = (float)( c*tmp1 + s*tmp2);
-	Row[0][2] = (float)(-s*tmp1 + c*tmp2);
+	Row[0][1] = ( c*tmp1 + s*tmp2);
+	Row[0][2] = (-s*tmp1 + c*tmp2);
 
 	tmp1 = Row[1][1]; tmp2 = Row[1][2];
-	Row[1][1] = (float)( c*tmp1 + s*tmp2);
-	Row[1][2] = (float)(-s*tmp1 + c*tmp2);
+	Row[1][1] = ( c*tmp1 + s*tmp2);
+	Row[1][2] = (-s*tmp1 + c*tmp2);
 
 	tmp1 = Row[2][1]; tmp2 = Row[2][2];
-	Row[2][1] = (float)( c*tmp1 + s*tmp2);
-	Row[2][2] = (float)(-s*tmp1 + c*tmp2);
+	Row[2][1] = ( c*tmp1 + s*tmp2);
+	Row[2][2] = (-s*tmp1 + c*tmp2);
 
 }
 
@@ -804,21 +804,21 @@ WWINLINE void Matrix3D::Rotate_X(float theta)
  * HISTORY:                                                                                    * 
  *   02/24/1997 GH  : Created.                                                                 * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::Rotate_X(float s,float c)
+WWINLINE void Matrix3D::Rotate_X(CustomFloat s,CustomFloat c)
 {
-	float tmp1,tmp2;
+	CustomFloat tmp1,tmp2;
 
 	tmp1 = Row[0][1]; tmp2 = Row[0][2];
-	Row[0][1] = (float)( c*tmp1 + s*tmp2);
-	Row[0][2] = (float)(-s*tmp1 + c*tmp2);
+	Row[0][1] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[0][2] = (CustomFloat)(-s*tmp1 + c*tmp2);
 
 	tmp1 = Row[1][1]; tmp2 = Row[1][2];
-	Row[1][1] = (float)( c*tmp1 + s*tmp2);
-	Row[1][2] = (float)(-s*tmp1 + c*tmp2);
+	Row[1][1] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[1][2] = (CustomFloat)(-s*tmp1 + c*tmp2);
 
 	tmp1 = Row[2][1]; tmp2 = Row[2][2];
-	Row[2][1] = (float)( c*tmp1 + s*tmp2);
-	Row[2][2] = (float)(-s*tmp1 + c*tmp2);
+	Row[2][1] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[2][2] = (CustomFloat)(-s*tmp1 + c*tmp2);
 }
 
 
@@ -835,25 +835,25 @@ WWINLINE void Matrix3D::Rotate_X(float s,float c)
  * HISTORY:                                                                                    * 
  *   02/24/1997 GH  : Created.                                                                 * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::Rotate_Y(float theta)
+WWINLINE void Matrix3D::Rotate_Y(CustomFloat theta)
 {
-	float tmp1,tmp2;
-	float s,c;
+	CustomFloat tmp1,tmp2;
+	CustomFloat s,c;
 
-	s = sinf(theta);
-	c = cosf(theta);
+	s = sin(theta);
+	c = cos(theta);
 
 	tmp1 = Row[0][0]; tmp2 = Row[0][2];
-	Row[0][0] = (float)(c*tmp1 - s*tmp2);
-	Row[0][2] = (float)(s*tmp1 + c*tmp2);
+	Row[0][0] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[0][2] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[1][0]; tmp2 = Row[1][2];
-	Row[1][0] = (float)(c*tmp1 - s*tmp2);
-	Row[1][2] = (float)(s*tmp1 + c*tmp2);
+	Row[1][0] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[1][2] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[2][0]; tmp2 = Row[2][2];
-	Row[2][0] = (float)(c*tmp1 - s*tmp2);
-	Row[2][2] = (float)(s*tmp1 + c*tmp2);
+	Row[2][0] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[2][2] = (CustomFloat)(s*tmp1 + c*tmp2);
 }
 
 
@@ -871,21 +871,21 @@ WWINLINE void Matrix3D::Rotate_Y(float theta)
  * HISTORY:                                                                                    * 
  *   02/24/1997 GH  : Created.                                                                 * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::Rotate_Y(float s,float c)
+WWINLINE void Matrix3D::Rotate_Y(CustomFloat s,CustomFloat c)
 {
-	float tmp1,tmp2;
+	CustomFloat tmp1,tmp2;
 
 	tmp1 = Row[0][0]; tmp2 = Row[0][2];
-	Row[0][0] = (float)(c*tmp1 - s*tmp2);
-	Row[0][2] = (float)(s*tmp1 + c*tmp2);
+	Row[0][0] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[0][2] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[1][0]; tmp2 = Row[1][2];
-	Row[1][0] = (float)(c*tmp1 - s*tmp2);
-	Row[1][2] = (float)(s*tmp1 + c*tmp2);
+	Row[1][0] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[1][2] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[2][0]; tmp2 = Row[2][2];
-	Row[2][0] = (float)(c*tmp1 - s*tmp2);
-	Row[2][2] = (float)(s*tmp1 + c*tmp2);
+	Row[2][0] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[2][2] = (CustomFloat)(s*tmp1 + c*tmp2);
 }
 
 
@@ -902,25 +902,25 @@ WWINLINE void Matrix3D::Rotate_Y(float s,float c)
  * HISTORY:                                                                                    * 
  *   02/24/1997 GH  : Created.                                                                 * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::Rotate_Z(float theta)
+WWINLINE void Matrix3D::Rotate_Z(CustomFloat theta)
 {
-	float tmp1,tmp2;
-	float c,s;
+	CustomFloat tmp1,tmp2;
+	CustomFloat c,s;
 
-	c = cosf(theta);
-	s = sinf(theta);
+	c = cos(theta);
+	s = sin(theta);
 
 	tmp1 = Row[0][0]; tmp2 = Row[0][1];
-	Row[0][0] = (float)( c*tmp1 + s*tmp2);
-	Row[0][1] = (float)(-s*tmp1 + c*tmp2);
+	Row[0][0] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[0][1] = (CustomFloat)(-s*tmp1 + c*tmp2);
 
 	tmp1 = Row[1][0]; tmp2 = Row[1][1];
-	Row[1][0] = (float)( c*tmp1 + s*tmp2);
-	Row[1][1] = (float)(-s*tmp1 + c*tmp2);
+	Row[1][0] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[1][1] = (CustomFloat)(-s*tmp1 + c*tmp2);
 
 	tmp1 = Row[2][0]; tmp2 = Row[2][1];
-	Row[2][0] = (float)( c*tmp1 + s*tmp2);
-	Row[2][1] = (float)(-s*tmp1 + c*tmp2);
+	Row[2][0] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[2][1] = (CustomFloat)(-s*tmp1 + c*tmp2);
 }
 
 
@@ -938,21 +938,21 @@ WWINLINE void Matrix3D::Rotate_Z(float theta)
  * HISTORY:                                                                                    * 
  *   02/24/1997 GH  : Created.                                                                 * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::Rotate_Z(float s,float c)
+WWINLINE void Matrix3D::Rotate_Z(CustomFloat s,CustomFloat c)
 {
-	float tmp1,tmp2;
+	CustomFloat tmp1,tmp2;
 
 	tmp1 = Row[0][0]; tmp2 = Row[0][1];
-	Row[0][0] = (float)( c*tmp1 + s*tmp2);
-	Row[0][1] = (float)(-s*tmp1 + c*tmp2);
+	Row[0][0] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[0][1] = (CustomFloat)(-s*tmp1 + c*tmp2);
 
 	tmp1 = Row[1][0]; tmp2 = Row[1][1];
-	Row[1][0] = (float)( c*tmp1 + s*tmp2);
-	Row[1][1] = (float)(-s*tmp1 + c*tmp2);
+	Row[1][0] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[1][1] = (CustomFloat)(-s*tmp1 + c*tmp2);
 
 	tmp1 = Row[2][0]; tmp2 = Row[2][1];
-	Row[2][0] = (float)( c*tmp1 + s*tmp2);
-	Row[2][1] = (float)(-s*tmp1 + c*tmp2);
+	Row[2][0] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[2][1] = (CustomFloat)(-s*tmp1 + c*tmp2);
 }
 
 /*********************************************************************************************** 
@@ -972,7 +972,7 @@ WWINLINE void Matrix3D::Rotate_Z(float s,float c)
 // !! The Matrix Inverse function, only works
 // !! with Orthogonal Matrices, for optimization purposes
 // !!
-WWINLINE void	Matrix3D::Scale(float scale)
+WWINLINE void	Matrix3D::Scale(CustomFloat scale)
 {	// uniform scale all 3 axis
 	// X
 	Row[0][0] *= scale;
@@ -1004,7 +1004,7 @@ WWINLINE void	Matrix3D::Scale(float scale)
 // !! The Matrix Inverse function, only works
 // !! with Orthogonal Matrices, for optimization purposes
 // !!
-WWINLINE void	Matrix3D::Scale(float x, float y, float z)
+WWINLINE void	Matrix3D::Scale(CustomFloat x, CustomFloat y, CustomFloat z)
 { // separate input for each axis
 	// X
 	Row[0][0] *= x;
@@ -1054,29 +1054,29 @@ WWINLINE void	Matrix3D::Scale(Vector3 &scale)
  * HISTORY:                                                                                    * 
  *   07/1/1999 NH  : Created.                                                                  * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::Pre_Rotate_X(float theta)
+WWINLINE void Matrix3D::Pre_Rotate_X(CustomFloat theta)
 {
-	float tmp1,tmp2;
-	float c,s;
+	CustomFloat tmp1,tmp2;
+	CustomFloat c,s;
 
-	c = cosf(theta);
-	s = sinf(theta);
+	c = cos(theta);
+	s = sin(theta);
 
 	tmp1 = Row[1][0]; tmp2 = Row[2][0];
-	Row[1][0] = (float)(c*tmp1 - s*tmp2);
-	Row[2][0] = (float)(s*tmp1 + c*tmp2);
+	Row[1][0] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[2][0] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[1][1]; tmp2 = Row[2][1];
-	Row[1][1] = (float)(c*tmp1 - s*tmp2);
-	Row[2][1] = (float)(s*tmp1 + c*tmp2);
+	Row[1][1] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[2][1] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[1][2]; tmp2 = Row[2][2];
-	Row[1][2] = (float)(c*tmp1 - s*tmp2);
-	Row[2][2] = (float)(s*tmp1 + c*tmp2);
+	Row[1][2] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[2][2] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[1][3]; tmp2 = Row[2][3];
-	Row[1][3] = (float)(c*tmp1 - s*tmp2);
-	Row[2][3] = (float)(s*tmp1 + c*tmp2);
+	Row[1][3] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[2][3] = (CustomFloat)(s*tmp1 + c*tmp2);
 }
 
 /*********************************************************************************************** 
@@ -1092,29 +1092,29 @@ WWINLINE void Matrix3D::Pre_Rotate_X(float theta)
  * HISTORY:                                                                                    * 
  *   07/1/1999 NH  : Created.                                                                  * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::Pre_Rotate_Y(float theta)
+WWINLINE void Matrix3D::Pre_Rotate_Y(CustomFloat theta)
 {
-	float tmp1,tmp2;
-	float c,s;
+	CustomFloat tmp1,tmp2;
+	CustomFloat c,s;
 
-	c = cosf(theta);
-	s = sinf(theta);
+	c = cos(theta);
+	s = sin(theta);
 
 	tmp1 = Row[0][0]; tmp2 = Row[2][0];
-	Row[0][0] = (float)( c*tmp1 + s*tmp2);
-	Row[2][0] = (float)(-s*tmp1 + c*tmp2);
+	Row[0][0] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[2][0] = (CustomFloat)(-s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][1]; tmp2 = Row[2][1];
-	Row[0][1] = (float)( c*tmp1 + s*tmp2);
-	Row[2][1] = (float)(-s*tmp1 + c*tmp2);
+	Row[0][1] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[2][1] = (CustomFloat)(-s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][2]; tmp2 = Row[2][2];
-	Row[0][2] = (float)( c*tmp1 + s*tmp2);
-	Row[2][2] = (float)(-s*tmp1 + c*tmp2);
+	Row[0][2] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[2][2] = (CustomFloat)(-s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][3]; tmp2 = Row[2][3];
-	Row[0][3] = (float)( c*tmp1 + s*tmp2);
-	Row[2][3] = (float)(-s*tmp1 + c*tmp2);
+	Row[0][3] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[2][3] = (CustomFloat)(-s*tmp1 + c*tmp2);
 }
 
 /*********************************************************************************************** 
@@ -1130,29 +1130,29 @@ WWINLINE void Matrix3D::Pre_Rotate_Y(float theta)
  * HISTORY:                                                                                    * 
  *   07/1/1999 NH  : Created.                                                                  * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::Pre_Rotate_Z(float theta)
+WWINLINE void Matrix3D::Pre_Rotate_Z(CustomFloat theta)
 {
-	float tmp1,tmp2;
-	float c,s;
+	CustomFloat tmp1,tmp2;
+	CustomFloat c,s;
 
-	c = cosf(theta);
-	s = sinf(theta);
+	c = cos(theta);
+	s = sin(theta);
 
 	tmp1 = Row[0][0]; tmp2 = Row[1][0];
-	Row[0][0] = (float)(c*tmp1 - s*tmp2);
-	Row[1][0] = (float)(s*tmp1 + c*tmp2);
+	Row[0][0] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[1][0] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][1]; tmp2 = Row[1][1];
-	Row[0][1] = (float)(c*tmp1 - s*tmp2);
-	Row[1][1] = (float)(s*tmp1 + c*tmp2);
+	Row[0][1] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[1][1] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][2]; tmp2 = Row[1][2];
-	Row[0][2] = (float)(c*tmp1 - s*tmp2);
-	Row[1][2] = (float)(s*tmp1 + c*tmp2);
+	Row[0][2] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[1][2] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][3]; tmp2 = Row[1][3];
-	Row[0][3] = (float)(c*tmp1 - s*tmp2);
-	Row[1][3] = (float)(s*tmp1 + c*tmp2);
+	Row[0][3] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[1][3] = (CustomFloat)(s*tmp1 + c*tmp2);
 }
 
 /*********************************************************************************************** 
@@ -1169,25 +1169,25 @@ WWINLINE void Matrix3D::Pre_Rotate_Z(float theta)
  * HISTORY:                                                                                    * 
  *   07/1/1999 NH  : Created.                                                                  * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::Pre_Rotate_X(float s,float c)
+WWINLINE void Matrix3D::Pre_Rotate_X(CustomFloat s,CustomFloat c)
 {
-	float tmp1,tmp2;
+	CustomFloat tmp1,tmp2;
 
 	tmp1 = Row[1][0]; tmp2 = Row[2][0];
-	Row[1][0] = (float)(c*tmp1 - s*tmp2);
-	Row[2][0] = (float)(s*tmp1 + c*tmp2);
+	Row[1][0] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[2][0] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[1][1]; tmp2 = Row[2][1];
-	Row[1][1] = (float)(c*tmp1 - s*tmp2);
-	Row[2][1] = (float)(s*tmp1 + c*tmp2);
+	Row[1][1] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[2][1] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[1][2]; tmp2 = Row[2][2];
-	Row[1][2] = (float)(c*tmp1 - s*tmp2);
-	Row[2][2] = (float)(s*tmp1 + c*tmp2);
+	Row[1][2] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[2][2] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[1][3]; tmp2 = Row[2][3];
-	Row[1][3] = (float)(c*tmp1 - s*tmp2);
-	Row[2][3] = (float)(s*tmp1 + c*tmp2);
+	Row[1][3] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[2][3] = (CustomFloat)(s*tmp1 + c*tmp2);
 }
 
 /*********************************************************************************************** 
@@ -1204,25 +1204,25 @@ WWINLINE void Matrix3D::Pre_Rotate_X(float s,float c)
  * HISTORY:                                                                                    * 
  *   07/1/1999 NH  : Created.                                                                  * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::Pre_Rotate_Y(float s,float c)
+WWINLINE void Matrix3D::Pre_Rotate_Y(CustomFloat s,CustomFloat c)
 {
-	float tmp1,tmp2;
+	CustomFloat tmp1,tmp2;
 
 	tmp1 = Row[0][0]; tmp2 = Row[2][0];
-	Row[0][0] = (float)( c*tmp1 + s*tmp2);
-	Row[2][0] = (float)(-s*tmp1 + c*tmp2);
+	Row[0][0] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[2][0] = (CustomFloat)(-s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][1]; tmp2 = Row[2][1];
-	Row[0][1] = (float)( c*tmp1 + s*tmp2);
-	Row[2][1] = (float)(-s*tmp1 + c*tmp2);
+	Row[0][1] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[2][1] = (CustomFloat)(-s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][2]; tmp2 = Row[2][2];
-	Row[0][2] = (float)( c*tmp1 + s*tmp2);
-	Row[2][2] = (float)(-s*tmp1 + c*tmp2);
+	Row[0][2] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[2][2] = (CustomFloat)(-s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][3]; tmp2 = Row[2][3];
-	Row[0][3] = (float)( c*tmp1 + s*tmp2);
-	Row[2][3] = (float)(-s*tmp1 + c*tmp2);
+	Row[0][3] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[2][3] = (CustomFloat)(-s*tmp1 + c*tmp2);
 }
 
 /*********************************************************************************************** 
@@ -1239,25 +1239,25 @@ WWINLINE void Matrix3D::Pre_Rotate_Y(float s,float c)
  * HISTORY:                                                                                    * 
  *   07/1/1999 NH  : Created.                                                                  * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::Pre_Rotate_Z(float s,float c)
+WWINLINE void Matrix3D::Pre_Rotate_Z(CustomFloat s,CustomFloat c)
 {
-	float tmp1,tmp2;
+	CustomFloat tmp1,tmp2;
 
 	tmp1 = Row[0][0]; tmp2 = Row[1][0];
-	Row[0][0] = (float)(c*tmp1 - s*tmp2);
-	Row[1][0] = (float)(s*tmp1 + c*tmp2);
+	Row[0][0] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[1][0] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][1]; tmp2 = Row[1][1];
-	Row[0][1] = (float)(c*tmp1 - s*tmp2);
-	Row[1][1] = (float)(s*tmp1 + c*tmp2);
+	Row[0][1] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[1][1] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][2]; tmp2 = Row[1][2];
-	Row[0][2] = (float)(c*tmp1 - s*tmp2);
-	Row[1][2] = (float)(s*tmp1 + c*tmp2);
+	Row[0][2] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[1][2] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][3]; tmp2 = Row[1][3];
-	Row[0][3] = (float)(c*tmp1 - s*tmp2);
-	Row[1][3] = (float)(s*tmp1 + c*tmp2);
+	Row[0][3] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[1][3] = (CustomFloat)(s*tmp1 + c*tmp2);
 }
 
 /*********************************************************************************************** 
@@ -1273,25 +1273,25 @@ WWINLINE void Matrix3D::Pre_Rotate_Z(float s,float c)
  * HISTORY:                                                                                    * 
  *   07/1/1999 NH  : Created.                                                                  * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::In_Place_Pre_Rotate_X(float theta)
+WWINLINE void Matrix3D::In_Place_Pre_Rotate_X(CustomFloat theta)
 {
-	float tmp1,tmp2;
-	float c,s;
+	CustomFloat tmp1,tmp2;
+	CustomFloat c,s;
 
-	c = cosf(theta);
-	s = sinf(theta);
+	c = cos(theta);
+	s = sin(theta);
 
 	tmp1 = Row[1][0]; tmp2 = Row[2][0];
-	Row[1][0] = (float)(c*tmp1 - s*tmp2);
-	Row[2][0] = (float)(s*tmp1 + c*tmp2);
+	Row[1][0] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[2][0] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[1][1]; tmp2 = Row[2][1];
-	Row[1][1] = (float)(c*tmp1 - s*tmp2);
-	Row[2][1] = (float)(s*tmp1 + c*tmp2);
+	Row[1][1] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[2][1] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[1][2]; tmp2 = Row[2][2];
-	Row[1][2] = (float)(c*tmp1 - s*tmp2);
-	Row[2][2] = (float)(s*tmp1 + c*tmp2);
+	Row[1][2] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[2][2] = (CustomFloat)(s*tmp1 + c*tmp2);
 }
 
 /*********************************************************************************************** 
@@ -1307,25 +1307,25 @@ WWINLINE void Matrix3D::In_Place_Pre_Rotate_X(float theta)
  * HISTORY:                                                                                    * 
  *   07/1/1999 NH  : Created.                                                                  * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::In_Place_Pre_Rotate_Y(float theta)
+WWINLINE void Matrix3D::In_Place_Pre_Rotate_Y(CustomFloat theta)
 {
-	float tmp1,tmp2;
-	float c,s;
+	CustomFloat tmp1,tmp2;
+	CustomFloat c,s;
 
-	c = cosf(theta);
-	s = sinf(theta);
+	c = cos(theta);
+	s = sin(theta);
 
 	tmp1 = Row[0][0]; tmp2 = Row[2][0];
-	Row[0][0] = (float)( c*tmp1 + s*tmp2);
-	Row[2][0] = (float)(-s*tmp1 + c*tmp2);
+	Row[0][0] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[2][0] = (CustomFloat)(-s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][1]; tmp2 = Row[2][1];
-	Row[0][1] = (float)( c*tmp1 + s*tmp2);
-	Row[2][1] = (float)(-s*tmp1 + c*tmp2);
+	Row[0][1] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[2][1] = (CustomFloat)(-s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][2]; tmp2 = Row[2][2];
-	Row[0][2] = (float)( c*tmp1 + s*tmp2);
-	Row[2][2] = (float)(-s*tmp1 + c*tmp2);
+	Row[0][2] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[2][2] = (CustomFloat)(-s*tmp1 + c*tmp2);
 }
 
 /*********************************************************************************************** 
@@ -1341,25 +1341,25 @@ WWINLINE void Matrix3D::In_Place_Pre_Rotate_Y(float theta)
  * HISTORY:                                                                                    * 
  *   07/1/1999 NH  : Created.                                                                  * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::In_Place_Pre_Rotate_Z(float theta)
+WWINLINE void Matrix3D::In_Place_Pre_Rotate_Z(CustomFloat theta)
 {
-	float tmp1,tmp2;
-	float c,s;
+	CustomFloat tmp1,tmp2;
+	CustomFloat c,s;
 
-	c = cosf(theta);
-	s = sinf(theta);
+	c = cos(theta);
+	s = sin(theta);
 
 	tmp1 = Row[0][0]; tmp2 = Row[1][0];
-	Row[0][0] = (float)(c*tmp1 - s*tmp2);
-	Row[1][0] = (float)(s*tmp1 + c*tmp2);
+	Row[0][0] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[1][0] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][1]; tmp2 = Row[1][1];
-	Row[0][1] = (float)(c*tmp1 - s*tmp2);
-	Row[1][1] = (float)(s*tmp1 + c*tmp2);
+	Row[0][1] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[1][1] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][2]; tmp2 = Row[1][2];
-	Row[0][2] = (float)(c*tmp1 - s*tmp2);
-	Row[1][2] = (float)(s*tmp1 + c*tmp2);
+	Row[0][2] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[1][2] = (CustomFloat)(s*tmp1 + c*tmp2);
 }
 
 /*********************************************************************************************** 
@@ -1376,21 +1376,21 @@ WWINLINE void Matrix3D::In_Place_Pre_Rotate_Z(float theta)
  * HISTORY:                                                                                    * 
  *   07/1/1999 NH  : Created.                                                                  * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::In_Place_Pre_Rotate_X(float s,float c)
+WWINLINE void Matrix3D::In_Place_Pre_Rotate_X(CustomFloat s,CustomFloat c)
 {
-	float tmp1,tmp2;
+	CustomFloat tmp1,tmp2;
 
 	tmp1 = Row[1][0]; tmp2 = Row[2][0];
-	Row[1][0] = (float)(c*tmp1 - s*tmp2);
-	Row[2][0] = (float)(s*tmp1 + c*tmp2);
+	Row[1][0] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[2][0] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[1][1]; tmp2 = Row[2][1];
-	Row[1][1] = (float)(c*tmp1 - s*tmp2);
-	Row[2][1] = (float)(s*tmp1 + c*tmp2);
+	Row[1][1] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[2][1] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[1][2]; tmp2 = Row[2][2];
-	Row[1][2] = (float)(c*tmp1 - s*tmp2);
-	Row[2][2] = (float)(s*tmp1 + c*tmp2);
+	Row[1][2] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[2][2] = (CustomFloat)(s*tmp1 + c*tmp2);
 }
 
 /*********************************************************************************************** 
@@ -1407,21 +1407,21 @@ WWINLINE void Matrix3D::In_Place_Pre_Rotate_X(float s,float c)
  * HISTORY:                                                                                    * 
  *   07/1/1999 NH  : Created.                                                                  * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::In_Place_Pre_Rotate_Y(float s,float c)
+WWINLINE void Matrix3D::In_Place_Pre_Rotate_Y(CustomFloat s,CustomFloat c)
 {
-	float tmp1,tmp2;
+	CustomFloat tmp1,tmp2;
 
 	tmp1 = Row[0][0]; tmp2 = Row[2][0];
-	Row[0][0] = (float)( c*tmp1 + s*tmp2);
-	Row[2][0] = (float)(-s*tmp1 + c*tmp2);
+	Row[0][0] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[2][0] = (CustomFloat)(-s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][1]; tmp2 = Row[2][1];
-	Row[0][1] = (float)( c*tmp1 + s*tmp2);
-	Row[2][1] = (float)(-s*tmp1 + c*tmp2);
+	Row[0][1] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[2][1] = (CustomFloat)(-s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][2]; tmp2 = Row[2][2];
-	Row[0][2] = (float)( c*tmp1 + s*tmp2);
-	Row[2][2] = (float)(-s*tmp1 + c*tmp2);
+	Row[0][2] = (CustomFloat)( c*tmp1 + s*tmp2);
+	Row[2][2] = (CustomFloat)(-s*tmp1 + c*tmp2);
 }
 
 /*********************************************************************************************** 
@@ -1438,21 +1438,21 @@ WWINLINE void Matrix3D::In_Place_Pre_Rotate_Y(float s,float c)
  * HISTORY:                                                                                    * 
  *   07/1/1999 NH  : Created.                                                                  * 
  *=============================================================================================*/
-WWINLINE void Matrix3D::In_Place_Pre_Rotate_Z(float s,float c)
+WWINLINE void Matrix3D::In_Place_Pre_Rotate_Z(CustomFloat s,CustomFloat c)
 {
-	float tmp1,tmp2;
+	CustomFloat tmp1,tmp2;
 
 	tmp1 = Row[0][0]; tmp2 = Row[1][0];
-	Row[0][0] = (float)(c*tmp1 - s*tmp2);
-	Row[1][0] = (float)(s*tmp1 + c*tmp2);
+	Row[0][0] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[1][0] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][1]; tmp2 = Row[1][1];
-	Row[0][1] = (float)(c*tmp1 - s*tmp2);
-	Row[1][1] = (float)(s*tmp1 + c*tmp2);
+	Row[0][1] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[1][1] = (CustomFloat)(s*tmp1 + c*tmp2);
 
 	tmp1 = Row[0][2]; tmp2 = Row[1][2];
-	Row[0][2] = (float)(c*tmp1 - s*tmp2);
-	Row[1][2] = (float)(s*tmp1 + c*tmp2);
+	Row[0][2] = (CustomFloat)(c*tmp1 - s*tmp2);
+	Row[1][2] = (CustomFloat)(s*tmp1 + c*tmp2);
 }
 
 #ifdef ALLOW_TEMPORARIES
@@ -1471,46 +1471,46 @@ WWINLINE void Matrix3D::In_Place_Pre_Rotate_Z(float s,float c)
 WWINLINE Matrix3D operator * (const Matrix3D &A,const Matrix3D &B)
 {
 	Matrix3D C;
-	float tmp1,tmp2,tmp3;
+	CustomFloat tmp1,tmp2,tmp3;
 
 	tmp1 = B[0][0];
 	tmp2 = B[1][0];
 	tmp3 = B[2][0];
 
-	C[0][0] = (float)(A[0][0]*tmp1 + A[0][1]*tmp2 + A[0][2]*tmp3);
-	C[1][0] = (float)(A[1][0]*tmp1 + A[1][1]*tmp2 + A[1][2]*tmp3);
-	C[2][0] = (float)(A[2][0]*tmp1 + A[2][1]*tmp2 + A[2][2]*tmp3);
+	C[0][0] = (CustomFloat)(A[0][0]*tmp1 + A[0][1]*tmp2 + A[0][2]*tmp3);
+	C[1][0] = (CustomFloat)(A[1][0]*tmp1 + A[1][1]*tmp2 + A[1][2]*tmp3);
+	C[2][0] = (CustomFloat)(A[2][0]*tmp1 + A[2][1]*tmp2 + A[2][2]*tmp3);
 
 	tmp1 = B[0][1];
 	tmp2 = B[1][1];
 	tmp3 = B[2][1];
 
-	C[0][1] = (float)(A[0][0]*tmp1 + A[0][1]*tmp2 + A[0][2]*tmp3);
-	C[1][1] = (float)(A[1][0]*tmp1 + A[1][1]*tmp2 + A[1][2]*tmp3);
-	C[2][1] = (float)(A[2][0]*tmp1 + A[2][1]*tmp2 + A[2][2]*tmp3);
+	C[0][1] = (CustomFloat)(A[0][0]*tmp1 + A[0][1]*tmp2 + A[0][2]*tmp3);
+	C[1][1] = (CustomFloat)(A[1][0]*tmp1 + A[1][1]*tmp2 + A[1][2]*tmp3);
+	C[2][1] = (CustomFloat)(A[2][0]*tmp1 + A[2][1]*tmp2 + A[2][2]*tmp3);
 
 	tmp1 = B[0][2];
 	tmp2 = B[1][2];
 	tmp3 = B[2][2];
 
-	C[0][2] = (float)(A[0][0]*tmp1 + A[0][1]*tmp2 + A[0][2]*tmp3);
-	C[1][2] = (float)(A[1][0]*tmp1 + A[1][1]*tmp2 + A[1][2]*tmp3);
-	C[2][2] = (float)(A[2][0]*tmp1 + A[2][1]*tmp2 + A[2][2]*tmp3);
+	C[0][2] = (CustomFloat)(A[0][0]*tmp1 + A[0][1]*tmp2 + A[0][2]*tmp3);
+	C[1][2] = (CustomFloat)(A[1][0]*tmp1 + A[1][1]*tmp2 + A[1][2]*tmp3);
+	C[2][2] = (CustomFloat)(A[2][0]*tmp1 + A[2][1]*tmp2 + A[2][2]*tmp3);
 
 	tmp1 = B[0][3];
 	tmp2 = B[1][3];
 	tmp3 = B[2][3];
 
-	C[0][3] = (float)(A[0][0]*tmp1 + A[0][1]*tmp2 + A[0][2]*tmp3 + A[0][3]);
-	C[1][3] = (float)(A[1][0]*tmp1 + A[1][1]*tmp2 + A[1][2]*tmp3 + A[1][3]);
-	C[2][3] = (float)(A[2][0]*tmp1 + A[2][1]*tmp2 + A[2][2]*tmp3 + A[2][3]);
+	C[0][3] = (CustomFloat)(A[0][0]*tmp1 + A[0][1]*tmp2 + A[0][2]*tmp3 + A[0][3]);
+	C[1][3] = (CustomFloat)(A[1][0]*tmp1 + A[1][1]*tmp2 + A[1][2]*tmp3 + A[1][3]);
+	C[2][3] = (CustomFloat)(A[2][0]*tmp1 + A[2][1]*tmp2 + A[2][2]*tmp3 + A[2][3]);
 
 	return C;
 }
 
 #else
 
-WWINLINE float submul(const Vector4& row, float tmp1, float tmp2, float tmp3)
+WWINLINE CustomFloat submul(const Vector4& row, CustomFloat tmp1, CustomFloat tmp2, CustomFloat tmp3)
 {
   return row.X * tmp1 + row.Y * tmp2 + row.Z * tmp3;
 }
@@ -1531,7 +1531,7 @@ WWINLINE void Matrix3D::postMul(const Matrix3D& that)
 
 #define AVOID_TEMP_IN_POSTMUL
 #ifdef AVOID_TEMP_IN_POSTMUL
-  float tmpX, tmpY, tmpZ, tmpW;
+  CustomFloat tmpX, tmpY, tmpZ, tmpW;
 
 	tmpX = submul(this->Row[0], that.Row[0].X, that.Row[1].X, that.Row[2].X);
 	tmpY = submul(this->Row[0], that.Row[0].Y, that.Row[1].Y, that.Row[2].Y);
@@ -1576,7 +1576,7 @@ WWINLINE void Matrix3D::mul(const Matrix3D& A, const Matrix3D& B)
 	// nope, this is actually ok. (srj)
 	//assert(this != &B);
 
-	float tmp1,tmp2,tmp3;
+	CustomFloat tmp1,tmp2,tmp3;
 
 	tmp1 = B.Row[0].X;
 	tmp2 = B.Row[1].X;
@@ -1650,9 +1650,9 @@ WWINLINE Vector3 operator * (const Matrix3D &A,const Vector3 &a)
 WWINLINE void Matrix3D::mulVector3(const Vector3& in, Vector3& out) const
 {
 	// note, it's ok for in==out here.
-	float x = (Row[0].X * in.X + Row[0].Y * in.Y + Row[0].Z * in.Z + Row[0].W);
-	float y = (Row[1].X * in.X + Row[1].Y * in.Y + Row[1].Z * in.Z + Row[1].W);
-	float z = (Row[2].X * in.X + Row[2].Y * in.Y + Row[2].Z * in.Z + Row[2].W);
+	CustomFloat x = (Row[0].X * in.X + Row[0].Y * in.Y + Row[0].Z * in.Z + Row[0].W);
+	CustomFloat y = (Row[1].X * in.X + Row[1].Y * in.Y + Row[1].Z * in.Z + Row[1].W);
+	CustomFloat z = (Row[2].X * in.X + Row[2].Y * in.Y + Row[2].Z * in.Z + Row[2].W);
 	out.Set(x, y, z);
 }
 
@@ -1689,9 +1689,9 @@ WWINLINE void Matrix3D::mulVector3Array(Vector3* inout, int count) const
 #else	
 	while (count--)
 	{
-		float x = (Row[0].X * inout->X + Row[0].Y * inout->Y + Row[0].Z * inout->Z + Row[0].W);
-		float y = (Row[1].X * inout->X + Row[1].Y * inout->Y + Row[1].Z * inout->Z + Row[1].W);
-		float z = (Row[2].X * inout->X + Row[2].Y * inout->Y + Row[2].Z * inout->Z + Row[2].W);
+		CustomFloat x = (Row[0].X * inout->X + Row[0].Y * inout->Y + Row[0].Z * inout->Z + Row[0].W);
+		CustomFloat y = (Row[1].X * inout->X + Row[1].Y * inout->Y + Row[1].Z * inout->Z + Row[1].W);
+		CustomFloat z = (Row[2].X * inout->X + Row[2].Y * inout->Y + Row[2].Z * inout->Z + Row[2].W);
 		inout->Set(x, y, z);
 		++inout;
 	}

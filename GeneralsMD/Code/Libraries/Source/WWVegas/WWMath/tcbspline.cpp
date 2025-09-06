@@ -64,7 +64,7 @@ enum
 ** TCBSpline3DClass Implemenation
 */
 
-int TCBSpline3DClass::Add_Key(const Vector3 & point,float t)
+int TCBSpline3DClass::Add_Key(const Vector3 & point,CustomFloat t)
 {
 	int index;
 	index = HermiteSpline3DClass::Add_Key(point,t);
@@ -89,7 +89,7 @@ void TCBSpline3DClass::Clear_Keys(void)
 	Params.Clear();
 }
 
-void TCBSpline3DClass::Set_TCB_Params(int i,float tension,float continuity,float bias)
+void TCBSpline3DClass::Set_TCB_Params(int i,CustomFloat tension,CustomFloat continuity,CustomFloat bias)
 {
 	WWASSERT(i >= 0);
 	WWASSERT(i < Params.Count());
@@ -99,7 +99,7 @@ void TCBSpline3DClass::Set_TCB_Params(int i,float tension,float continuity,float
 	TangentsDirty = true;
 }
 
-void TCBSpline3DClass::Get_TCB_Params(int i,float *tension,float *continuity,float *bias)
+void TCBSpline3DClass::Get_TCB_Params(int i,CustomFloat *tension,CustomFloat *continuity,CustomFloat *bias)
 {
 	if (tension) *tension = Params[i].Tension;
 	if (continuity) *continuity = Params[i].Continuity;
@@ -125,10 +125,10 @@ void TCBSpline3DClass::Update_Tangents(void)
 
 		// This really only works if the start and end points have the same position...
 		// Also just using the TCB params from p0 for both
-		float k0 = 0.5f * ((1-Params[0].Tension) * (1-Params[0].Continuity) * (1-Params[0].Bias));
-		float k1 = 0.5f * ((1-Params[0].Tension) * (1+Params[0].Continuity) * (1+Params[0].Bias));
-		float k2 = 0.5f * ((1-Params[0].Tension) * (1+Params[0].Continuity) * (1-Params[0].Bias));
-		float k3 = 0.5f * ((1-Params[0].Tension) * (1-Params[0].Continuity) * (1+Params[0].Bias));
+		CustomFloat k0 = (CustomFloat)0.5f * (((CustomFloat)1-Params[0].Tension) * ((CustomFloat)1-Params[0].Continuity) * ((CustomFloat)1-Params[0].Bias));
+		CustomFloat k1 = (CustomFloat)0.5f * (((CustomFloat)1-Params[0].Tension) * ((CustomFloat)1+Params[0].Continuity) * ((CustomFloat)1+Params[0].Bias));
+		CustomFloat k2 = (CustomFloat)0.5f * (((CustomFloat)1-Params[0].Tension) * ((CustomFloat)1+Params[0].Continuity) * ((CustomFloat)1-Params[0].Bias));
+		CustomFloat k3 = (CustomFloat)0.5f * (((CustomFloat)1-Params[0].Tension) * ((CustomFloat)1-Params[0].Continuity) * ((CustomFloat)1+Params[0].Bias));
 
 		Vector3 dp_in;
 		Vector3 dp_out;
@@ -140,8 +140,8 @@ void TCBSpline3DClass::Update_Tangents(void)
 		
 	} else {
 		
-		float k2 = 0.25f * ((1-Params[0].Tension) * (1+Params[0].Continuity) * (1-Params[0].Bias));
-		float k3 = 0.25f * ((1-Params[0].Tension) * (1-Params[0].Continuity) * (1+Params[0].Bias));
+		CustomFloat k2 = (CustomFloat)0.25f * (((CustomFloat)1-Params[0].Tension) * ((CustomFloat)1+Params[0].Continuity) * ((CustomFloat)1-Params[0].Bias));
+		CustomFloat k3 = (CustomFloat)0.25f * (((CustomFloat)1-Params[0].Tension) * ((CustomFloat)1-Params[0].Continuity) * ((CustomFloat)1+Params[0].Bias));
 
 		Vector3 dp_in;
 		Vector3 dp_out;
@@ -149,16 +149,16 @@ void TCBSpline3DClass::Update_Tangents(void)
 		dp_in = dp_out;
 		Vector3::Add(k2*dp_out, k3*dp_in, &Tangents[0].OutTangent);
 
-		float k0 = 0.25f * ((1-Params[0].Tension) * (1-Params[0].Continuity) * (1-Params[0].Bias));
-		float k1 = 0.25f * ((1-Params[0].Tension) * (1+Params[0].Continuity) * (1+Params[0].Bias));
+		CustomFloat k0 = (CustomFloat)0.25f * (((CustomFloat)1-Params[0].Tension) * ((CustomFloat)1-Params[0].Continuity) * ((CustomFloat)1-Params[0].Bias));
+		CustomFloat k1 = (CustomFloat)0.25f * (((CustomFloat)1-Params[0].Tension) * ((CustomFloat)1+Params[0].Continuity) * ((CustomFloat)1+Params[0].Bias));
 		Vector3::Subtract(Keys[end].Point,Keys[end-1].Point,&dp_in);
 		dp_out = dp_in;
 		Vector3::Add(k0*dp_out, k1*dp_in, &Tangents[end].InTangent);
 	}
 
-	float total_time = (Keys[1].Time - Keys[0].Time) + (Keys[end].Time - Keys[end-1].Time);
-	float in_factor = 2.0f * (Keys[end].Time - Keys[end-1].Time) / total_time;
-	float out_factor = 2.0f * (Keys[1].Time - Keys[0].Time) / total_time;
+	CustomFloat total_time = (Keys[1].Time - Keys[0].Time) + (Keys[end].Time - Keys[end-1].Time);
+	CustomFloat in_factor = (CustomFloat)2.0f * (Keys[end].Time - Keys[end-1].Time) / total_time;
+	CustomFloat out_factor = (CustomFloat)2.0f * (Keys[1].Time - Keys[0].Time) / total_time;
 	Tangents[end].InTangent *= in_factor;
 	Tangents[0].OutTangent *= out_factor;
 
@@ -166,10 +166,10 @@ void TCBSpline3DClass::Update_Tangents(void)
 	// Now compute the tangents of all of the normal keys...
 	for (int pi=1;pi<Keys.Count() - 1; pi++) {
 
-		float k0 = 0.5f * ((1-Params[pi].Tension) * (1-Params[pi].Continuity) * (1-Params[pi].Bias));
-		float k1 = 0.5f * ((1-Params[pi].Tension) * (1+Params[pi].Continuity) * (1+Params[pi].Bias));
-		float k2 = 0.5f * ((1-Params[pi].Tension) * (1+Params[pi].Continuity) * (1-Params[pi].Bias));
-		float k3 = 0.5f * ((1-Params[pi].Tension) * (1-Params[pi].Continuity) * (1+Params[pi].Bias));
+		CustomFloat k0 = (CustomFloat)0.5f * (((CustomFloat)1-Params[pi].Tension) * ((CustomFloat)1-Params[pi].Continuity) * ((CustomFloat)1-Params[pi].Bias));
+		CustomFloat k1 = (CustomFloat)0.5f * (((CustomFloat)1-Params[pi].Tension) * ((CustomFloat)1+Params[pi].Continuity) * ((CustomFloat)1+Params[pi].Bias));
+		CustomFloat k2 = (CustomFloat)0.5f * (((CustomFloat)1-Params[pi].Tension) * ((CustomFloat)1+Params[pi].Continuity) * ((CustomFloat)1-Params[pi].Bias));
+		CustomFloat k3 = (CustomFloat)0.5f * (((CustomFloat)1-Params[pi].Tension) * ((CustomFloat)1-Params[pi].Continuity) * ((CustomFloat)1+Params[pi].Bias));
 
 		Vector3 dp_in;
 		Vector3 dp_out;
@@ -179,9 +179,9 @@ void TCBSpline3DClass::Update_Tangents(void)
 		Vector3::Add(k0*dp_out, k1*dp_in, &Tangents[pi].InTangent);
 		Vector3::Add(k2*dp_out, k3*dp_in, &Tangents[pi].OutTangent);
 
-		float total_time = (Keys[pi+1].Time - Keys[pi-1].Time);
-		float in_factor = 2.0f * (Keys[pi].Time - Keys[pi-1].Time) / total_time;
-		float out_factor = 2.0f * (Keys[pi+1].Time - Keys[pi].Time) / total_time;
+		CustomFloat total_time = (Keys[pi+1].Time - Keys[pi-1].Time);
+		CustomFloat in_factor = (CustomFloat)2.0f * (Keys[pi].Time - Keys[pi-1].Time) / total_time;
+		CustomFloat out_factor = (CustomFloat)2.0f * (Keys[pi+1].Time - Keys[pi].Time) / total_time;
 
 		Tangents[pi].InTangent *= in_factor;		// compensating for un-even keys
 		Tangents[pi].OutTangent *= out_factor;

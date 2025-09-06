@@ -52,12 +52,12 @@ class CardinalSpline3DClass : public HermiteSpline3DClass
 {
 public:
 
-	virtual int			Add_Key(const Vector3 & point,float t);
+	virtual int			Add_Key(const Vector3 & point,CustomFloat t);
 	virtual void		Remove_Key(int i);
 	virtual void		Clear_Keys(void);
 
-	virtual void		Set_Tightness(int i,float tightness);
-	virtual float		Get_Tightness(int i);
+	virtual void		Set_Tightness(int i,CustomFloat tightness);
+	virtual CustomFloat		Get_Tightness(int i);
 
 	virtual void		Update_Tangents(void);
 
@@ -68,7 +68,7 @@ public:
 
 protected:	
 	
-	DynamicVectorClass<float>	Tightness;
+	DynamicVectorClass<CustomFloat>	Tightness;
 };
 
 
@@ -80,12 +80,12 @@ class CardinalSpline1DClass : public HermiteSpline1DClass
 {
 public:
 
-	virtual int			Add_Key(float point,float t);
+	virtual int			Add_Key(CustomFloat point,CustomFloat t);
 	virtual void		Remove_Key(int i);
 	virtual void		Clear_Keys(void);
 
-	virtual void		Set_Tightness(int i,float tightness);
-	virtual float		Get_Tightness(int i);
+	virtual void		Set_Tightness(int i,CustomFloat tightness);
+	virtual CustomFloat		Get_Tightness(int i);
 
 	virtual void		Update_Tangents(void);
 
@@ -96,7 +96,7 @@ public:
 
 protected:	
 	
-	DynamicVectorClass<float>	Tightness;
+	DynamicVectorClass<CustomFloat>	Tightness;
 };
 
 

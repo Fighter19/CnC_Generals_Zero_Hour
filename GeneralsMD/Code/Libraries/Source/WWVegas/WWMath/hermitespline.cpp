@@ -87,7 +87,7 @@ void HermiteSpline3DClass::Set_Looping(bool onoff)
 	}
 }
 
-void HermiteSpline3DClass::Evaluate(float time,Vector3 * set_val)
+void HermiteSpline3DClass::Evaluate(CustomFloat time,Vector3 * set_val)
 {
 	// if we're outside the range, return the start or end...
 	if (time < Keys[0].Time) { 
@@ -107,17 +107,17 @@ void HermiteSpline3DClass::Evaluate(float time,Vector3 * set_val)
 	
 	// ok find the segment
 	int i0,i1;
-	float t;
+	CustomFloat t;
 	Find_Interval(time,&i0,&i1,&t);
 
-	float t2 = t*t;
-	float t3 = t2*t;
+	CustomFloat t2 = t*t;
+	CustomFloat t3 = t2*t;
 
 	// hermite basis functions:
-	float h0 = 2*t3 - 3*t2 + 1;
-	float h1 = -2*t3 + 3*t2;
-	float h2 = t3 - 2*t2 + t;
-	float h3 = t3 - t2;
+	CustomFloat h0 = (CustomFloat)2*t3 - (CustomFloat)3*t2 + (CustomFloat)1;
+	CustomFloat h1 = (CustomFloat)-2*t3 + (CustomFloat)3*t2;
+	CustomFloat h2 = t3 - (CustomFloat)2*t2 + t;
+	CustomFloat h3 = t3 - t2;
 
 	set_val->X =	h0*Keys[i0].Point.X + h1*Keys[i1].Point.X + 
 						h2*Tangents[i0].OutTangent.X + h3*Tangents[i1].InTangent.X;
@@ -129,11 +129,11 @@ void HermiteSpline3DClass::Evaluate(float time,Vector3 * set_val)
 						h2*Tangents[i0].OutTangent.Z + h3*Tangents[i1].InTangent.Z;
 }
 
-void HermiteSpline3DClass::Evaluate_Derivative(float time,Vector3 * set_val)
+void HermiteSpline3DClass::Evaluate_Derivative(CustomFloat time,Vector3 * set_val)
 {
 	// if we're outside the range, return the value for the start or end...
-	float min_time = Keys[0].Time;
-	float max_time = Keys[Keys.Count() - 1].Time;
+	CustomFloat min_time = Keys[0].Time;
+	CustomFloat max_time = Keys[Keys.Count() - 1].Time;
 	time = MAX(time, min_time);
 	time = MIN(time, max_time);
 
@@ -144,16 +144,16 @@ void HermiteSpline3DClass::Evaluate_Derivative(float time,Vector3 * set_val)
 	
 	// ok find the segment
 	int i0,i1;
-	float t;
+	CustomFloat t;
 	Find_Interval(time,&i0,&i1,&t);
 
-	float t2 = t*t;
+	CustomFloat t2 = t*t;
 
 	// derivatives of hermite basis functions:
-	float dh0 = 6*t2 - 6*t;
-	float dh1 = -6*t2 + 6*t;
-	float dh2 = 3*t2 - 4*t + 1;
-	float dh3 = 3*t2 - 2*t;
+	CustomFloat dh0 = (CustomFloat)6*t2 - (CustomFloat)6*t;
+	CustomFloat dh1 = (CustomFloat)-6*t2 + (CustomFloat)6*t;
+	CustomFloat dh2 = (CustomFloat)3*t2 - (CustomFloat)4*t + (CustomFloat)1;
+	CustomFloat dh3 = (CustomFloat)3*t2 - (CustomFloat)2*t;
 
 	set_val->X =	dh0*Keys[i0].Point.X + dh1*Keys[i1].Point.X + 
 						dh2*Tangents[i0].OutTangent.X + dh3*Tangents[i1].InTangent.X;
@@ -171,7 +171,7 @@ void HermiteSpline3DClass::Set_Key(int i,const Vector3 & point)
 	TangentsDirty = true;
 }
 
-int HermiteSpline3DClass::Add_Key(const Vector3 & point,float t)
+int HermiteSpline3DClass::Add_Key(const Vector3 & point,CustomFloat t)
 {
 	int index = Curve3DClass::Add_Key(point,t);
 	TangentsDirty = true;
@@ -282,7 +282,7 @@ void HermiteSpline1DClass::Set_Looping(bool onoff)
 	}
 }
 
-void HermiteSpline1DClass::Evaluate(float time,float * set_val)
+void HermiteSpline1DClass::Evaluate(CustomFloat time,CustomFloat * set_val)
 {
 	if (Keys.Count() == 1)
 	{
@@ -311,29 +311,29 @@ void HermiteSpline1DClass::Evaluate(float time,float * set_val)
 	
 	// ok find the segment
 	int i0,i1;
-	float t;
+	CustomFloat t;
 	Find_Interval(time,&i0,&i1,&t);
 
-	float t2 = t*t;
-	float t3 = t2*t;
+	CustomFloat t2 = t*t;
+	CustomFloat t3 = t2*t;
 
 	// hermite basis functions:
-	float h0 = 2*t3 - 3*t2 + 1;
-	float h1 = -2*t3 + 3*t2;
-	float h2 = t3 - 2*t2 + t;
-	float h3 = t3 - t2;
+	CustomFloat h0 = (CustomFloat)2*t3 - (CustomFloat)3*t2 + (CustomFloat)1;
+	CustomFloat h1 = (CustomFloat)-2*t3 + (CustomFloat)3*t2;
+	CustomFloat h2 = t3 - (CustomFloat)2*t2 + t;
+	CustomFloat h3 = t3 - t2;
 
 	*set_val = h0*Keys[i0].Point + h1*Keys[i1].Point +
 		h2*Tangents[i0].OutTangent + h3*Tangents[i1].InTangent;
 }
 
-void HermiteSpline1DClass::Set_Key(int i,float point,unsigned int extra)
+void HermiteSpline1DClass::Set_Key(int i,CustomFloat point,unsigned int extra)
 {
 	Curve1DClass::Set_Key(i,point,extra);
 	TangentsDirty = true;
 }
 
-int HermiteSpline1DClass::Add_Key(float point,float t,unsigned int extra)
+int HermiteSpline1DClass::Add_Key(CustomFloat point,CustomFloat t,unsigned int extra)
 {
 	int index = Curve1DClass::Add_Key(point,t,extra);
 	TangentsDirty = true;
@@ -358,7 +358,7 @@ void HermiteSpline1DClass::Clear_Keys(void)
 	TangentsDirty = true;
 }
 
-void HermiteSpline1DClass::Set_Tangents(int i,float in_tan,float out_tan)
+void HermiteSpline1DClass::Set_Tangents(int i,CustomFloat in_tan,CustomFloat out_tan)
 {
 	assert(i>=0);
 	assert(i<Keys.Count());
@@ -366,7 +366,7 @@ void HermiteSpline1DClass::Set_Tangents(int i,float in_tan,float out_tan)
 	Tangents[i].OutTangent = out_tan;
 }
 
-void HermiteSpline1DClass::Get_Tangents(int i,float * set_in,float * set_out)
+void HermiteSpline1DClass::Get_Tangents(int i,CustomFloat * set_in,CustomFloat * set_out)
 {
 	assert(i>=0);
 	assert(i<Keys.Count());

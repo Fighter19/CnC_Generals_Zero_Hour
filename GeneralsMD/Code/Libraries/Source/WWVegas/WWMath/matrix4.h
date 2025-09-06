@@ -43,7 +43,7 @@
  *   Matrix4x4::Make_Identity -- Initializes the matrix to Identity                              *
  *   Matrix4x4::Init -- Initializes from the contents of the give Matrix3D                       *
  *   Matrix4x4::Init -- Initializes the rows from the given Vector4s                             *
- *   Matrix4x4::Init -- Initializes the rows from the given 16 floats                            *
+ *   Matrix4x4::Init -- Initializes the rows from the given 16 CustomFloats                            *
  *   Matrix4x4::Init_Ortho -- Initialize to an orthographic projection matrix                    *
  *   Matrix4x4::Init_Perspective -- Initialize to a perspective projection matrix                *
  *   Matrix4x4::Init_Perspective -- Initialize to a perspective projection matrix                *
@@ -85,27 +85,27 @@ public:
 	WWINLINE explicit Matrix4x4(const Matrix3D & m);
 	WWINLINE explicit Matrix4x4(const Matrix3x3 & m);
 	WWINLINE explicit Matrix4x4(const Vector4 & v0, const Vector4 & v1, const Vector4 & v2, const Vector4 & v3);
-	WWINLINE explicit Matrix4x4(	float m11,float m12,float m13,float m14,
-										float m21,float m22,float m23,float m24,
-										float m31,float m32,float m33,float m34,  
-										float m41,float m42,float m43,float m44 ); 
+	WWINLINE explicit Matrix4x4(	CustomFloat m11,CustomFloat m12,CustomFloat m13,CustomFloat m14,
+										CustomFloat m21,CustomFloat m22,CustomFloat m23,CustomFloat m24,
+										CustomFloat m31,CustomFloat m32,CustomFloat m33,CustomFloat m34,  
+										CustomFloat m41,CustomFloat m42,CustomFloat m43,CustomFloat m44 ); 
 	
 	WWINLINE void		Make_Identity(void);
 	WWINLINE void		Init(const Matrix3D & m);
 	WWINLINE void		Init(const Matrix3x3 & m);
 	WWINLINE void		Init(const Vector4 & v0, const Vector4 & v1, const Vector4 & v2, const Vector4 & v3);
-	WWINLINE void		Init(	float m11,float m12,float m13,float m14,
-									float m21,float m22,float m23,float m24,
-									float m31,float m32,float m33,float m34,  
-									float m41,float m42,float m43,float m44 ); 
+	WWINLINE void		Init(	CustomFloat m11,CustomFloat m12,CustomFloat m13,CustomFloat m14,
+									CustomFloat m21,CustomFloat m22,CustomFloat m23,CustomFloat m24,
+									CustomFloat m31,CustomFloat m32,CustomFloat m33,CustomFloat m34,  
+									CustomFloat m41,CustomFloat m42,CustomFloat m43,CustomFloat m44 ); 
 
 	/*
 	** Projection matrices.  The znear and zfar parameters are positive values indicating the
 	** distance from the camera to the z clipping planes.  See implementations for more info.
 	*/
-	WWINLINE void		Init_Ortho(float left,float right,float bottom,float top,float znear,float zfar);
-	WWINLINE void		Init_Perspective(float hfov,float vfov,float znear,float zfar);
-	WWINLINE void		Init_Perspective(float left,float right,float bottom,float top,float znear,float zfar);
+	WWINLINE void		Init_Ortho(CustomFloat left,CustomFloat right,CustomFloat bottom,CustomFloat top,CustomFloat znear,CustomFloat zfar);
+	WWINLINE void		Init_Perspective(CustomFloat hfov,CustomFloat vfov,CustomFloat znear,CustomFloat zfar);
+	WWINLINE void		Init_Perspective(CustomFloat left,CustomFloat right,CustomFloat bottom,CustomFloat top,CustomFloat znear,CustomFloat zfar);
 
 	/*
 	** Access operators
@@ -125,8 +125,8 @@ public:
 	WWINLINE Matrix4x4 & operator = (const Matrix4x4 & m);
 	WWINLINE Matrix4x4 & operator += (const Matrix4x4 & m);
 	WWINLINE Matrix4x4 & operator -= (const Matrix4x4 & m);
-	WWINLINE Matrix4x4 & operator *= (float d);
-	WWINLINE Matrix4x4 & operator /= (float d);
+	WWINLINE Matrix4x4 & operator *= (CustomFloat d);
+	WWINLINE Matrix4x4 & operator /= (CustomFloat d);
 
 	/*
 	** Negation
@@ -136,9 +136,9 @@ public:
 	/*
 	** Scalar multiplication and division
 	*/
-	WWINLINE friend Matrix4x4 operator * (const Matrix4x4& a,float d);
-	WWINLINE friend Matrix4x4 operator * (float d,const Matrix4x4& a);
-	WWINLINE friend Matrix4x4 operator / (const Matrix4x4& a,float d);
+	WWINLINE friend Matrix4x4 operator * (const Matrix4x4& a,CustomFloat d);
+	WWINLINE friend Matrix4x4 operator * (CustomFloat d,const Matrix4x4& a);
+	WWINLINE friend Matrix4x4 operator / (const Matrix4x4& a,CustomFloat d);
 
 	/*
 	** matrix addition
@@ -277,8 +277,8 @@ WWINLINE Matrix4x4::Matrix4x4(const Vector4 & r0, const Vector4 & r1, const Vect
  * HISTORY:                                                                                    * 
  *   11/06/2001 NH  : Created.                                                                 * 
  *=============================================================================================*/
-WWINLINE Matrix4x4::Matrix4x4(float m11,float m12,float m13,float m14, float m21,float m22,float m23,float m24,
-	float m31,float m32,float m33,float m34, float m41,float m42,float m43,float m44 )
+WWINLINE Matrix4x4::Matrix4x4(CustomFloat m11,CustomFloat m12,CustomFloat m13,CustomFloat m14, CustomFloat m21,CustomFloat m22,CustomFloat m23,CustomFloat m24,
+	CustomFloat m31,CustomFloat m32,CustomFloat m33,CustomFloat m34, CustomFloat m41,CustomFloat m42,CustomFloat m43,CustomFloat m44 )
 {
 	Init(m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44);
 }
@@ -341,7 +341,7 @@ WWINLINE void Matrix4x4::Init(const Vector4 & r0, const Vector4 & r1, const Vect
 
 
 /***********************************************************************************************
- * Matrix4x4::Init -- Initializes the rows from the given 16 floats                              *
+ * Matrix4x4::Init -- Initializes the rows from the given 16 CustomFloats                              *
  *                                                                                             *
  * INPUT:                                                                                      *
  *                                                                                             *
@@ -352,8 +352,8 @@ WWINLINE void Matrix4x4::Init(const Vector4 & r0, const Vector4 & r1, const Vect
  * HISTORY:                                                                                    *
  *   11/6/01    NH : Created.                                                                  *
  *=============================================================================================*/
-WWINLINE void Matrix4x4::Init(float m11,float m12,float m13,float m14, float m21,float m22,float m23,float m24,
-	float m31,float m32,float m33,float m34, float m41,float m42,float m43,float m44)
+WWINLINE void Matrix4x4::Init(CustomFloat m11,CustomFloat m12,CustomFloat m13,CustomFloat m14, CustomFloat m21,CustomFloat m22,CustomFloat m23,CustomFloat m24,
+	CustomFloat m31,CustomFloat m32,CustomFloat m33,CustomFloat m34, CustomFloat m41,CustomFloat m42,CustomFloat m43,CustomFloat m44)
 {
 	Row[0].Set(m11,m12,m13,m14);
 	Row[1].Set(m21,m22,m23,m24);
@@ -387,23 +387,23 @@ WWINLINE void Matrix4x4::Init(float m11,float m12,float m13,float m14, float m21
  *=============================================================================================*/
 WWINLINE void Matrix4x4::Init_Ortho
 (
-	float left,
-	float right,
-	float bottom,
-	float top,
-	float znear,
-	float zfar
+	CustomFloat left,
+	CustomFloat right,
+	CustomFloat bottom,
+	CustomFloat top,
+	CustomFloat znear,
+	CustomFloat zfar
 )
 {
 	assert(znear >= 0.0f);
 	assert(zfar > znear);
 
 	Make_Identity();
-	Row[0][0] = 2.0f / (right - left);
+	Row[0][0] = (CustomFloat)2.0f / (right - left);
 	Row[0][3] = -(right + left) / (right - left);
-	Row[1][1] = 2.0f / (top - bottom);
+	Row[1][1] = (CustomFloat)2.0f / (top - bottom);
 	Row[1][3] = -(top + bottom) / (top - bottom);
-	Row[2][2] = -2.0f / (zfar - znear);
+	Row[2][2] = (CustomFloat)-2.0f / (zfar - znear);
 	Row[2][3] = -(zfar + znear) / (zfar - znear);
 }
 
@@ -435,16 +435,16 @@ WWINLINE void Matrix4x4::Init_Ortho
  * HISTORY:                                                                                    *
  *   11/5/99    gth : Created.                                                                 *
  *=============================================================================================*/
-WWINLINE void Matrix4x4::Init_Perspective(float hfov,float vfov,float znear,float zfar)
+WWINLINE void Matrix4x4::Init_Perspective(CustomFloat hfov,CustomFloat vfov,CustomFloat znear,CustomFloat zfar)
 {
 	assert(znear > 0.0f);
 	assert(zfar > znear);
 
 	Make_Identity();
-	Row[0][0] = static_cast<float>(1.0 / tan(hfov*0.5));
-	Row[1][1] = static_cast<float>(1.0 / tan(vfov*0.5));
+	Row[0][0] = static_cast<CustomFloat>((CustomFloat)1.0 / tan(hfov*0.5));
+	Row[1][1] = static_cast<CustomFloat>((CustomFloat)1.0 / tan(vfov*0.5));
 	Row[2][2] = -(zfar + znear) / (zfar - znear);
-	Row[2][3] = static_cast<float>(-(2.0*zfar*znear) / (zfar - znear));
+	Row[2][3] = static_cast<CustomFloat>(-((CustomFloat)2.0*zfar*znear) / (zfar - znear));
 	Row[3][2] = -1.0f;
 	Row[3][3] = 0.0f;
 }
@@ -482,24 +482,24 @@ WWINLINE void Matrix4x4::Init_Perspective(float hfov,float vfov,float znear,floa
  *=============================================================================================*/
 WWINLINE void Matrix4x4::Init_Perspective
 (
-	float left,
-	float right,
-	float bottom,
-	float top,
-	float znear,
-	float zfar
+	CustomFloat left,
+	CustomFloat right,
+	CustomFloat bottom,
+	CustomFloat top,
+	CustomFloat znear,
+	CustomFloat zfar
 )
 {
 	assert(znear > 0.0f);
 	assert(zfar > 0.0f);
 
 	Make_Identity();
-	Row[0][0] = static_cast<float>(2.0*znear / (right - left));
+	Row[0][0] = static_cast<CustomFloat>((CustomFloat)2.0*znear / (right - left));
 	Row[0][2] = (right + left) / (right - left);
-	Row[1][1] = static_cast<float>(2.0*znear / (top - bottom));
+	Row[1][1] = static_cast<CustomFloat>((CustomFloat)2.0*znear / (top - bottom));
 	Row[1][2] = (top + bottom) / (top - bottom);
 	Row[2][2] = -(zfar + znear) / (zfar - znear);
-	Row[2][3] = static_cast<float>(-(2.0*zfar*znear) / (zfar - znear));
+	Row[2][3] = static_cast<CustomFloat>(-((CustomFloat)2.0*zfar*znear) / (zfar - znear));
 	Row[3][2] = -1.0f;
 	Row[3][3] = 0.0f;
 }
@@ -645,7 +645,7 @@ WWINLINE Matrix4x4& Matrix4x4::operator -= (const Matrix4x4 & m)
  * HISTORY:                                                                                    * 
  *   06/02/1997 GH  : Created.                                                                 * 
  *=============================================================================================*/
-WWINLINE Matrix4x4& Matrix4x4::operator *= (float d)
+WWINLINE Matrix4x4& Matrix4x4::operator *= (CustomFloat d)
 {
 	Row[0] *= d; Row[1] *= d; Row[2] *= d; Row[3] *= d;
 	return *this; 
@@ -663,9 +663,9 @@ WWINLINE Matrix4x4& Matrix4x4::operator *= (float d)
  * HISTORY:                                                                                    * 
  *   06/02/1997 GH  : Created.                                                                 * 
  *=============================================================================================*/
-WWINLINE Matrix4x4& Matrix4x4::operator /= (float d)
+WWINLINE Matrix4x4& Matrix4x4::operator /= (CustomFloat d)
 {
-	float ood = d;
+	CustomFloat ood = d;
 	Row[0] *= ood; Row[1] *= ood; Row[2] *= ood; Row[3] *= ood;
 	return *this; 
 }
@@ -675,19 +675,19 @@ WWINLINE Matrix4x4 operator - (const Matrix4x4 & a)
 	return Matrix4x4(-a.Row[0], -a.Row[1], -a.Row[2], -a.Row[3]); 
 }
 
-WWINLINE Matrix4x4 operator * (const Matrix4x4 & a, float d)
+WWINLINE Matrix4x4 operator * (const Matrix4x4 & a, CustomFloat d)
 { 
 	return Matrix4x4(a.Row[0] * d, a.Row[1] * d, a.Row[2] * d, a.Row[3] * d); 
 }
 
-WWINLINE Matrix4x4 operator * (float d, const Matrix4x4 & a)
+WWINLINE Matrix4x4 operator * (CustomFloat d, const Matrix4x4 & a)
 { 
 	return a*d; 
 }
 
-WWINLINE Matrix4x4 operator / (const Matrix4x4 & a, float d)
+WWINLINE Matrix4x4 operator / (const Matrix4x4 & a, CustomFloat d)
 { 
-	float ood = 1.0f / d;
+	CustomFloat ood = (CustomFloat)1.0f / d;
 	return Matrix4x4(a.Row[0] * ood, a.Row[1] * ood, a.Row[2] * ood, a.Row[3] * ood); 
 }
 

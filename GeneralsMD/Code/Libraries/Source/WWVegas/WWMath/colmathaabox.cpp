@@ -181,7 +181,7 @@ CollisionMath::OverlapType CollisionMath::Overlap_Test(const AABoxClass & box,co
 		// In practice, there are optimizations you can make on each of the axes that
 		// we need to test (see below).
 
-		float box_proj,p0_proj,dp_proj;
+		CustomFloat box_proj,p0_proj,dp_proj;
 		Vector3 dp0;
 		Vector3::Subtract(line.Get_P0(),box.Center,&dp0);
 
@@ -270,8 +270,8 @@ CollisionMath::OverlapType CollisionMath::Overlap_Test(const AABoxClass & box,co
 		Vector3::Subtract(box.Center,box.Extent,&boxmin);
 		Vector3::Add(box.Center,box.Extent,&boxmax);
 
-		float candidateplane[3];	// candidate intersection plane distance for each axis 
-		float maxt[3];					// t value along the ray for each axis
+		CustomFloat candidateplane[3];	// candidate intersection plane distance for each axis 
+		CustomFloat maxt[3];					// t value along the ray for each axis
 		Vector3 coord;					// intersection point
 
 		const int BOX_SIDE_NEGATIVE = -1;
@@ -382,11 +382,11 @@ bool CollisionMath::Collide
 	CastResultStruct *		result
 )
 {
-	float frac;
+	CustomFloat frac;
 
-	float extent = box.Project_To_Axis(plane.N);
-	float dist = Vector3::Dot_Product(plane.N,box.Center) + plane.D;
-	float move = Vector3::Dot_Product(plane.N,move_vector);
+	CustomFloat extent = box.Project_To_Axis(plane.N);
+	CustomFloat dist = Vector3::Dot_Product(plane.N,box.Center) + plane.D;
+	CustomFloat move = Vector3::Dot_Product(plane.N,move_vector);
 
 	if (dist > extent) {
 		if (dist + move > extent) {
@@ -418,7 +418,7 @@ bool CollisionMath::Collide
 		if (result->ComputeContactPoint) {
 			Vector3 move_dir(move_vector);
 			move_dir.Normalize();
-			float move_extent = Vector3::Dot_Product(box.Extent,move_dir);
+			CustomFloat move_extent = Vector3::Dot_Product(box.Extent,move_dir);
 			result->ContactPoint = box.Center + result->Fraction * move_vector + move_extent * move_dir;
 		}
 		return true;
@@ -450,7 +450,7 @@ struct AABCollisionStruct
 	}
 
 	bool						StartBad;			// Inital configuration is intersecting?
-	float						MaxFrac;				// Longest move allowed so far
+	CustomFloat						MaxFrac;				// Longest move allowed so far
 	int						AxisId;				// Last separating axis
 	int						Side;					// which side of the interval
 
@@ -493,13 +493,13 @@ static inline bool aab_separation_test
 	// rb = box1 projection onto the axis
 	// u0 = projected distance between the box centers at t0
 	// u1 = projected distance between the box centers at t1
-	float ra = context.Box0.Extent[axis];
-	float rb = context.Box1.Extent[axis];
-	float u0 = context.C[axis];
-	float u1 = u0 + context.M[axis];
+	CustomFloat ra = context.Box0.Extent[axis];
+	CustomFloat rb = context.Box1.Extent[axis];
+	CustomFloat u0 = context.C[axis];
+	CustomFloat u1 = u0 + context.M[axis];
 
-	float tmp;
-	float rsum = ra+rb;
+	CustomFloat tmp;
+	CustomFloat rsum = ra+rb;
 
 	if ( u0 + WWMATH_EPSILON > rsum ) { 
 		context.StartBad = false; 

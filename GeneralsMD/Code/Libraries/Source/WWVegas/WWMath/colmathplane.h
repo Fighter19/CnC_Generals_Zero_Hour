@@ -103,7 +103,7 @@ inline
 CollisionMath::OverlapType
 CollisionMath::Overlap_Test(const PlaneClass & plane,const Vector3 & point)
 {
-	float delta = Vector3::Dot_Product(point,plane.N) - plane.D;
+	CustomFloat delta = Vector3::Dot_Product(point,plane.N) - plane.D;
 	if (delta > COINCIDENCE_EPSILON) {
 		return POS;
 	} 

@@ -70,7 +70,7 @@ public:
 			m_SharpnessPos (0, 0, 0),
 			Curve3DClass () { }
 
-	VehicleCurveClass (float radius)
+	VehicleCurveClass (CustomFloat radius)
 		:	m_IsDirty (true),
 			m_Radius (radius),
 			m_LastTime (0),
@@ -88,22 +88,22 @@ public:
 	//
 	//	Initialization
 	//	
-	void			Initialize_Arc (float radius);
+	void			Initialize_Arc (CustomFloat radius);
 	
 	//
 	//	From Curve3DClass
 	//	
-	void			Evaluate (float time, Vector3 *set_val);
+	void			Evaluate (CustomFloat time, Vector3 *set_val);
 	void			Set_Key (int i,const Vector3 & point);
-	int			Add_Key (const Vector3 & point,float t);
+	int			Add_Key (const Vector3 & point,CustomFloat t);
 	void			Remove_Key (int i);
 	void			Clear_Keys (void);
 
 	//
 	//	Vehicle curve specific
 	//
-	float			Get_Current_Sharpness (Vector3 *position) const	{ *position = m_SharpnessPos; return m_Sharpness; }
-	float			Get_Last_Eval_Time (void) const						{ return m_LastTime; }
+	CustomFloat			Get_Current_Sharpness (Vector3 *position) const	{ *position = m_SharpnessPos; return m_Sharpness; }
+	CustomFloat			Get_Last_Eval_Time (void) const						{ return m_LastTime; }
 
 	//
 	// Save-load support
@@ -129,10 +129,10 @@ protected:
 		Vector3	center;
 		Vector3	point_in;
 		Vector3	point_out;
-		float		point_angle;
-		float		radius;
-		float		angle_in_delta;
-		float		angle_out_delta;
+		CustomFloat		point_angle;
+		CustomFloat		radius;
+		CustomFloat		angle_in_delta;
+		CustomFloat		angle_out_delta;
 
 		_ArcInfoStruct (void)
 			:	center (0, 0, 0),
@@ -154,11 +154,11 @@ protected:
 	//	Protected member data
 	///////////////////////////////////////////////////////////////////////////
 	bool			m_IsDirty;
-	float			m_Radius;
+	CustomFloat			m_Radius;
 	ARC_LIST		m_ArcList;	
 
-	float			m_LastTime;
-	float			m_Sharpness;
+	CustomFloat			m_LastTime;
+	CustomFloat			m_Sharpness;
 	Vector3		m_SharpnessPos;
 };
 
@@ -177,7 +177,7 @@ VehicleCurveClass::Set_Key (int i,const Vector3 & point)
 //	Add_Key
 ///////////////////////////////////////////////////////////////////////////
 inline int
-VehicleCurveClass::Add_Key (const Vector3 & point,float t)
+VehicleCurveClass::Add_Key (const Vector3 & point,CustomFloat t)
 {
 	m_IsDirty = true;
 	return Curve3DClass::Add_Key (point, t);

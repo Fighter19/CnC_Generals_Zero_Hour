@@ -59,7 +59,7 @@ struct BoxTestStruct
 	Vector3		Max;
 	Vector3		P0;
 	Vector3		DP;
-	float			Fraction;
+	CustomFloat			Fraction;
 	bool			Inside;
 	int			Axis;
 	int			Side;
@@ -113,7 +113,7 @@ inline bool Test_Aligned_Box(BoxTestStruct * test);
 
 bool CollisionMath::Collide(const LineSegClass & line,const AAPlaneClass & plane,CastResultStruct * result)
 {
-	float num,den,t;
+	CustomFloat num,den,t;
 
 	den = line.Get_DP()[plane.Normal];
 
@@ -150,7 +150,7 @@ bool CollisionMath::Collide(const LineSegClass & line,const AAPlaneClass & plane
 
 bool CollisionMath::Collide(const LineSegClass & line,const PlaneClass & plane,CastResultStruct * result)
 {
-	float num,den,t;
+	CustomFloat num,den,t;
 	den = Vector3::Dot_Product(plane.N,line.Get_DP());
 
 	/*
@@ -198,7 +198,7 @@ bool CollisionMath::Collide(const LineSegClass & line,const TriClass & tri,CastR
 	*/
 	PlaneClass plane(*tri.N,*tri.V[0]);
 	Vector3 ipoint;
-	float num,den,t;
+	CustomFloat num,den,t;
 
 	den = Vector3::Dot_Product(plane.N,line.Get_DP());
 	
@@ -248,13 +248,13 @@ bool CollisionMath::Collide(const LineSegClass & line,const SphereClass & sphere
 	// this game from graphics gems 1, page 388
 	// intersection of a ray with a sphere
 	Vector3 dc = sphere.Center - line.Get_P0();
-	float clen = Vector3::Dot_Product((dc) , line.Get_Dir());
-	float disc = (sphere.Radius * sphere.Radius) - (dc.Length2() - clen*clen);
+	CustomFloat clen = Vector3::Dot_Product((dc) , line.Get_Dir());
+	CustomFloat disc = (sphere.Radius * sphere.Radius) - (dc.Length2() - clen*clen);
 	if (disc < 0.0f) {
 		return false;
 	} else {
-		float d = WWMath::Sqrt(disc);
-		float frac = (clen - d) / line.Get_Length();
+		CustomFloat d = WWMath::Sqrt(disc);
+		CustomFloat frac = (clen - d) / line.Get_Length();
 		if (frac<0.0f)
 			frac = (clen + d) / line.Get_Length();
 		if (frac<0.0f) return false;
@@ -381,10 +381,10 @@ inline bool Test_Aligned_Box(BoxTestStruct * test)
 	int i;
 
 	// candidate intersection plane distance for each axis 
-	float candidateplane[3];
+	CustomFloat candidateplane[3];
 
 	// t value along the ray for each axis
-	float maxt[3];
+	CustomFloat maxt[3];
 
 	// intersection point
 	Vector3 coord;

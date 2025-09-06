@@ -124,11 +124,11 @@ bool CollisionMath::Collide
 	CastResultStruct *		result
 )
 {
-	float frac;
+	CustomFloat frac;
 
-	float extent = box.Project_To_Axis(plane.N);
-	float dist = Vector3::Dot_Product(plane.N,box.Center) + plane.D;
-	float move = Vector3::Dot_Product(plane.N,move_vector);
+	CustomFloat extent = box.Project_To_Axis(plane.N);
+	CustomFloat dist = Vector3::Dot_Product(plane.N,box.Center) + plane.D;
+	CustomFloat move = Vector3::Dot_Product(plane.N,move_vector);
 
 	if (dist > extent) {
 		if (dist + move > extent) {
@@ -160,7 +160,7 @@ bool CollisionMath::Collide
 
 			Vector3 move_dir(move_vector);
 			move_dir.Normalize();
-			float move_extent = Vector3::Dot_Product(move_dir,box.Extent);
+			CustomFloat move_extent = Vector3::Dot_Product(move_dir,box.Extent);
 			result->ContactPoint = box.Center + result->Fraction*move_vector  + move_extent*move_dir;
 
 		}

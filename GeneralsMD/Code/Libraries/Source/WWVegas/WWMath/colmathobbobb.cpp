@@ -140,7 +140,7 @@ struct ObbIntersectionStruct
 	Vector3					C;						// Vector from the center0 to center1
 	Vector3					A[3];					// basis vectors for box0
 	Vector3					B[3];					// basis vectors for box1
-	float						AB[3][3];			// dot products of the basis vectors
+	CustomFloat						AB[3][3];			// dot products of the basis vectors
 
 	const OBBoxClass &	Box0;
 	const OBBoxClass &	Box1;
@@ -176,14 +176,14 @@ static bool obb_intersect_box0_basis
 {
 	// ra = box0 projection onto the axis
 	// rb = box1 projection onto the axis
-	float ra =	context.Box0.Extent[axis_index];
-	float rb =	WWMath::Fabs(context.Box1.Extent[0]*context.AB[axis_index][0]) + 
+	CustomFloat ra =	context.Box0.Extent[axis_index];
+	CustomFloat rb =	WWMath::Fabs(context.Box1.Extent[0]*context.AB[axis_index][0]) + 
 					WWMath::Fabs(context.Box1.Extent[1]*context.AB[axis_index][1]) + 
 					WWMath::Fabs(context.Box1.Extent[2]*context.AB[axis_index][2]);
-	float rsum = ra+rb;
+	CustomFloat rsum = ra+rb;
 
 	// u = projected distance between the box centers
-	float u = Vector3::Dot_Product(context.C,context.A[axis_index]);
+	CustomFloat u = Vector3::Dot_Product(context.C,context.A[axis_index]);
 
 	// (gth) the epsilon here was not scaled to the length of the axis so it
 	// caused problems when the axis being tested became very small
@@ -214,14 +214,14 @@ static bool obb_intersect_box1_basis
 {
 	// ra = box0 projection onto the axis
 	// rb = box1 projection onto the axis
-	float ra =	WWMath::Fabs(context.Box0.Extent[0]*context.AB[0][axis_index]) + 
+	CustomFloat ra =	WWMath::Fabs(context.Box0.Extent[0]*context.AB[0][axis_index]) + 
 					WWMath::Fabs(context.Box0.Extent[1]*context.AB[1][axis_index]) + 
 					WWMath::Fabs(context.Box0.Extent[2]*context.AB[2][axis_index]);
-	float rb =	context.Box1.Extent[axis_index];
-	float rsum = ra+rb;
+	CustomFloat rb =	context.Box1.Extent[axis_index];
+	CustomFloat rsum = ra+rb;
 
 	// u = projected distance between the box centers
-	float u = Vector3::Dot_Product(context.C,context.B[axis_index]);
+	CustomFloat u = Vector3::Dot_Product(context.C,context.B[axis_index]);
 
 	// (gth) the epsilon here was not scaled to the length of the axis so it
 	// caused problems when the axis being tested became very small
@@ -249,12 +249,12 @@ static inline bool obb_intersect_axis
 (
 	ObbIntersectionStruct &	context,
 	const Vector3 &			axis,
-	float							ra,
-	float							rb
+	CustomFloat							ra,
+	CustomFloat							rb
 )
 {
-	float rsum = ra+rb;
-	float u = Vector3::Dot_Product(context.C,axis);
+	CustomFloat rsum = ra+rb;
+	CustomFloat u = Vector3::Dot_Product(context.C,axis);
 
 	// (gth) the epsilon here was not scaled to the length of the axis so it
 	// caused problems when the axis being tested became very small
@@ -286,7 +286,7 @@ bool intersect_obb_obb
 )
 {
 	Vector3 axis;
-	float ra,rb;
+	CustomFloat ra,rb;
 	
 	/////////////////////////////////////////////////////////////////////////
 	// Axis = A0
@@ -537,7 +537,7 @@ struct ObbCollisionStruct
 	}
 
 	bool						StartBad;			// Inital configuration is intersecting?
-	float						MaxFrac;				// Longest move allowed so far
+	CustomFloat						MaxFrac;				// Longest move allowed so far
 	int						AxisId;				// Last separating axis
 	int						Side;					// which side of the interval
 
@@ -549,7 +549,7 @@ struct ObbCollisionStruct
 	
 	Vector3					A[3];					// basis vectors for box0
 	Vector3					B[3];					// basis vectors for box1
-	float						AB[3][3];			// dot products of the basis vectors
+	CustomFloat						AB[3][3];			// dot products of the basis vectors
 
 	const OBBoxClass &	Box0;
 	const Vector3 &		Move0;
@@ -579,14 +579,14 @@ private:
 static inline bool obb_separation_test
 (
  	ObbCollisionStruct & context,
-	float ra,
-	float rb,
-	float u0,
-	float u1
+	CustomFloat ra,
+	CustomFloat rb,
+	CustomFloat u0,
+	CustomFloat u1
 )
 {
-	float tmp;
-	float rsum = ra+rb;
+	CustomFloat tmp;
+	CustomFloat rsum = ra+rb;
 
 	if ( u0 + WWMATH_EPSILON > rsum ) { 
 		context.StartBad = false; 
@@ -639,15 +639,15 @@ static bool obb_check_box0_basis
 {
 	// ra = box0 projection onto the axis
 	// rb = box1 projection onto the axis
-	float ra =	context.Box0.Extent[axis_index];
-	float rb =	WWMath::Fabs(context.Box1.Extent[0]*context.AB[axis_index][0]) + 
+	CustomFloat ra =	context.Box0.Extent[axis_index];
+	CustomFloat rb =	WWMath::Fabs(context.Box1.Extent[0]*context.AB[axis_index][0]) + 
 					WWMath::Fabs(context.Box1.Extent[1]*context.AB[axis_index][1]) + 
 					WWMath::Fabs(context.Box1.Extent[2]*context.AB[axis_index][2]);
 
 	// u0 = projected distance between the box centers at t0
 	// u1 = projected distance between the box centers at t1
-	float u0 = Vector3::Dot_Product(context.C,context.A[axis_index]);
-	float u1 = u0 + Vector3::Dot_Product(context.M,context.A[axis_index]);
+	CustomFloat u0 = Vector3::Dot_Product(context.C,context.A[axis_index]);
+	CustomFloat u1 = u0 + Vector3::Dot_Product(context.M,context.A[axis_index]);
 
 	return obb_separation_test(context,ra,rb,u0,u1);
 }
@@ -673,15 +673,15 @@ static bool obb_check_box1_basis
 {
 	// ra = box0 projection onto the axis
 	// rb = box1 projection onto the axis
-	float ra =	WWMath::Fabs(context.Box0.Extent[0]*context.AB[0][axis_index]) + 
+	CustomFloat ra =	WWMath::Fabs(context.Box0.Extent[0]*context.AB[0][axis_index]) + 
 					WWMath::Fabs(context.Box0.Extent[1]*context.AB[1][axis_index]) + 
 					WWMath::Fabs(context.Box0.Extent[2]*context.AB[2][axis_index]);
-	float rb =	context.Box1.Extent[axis_index];
+	CustomFloat rb =	context.Box1.Extent[axis_index];
 
 	// u0 = projected distance between the box centers at t0
 	// u1 = projected distance between the box centers at t1
-	float u0 = Vector3::Dot_Product(context.C,context.B[axis_index]);
-	float u1 = u0 + Vector3::Dot_Product(context.M,context.B[axis_index]);
+	CustomFloat u0 = Vector3::Dot_Product(context.C,context.B[axis_index]);
+	CustomFloat u1 = u0 + Vector3::Dot_Product(context.M,context.B[axis_index]);
 	return obb_separation_test(context,ra,rb,u0,u1);
 }
 
@@ -701,12 +701,12 @@ static bool obb_check_box1_basis
 static inline bool obb_check_axis
 (
 	ObbCollisionStruct &		context,
-	float							ra,
-	float							rb
+	CustomFloat							ra,
+	CustomFloat							rb
 )
 {
-	float u0 = Vector3::Dot_Product(context.C,context.TestAxis);
-	float u1 = u0 + Vector3::Dot_Product(context.M,context.TestAxis);
+	CustomFloat u0 = Vector3::Dot_Product(context.C,context.TestAxis);
+	CustomFloat u1 = u0 + Vector3::Dot_Product(context.M,context.TestAxis);
 	return obb_separation_test(context,ra,rb,u0,u1);
 }
 
@@ -726,8 +726,8 @@ static inline bool obb_check_axis
 static inline void obb_compute_projections
 (
 	const ObbCollisionStruct &		context,
-	float *								ra,
-	float *								rb
+	CustomFloat *								ra,
+	CustomFloat *								rb
 )
 {
 	*ra =	context.Box0.Extent.X * WWMath::Fabs(Vector3::Dot_Product(context.A[0],context.TestAxis)) + 
@@ -847,7 +847,7 @@ static inline void compute_contact_normal(ObbCollisionStruct & context,CastResul
  * HISTORY:                                                                                    *
  *   4/8/99     GTH : Created.                                                                 *
  *=============================================================================================*/
-static inline float eval_side(float ab,float side)
+static inline CustomFloat eval_side(CustomFloat ab,CustomFloat side)
 {
 	if (ab > 0.0f) {
 		return side;
@@ -874,9 +874,9 @@ static inline float eval_side(float ab,float side)
 static inline void compute_contact_point(ObbCollisionStruct & context,CastResultStruct * result)
 {
 	int i,j;
-	float x[3];		// box0 parameters
-	float y[3];		// box1 parameters
-	float den;
+	CustomFloat x[3];		// box0 parameters
+	CustomFloat y[3];		// box1 parameters
+	CustomFloat den;
 	Vector3 dcnew(0,0,0);
 
 //again:
@@ -922,8 +922,8 @@ static inline void compute_contact_point(ObbCollisionStruct & context,CastResult
 		y[1] = -eval_side(context.AB[0][2],context.Side) * context.Box1.Extent[1];
 		y[2] = eval_side(context.AB[0][1],context.Side) * context.Box1.Extent[2];
 		
-		den = (1.0f - context.AB[0][0] * context.AB[0][0]);
-		if (WWMath::Fabs(den) > 0.0f) {
+		den = ((CustomFloat)1.0f - context.AB[0][0] * context.AB[0][0]);
+		if (WWMath::Fabs(den) > (CustomFloat)0.0f) {
 			x[0] = Vector3::Dot_Product(context.A[0],dcnew);
 			x[0] += context.AB[0][0] * (Vector3::Dot_Product(-context.B[0],dcnew) + context.AB[1][0]*x[1] + context.AB[2][0]*x[2]);
 			x[0] += context.AB[0][1] * y[1] + context.AB[0][2] * y[2];
@@ -939,8 +939,8 @@ static inline void compute_contact_point(ObbCollisionStruct & context,CastResult
 		y[0] = eval_side(context.AB[0][2],context.Side) * context.Box1.Extent[0];
 		y[2] = -eval_side(context.AB[0][0],context.Side) * context.Box1.Extent[2];
 
-		den = (1.0f - context.AB[0][1] * context.AB[0][1]);
-		if (WWMath::Fabs(den) > 0.0f) {
+		den = ((CustomFloat)1.0f - context.AB[0][1] * context.AB[0][1]);
+		if (WWMath::Fabs(den) > (CustomFloat)0.0f) {
 			x[0] = Vector3::Dot_Product(context.A[0],dcnew);
 			x[0] += context.AB[0][1] * (Vector3::Dot_Product(-context.B[1],dcnew) + context.AB[1][1]*x[1] + context.AB[2][1]*x[2]);
 			x[0] += context.AB[0][0] * y[0] + context.AB[0][2] * y[2];
@@ -956,8 +956,8 @@ static inline void compute_contact_point(ObbCollisionStruct & context,CastResult
 		y[0] = -eval_side(context.AB[0][1],context.Side) * context.Box1.Extent[0];
 		y[1] = eval_side(context.AB[0][0],context.Side) * context.Box1.Extent[1];
 
-		den = (1.0f - context.AB[0][2] * context.AB[0][2]);
-		if (WWMath::Fabs(den) > 0.0f) {
+		den = ((CustomFloat)1.0f - context.AB[0][2] * context.AB[0][2]);
+		if (WWMath::Fabs(den) > (CustomFloat)0.0f) {
 			x[0] = Vector3::Dot_Product(context.A[0],dcnew);
 			x[0] += context.AB[0][2] * (Vector3::Dot_Product(-context.B[2],dcnew) + context.AB[1][2]*x[1] + context.AB[2][2]*x[2]);
 			x[0] += context.AB[0][0] * y[0] + context.AB[0][1] * y[1];
@@ -973,8 +973,8 @@ static inline void compute_contact_point(ObbCollisionStruct & context,CastResult
 		y[1] = -eval_side(context.AB[1][2],context.Side) * context.Box1.Extent[1];
 		y[2] = eval_side(context.AB[1][1],context.Side) * context.Box1.Extent[2];
 
-		den = (1.0f - context.AB[1][0] * context.AB[1][0]);
-		if (WWMath::Fabs(den) > 0.0f) {
+		den = ((CustomFloat)1.0f - context.AB[1][0] * context.AB[1][0]);
+		if (WWMath::Fabs(den) > (CustomFloat)0.0f) {
 			x[1] = Vector3::Dot_Product(context.A[1],dcnew);
 			x[1] += context.AB[1][0] * (Vector3::Dot_Product(-context.B[0],dcnew) + context.AB[0][0]*x[0] + context.AB[2][0]*x[2]);
 			x[1] += context.AB[1][1] * y[1] + context.AB[1][2] * y[2];
@@ -990,8 +990,8 @@ static inline void compute_contact_point(ObbCollisionStruct & context,CastResult
 		y[0] = eval_side(context.AB[1][2],context.Side) * context.Box1.Extent[0];
 		y[2] = -eval_side(context.AB[1][0],context.Side) * context.Box1.Extent[2];
 
-		den = 1.0f / (1.0f - context.AB[1][1] * context.AB[1][1]);
-		if (WWMath::Fabs(den) > 0.0f) {
+		den = (CustomFloat)1.0f / ((CustomFloat)1.0f - context.AB[1][1] * context.AB[1][1]);
+		if (WWMath::Fabs(den) > (CustomFloat)0.0f) {
 			x[1] = Vector3::Dot_Product(context.A[1],dcnew);
 			x[1] += context.AB[1][1] * (Vector3::Dot_Product(-context.B[1],dcnew) + context.AB[0][1]*x[0] + context.AB[2][1]*x[2]);
 			x[1] += context.AB[1][0] * y[0] + context.AB[1][2] * y[2];
@@ -1007,8 +1007,8 @@ static inline void compute_contact_point(ObbCollisionStruct & context,CastResult
 		y[0] = -eval_side(context.AB[1][1],context.Side) * context.Box1.Extent[0];
 		y[1] = eval_side(context.AB[1][0],context.Side) * context.Box1.Extent[1];
 
-		den = (1.0f - context.AB[1][2] * context.AB[1][2]);
-		if (WWMath::Fabs(den) > 0.0f) {
+		den = ((CustomFloat)1.0f - context.AB[1][2] * context.AB[1][2]);
+		if (WWMath::Fabs(den) > (CustomFloat)0.0f) {
 			x[1] = Vector3::Dot_Product(context.A[1],dcnew);
 			x[1] += context.AB[1][2] * (Vector3::Dot_Product(-context.B[2],dcnew) + context.AB[0][2]*x[0] + context.AB[2][2]*x[2]);
 			x[1] += context.AB[1][0] * y[0] + context.AB[1][1] * y[1];
@@ -1024,8 +1024,8 @@ static inline void compute_contact_point(ObbCollisionStruct & context,CastResult
 		y[1] = -eval_side(context.AB[2][2],context.Side) * context.Box1.Extent[1];
 		y[2] = eval_side(context.AB[2][1],context.Side) * context.Box1.Extent[2];
 
-		den = (1.0f - context.AB[2][0] * context.AB[2][0]);
-		if (WWMath::Fabs(den) > 0.0f) {
+		den = ((CustomFloat)1.0f - context.AB[2][0] * context.AB[2][0]);
+		if (WWMath::Fabs(den) > (CustomFloat)0.0f) {
 			x[2] = Vector3::Dot_Product(context.A[2],dcnew);
 			x[2] += context.AB[2][0] * (Vector3::Dot_Product(-context.B[0],dcnew) + context.AB[0][0]*x[0] + context.AB[1][0]*x[1]);
 			x[2] += context.AB[2][1] * y[1] + context.AB[2][2] * y[2];
@@ -1041,8 +1041,8 @@ static inline void compute_contact_point(ObbCollisionStruct & context,CastResult
 		y[0] = eval_side(context.AB[2][2],context.Side) * context.Box1.Extent[0];
 		y[2] = -eval_side(context.AB[2][0],context.Side) * context.Box1.Extent[2];
 
-		den = (1.0f - context.AB[2][1] * context.AB[2][1]);
-		if (WWMath::Fabs(den) > 0.0f) {
+		den = ((CustomFloat)1.0f - context.AB[2][1] * context.AB[2][1]);
+		if (WWMath::Fabs(den) > (CustomFloat)0.0f) {
 			x[2] = Vector3::Dot_Product(context.A[2],dcnew);
 			x[2] += context.AB[2][1] * (Vector3::Dot_Product(-context.B[1],dcnew) + context.AB[0][1]*x[0] + context.AB[1][1]*x[1]);
 			x[2] += context.AB[2][0] * y[0] + context.AB[2][2] * y[2];
@@ -1058,8 +1058,8 @@ static inline void compute_contact_point(ObbCollisionStruct & context,CastResult
 		y[0] = -eval_side(context.AB[2][1],context.Side) * context.Box1.Extent[0];
 		y[1] = eval_side(context.AB[2][0],context.Side) * context.Box1.Extent[1];
 
-		den = (1.0f - context.AB[2][2] * context.AB[2][2]); 
-		if (WWMath::Fabs(den) > 0.0f) {
+		den = ((CustomFloat)1.0f - context.AB[2][2] * context.AB[2][2]); 
+		if (WWMath::Fabs(den) > (CustomFloat)0.0f) {
 			x[2] = Vector3::Dot_Product(context.A[2],dcnew);
 			x[2] += context.AB[2][2] * (Vector3::Dot_Product(-context.B[2],dcnew) + context.AB[0][2]*x[0] + context.AB[1][2]*x[1]);
 			x[2] += context.AB[2][0] * y[0] + context.AB[2][1] * y[1];
@@ -1110,7 +1110,7 @@ bool collide_obb_obb
 )
 {
 	Vector3 axis;
-	float ra,rb;
+	CustomFloat ra,rb;
 
 	/////////////////////////////////////////////////////////////////////////
 	// Axis = A0

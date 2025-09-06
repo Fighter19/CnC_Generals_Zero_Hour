@@ -52,12 +52,12 @@ class TCBSpline3DClass : public HermiteSpline3DClass
 {
 public:
 
-	virtual int			Add_Key(const Vector3 & point,float t);
+	virtual int			Add_Key(const Vector3 & point,CustomFloat t);
 	virtual void		Remove_Key(int i);
 	virtual void		Clear_Keys(void);
 
-	virtual void		Set_TCB_Params(int i,float tension,float continuity,float bias);
-	virtual void		Get_TCB_Params(int i,float *tension,float *continuity,float *bias);
+	virtual void		Set_TCB_Params(int i,CustomFloat tension,CustomFloat continuity,CustomFloat bias);
+	virtual void		Get_TCB_Params(int i,CustomFloat *tension,CustomFloat *continuity,CustomFloat *bias);
 
 	void					Update_Tangents(void);
 
@@ -71,9 +71,9 @@ protected:
 	class TCBClass
 	{
 	public:
-		float				Tension;
-		float				Continuity;
-		float				Bias;
+		CustomFloat				Tension;
+		CustomFloat				Continuity;
+		CustomFloat				Bias;
 		bool				operator == (const TCBClass & that) { return ((Tension == that.Tension) && (Continuity == that.Continuity) && (Bias == that.Bias)); }
 		bool				operator != (const TCBClass & that) { return !TCBClass::operator == (that); }
 	};

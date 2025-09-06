@@ -114,11 +114,11 @@ public:
 	void		From_Matrix(const Matrix3D & from,int order);
 	void		To_Matrix(Matrix3D & M);
 
-	double	Get_Angle(int i);
+	CustomFloat	Get_Angle(int i);
 
 private:
 
-	double	Angle[3];
+	CustomFloat	Angle[3];
 	int		Order;
 
 };

@@ -57,26 +57,26 @@ public:
 
 	// X,Y,Z are the imaginary parts of the quaterion
 	// W is the real part
-	float X;
-	float Y;
-	float Z;
-	float W;
+	CustomFloat X;
+	CustomFloat Y;
+	CustomFloat Z;
+	CustomFloat W;
 
 public:
 
 	WWINLINE Quaternion(void) {};
 	WWINLINE explicit Quaternion(bool init) { if (init) { X = 0.0f; Y = 0.0f; Z = 0.0f; W = 1.0f; } }
-	WWINLINE explicit Quaternion(float a, float b, float c, float d) { X=a; Y=b; Z=c; W=d; }
-	WWINLINE explicit Quaternion(const Vector3 & axis,float angle);
+	WWINLINE explicit Quaternion(CustomFloat a, CustomFloat b, CustomFloat c, CustomFloat d) { X=a; Y=b; Z=c; W=d; }
+	WWINLINE explicit Quaternion(const Vector3 & axis,CustomFloat angle);
 	WWINLINE Quaternion & operator=(const Quaternion & source);
 
-	WWINLINE void		Set(float a = 0.0, float b = 0.0, float c = 0.0, float d = 1.0) { X = a; Y = b; Z = c; W = d; }
+	WWINLINE void		Set(CustomFloat a = 0.0, CustomFloat b = 0.0, CustomFloat c = 0.0, CustomFloat d = 1.0) { X = a; Y = b; Z = c; W = d; }
 	WWINLINE void		Make_Identity(void) { Set(); };
-	WWINLINE void		Scale(float s) { X = (float)(s*X); Y = (float)(s*Y); Z = (float)(s*Z); W = (float)(s*W); }
+	WWINLINE void		Scale(CustomFloat s) { X = (CustomFloat)(s*X); Y = (CustomFloat)(s*Y); Z = (CustomFloat)(s*Z); W = (CustomFloat)(s*W); }
 
 	// Array access
-	WWINLINE float &	operator [](int i) { return (&X)[i]; }     
-	WWINLINE const float &  operator [](int i) const { return (&X)[i]; }  
+	WWINLINE CustomFloat &	operator [](int i) { return (&X)[i]; }     
+	WWINLINE const CustomFloat &  operator [](int i) const { return (&X)[i]; }  
 
 	// Unary operators.  
 	// Remember that q and -q represent the same 3D rotation.  
@@ -89,18 +89,18 @@ public:
 	Quaternion & Make_Closest(const Quaternion & qto);
 
 	// Square of the magnitude of the quaternion
-	WWINLINE float Length2(void) const { return (X*X + Y*Y + Z*Z + W*W); }
+	WWINLINE CustomFloat Length2(void) const { return (X*X + Y*Y + Z*Z + W*W); }
 
 	// Magnitude of the quaternion
-	WWINLINE float Length(void) const { return WWMath::Sqrt(Length2()); }
+	WWINLINE CustomFloat Length(void) const { return WWMath::Sqrt(Length2()); }
 
 	// Make the quaternion unit length
 	void Normalize(void);
 
 	// post-concatenate rotations about the coordinate axes
-	void	Rotate_X(float theta);
-	void	Rotate_Y(float theta);
-	void 	Rotate_Z(float theta);
+	void	Rotate_X(CustomFloat theta);
+	void	Rotate_Y(CustomFloat theta);
+	void 	Rotate_Z(CustomFloat theta);
 
 	// initialize this quaternion randomly (creates a random *unit* quaternion)
 	void	Randomize(void);
@@ -109,7 +109,7 @@ public:
 	WWINLINE Vector3	Rotate_Vector(const Vector3 & v) const;
 	WWINLINE void		Rotate_Vector(const Vector3 & v,Vector3 * set_result) const;
 
-	// verify that none of the members of this quaternion are invalid floats
+	// verify that none of the members of this quaternion are invalid CustomFloats
 	bool		Is_Valid(void) const;
 };
 
@@ -138,13 +138,13 @@ WWINLINE Quaternion operator - (const Quaternion & a,const Quaternion & b)
 }
 
 // Multiply a quaternion by a scalar:
-WWINLINE Quaternion operator * (float scl, const Quaternion & a)
+WWINLINE Quaternion operator * (CustomFloat scl, const Quaternion & a)
 {
 	return Quaternion(scl*a[0], scl*a[1], scl*a[2], scl*a[3]);
 }
 
 // Multiply a quaternion by a scalar
-WWINLINE Quaternion operator * (const Quaternion & a, float scl)
+WWINLINE Quaternion operator * (const Quaternion & a, CustomFloat scl)
 {
 	return scl*a;
 }
@@ -170,11 +170,11 @@ WWINLINE Quaternion operator / (const Quaternion & a,const Quaternion & b)
 // Normalized version of the quaternion
 WWINLINE Quaternion Normalize(const Quaternion & a)
 {
-	float mag = a.Length();
-	if (0.0f == mag) {
+	CustomFloat mag = a.Length();
+	if ((CustomFloat)0.0f == mag) {
 		return a;
 	} else {
-		float oomag = 1.0f / mag;
+		CustomFloat oomag = (CustomFloat)1.0f / mag;
 		return Quaternion(a[0] * oomag, a[1] * oomag, a[2] * oomag, a[3] * oomag);
 	}
 }
@@ -182,20 +182,20 @@ WWINLINE Quaternion Normalize(const Quaternion & a)
 // This function computes a quaternion based on an axis
 // (defined by the given Vector a) and an angle about
 // which to rotate.  The angle is expressed in radians.
-Quaternion Axis_To_Quat(const Vector3 &a, float angle);
+Quaternion Axis_To_Quat(const Vector3 &a, CustomFloat angle);
 
 // Pass the x and y coordinates of the last and current position
 // of the mouse, scaled so they are from -1.0 to 1.0
 // The quaternion is the computed as the rotation of a trackball
 // between the two points projected onto a sphere.  This can
 // be used to implement an intuitive viewing control system.
-Quaternion Trackball(float x0, float y0, float x1, float y1, float sphsize);
+Quaternion Trackball(CustomFloat x0, CustomFloat y0, CustomFloat x1, CustomFloat y1, CustomFloat sphsize);
 
 // Spherical Linear interpolation of quaternions
-//Quaternion Slerp(const Quaternion & a,const Quaternion & b,float t);
-void __cdecl Slerp(Quaternion& result, const Quaternion & a,const Quaternion & b,float t);
+//Quaternion Slerp(const Quaternion & a,const Quaternion & b,CustomFloat t);
+void __cdecl Slerp(Quaternion& result, const Quaternion & a,const Quaternion & b,CustomFloat t);
 // Fast slerp is innaccurate but multiple times faster
-void __cdecl Fast_Slerp(Quaternion& result, const Quaternion & a,const Quaternion & b,float t);
+void __cdecl Fast_Slerp(Quaternion& result, const Quaternion & a,const Quaternion & b,CustomFloat t);
 
 // Convert a rotation matrix into a quaternion
 Quaternion Build_Quaternion(const Matrix3x3 & matrix);
@@ -207,17 +207,17 @@ Matrix3x3 Build_Matrix3(const Quaternion & quat);
 Matrix3D &Build_Matrix3D(const Quaternion & q, Matrix3D &out);
 WWINLINE Matrix3D &Build_Matrix3D(const Quaternion & q, Matrix3D &out)
 {
-	out[0][0] = (float)(1.0 - 2.0 * (q[1] * q[1] + q[2] * q[2]));
-	out[0][1] = (float)(2.0 * (q[0] * q[1] - q[2] * q[3]));
-	out[0][2] = (float)(2.0 * (q[2] * q[0] + q[1] * q[3]));
+	out[0][0] = ((CustomFloat)1.0 - (CustomFloat)2.0 * (q[1] * q[1] + q[2] * q[2]));
+	out[0][1] = ((CustomFloat)2.0 * (q[0] * q[1] - q[2] * q[3]));
+	out[0][2] = ((CustomFloat)2.0 * (q[2] * q[0] + q[1] * q[3]));
 
-	out[1][0] = (float)(2.0 * (q[0] * q[1] + q[2] * q[3]));
-	out[1][1] = (float)(1.0 - 2.0f * (q[2] * q[2] + q[0] * q[0]));
-	out[1][2] = (float)(2.0 * (q[1] * q[2] - q[0] * q[3]));
+	out[1][0] = ((CustomFloat)2.0 * (q[0] * q[1] + q[2] * q[3]));
+	out[1][1] = ((CustomFloat)1.0 - (CustomFloat)2.0f * (q[2] * q[2] + q[0] * q[0]));
+	out[1][2] = ((CustomFloat)2.0 * (q[1] * q[2] - q[0] * q[3]));
 
-	out[2][0] = (float)(2.0 * (q[2] * q[0] - q[1] * q[3]));
-	out[2][1] = (float)(2.0 * (q[1] * q[2] + q[0] * q[3]));
-	out[2][2] =(float)(1.0 - 2.0 * (q[1] * q[1] + q[0] * q[0]));
+	out[2][0] = ((CustomFloat)2.0 * (q[2] * q[0] - q[1] * q[3]));
+	out[2][1] = ((CustomFloat)2.0 * (q[1] * q[2] + q[0] * q[3]));
+	out[2][2] = ((CustomFloat)1.0 - (CustomFloat)2.0 * (q[1] * q[1] + q[0] * q[0]));
 
 	// no translation
 	out[0][3] = out[1][3] = out[2][3] = 0.0f;
@@ -232,23 +232,23 @@ Matrix4x4  Build_Matrix4(const Quaternion & quat);
 // between the same two quaternions...
 struct SlerpInfoStruct
 {
-	float		SinT;
-	float		Theta;
+	CustomFloat		SinT;
+	CustomFloat		Theta;
 	bool		Flip;
 	bool		Linear;
 };
 
 // Cached slerp implementation
 void Slerp_Setup(const Quaternion & p,const Quaternion & q,SlerpInfoStruct * slerpinfo);
-void Cached_Slerp(const Quaternion & p,const Quaternion & q,float alpha,SlerpInfoStruct * slerpinfo,Quaternion * set_q);
-Quaternion Cached_Slerp(const Quaternion & p,const Quaternion & q,float alpha,SlerpInfoStruct * slerpinfo);
+void Cached_Slerp(const Quaternion & p,const Quaternion & q,CustomFloat alpha,SlerpInfoStruct * slerpinfo,Quaternion * set_q);
+Quaternion Cached_Slerp(const Quaternion & p,const Quaternion & q,CustomFloat alpha,SlerpInfoStruct * slerpinfo);
 
 WWINLINE Vector3 Quaternion::Rotate_Vector(const Vector3 & v) const
 {
-	float x = W*v.X + (Y*v.Z - v.Y*Z);
-	float y = W*v.Y - (X*v.Z - v.X*Z);
-	float z = W*v.Z + (X*v.Y - v.X*Y);
-	float w = -(X*v.X + Y*v.Y + Z*v.Z);
+	CustomFloat x = W*v.X + (Y*v.Z - v.Y*Z);
+	CustomFloat y = W*v.Y - (X*v.Z - v.X*Z);
+	CustomFloat z = W*v.Z + (X*v.Y - v.X*Y);
+	CustomFloat w = -(X*v.X + Y*v.Y + Z*v.Z);
 
 	return Vector3
 	(
@@ -262,10 +262,10 @@ WWINLINE void Quaternion::Rotate_Vector(const Vector3 & v,Vector3 * result) cons
 {
 	assert(result != NULL);
 	
-	float x = W*v.X + (Y*v.Z - v.Y*Z);
-	float y = W*v.Y - (X*v.Z - v.X*Z);
-	float z = W*v.Z + (X*v.Y - v.X*Y);
-	float w = -(X*v.X + Y*v.Y + Z*v.Z);
+	CustomFloat x = W*v.X + (Y*v.Z - v.Y*Z);
+	CustomFloat y = W*v.Y - (X*v.Z - v.X*Z);
+	CustomFloat z = W*v.Z + (X*v.Y - v.X*Y);
+	CustomFloat w = -(X*v.X + Y*v.Y + Z*v.Z);
 
 	result->X = w*(-X) + W*x + (y*(-Z) - (-Y)*z);
 	result->Y = w*(-Y) + W*y - (x*(-Z) - (-X)*z);
@@ -280,7 +280,7 @@ WWINLINE bool Quaternion::Is_Valid(void) const
 				WWMath::Is_Valid_Float(W) );
 }
 
-WWINLINE bool Equal_Within_Epsilon(const Quaternion &a, const Quaternion &b, float epsilon)
+WWINLINE bool Equal_Within_Epsilon(const Quaternion &a, const Quaternion &b, CustomFloat epsilon)
 {
    return(	(WWMath::Fabs(a.X - b.X) < epsilon) && 
 				(WWMath::Fabs(a.Y - b.Y) < epsilon) && 

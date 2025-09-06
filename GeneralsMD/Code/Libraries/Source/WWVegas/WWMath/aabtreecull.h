@@ -48,7 +48,7 @@
 #include "mempool.h"
 #include "simplevec.h"
 #include <math.h>
-#include <float.h>
+#include <cfloat>
 
 class AABTreeNodeClass;
 class ChunkLoadClass;
@@ -286,7 +286,7 @@ public:
 			BackBox.Init_Empty();
 		}
 
-		float					Cost;
+		CustomFloat	Cost;
 		int					FrontCount;
 		int					BackCount;
 		MinMaxAABoxClass	FrontBox;
@@ -296,7 +296,7 @@ public:
 
 	void						Compute_Bounding_Box(void);
 	void						Compute_Local_Bounding_Box(void);
-	float						Compute_Volume(void);
+	CustomFloat			Compute_Volume(void);
 	void						Transfer_Objects(AABTreeNodeClass * dummy_node);
 
 	/*

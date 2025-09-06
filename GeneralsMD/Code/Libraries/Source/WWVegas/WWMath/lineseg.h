@@ -71,12 +71,12 @@ public:
 	const Vector3 &	Get_P1() const { return P1; }				// end point
 	const Vector3 &	Get_DP() const { return DP; }				// difference of the two points
 	const Vector3 &	Get_Dir() const { return Dir; }			// normalized direction.
-	float					Get_Length() const { return Length; }	// length of the segment
+	CustomFloat					Get_Length() const { return Length; }	// length of the segment
 
-	void					Compute_Point(float t,Vector3 * set) const	{ Vector3::Add(P0,t*DP,set); }
+	void					Compute_Point(CustomFloat t,Vector3 * set) const	{ Vector3::Add(P0,t*DP,set); }
 	
 	Vector3				Find_Point_Closest_To(const Vector3 &pos) const;
-	bool					Find_Intersection (const LineSegClass &other_line, Vector3 *p1, float *fraction1, Vector3 *p2, float *fraction2) const;
+	bool					Find_Intersection (const LineSegClass &other_line, Vector3 *p1, CustomFloat *fraction1, Vector3 *p2, CustomFloat *fraction2) const;
 
 protected:
 
@@ -86,7 +86,7 @@ protected:
 	Vector3				P1;		// end point
 	Vector3				DP;		// difference of the two points
 	Vector3				Dir;		// normalized direction.
-	float					Length;	// length of the segment
+	CustomFloat					Length;	// length of the segment
 };
 
 

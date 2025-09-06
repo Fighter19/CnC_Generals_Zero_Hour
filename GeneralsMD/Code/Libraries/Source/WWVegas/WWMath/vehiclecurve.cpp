@@ -67,10 +67,10 @@ enum
 //////////////////////////////////////////////////////////////////////
 //	Local prototypes
 //////////////////////////////////////////////////////////////////////
-bool	Find_Tangent (const Vector3 &center, float radius, const Vector3 &point, bool clockwise, float *result);
-float	Get_Angle_Delta (float angle1, float angle2, bool clockwise);
-void	Find_Turn_Arc (const Matrix3D &transform, float radius, const Vector3 &prev_pt, const Vector3 &curr_pt, const Vector3 &next_pt, Vector3 *arc_center, bool *is_right_turn);
-void	Find_Tangents (float radius, const Vector3 &prev_pt, const Vector3 &curr_pt, const Vector3 &next_pt, const Vector3 &arc_center, bool is_right_turn, float *point_angle, float *angle_in_delta, float *angle_out_delta);
+bool	Find_Tangent (const Vector3 &center, CustomFloat radius, const Vector3 &point, bool clockwise, CustomFloat *result);
+CustomFloat	Get_Angle_Delta (CustomFloat angle1, CustomFloat angle2, bool clockwise);
+void	Find_Turn_Arc (const Matrix3D &transform, CustomFloat radius, const Vector3 &prev_pt, const Vector3 &curr_pt, const Vector3 &next_pt, Vector3 *arc_center, bool *is_right_turn);
+void	Find_Tangents (CustomFloat radius, const Vector3 &prev_pt, const Vector3 &curr_pt, const Vector3 &next_pt, const Vector3 &arc_center, bool is_right_turn, CustomFloat *point_angle, CustomFloat *angle_in_delta, CustomFloat *angle_out_delta);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -82,10 +82,10 @@ bool
 Find_Tangent
 (
 	const Vector3 &	center,
-	float					radius,
+	CustomFloat					radius,
 	const Vector3 &	point,
 	bool					clockwise,
-	float	*				result
+	CustomFloat	*				result
 )
 {
 	bool retval = false;
@@ -93,24 +93,24 @@ Find_Tangent
 	//
 	//	Calculate the distance from the point to the center of the circle
 	//
-	float delta_x = point.X - center.X;
-	float delta_y = point.Y - center.Y;
-	float dist = ::sqrt (delta_x * delta_x + delta_y * delta_y);
+	CustomFloat delta_x = point.X - center.X;
+	CustomFloat delta_y = point.Y - center.Y;
+	CustomFloat dist = ::sqrt (delta_x * delta_x + delta_y * delta_y);
 	if (dist >= radius) {
 
 		//
 		//	Determine the offset angle (from the line between the point and center)
 		// where the 2 tangent points lie.
 		//
-		float angle_offset	= WWMath::Acos (radius / dist);
-		float base_angle		= WWMath::Atan2 (delta_x, -delta_y);
+		CustomFloat angle_offset	= WWMath::Acos (radius / dist);
+		CustomFloat base_angle		= WWMath::Atan2 (delta_x, -delta_y);
 		base_angle = WWMath::Wrap (base_angle, 0, DEG_TO_RADF (360));
 
 		//
 		//	Determine which tangent angle we would come across first, depending
 		// on our orientation
 		//
-		float angle = 0;
+		CustomFloat angle = 0;
 		if (clockwise) {
 			angle = base_angle - angle_offset;
 		} else {
@@ -136,15 +136,15 @@ Find_Tangent
 // the delta.
 //
 //////////////////////////////////////////////////////////////////////
-float
+CustomFloat
 Get_Angle_Delta
 (
-	float	angle1,
-	float angle2,
+	CustomFloat	angle1,
+	CustomFloat angle2,
 	bool	clockwise
 )
 {
-	float result = angle1 - angle2;
+	CustomFloat result = angle1 - angle2;
 
 	if (clockwise) {
 		if (angle1 < angle2) {
@@ -169,7 +169,7 @@ void
 Find_Turn_Arc
 (
 	const Matrix3D &	transform,
-	float					radius,
+	CustomFloat					radius,
 	const Vector3 &	prev_pt,
 	const Vector3 &	curr_pt,
 	const Vector3 &	next_pt,
@@ -185,20 +185,20 @@ Find_Turn_Arc
 	// the point halfway between the angles formed by the (prev-curr) and
 	// (next-curr) vectors.
 	//
-	float angle1 = ::WWMath::Atan2 ((prev_pt.Y - curr_pt.Y), prev_pt.X - curr_pt.X);
+	CustomFloat angle1 = ::WWMath::Atan2 ((prev_pt.Y - curr_pt.Y), prev_pt.X - curr_pt.X);
 	angle1 = WWMath::Wrap (angle1, 0, DEG_TO_RADF (360));
 
-	float angle2 = ::WWMath::Atan2 ((next_pt.Y - curr_pt.Y), next_pt.X - curr_pt.X);
+	CustomFloat angle2 = ::WWMath::Atan2 ((next_pt.Y - curr_pt.Y), next_pt.X - curr_pt.X);
 	angle2 = WWMath::Wrap (angle2, 0, DEG_TO_RADF (360));
 
-	float avg_angle = (angle1 + angle2) * 0.5F;
+	CustomFloat avg_angle = (angle1 + angle2) * 0.5F;
 
 	//
 	//	Find the shortest delta between the two angles (either clockwise or
 	// counterclockwise).
 	//
-	float delta1 = WWMath::Fabs (::Get_Angle_Delta (angle1, angle2, true));
-	float delta2 = WWMath::Fabs (::Get_Angle_Delta (angle1, angle2, false));
+	CustomFloat delta1 = WWMath::Fabs (::Get_Angle_Delta (angle1, angle2, true));
+	CustomFloat delta2 = WWMath::Fabs (::Get_Angle_Delta (angle1, angle2, false));
 	if (delta1 < delta2) {
 		avg_angle = angle1 - (delta1 * 0.5F);
 	} else {
@@ -230,23 +230,23 @@ Find_Turn_Arc
 void
 Find_Tangents
 (
-	float					radius,
+	CustomFloat					radius,
 	const Vector3 &	prev_pt,
 	const Vector3 &	curr_pt,
 	const Vector3 &	next_pt,
 	const Vector3 &	arc_center,
 	bool					is_right_turn,
-	float *				point_angle,
-	float *				angle_in_delta,
-	float *				angle_out_delta
+	CustomFloat *				point_angle,
+	CustomFloat *				angle_in_delta,
+	CustomFloat *				angle_out_delta
 )
 {
 
 	//
 	//	Find the 'in' and 'out' tangent angles
 	//
-	float angle_in	= 0;
-	float angle_out = 0;
+	CustomFloat angle_in	= 0;
+	CustomFloat angle_out = 0;
 	bool valid_in = ::Find_Tangent (arc_center, radius, prev_pt, is_right_turn, &angle_in);
 	bool valid_out = ::Find_Tangent (arc_center, radius, next_pt, !is_right_turn, &angle_out);
 
@@ -322,7 +322,7 @@ VehicleCurveClass::Update_Arc_List (void)
 		Vector3 prev_pt;
 		Vector3 next_pt;
 		Vector3 curr_pt;
-		float time = 0;
+		CustomFloat time = 0;
 		Get_Key (index-1, &prev_pt, &time);
 		Get_Key (index,	&curr_pt, &time);
 		Get_Key (index+1, &next_pt, &time);
@@ -364,9 +364,9 @@ VehicleCurveClass::Update_Arc_List (void)
 		//
 		//	Determine where the vehicle should enter and exit the turn
 		//
-		float angle_in_delta		= 0;
-		float angle_out_delta	= 0;
-		float point_angle			= 0;
+		CustomFloat angle_in_delta		= 0;
+		CustomFloat angle_out_delta	= 0;
+		CustomFloat point_angle			= 0;
 		::Find_Tangents (	m_Radius,
 								last_path_pt,
 								curr_pt,
@@ -451,7 +451,7 @@ VehicleCurveClass::Update_Arc_List (void)
 //
 //////////////////////////////////////////////////////////////////////
 void
-VehicleCurveClass::Evaluate (float time, Vector3 *set_val)
+VehicleCurveClass::Evaluate (CustomFloat time, Vector3 *set_val)
 {
 	int count = Keys.Count ();
 	m_Sharpness = 0;
@@ -480,7 +480,7 @@ VehicleCurveClass::Evaluate (float time, Vector3 *set_val)
 	//
 	int index0 = 0;
 	int index1 = 0;
-	float seg_time = 0;
+	CustomFloat seg_time = 0;
 	Find_Interval (time, &index0, &index1, &seg_time);
 
 	ArcInfoStruct &arc_info0 = m_ArcList[index0];
@@ -493,16 +493,16 @@ VehicleCurveClass::Evaluate (float time, Vector3 *set_val)
 	//		- Straight line from exit of last curve to enter of this curve
 	//		- Enter curve for the current point
 	//
-	float arc_length0		= arc_info0.radius * WWMath::Fabs (arc_info0.angle_out_delta);
-	float arc_length1		= arc_info1.radius * WWMath::Fabs (arc_info1.angle_in_delta);
-	float other_length	= ((arc_info1.point_in - arc_info0.point_out).Length ()) / 2;
-	float total_length	= arc_length0 + arc_length1 + other_length;
+	CustomFloat arc_length0		= arc_info0.radius * WWMath::Fabs (arc_info0.angle_out_delta);
+	CustomFloat arc_length1		= arc_info1.radius * WWMath::Fabs (arc_info1.angle_in_delta);
+	CustomFloat other_length	= ((arc_info1.point_in - arc_info0.point_out).Length ()) / 2;
+	CustomFloat total_length	= arc_length0 + arc_length1 + other_length;
 
 	//
 	//	Determine at what times we should switch between parts of the segment
 	//
-	float time1 = arc_length0 / total_length;
-	float time2 = (arc_length0 + other_length) / total_length;
+	CustomFloat time1 = arc_length0 / total_length;
+	CustomFloat time2 = (arc_length0 + other_length) / total_length;
 
 	//
 	//	Determine which part of the segment we are on
@@ -513,9 +513,9 @@ VehicleCurveClass::Evaluate (float time, Vector3 *set_val)
 		//	We are on the initial curve of the segment, so calculate where
 		// on the curve we are...
 		//
-		//float percent = seg_time / time1;
-		//float angle = arc_info0.point_angle + (arc_info0.angle_out_delta) * percent;
-		float angle = arc_info0.point_angle + arc_info0.angle_out_delta;
+		//CustomFloat percent = seg_time / time1;
+		//CustomFloat angle = arc_info0.point_angle + (arc_info0.angle_out_delta) * percent;
+		CustomFloat angle = arc_info0.point_angle + arc_info0.angle_out_delta;
 
 		set_val->X = arc_info0.center.X + (arc_info0.radius * ::WWMath::Sin (angle));
 		set_val->Y = arc_info0.center.Y + (arc_info0.radius * -::WWMath::Cos (angle));
@@ -533,7 +533,7 @@ VehicleCurveClass::Evaluate (float time, Vector3 *set_val)
 		//	We are on the line between the two curves, so calculate where on
 		// the line we are
 		//			
-		float percent = (seg_time - time1) / (time2 - time1);
+		CustomFloat percent = (seg_time - time1) / (time2 - time1);
 
 		if (percent == 0) {
 			set_val->X = arc_info0.point_out.X;
@@ -557,13 +557,13 @@ VehicleCurveClass::Evaluate (float time, Vector3 *set_val)
 		//	We are on the ending curve of the segment, so calculate where
 		// on the curve we are...
 		//
-		/*float percent = 1.0F - ((seg_time - time2) / (1.0F - time2));
-		float angle = arc_info1.point_angle + (arc_info1.angle_in_delta * percent);
+		/*CustomFloat percent = 1.0F - ((seg_time - time2) / (1.0F - time2));
+		CustomFloat angle = arc_info1.point_angle + (arc_info1.angle_in_delta * percent);
 		
 		set_val->X = arc_info1.center.X + (arc_info1.radius * ::WWMath::Sin (angle));
 		set_val->Y = arc_info1.center.Y + (arc_info1.radius * -::WWMath::Cos (angle));			*/
 
-		float angle = arc_info1.point_angle + (arc_info1.angle_out_delta);
+		CustomFloat angle = arc_info1.point_angle + (arc_info1.angle_out_delta);
 
 		set_val->X = arc_info1.center.X + (arc_info1.radius * ::WWMath::Sin (angle));
 		set_val->Y = arc_info1.center.Y + (arc_info1.radius * -::WWMath::Cos (angle));		

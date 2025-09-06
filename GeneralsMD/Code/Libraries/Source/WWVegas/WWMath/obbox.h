@@ -103,10 +103,10 @@ public:
 	bool operator!= (const OBBoxClass &src);
 
 	void		Init_From_Box_Points(Vector3 * points,int num_points);
-	void		Init_Random(float min_extent = 0.5f,float max_extent = 1.0f);
-	float		Project_To_Axis(const Vector3 & axis) const;
-	float		Volume(void) const { return 2.0*Extent.X * 2.0*Extent.Y * 2.0*Extent.Z; }
-	void		Compute_Point(float params[3],Vector3 * set_point) const;
+	void		Init_Random(CustomFloat min_extent = 0.5f,CustomFloat max_extent = 1.0f);
+	CustomFloat		Project_To_Axis(const Vector3 & axis) const;
+	CustomFloat		Volume(void) const { return (CustomFloat)2.0*Extent.X * (CustomFloat)2.0*Extent.Y * (CustomFloat)2.0*Extent.Z; }
+	void		Compute_Point(CustomFloat params[3],Vector3 * set_point) const;
 	void		Compute_Axis_Aligned_Extent(Vector3 * set_extent) const;
 
 	Matrix3x3	Basis;
@@ -118,7 +118,7 @@ public:
 
 // Test functions: slow, easy to understand version of box intersection code :)
 bool Oriented_Boxes_Intersect(const OBBoxClass & box0,const OBBoxClass & box1);
-bool Oriented_Boxes_Collide(const OBBoxClass & box0,const Vector3 & v0,const OBBoxClass & box1,const Vector3 & v1,float dt);
+bool Oriented_Boxes_Collide(const OBBoxClass & box0,const Vector3 & v0,const OBBoxClass & box1,const Vector3 & v1,CustomFloat dt);
 bool Oriented_Box_Intersects_Tri(const OBBoxClass & box,const TriClass & tri);
 
 
@@ -134,11 +134,11 @@ bool Oriented_Box_Intersects_Tri(const OBBoxClass & box,const TriClass & tri);
  * HISTORY:                                                                                    *
  *   2/24/98    GTH : Created.                                                                 *
  *=============================================================================================*/
-inline float OBBoxClass::Project_To_Axis(const Vector3 & axis) const
+inline CustomFloat OBBoxClass::Project_To_Axis(const Vector3 & axis) const
 {
-	float x = Extent[0] * Vector3::Dot_Product(axis,Vector3(Basis[0][0],Basis[1][0],Basis[2][0]));
-	float y = Extent[1] * Vector3::Dot_Product(axis,Vector3(Basis[0][1],Basis[1][1],Basis[2][1]));
-	float z = Extent[2] * Vector3::Dot_Product(axis,Vector3(Basis[0][2],Basis[1][2],Basis[2][2]));
+	CustomFloat x = Extent[0] * Vector3::Dot_Product(axis,Vector3(Basis[0][0],Basis[1][0],Basis[2][0]));
+	CustomFloat y = Extent[1] * Vector3::Dot_Product(axis,Vector3(Basis[0][1],Basis[1][1],Basis[2][1]));
+	CustomFloat z = Extent[2] * Vector3::Dot_Product(axis,Vector3(Basis[0][2],Basis[1][2],Basis[2][2]));
 
 	// projection is the sum of the absolute values of the projections of the three extents
 	return (WWMath::Fabs(x) + WWMath::Fabs(y) + WWMath::Fabs(z));
@@ -189,7 +189,7 @@ inline void OBBoxClass::Transform
  * HISTORY:                                                                                    *
  *   4/2/99     GTH : Created.                                                                 *
  *=============================================================================================*/
-inline void OBBoxClass::Compute_Point(float params[3],Vector3 * set_point) const
+inline void OBBoxClass::Compute_Point(CustomFloat params[3],Vector3 * set_point) const
 {
 	Vector3 point = Extent;
 	point.X *= params[0];

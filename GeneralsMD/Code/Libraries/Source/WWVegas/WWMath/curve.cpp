@@ -115,7 +115,7 @@ void Curve3DClass::Set_Looping(bool onoff)
 	IsLooping = onoff;
 }
 
-float Curve3DClass::Get_Start_Time(void)
+CustomFloat Curve3DClass::Get_Start_Time(void)
 {
 	if (Keys.Count() > 0) {
 		return Keys[0].Time;
@@ -124,7 +124,7 @@ float Curve3DClass::Get_Start_Time(void)
 	}
 }
 
-float Curve3DClass::Get_End_Time(void)
+CustomFloat Curve3DClass::Get_End_Time(void)
 {
 	if (Keys.Count() > 0) {
 		return Keys[Keys.Count() - 1].Time;
@@ -138,7 +138,7 @@ int Curve3DClass::Key_Count(void)
 	return Keys.Count();
 }
 
-void Curve3DClass::Get_Key(int i,Vector3 * set_point,float * set_t)
+void Curve3DClass::Get_Key(int i,Vector3 * set_point,CustomFloat * set_t)
 {
 	assert(i >= 0);
 	assert(i < Keys.Count());
@@ -158,7 +158,7 @@ void Curve3DClass::Set_Key(int i,const Vector3 & point)
 }	
 
 
-int Curve3DClass::Add_Key(const Vector3 & point,float t)
+int Curve3DClass::Add_Key(const Vector3 & point,CustomFloat t)
 {
 	int idx = 0;
 	while (idx < Keys.Count() && Keys[idx].Time < t) {
@@ -185,7 +185,7 @@ void Curve3DClass::Clear_Keys(void)
 	Keys.Clear();
 }
 
-void Curve3DClass::Find_Interval(float time,int * i0,int * i1,float * t)
+void Curve3DClass::Find_Interval(CustomFloat time,int * i0,int * i1,CustomFloat * t)
 {
 	WWASSERT(time >= Keys[0].Time);
 	WWASSERT(time <= Keys[Keys.Count()-1].Time);
@@ -269,7 +269,7 @@ bool Curve3DClass::Load(ChunkLoadClass & cload)
 ** Linear curve, linearly interpolates the keys
 **
 ***********************************************************************************************/
-void LinearCurve3DClass::Evaluate(float time,Vector3 * set_val)
+void LinearCurve3DClass::Evaluate(CustomFloat time,Vector3 * set_val)
 {
 	if (time < Keys[0].Time) {
 		*set_val = Keys[0].Point;
@@ -282,7 +282,7 @@ void LinearCurve3DClass::Evaluate(float time,Vector3 * set_val)
 	}
 
 	int i0,i1;
-	float t;
+	CustomFloat t;
 	Find_Interval(time,&i0,&i1,&t);
 
 	*set_val = Keys[i0].Point + t * (Keys[i1].Point - Keys[i0].Point);
@@ -358,7 +358,7 @@ void Curve1DClass::Set_Looping(bool onoff)
 	IsLooping = onoff;
 }
 
-float Curve1DClass::Get_Start_Time(void)
+CustomFloat Curve1DClass::Get_Start_Time(void)
 {
 	if (Keys.Count() > 0) {
 		return Keys[0].Time;
@@ -367,7 +367,7 @@ float Curve1DClass::Get_Start_Time(void)
 	}
 }
 
-float Curve1DClass::Get_End_Time(void)
+CustomFloat Curve1DClass::Get_End_Time(void)
 {
 	if (Keys.Count() > 0) {
 		return Keys[Keys.Count() - 1].Time;
@@ -381,7 +381,7 @@ int Curve1DClass::Key_Count(void)
 	return Keys.Count();
 }
 
-void Curve1DClass::Get_Key(int i,float * set_point,float * set_t,unsigned int * extra)
+void Curve1DClass::Get_Key(int i,CustomFloat * set_point,CustomFloat * set_t,unsigned int * extra)
 {
 	assert(i >= 0);
 	assert(i < Keys.Count());
@@ -396,7 +396,7 @@ void Curve1DClass::Get_Key(int i,float * set_point,float * set_t,unsigned int * 
 	}
 }
 
-void Curve1DClass::Set_Key(int i,float point,unsigned int extra)
+void Curve1DClass::Set_Key(int i,CustomFloat point,unsigned int extra)
 {
 	assert(i >= 0);
 	assert(i < Keys.Count());
@@ -405,7 +405,7 @@ void Curve1DClass::Set_Key(int i,float point,unsigned int extra)
 }	
 
 
-int Curve1DClass::Add_Key(float point,float t,unsigned int extra)
+int Curve1DClass::Add_Key(CustomFloat point,CustomFloat t,unsigned int extra)
 {
 	int idx = 0;
 	while (idx < Keys.Count() && Keys[idx].Time < t) {
@@ -433,20 +433,20 @@ void Curve1DClass::Clear_Keys(void)
 	Keys.Clear();
 }
 
-void Curve1DClass::Find_Interval(float time,int * i0,int * i1,float * t)
+void Curve1DClass::Find_Interval(CustomFloat time,int * i0,int * i1,CustomFloat * t)
 {
 	if (IsLooping) {
 		if (time < Keys[0].Time) {
 			*i0 = Keys.Count() - 1;
 			*i1 = 0;
-			float interval = 1.0f - Keys[*i0].Time + Keys[*i1].Time;
-			*t = (1.0f - Keys[*i0].Time + time) / interval;
+			CustomFloat interval = (CustomFloat)1.0f - Keys[*i0].Time + Keys[*i1].Time;
+			*t = ((CustomFloat)1.0f - Keys[*i0].Time + time) / interval;
 			return;
 		}
 		else if (time > Keys[Keys.Count() - 1].Time) {
 			*i0 = Keys.Count() - 1;
 			*i1 = 0;
-			float interval = 1.0f - Keys[*i0].Time + Keys[*i1].Time;
+			CustomFloat interval = (CustomFloat)1.0f - Keys[*i0].Time + Keys[*i1].Time;
 			*t = (time - Keys[*i0].Time) / interval;
 			return;
 		}
@@ -534,7 +534,7 @@ bool Curve1DClass::Load(ChunkLoadClass & cload)
 ** LinearCurve1DClass, linearly interpolates the keys
 **
 ***********************************************************************************************/
-void LinearCurve1DClass::Evaluate(float time,float * set_val)
+void LinearCurve1DClass::Evaluate(CustomFloat time,CustomFloat * set_val)
 {
 	if (!IsLooping) {
 		if (time < Keys[0].Time) {
@@ -549,7 +549,7 @@ void LinearCurve1DClass::Evaluate(float time,float * set_val)
 	}
 
 	int i0,i1;
-	float t;
+	CustomFloat t;
 	Find_Interval(time,&i0,&i1,&t);
 
 	*set_val = Keys[i0].Point + t * (Keys[i1].Point - Keys[i0].Point);

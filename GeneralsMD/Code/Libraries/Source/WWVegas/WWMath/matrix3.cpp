@@ -161,17 +161,17 @@ void Matrix3x3::Set(const Matrix4x4 & m)
 
 void Matrix3x3::Set(const Quaternion & q)
 {
-	Row[0][0] = (float)(1.0 - 2.0 * (q[1] * q[1] + q[2] * q[2]));
-	Row[0][1] = (float)(2.0 * (q[0] * q[1] - q[2] * q[3]));
-	Row[0][2] = (float)(2.0 * (q[2] * q[0] + q[1] * q[3]));
+	Row[0][0] = ((CustomFloat)1.0 - (CustomFloat)2.0 * (q[1] * q[1] + q[2] * q[2]));
+	Row[0][1] = ((CustomFloat)2.0 * (q[0] * q[1] - q[2] * q[3]));
+	Row[0][2] = ((CustomFloat)2.0 * (q[2] * q[0] + q[1] * q[3]));
 
-	Row[1][0] = (float)(2.0 * (q[0] * q[1] + q[2] * q[3]));
-	Row[1][1] = (float)(1.0 - 2.0f * (q[2] * q[2] + q[0] * q[0]));
-	Row[1][2] = (float)(2.0 * (q[1] * q[2] - q[0] * q[3]));
+	Row[1][0] = ((CustomFloat)2.0 * (q[0] * q[1] + q[2] * q[3]));
+	Row[1][1] = ((CustomFloat)1.0 - (CustomFloat)2.0f * (q[2] * q[2] + q[0] * q[0]));
+	Row[1][2] = ((CustomFloat)2.0 * (q[1] * q[2] - q[0] * q[3]));
 
-	Row[2][0] = (float)(2.0 * (q[2] * q[0] - q[1] * q[3]));
-	Row[2][1] = (float)(2.0 * (q[1] * q[2] + q[0] * q[3]));
-	Row[2][2] =(float)(1.0 - 2.0 * (q[1] * q[1] + q[0] * q[0]));
+	Row[2][0] = ((CustomFloat)2.0 * (q[2] * q[0] - q[1] * q[3]));
+	Row[2][1] = ((CustomFloat)2.0 * (q[1] * q[2] + q[0] * q[3]));
+	Row[2][2] = ((CustomFloat)1.0 - (CustomFloat)2.0 * (q[1] * q[1] + q[0] * q[0]));
 }
 
 
@@ -291,7 +291,7 @@ void Matrix3x3::Multiply(const Matrix3x3 & A,const Matrix3x3 & B,Matrix3x3 * set
 {
 	Matrix3x3 tmp;
 	Matrix3x3 * Aptr;
-	float tmp1,tmp2,tmp3;
+	CustomFloat tmp1,tmp2,tmp3;
 
 	// Check for aliased parameters, copy the 'A' matrix into a temporary if the 
 	// result is going into 'A'. (in this case, this function is no better than 
@@ -307,25 +307,25 @@ void Matrix3x3::Multiply(const Matrix3x3 & A,const Matrix3x3 & B,Matrix3x3 * set
 	tmp2 = B[1][0];
 	tmp3 = B[2][0];
 
-	(*set_res)[0][0] = (float)((*Aptr)[0][0]*tmp1 + (*Aptr)[0][1]*tmp2 + (*Aptr)[0][2]*tmp3);
-	(*set_res)[1][0] = (float)((*Aptr)[1][0]*tmp1 + (*Aptr)[1][1]*tmp2 + (*Aptr)[1][2]*tmp3);
-	(*set_res)[2][0] = (float)((*Aptr)[2][0]*tmp1 + (*Aptr)[2][1]*tmp2 + (*Aptr)[2][2]*tmp3);
+	(*set_res)[0][0] = (CustomFloat)((*Aptr)[0][0]*tmp1 + (*Aptr)[0][1]*tmp2 + (*Aptr)[0][2]*tmp3);
+	(*set_res)[1][0] = (CustomFloat)((*Aptr)[1][0]*tmp1 + (*Aptr)[1][1]*tmp2 + (*Aptr)[1][2]*tmp3);
+	(*set_res)[2][0] = (CustomFloat)((*Aptr)[2][0]*tmp1 + (*Aptr)[2][1]*tmp2 + (*Aptr)[2][2]*tmp3);
 
 	tmp1 = B[0][1];
 	tmp2 = B[1][1];
 	tmp3 = B[2][1];
 
-	(*set_res)[0][1] = (float)((*Aptr)[0][0]*tmp1 + (*Aptr)[0][1]*tmp2 + (*Aptr)[0][2]*tmp3);
-	(*set_res)[1][1] = (float)((*Aptr)[1][0]*tmp1 + (*Aptr)[1][1]*tmp2 + (*Aptr)[1][2]*tmp3);
-	(*set_res)[2][1] = (float)((*Aptr)[2][0]*tmp1 + (*Aptr)[2][1]*tmp2 + (*Aptr)[2][2]*tmp3);
+	(*set_res)[0][1] = (CustomFloat)((*Aptr)[0][0]*tmp1 + (*Aptr)[0][1]*tmp2 + (*Aptr)[0][2]*tmp3);
+	(*set_res)[1][1] = (CustomFloat)((*Aptr)[1][0]*tmp1 + (*Aptr)[1][1]*tmp2 + (*Aptr)[1][2]*tmp3);
+	(*set_res)[2][1] = (CustomFloat)((*Aptr)[2][0]*tmp1 + (*Aptr)[2][1]*tmp2 + (*Aptr)[2][2]*tmp3);
 
 	tmp1 = B[0][2];
 	tmp2 = B[1][2];
 	tmp3 = B[2][2];
 
-	(*set_res)[0][2] = (float)((*Aptr)[0][0]*tmp1 + (*Aptr)[0][1]*tmp2 + (*Aptr)[0][2]*tmp3);
-	(*set_res)[1][2] = (float)((*Aptr)[1][0]*tmp1 + (*Aptr)[1][1]*tmp2 + (*Aptr)[1][2]*tmp3);
-	(*set_res)[2][2] = (float)((*Aptr)[2][0]*tmp1 + (*Aptr)[2][1]*tmp2 + (*Aptr)[2][2]*tmp3);
+	(*set_res)[0][2] = (CustomFloat)((*Aptr)[0][0]*tmp1 + (*Aptr)[0][1]*tmp2 + (*Aptr)[0][2]*tmp3);
+	(*set_res)[1][2] = (CustomFloat)((*Aptr)[1][0]*tmp1 + (*Aptr)[1][1]*tmp2 + (*Aptr)[1][2]*tmp3);
+	(*set_res)[2][2] = (CustomFloat)((*Aptr)[2][0]*tmp1 + (*Aptr)[2][1]*tmp2 + (*Aptr)[2][2]*tmp3);
 }
 
 int Matrix3x3::Is_Orthogonal(void) const
@@ -354,7 +354,7 @@ void Matrix3x3::Re_Orthogonalize(void)
 	Vector3::Cross_Product(x,y,&z);
 	Vector3::Cross_Product(z,x,&y);
 
-	float len = x.Length();
+	CustomFloat len = x.Length();
 	if (len < WWMATH_EPSILON) {
 		Make_Identity();
 		return;

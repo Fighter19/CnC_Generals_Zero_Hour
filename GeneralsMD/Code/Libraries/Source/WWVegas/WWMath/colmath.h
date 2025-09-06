@@ -62,7 +62,7 @@ class AABoxClass;
 class OBBoxClass;
 class FrustumClass;
 
-const float COLLISION_EPSILON = 0.001f;
+const CustomFloat COLLISION_EPSILON = 0.001f;
 
 /*
 ** #define COLMATH_STAT_TRACKING to enable stat tracking for the collision math functions
@@ -236,7 +236,7 @@ private:
 	static OverlapType eval_overlap_mask(int mask);
 	static OverlapType eval_overlap_collision(const CastResultStruct & res);
 
-	static const float COINCIDENCE_EPSILON;
+	static const CustomFloat COINCIDENCE_EPSILON;
 
 	static ColmathStatsStruct				Stats;
 };

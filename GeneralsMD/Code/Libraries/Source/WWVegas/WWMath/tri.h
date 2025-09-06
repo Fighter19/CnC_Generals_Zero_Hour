@@ -123,12 +123,12 @@ inline bool Point_In_Triangle_2D(const Vector3 &tri_point0, const Vector3 &tri_p
 	// triangle. (this test will also tell us if the three points are colinear - if the triangle
 	// is degenerate).
 	Vector2 p0p2(tri_point2[axis_1] - tri_point0[axis_1], tri_point2[axis_2] - tri_point0[axis_2]);
-	float p0p1p2 = Vector2::Perp_Dot_Product(p0p1, p0p2);
+	CustomFloat p0p1p2 = Vector2::Perp_Dot_Product(p0p1, p0p2);
 	if (p0p1p2 != 0.0f) {
 
 		// The triangle is not degenerate - test three sides
-		float side_factor = p0p1p2 > 0.0f ? 1.0f : -1.0f;
-		float factors[3];
+		CustomFloat side_factor = p0p1p2 > 0.0f ? 1.0f : -1.0f;
+		CustomFloat factors[3];
 
 		// Now perform tests
 		Vector2 p0pT(test_point[axis_1] - tri_point0[axis_1], test_point[axis_2] - tri_point0[axis_2]);
@@ -155,10 +155,10 @@ inline bool Point_In_Triangle_2D(const Vector3 &tri_point0, const Vector3 &tri_p
 		// is a little slower than the non-colinear case.
 		
 		// Find the two outer points along the triangle's line ('start' and 'end' points)
-		float p0p1dist2 = p0p1.Length2();
-		float p1p2dist2 = p1p2.Length2();
-		float p2p0dist2 = p1p2.Length2();
-		float max_dist2;
+		CustomFloat p0p1dist2 = p0p1.Length2();
+		CustomFloat p1p2dist2 = p1p2.Length2();
+		CustomFloat p2p0dist2 = p1p2.Length2();
+		CustomFloat max_dist2;
 		Vector2 pSpE, pSpT;	// 'end' point, test point - both in 'start' points' frame
 		if (p0p1dist2 > p1p2dist2) {
 			if (p0p1dist2 > p2p0dist2) {
@@ -247,8 +247,8 @@ inline bool Cast_Semi_Infinite_Axis_Aligned_Ray_To_Triangle(const Vector3 &tri_p
 		// and is negative if the start point is on the 'anti-rayward side' (ray does
 		// intersect triangle). In either of these two cases we are done.
 		// (see below for what happens when the result is zero - more checks need to be made).
-		static const float sign[2] = {-1.0f, 1.0f };
-		float result = tri_plane[axis_r] * sign[direction] * (tri_plane.X * ray_start.X +
+		static const CustomFloat sign[2] = {-1.0f, 1.0f };
+		CustomFloat result = tri_plane[axis_r] * sign[direction] * (tri_plane.X * ray_start.X +
 			tri_plane.Y * ray_start.Y + tri_plane.Z * ray_start.Z + tri_plane.W);
 		if (result < 0.0f) {
 			// Intersection!

@@ -72,23 +72,23 @@ class SphereClass
 {
 public:
 	inline SphereClass(void) { };
-	inline SphereClass(const Vector3 & center,float radius) { Init(center,radius); }
-	inline SphereClass(const Matrix3D& mtx,const Vector3 & center,float radius) { Init(mtx,center,radius); }
+	inline SphereClass(const Vector3 & center,CustomFloat radius) { Init(center,radius); }
+	inline SphereClass(const Matrix3D& mtx,const Vector3 & center,CustomFloat radius) { Init(mtx,center,radius); }
 	inline SphereClass(const Vector3 & center,const SphereClass & s0);
 	inline SphereClass(const Vector3 *Position, const int VertCount);
 
-	inline void Init(const Vector3 & pos,float radius);
-	inline void Init(const Matrix3D& mtx,const Vector3 & pos,float radius);
+	inline void Init(const Vector3 & pos,CustomFloat radius);
+	inline void Init(const Matrix3D& mtx,const Vector3 & pos,CustomFloat radius);
 	inline void Re_Center(const Vector3 & center);
 	inline void Add_Sphere(const SphereClass & s);
 	inline void Transform(const Matrix3D & tm);
-	inline float Volume(void) const;
+	inline CustomFloat Volume(void) const;
 	
 	inline SphereClass & operator += (const SphereClass & s);
 	inline SphereClass & operator *= (const Matrix3D & m);
 
 	Vector3	Center;
-	float		Radius;
+	CustomFloat		Radius;
 };
 
 
@@ -106,7 +106,7 @@ public:
  *=============================================================================================*/
 inline SphereClass::SphereClass(const Vector3 & center,const SphereClass & s0)
 {
-	float dist = (s0.Center - center).Length();
+	CustomFloat dist = (s0.Center - center).Length();
 	Center = center;
 	Radius = s0.Radius + dist;
 }
@@ -114,7 +114,7 @@ inline SphereClass::SphereClass(const Vector3 & center,const SphereClass & s0)
 inline SphereClass::SphereClass(const Vector3 *Position,const int VertCount)
 {
 	int i;
-	double dx,dy,dz;
+	CustomFloat dx,dy,dz;
 
 	// bounding sphere
 	// Using the algorithm described in Graphics Gems I page 301.
@@ -156,24 +156,24 @@ inline SphereClass::SphereClass(const Vector3 *Position,const int VertCount)
 	dx = xmax.X - xmin.X;
 	dy = xmax.Y - xmin.Y;
 	dz = xmax.Z - xmin.Z;
-	double xspan = dx*dx + dy*dy + dz*dz;
+	CustomFloat xspan = dx*dx + dy*dy + dz*dz;
 
 	dx = ymax.X - ymin.X;
 	dy = ymax.Y - ymin.Y;
 	dz = ymax.Z - ymin.Z;
-	double yspan = dx*dx + dy*dy + dz*dz;
+	CustomFloat yspan = dx*dx + dy*dy + dz*dz;
 
 	dx = zmax.X - zmin.X;
 	dy = zmax.Y - zmin.Y;
 	dz = zmax.Z - zmin.Z;
-	double zspan = dx*dx + dy*dy + dz*dz;
+	CustomFloat zspan = dx*dx + dy*dy + dz*dz;
 
 
 	// Set points dia1 and dia2 to the maximally separated pair
 	// This will be the diameter of the initial sphere
 	Vector3 dia1 = xmin;
 	Vector3 dia2 = xmax;
-	double maxspan = xspan;
+	CustomFloat maxspan = xspan;
 
 	if (yspan > maxspan) {
 		maxspan = yspan;
@@ -197,8 +197,8 @@ inline SphereClass::SphereClass(const Vector3 *Position,const int VertCount)
 	dy = dia2.Y - center.Y;
 	dz = dia2.Z - center.Z;
 
-	double radsqr = dx*dx + dy*dy + dz*dz;
-	double radius = sqrt(radsqr);
+	CustomFloat radsqr = dx*dx + dy*dy + dz*dz;
+	CustomFloat radius = sqrt(radsqr);
 
 	
 	// SECOND PASS:
@@ -209,19 +209,19 @@ inline SphereClass::SphereClass(const Vector3 *Position,const int VertCount)
 		dy = Position[i].Y - center.Y;
 		dz = Position[i].Z - center.Z;
 		
-		double testrad2 = dx*dx + dy*dy + dz*dz;
+		CustomFloat testrad2 = dx*dx + dy*dy + dz*dz;
 
 		if (testrad2 > radsqr) {
 			
 			// this point was outside the old sphere, compute a new
 			// center point and radius which contains this point
-			double testrad = sqrt(testrad2);
+			CustomFloat testrad = sqrt(testrad2);
 			
 			// adjust center and radius
 			radius = (radius + testrad) / 2.0;
 			radsqr = radius * radius;
 
-			double oldtonew = testrad - radius;
+			CustomFloat oldtonew = testrad - radius;
 			center.X = (radius * center.X + oldtonew * Position[i].X) / testrad;
 			center.Y = (radius * center.Y + oldtonew * Position[i].Y) / testrad;
 			center.Z = (radius * center.Z + oldtonew * Position[i].Z) / testrad;
@@ -245,7 +245,7 @@ inline SphereClass::SphereClass(const Vector3 *Position,const int VertCount)
  * HISTORY:                                                                                    *
  *   8/12/98    GTH : Created.                                                                 *
  *=============================================================================================*/
-inline void SphereClass::Init(const Vector3 & pos,float radius)
+inline void SphereClass::Init(const Vector3 & pos,CustomFloat radius)
 {
 	Center = pos;
 	Radius = radius;
@@ -263,7 +263,7 @@ inline void SphereClass::Init(const Vector3 & pos,float radius)
  * HISTORY:                                                                                    *
  *   8/12/98    GTH : Created.                                                                 *
  *=============================================================================================*/
-inline void SphereClass::Init(const Matrix3D& mtx, const Vector3 & pos,float radius)
+inline void SphereClass::Init(const Matrix3D& mtx, const Vector3 & pos,CustomFloat radius)
 {
 #ifdef ALLOW_TEMPORARIES
 	Center = mtx * pos;
@@ -288,7 +288,7 @@ inline void SphereClass::Init(const Matrix3D& mtx, const Vector3 & pos,float rad
  *=============================================================================================*/
 inline void SphereClass::Re_Center(const Vector3 & center)
 {
-	float dist = (Center - center).Length();
+	CustomFloat dist = (Center - center).Length();
 	Center = center;
 	Radius += dist;
 }
@@ -310,13 +310,13 @@ inline void SphereClass::Add_Sphere(const SphereClass & s)
 {
 	if (s.Radius == 0.0f) return;
 
-	float dist = (s.Center - Center).Length();
+	CustomFloat dist = (s.Center - Center).Length();
 	if (dist == 0.0f) {
 		Radius = (Radius > s.Radius) ? Radius : s.Radius;
 		return;
 	}
 
-	float rnew = (dist + Radius + s.Radius) / 2.0f;
+	CustomFloat rnew = (dist + Radius + s.Radius) / 2.0f;
 
    // If rnew is smaller than either of the two sphere radii (it can't be
    // smaller than both of them), this means that the smaller sphere is
@@ -332,7 +332,7 @@ inline void SphereClass::Add_Sphere(const SphereClass & s)
       } else {
          // Neither sphere is completely inside the other, so rnew is the new
          // radius - calculate the new center
-	      float lerp = (rnew - Radius) / dist;
+	      CustomFloat lerp = (rnew - Radius) / dist;
 	      Vector3 center = (s.Center - Center) * lerp + Center;
 	      Init(center, rnew);
       }
@@ -374,9 +374,9 @@ inline void SphereClass::Transform(const Matrix3D & tm)
  * HISTORY:                                                                                    *
  *   3/22/99    GTH : Created.                                                                 *
  *=============================================================================================*/
-inline float SphereClass::Volume(void) const
+inline CustomFloat SphereClass::Volume(void) const
 {
-	return (4.0 / 3.0) * WWMATH_PI * (Radius * Radius * Radius);
+	return ((CustomFloat)4.0 / (CustomFloat)3.0) * WWMATH_PI * (Radius * Radius * Radius);
 }
 
 /***********************************************************************************************
@@ -434,7 +434,7 @@ inline SphereClass & SphereClass::operator *= (const Matrix3D & m)
 inline bool Spheres_Intersect(const SphereClass & s0,const SphereClass & s1) 
 {
 	Vector3 delta = s0.Center - s1.Center;
-	float dist2 = Vector3::Dot_Product(delta, delta);
+	CustomFloat dist2 = Vector3::Dot_Product(delta, delta);
 
 	if (dist2 < (s0.Radius + s1.Radius) * (s0.Radius + s1.Radius)) {
 		return true;

@@ -66,20 +66,20 @@ public:
 	virtual ~LookupTableClass(void);
 
 	void								Init(const char * name,Curve1DClass * curve);
-	float								Get_Value(float input);
-	float								Get_Value_Quick(float input);
+	CustomFloat								Get_Value(CustomFloat input);
+	CustomFloat								Get_Value_Quick(CustomFloat input);
 	const char *					Get_Name(void)							{ return Name; }
 protected:
 
 	StringClass						Name;				// name of this table, if it came from a file, this is also the filename
-	float								MinInputValue; 
-	float								MaxInputValue;
-	float								OOMaxMinusMin;
-	SimpleVecClass<float>		OutputSamples;
+	CustomFloat								MinInputValue; 
+	CustomFloat								MaxInputValue;
+	CustomFloat								OOMaxMinusMin;
+	SimpleVecClass<CustomFloat>		OutputSamples;
 
 };
 
-inline float LookupTableClass::Get_Value(float input)
+inline CustomFloat LookupTableClass::Get_Value(CustomFloat input)
 {
 	if (input <= MinInputValue) {
 		return OutputSamples[0];
@@ -88,17 +88,17 @@ inline float LookupTableClass::Get_Value(float input)
 		return OutputSamples[OutputSamples.Length()-1];
 	}
 	
-	float normalized_input = (float)(OutputSamples.Length()-1) * (input - MinInputValue) * OOMaxMinusMin;
-	float input0 = WWMath::Floor(normalized_input);
+	CustomFloat normalized_input = (CustomFloat)(OutputSamples.Length()-1) * (input - MinInputValue) * OOMaxMinusMin;
+	CustomFloat input0 = WWMath::Floor(normalized_input);
 	
 	int index0 = WWMath::Float_To_Long(input0);
 	int index1 = index0+1;
-	float lerp = normalized_input - input0;
+	CustomFloat lerp = normalized_input - input0;
 
 	return OutputSamples[index0] + lerp * (OutputSamples[index1] - OutputSamples[index0]);
 }
 
-inline float LookupTableClass::Get_Value_Quick(float input)
+inline CustomFloat LookupTableClass::Get_Value_Quick(CustomFloat input)
 {
 	if (input <= MinInputValue) {
 		return OutputSamples[0];

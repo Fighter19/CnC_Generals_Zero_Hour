@@ -69,7 +69,7 @@ static StateVectorClass		_WorkVector7;
  *   08/11/1997 GH  : Created.                                                                 * 
  *   6/25/99    GTH : Updated to the new integrator system                                     *
  *=============================================================================================*/
-void IntegrationSystem::Euler_Integrate(ODESystemClass * sys, float dt)
+void IntegrationSystem::Euler_Integrate(ODESystemClass * sys, CustomFloat dt)
 {
 	WWASSERT(sys != NULL);
 
@@ -116,7 +116,7 @@ void IntegrationSystem::Euler_Integrate(ODESystemClass * sys, float dt)
  *   08/11/1997 GH  : Created.                                                                 * 
  *   6/25/99    GTH : Updated to the new integrator system                                     *
  *=============================================================================================*/
-void IntegrationSystem::Midpoint_Integrate(ODESystemClass * sys,float dt)
+void IntegrationSystem::Midpoint_Integrate(ODESystemClass * sys,CustomFloat dt)
 {
 	int i;
 
@@ -180,11 +180,11 @@ void IntegrationSystem::Midpoint_Integrate(ODESystemClass * sys,float dt)
  * HISTORY:                                                                                    * 
  *   08/11/1997 GH  : Created.                                                                 * 
  *=============================================================================================*/
-void IntegrationSystem::Runge_Kutta_Integrate(ODESystemClass * sys,float dt)
+void IntegrationSystem::Runge_Kutta_Integrate(ODESystemClass * sys,CustomFloat dt)
 {
 	int i;
-	float dt2 = dt / 2.0f;
-	float dt6 = dt / 6.0f;
+	CustomFloat dt2 = dt / 2.0f;
+	CustomFloat dt6 = dt / 6.0f;
 
 	/*
 	** Get the current state
@@ -235,7 +235,7 @@ void IntegrationSystem::Runge_Kutta_Integrate(ODESystemClass * sys,float dt)
 	*/
 	sys->Compute_Derivatives(dt, &yt, &dyt);
 	for (i=0; i<Y0.Count(); i++) {
-		Y1[i] = Y0[i] + dt6 * (dydt[i] + dyt[i] + 2.0f*dym[i]);
+		Y1[i] = Y0[i] + dt6 * (dydt[i] + dyt[i] + (CustomFloat)2.0f*dym[i]);
 	}
 
 	sys->Set_State(Y1);
@@ -257,39 +257,39 @@ void IntegrationSystem::Runge_Kutta_Integrate(ODESystemClass * sys,float dt)
  *   08/11/1997 GH  : Created.                                                                 * 
  *   6/25/99    GTH : Converted to the new Integrator system                                   *
  *=============================================================================================*/
-void IntegrationSystem::Runge_Kutta5_Integrate(ODESystemClass * odesys,float dt)
+void IntegrationSystem::Runge_Kutta5_Integrate(ODESystemClass * odesys,CustomFloat dt)
 {
 	int i;
 	int veclen;
-	static const float a2 =			0.2f;
-	static const float a3 =			0.3f;
-	static const float a4 =			0.6f;
-	static const float a5 =			1.0f;
-	static const float a6 =			0.875f;
-	static const float b21 =		0.2f;
-	static const float b31 =		3.0f/40.0f;
-	static const float b32 =		9.0f/40.0f;
-	static const float b41 =		0.3f;
-	static const float b42 =		-0.9f;
-	static const float b43 =		1.2f;
-	static const float b51 =		-11.0f /54.0f;
-	static const float b52 =		2.5f;
-	static const float b53 =		-70.0f/27.0f;
-	static const float b54 =		35.0f/27.0f;
-	static const float b61 =		1631.0f/55296.0f;
-	static const float b62 =		175.0f/512.0f;
-	static const float b63 =		575.0f/13824.0f;
-	static const float b64 =		44275.0f/110592.0f;
-	static const float b65 =		253.0f/4096.0f;
-	static const float c1 =			37.0f/378.0f;
-	static const float c3 =			250.0f/621.0f;
-	static const float c4 =			125.0f/594.0f;
-	static const float c6 =			512.0f/1771.0f;
-	static const float dc5 =		-277.0f/14336.0f;
-	static const float dc1 =		c1 - 2825.0f/27648.0f;
-	static const float dc3 =		c3 - 18575.0f/48384.0f;
-	static const float dc4 =		c4 - 13525.0f/55296.0f;
-	static const float dc6 =		c6 - 0.25f;
+	static const CustomFloat a2 =			0.2f;
+	static const CustomFloat a3 =			0.3f;
+	static const CustomFloat a4 =			0.6f;
+	static const CustomFloat a5 =			1.0f;
+	static const CustomFloat a6 =			0.875f;
+	static const CustomFloat b21 =		0.2f;
+	static const CustomFloat b31 =		3.0f/40.0f;
+	static const CustomFloat b32 =		9.0f/40.0f;
+	static const CustomFloat b41 =		0.3f;
+	static const CustomFloat b42 =		-0.9f;
+	static const CustomFloat b43 =		1.2f;
+	static const CustomFloat b51 =		-11.0f /54.0f;
+	static const CustomFloat b52 =		2.5f;
+	static const CustomFloat b53 =		-70.0f/27.0f;
+	static const CustomFloat b54 =		35.0f/27.0f;
+	static const CustomFloat b61 =		1631.0f/55296.0f;
+	static const CustomFloat b62 =		175.0f/512.0f;
+	static const CustomFloat b63 =		575.0f/13824.0f;
+	static const CustomFloat b64 =		44275.0f/110592.0f;
+	static const CustomFloat b65 =		253.0f/4096.0f;
+	static const CustomFloat c1 =			37.0f/378.0f;
+	static const CustomFloat c3 =			250.0f/621.0f;
+	static const CustomFloat c4 =			125.0f/594.0f;
+	static const CustomFloat c6 =			512.0f/1771.0f;
+	static const CustomFloat dc5 =		-277.0f/14336.0f;
+	static const CustomFloat dc1 =		c1 - 2825.0f/27648.0f;
+	static const CustomFloat dc3 =		c3 - 18575.0f/48384.0f;
+	static const CustomFloat dc4 =		c4 - 13525.0f/55296.0f;
+	static const CustomFloat dc6 =		c6 - 0.25f;
 
 	/*
 	** Get the current state

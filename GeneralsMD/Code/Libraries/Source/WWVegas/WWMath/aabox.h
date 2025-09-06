@@ -103,17 +103,17 @@ public:
 	WWINLINE void		Init(const MinMaxAABoxClass & minmaxbox);
 	void		Init(const LineSegClass & line);
 	void		Init_Min_Max(const Vector3 & min,const Vector3 & max);
-	void		Init_Random(float min_center = -1.0f,float max_center = 1.0f,float min_extent = 0.5f,float max_extent = 1.0f);
+	void		Init_Random(CustomFloat min_center = -1.0f,CustomFloat max_center = 1.0f,CustomFloat min_extent = 0.5f,CustomFloat max_extent = 1.0f);
 
 	void		Add_Point(const Vector3 & point);
 	void		Add_Box(const AABoxClass & b);
 	void		Add_Box(const MinMaxAABoxClass & b);
-	float		Project_To_Axis(const Vector3 & axis) const;
+	CustomFloat		Project_To_Axis(const Vector3 & axis) const;
 
 	void		Transform(const Matrix3D & tm);
 	void		Translate(const Vector3 & pos);
 
-	WWINLINE float Volume(void) const { return 2.0*Extent.X * 2.0*Extent.Y * 2.0*Extent.Z; }
+	WWINLINE CustomFloat Volume(void) const { return CustomFloat(2.0)*Extent.X * CustomFloat(2.0)*Extent.Y * CustomFloat(2.0)*Extent.Z; }
 	WWINLINE bool		Contains(const Vector3 & point) const;
 	WWINLINE bool		Contains(const AABoxClass & other_box) const;
 	WWINLINE bool		Contains(const MinMaxAABoxClass & other_box) const;
@@ -159,7 +159,7 @@ public:
 	void		Transform(const Matrix3D & tm);
 	void		Translate(const Vector3 & pos);
 
-	WWINLINE float		Volume(void) const { Vector3 size = MaxCorner - MinCorner; return size.X*size.Y*size.Z; }
+	WWINLINE CustomFloat		Volume(void) const { Vector3 size = MaxCorner - MinCorner; return size.X*size.Y*size.Z; }
 
 	Vector3	MinCorner;
 	Vector3	MaxCorner;
@@ -434,11 +434,11 @@ WWINLINE void AABoxClass::Add_Box(const MinMaxAABoxClass & b)
  * HISTORY:                                                                                    *
  *   2/24/98    GTH : Created.                                                                 *
  *=============================================================================================*/
-WWINLINE float AABoxClass::Project_To_Axis(const Vector3 & axis) const
+WWINLINE CustomFloat AABoxClass::Project_To_Axis(const Vector3 & axis) const
 {
-	float x = Extent[0] * axis[0];
-	float y = Extent[1] * axis[1];
-	float z = Extent[2] * axis[2];
+	CustomFloat x = Extent[0] * axis[0];
+	CustomFloat y = Extent[1] * axis[1];
+	CustomFloat z = Extent[2] * axis[2];
 
 	// projection is the sum of the absolute values of the projections of the three extents
 	return (WWMath::Fabs(x) + WWMath::Fabs(y) + WWMath::Fabs(z));

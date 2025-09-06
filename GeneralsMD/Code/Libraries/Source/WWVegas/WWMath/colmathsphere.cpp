@@ -126,7 +126,7 @@ bool CollisionMath::Intersection_Test(const SphereClass & sphere,const OBBoxClas
 CollisionMath::OverlapType
 CollisionMath::Overlap_Test(const SphereClass & sphere,const Vector3 & point)
 {
-	float r2 = (point - sphere.Center).Length2();
+	CustomFloat r2 = (point - sphere.Center).Length2();
 	if (r2 < sphere.Radius * sphere.Radius - COINCIDENCE_EPSILON) {
 		return NEG;
 	}
@@ -194,8 +194,8 @@ CollisionMath::Overlap_Test(const SphereClass & sphere,const SphereClass & spher
 {
 	CollisionMath::OverlapType retval = OUTSIDE;
 
-	float radius	= sphere.Radius + sphere2.Radius;
-	float dist2		= (sphere2.Center - sphere.Center).Length2();
+	CustomFloat radius	= sphere.Radius + sphere2.Radius;
+	CustomFloat dist2		= (sphere2.Center - sphere.Center).Length2();
 	
 	if (dist2 == 0 && sphere.Radius == sphere2.Radius) {
 		retval = OVERLAPPED;

@@ -127,7 +127,6 @@
 //--------------------------------------------------------------------
 // Fundamental type definitions
 //--------------------------------------------------------------------
-typedef float							Real;							// 4 bytes 
 typedef int								Int;							// 4 bytes 
 typedef unsigned int			UnsignedInt;	  	// 4 bytes 
 typedef unsigned short		UnsignedShort;		// 2 bytes 
@@ -138,7 +137,10 @@ typedef char							Char;							// 1 byte of text
 typedef bool							Bool;							// 
 // note, the types below should use "long long", but MSVC doesn't support it yet
 typedef int64_t						Int64;							// 8 bytes 
-typedef uint64_t	UnsignedInt64;	  	// 8 bytes 
+typedef uint64_t	UnsignedInt64;	  	// 8 bytes
+
+#include "Lib/CustomFloat.h"
+typedef CustomFloat				Real;							// 4 bytes
 
 #include "Lib/Trig.h"
 

@@ -64,8 +64,8 @@ void FrustumClass::Init
 	const Matrix3D &		camera,
 	const Vector2 &		vpmin,
 	const Vector2 &		vpmax,
-	float						znear,
-	float						zfar
+	CustomFloat						znear,
+	CustomFloat						zfar
 )
 {
 	int i;

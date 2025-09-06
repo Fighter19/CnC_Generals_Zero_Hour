@@ -43,27 +43,27 @@
 #include "wwprofile.h"
 
 // TODO: convert to use loouptablemanager...
-float _FastAcosTable[ARC_TABLE_SIZE];
-float _FastAsinTable[ARC_TABLE_SIZE];
-float _FastSinTable[SIN_TABLE_SIZE];
-float _FastInvSinTable[SIN_TABLE_SIZE];
+CustomFloat _FastAcosTable[ARC_TABLE_SIZE];
+CustomFloat _FastAsinTable[ARC_TABLE_SIZE];
+CustomFloat _FastSinTable[SIN_TABLE_SIZE];
+CustomFloat _FastInvSinTable[SIN_TABLE_SIZE];
 
 void		WWMath::Init(void)
 {
 	LookupTableMgrClass::Init();
 
 	for (int a=0;a<ARC_TABLE_SIZE;++a) {
-		float cv=float(a-ARC_TABLE_SIZE/2)*(1.0f/(ARC_TABLE_SIZE/2));
+		CustomFloat cv=CustomFloat(a-ARC_TABLE_SIZE/2)*(1.0f/(ARC_TABLE_SIZE/2));
 		_FastAcosTable[a]=acos(cv);
 		_FastAsinTable[a]=asin(cv);
 	}
 
 	for (int a=0;a<SIN_TABLE_SIZE;++a) {
-		float cv= (float)a * 2.0f * WWMATH_PI / SIN_TABLE_SIZE; //float(a-SIN_TABLE_SIZE/2)*(1.0f/(SIN_TABLE_SIZE/2));
+		CustomFloat cv= (CustomFloat)a * (CustomFloat)2.0f * WWMATH_PI / SIN_TABLE_SIZE; //CustomFloat(a-SIN_TABLE_SIZE/2)*(1.0f/(SIN_TABLE_SIZE/2));
 		_FastSinTable[a]=sin(cv);
 		
 		if (a>0) {
-			_FastInvSinTable[a]=1.0f/_FastSinTable[a];
+			_FastInvSinTable[a]=(CustomFloat)1.0f/_FastSinTable[a];
 		} else {
 			_FastInvSinTable[a]=WWMATH_FLOAT_MAX;
 		}
@@ -75,9 +75,9 @@ void		WWMath::Shutdown(void)
 	LookupTableMgrClass::Shutdown();
 }
 
-float		WWMath::Random_Float(void) 
+CustomFloat		WWMath::Random_Float(void) 
 { 
-	return ((float)(rand() & 0xFFF)) / (float)(0xFFF); 
+	return ((CustomFloat)(rand() & 0xFFF)) / (CustomFloat)(0xFFF); 
 }
 
 

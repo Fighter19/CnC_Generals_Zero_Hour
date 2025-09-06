@@ -103,39 +103,39 @@ void CatmullRomSpline3DClass::Update_Tangents(void)
 	if (IsLooping) {
 
 		// This really only works if the start and end points have the same position...
-		Tangents[0].OutTangent.X = 0.5f*(Keys[1].Point.X - Keys[end-1].Point.X); 			
-		Tangents[0].OutTangent.Y = 0.5f*(Keys[1].Point.Y - Keys[end-1].Point.Y); 			
-		Tangents[0].OutTangent.Z = 0.5f*(Keys[1].Point.Z - Keys[end-1].Point.Z); 			
+		Tangents[0].OutTangent.X = (CustomFloat)0.5f*(Keys[1].Point.X - Keys[end-1].Point.X); 			
+		Tangents[0].OutTangent.Y = (CustomFloat)0.5f*(Keys[1].Point.Y - Keys[end-1].Point.Y); 			
+		Tangents[0].OutTangent.Z = (CustomFloat)0.5f*(Keys[1].Point.Z - Keys[end-1].Point.Z); 			
 		Tangents[end].InTangent = Tangents[0].OutTangent;
 	
 	} else {
 		
 		// TODO: second derivative = 0... what is formula?  I'm making this up...
-		Tangents[0].OutTangent.X = 0.25f*(Keys[1].Point.X - Keys[0].Point.X); 			
-		Tangents[0].OutTangent.Y = 0.25f*(Keys[1].Point.Y - Keys[0].Point.Y); 			
-		Tangents[0].OutTangent.Z = 0.25f*(Keys[1].Point.Z - Keys[0].Point.Z); 			
+		Tangents[0].OutTangent.X = (CustomFloat)0.25f*(Keys[1].Point.X - Keys[0].Point.X); 			
+		Tangents[0].OutTangent.Y = (CustomFloat)0.25f*(Keys[1].Point.Y - Keys[0].Point.Y); 			
+		Tangents[0].OutTangent.Z = (CustomFloat)0.25f*(Keys[1].Point.Z - Keys[0].Point.Z); 			
 
-		Tangents[end].InTangent.X = 0.25f*(Keys[end].Point.X - Keys[end-1].Point.X); 			
-		Tangents[end].InTangent.Y = 0.25f*(Keys[end].Point.Y - Keys[end-1].Point.Y); 			
-		Tangents[end].InTangent.Z = 0.25f*(Keys[end].Point.Z - Keys[end-1].Point.Z); 			
+		Tangents[end].InTangent.X = (CustomFloat)0.25f*(Keys[end].Point.X - Keys[end-1].Point.X); 			
+		Tangents[end].InTangent.Y = (CustomFloat)0.25f*(Keys[end].Point.Y - Keys[end-1].Point.Y); 			
+		Tangents[end].InTangent.Z = (CustomFloat)0.25f*(Keys[end].Point.Z - Keys[end-1].Point.Z); 			
 	
 	}
 
-	float total_time = (Keys[1].Time - Keys[0].Time) + (Keys[end].Time - Keys[end-1].Time);
-	float in_factor = 2.0f * (Keys[end].Time - Keys[end-1].Time) / total_time;
-	float out_factor = 2.0f * (Keys[1].Time - Keys[0].Time) / total_time;
+	CustomFloat total_time = (Keys[1].Time - Keys[0].Time) + (Keys[end].Time - Keys[end-1].Time);
+	CustomFloat in_factor = (CustomFloat)2.0f * (Keys[end].Time - Keys[end-1].Time) / total_time;
+	CustomFloat out_factor = (CustomFloat)2.0f * (Keys[1].Time - Keys[0].Time) / total_time;
 	Tangents[end].InTangent *= in_factor;
 	Tangents[0].OutTangent *= out_factor;
 
 	// inner knots
 	for (int i=1; i<Keys.Count()-1; i++) {
-		Tangents[i].InTangent.X = 0.5f*(Keys[i+1].Point.X - Keys[i-1].Point.X);
-		Tangents[i].InTangent.Y = 0.5f*(Keys[i+1].Point.Y - Keys[i-1].Point.Y);
-		Tangents[i].InTangent.Z = 0.5f*(Keys[i+1].Point.Z - Keys[i-1].Point.Z);
+		Tangents[i].InTangent.X = (CustomFloat)0.5f*(Keys[i+1].Point.X - Keys[i-1].Point.X);
+		Tangents[i].InTangent.Y = (CustomFloat)0.5f*(Keys[i+1].Point.Y - Keys[i-1].Point.Y);
+		Tangents[i].InTangent.Z = (CustomFloat)0.5f*(Keys[i+1].Point.Z - Keys[i-1].Point.Z);
 		Tangents[i].OutTangent = Tangents[i].InTangent;
 
-		float in_factor = 2.0f * (Keys[i].Time - Keys[i-1].Time) / (Keys[i+1].Time - Keys[i-1].Time);
-		float out_factor = 2.0f * (Keys[i+1].Time - Keys[i].Time) / (Keys[i+1].Time - Keys[i-1].Time);
+		CustomFloat in_factor = (CustomFloat)2.0f * (Keys[i].Time - Keys[i-1].Time) / (Keys[i+1].Time - Keys[i-1].Time);
+		CustomFloat out_factor = (CustomFloat)2.0f * (Keys[i+1].Time - Keys[i].Time) / (Keys[i+1].Time - Keys[i-1].Time);
 		Tangents[i].InTangent *= in_factor;			// compensating for the un-even keys
 		Tangents[i].OutTangent *= out_factor;
 	}
@@ -250,31 +250,31 @@ void CatmullRomSpline1DClass::Update_Tangents(void)
 	if (IsLooping) {
 
 		// This really only works if the start and end points have the same position...
-		Tangents[0].OutTangent = 0.5f*(Keys[1].Point - Keys[end-1].Point);
+		Tangents[0].OutTangent = (CustomFloat)0.5f*(Keys[1].Point - Keys[end-1].Point);
 		Tangents[end].InTangent = Tangents[0].OutTangent;
 	
 	} else {
 		
 		// TODO: second derivative = 0... what is formula?  I'm making this up...
-		Tangents[0].OutTangent = 0.25f*(Keys[1].Point - Keys[0].Point);
+		Tangents[0].OutTangent = (CustomFloat)0.25f*(Keys[1].Point - Keys[0].Point);
 
-		Tangents[end].InTangent = 0.25f*(Keys[end].Point - Keys[end-1].Point);
+		Tangents[end].InTangent = (CustomFloat)0.25f*(Keys[end].Point - Keys[end-1].Point);
 	
 	}
 
-	float total_time = (Keys[1].Time - Keys[0].Time) + (Keys[end].Time - Keys[end-1].Time);
-	float in_factor = 2.0f * (Keys[end].Time - Keys[end-1].Time) / total_time;
-	float out_factor = 2.0f * (Keys[1].Time - Keys[0].Time) / total_time;
+	CustomFloat total_time = (Keys[1].Time - Keys[0].Time) + (Keys[end].Time - Keys[end-1].Time);
+	CustomFloat in_factor = (CustomFloat)2.0f * (Keys[end].Time - Keys[end-1].Time) / total_time;
+	CustomFloat out_factor = (CustomFloat)2.0f * (Keys[1].Time - Keys[0].Time) / total_time;
 	Tangents[end].InTangent *= in_factor;
 	Tangents[0].OutTangent *= out_factor;
 
 	// inner knots
 	for (int i=1; i<Keys.Count()-1; i++) {
-		Tangents[i].InTangent = 0.5f*(Keys[i+1].Point - Keys[i-1].Point);
+		Tangents[i].InTangent = (CustomFloat)0.5f*(Keys[i+1].Point - Keys[i-1].Point);
 		Tangents[i].OutTangent = Tangents[i].InTangent;
 
-		float in_factor = 2.0f * (Keys[i].Time - Keys[i-1].Time) / (Keys[i+1].Time - Keys[i-1].Time);
-		float out_factor = 2.0f * (Keys[i+1].Time - Keys[i].Time) / (Keys[i+1].Time - Keys[i-1].Time);
+		CustomFloat in_factor = (CustomFloat)2.0f * (Keys[i].Time - Keys[i-1].Time) / (Keys[i+1].Time - Keys[i-1].Time);
+		CustomFloat out_factor = (CustomFloat)2.0f * (Keys[i+1].Time - Keys[i].Time) / (Keys[i+1].Time - Keys[i-1].Time);
 		Tangents[i].InTangent *= in_factor;			// compensating for the un-even keys
 		Tangents[i].OutTangent *= out_factor;
 	}

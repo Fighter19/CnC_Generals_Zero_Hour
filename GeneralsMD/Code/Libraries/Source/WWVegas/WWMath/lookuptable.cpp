@@ -85,12 +85,12 @@ void LookupTableClass::Init(const char * name,Curve1DClass * curve)
 	// Store the min and max input values for the table
 	curve->Get_Key(0,NULL,&MinInputValue,NULL);
 	curve->Get_Key(curve->Key_Count()-1,NULL,&MaxInputValue,NULL);
-	OOMaxMinusMin = 1.0f / (MaxInputValue - MinInputValue);
+	OOMaxMinusMin = (CustomFloat)1.0f / (MaxInputValue - MinInputValue);
 
 	// Sample the curve and store the output values
 	for (int i=0; i<OutputSamples.Length(); i++) {
-		float x = MinInputValue + (MaxInputValue - MinInputValue) * (float)i / (float)(OutputSamples.Length() - 1);
-		float y;
+		CustomFloat x = MinInputValue + (MaxInputValue - MinInputValue) * (CustomFloat)i / (CustomFloat)(OutputSamples.Length() - 1);
+		CustomFloat y;
 		curve->Evaluate(x,&y);
 		OutputSamples[i] = y;
 	}
@@ -191,10 +191,10 @@ void LookupTableMgrClass::Save_Table_Desc
 
 	// save the extents
 	csave.Begin_Chunk(LOOKUPTABLE_CHUNK_EXTENTS);
-	csave.Write(&(min_corner.X),sizeof(float));
-	csave.Write(&(min_corner.Y),sizeof(float));
-	csave.Write(&(max_corner.X),sizeof(float));
-	csave.Write(&(max_corner.Y),sizeof(float));
+	csave.Write(&(min_corner.X),sizeof(CustomFloat));
+	csave.Write(&(min_corner.Y),sizeof(CustomFloat));
+	csave.Write(&(max_corner.X),sizeof(CustomFloat));
+	csave.Write(&(max_corner.Y),sizeof(CustomFloat));
 	csave.End_Chunk();
 }
 
@@ -209,8 +209,8 @@ void LookupTableMgrClass::Load_Table_Desc
 	*curve_ptr = NULL;
 	PersistFactoryClass * factory;
 
-	float xmin,xmax;
-	float ymin,ymax;
+	CustomFloat xmin,xmax;
+	CustomFloat ymin,ymax;
 	xmin = xmax = ymin = ymax = 0.0f;
 
 	while (cload.Open_Chunk()) {
