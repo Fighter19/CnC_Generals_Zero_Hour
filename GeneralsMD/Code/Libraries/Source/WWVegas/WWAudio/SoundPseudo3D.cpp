@@ -133,7 +133,7 @@ SoundPseudo3DClass::Initialize_Miles_Handle (void)
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void
-SoundPseudo3DClass::Update_Pseudo_Volume (float distance)
+SoundPseudo3DClass::Update_Pseudo_Volume (CustomFloat distance)
 {
 	MMSLockClass lock;	
 
@@ -142,17 +142,17 @@ SoundPseudo3DClass::Update_Pseudo_Volume (float distance)
 	//
 	if (m_SoundHandle != NULL) {
 		
-		float volume_mod = Determine_Real_Volume ();
-		float max_distance = Get_DropOff_Radius ();
-		float min_distance = Get_Max_Vol_Radius ();
-		float delta = max_distance - min_distance;
+		CustomFloat volume_mod = Determine_Real_Volume ();
+		CustomFloat max_distance = Get_DropOff_Radius ();
+		CustomFloat min_distance = Get_Max_Vol_Radius ();
+		CustomFloat delta = max_distance - min_distance;
 
 		// Determine a normalized volume from the position
-		float volume = 1.0F;
+		CustomFloat volume = (CustomFloat)1.0F;
 		if (distance > min_distance) {
-			volume = 1.0F - ((distance - min_distance) / delta);
-			volume = min (volume, 1.0F);
-			volume = max (volume, 0.0F);			
+			volume = (CustomFloat)1.0F - ((distance - min_distance) / delta);
+			volume = min (volume, (CustomFloat)1.0F);
+			volume = max (volume, (CustomFloat)0.0F);
 		}
 
 		// Multiply the 'max' volume with the calculated volume
@@ -185,7 +185,7 @@ SoundPseudo3DClass::Update_Pseudo_Volume (void)
 		// Find the difference in the sound position and its listener's position
 		//		
 		Vector3 sound_pos = m_ListenerTransform.Get_Translation () - m_Transform.Get_Translation ();
-		float distance = sound_pos.Quick_Length ();
+		CustomFloat distance = sound_pos.Quick_Length ();
 
 		//
 		// Determine a normalized volume from the position
@@ -222,8 +222,8 @@ SoundPseudo3DClass::Update_Pseudo_Pan (void)
 		//
 		//	Calculate a normalized pan from 0 (hard left) to 1.0F (hard right)
 		//
-		float angle	= WWMath::Atan2 (rel_sound_pos.Y, rel_sound_pos.X);
-		float pan	= -WWMath::Fast_Sin (angle);
+		CustomFloat angle	= WWMath::Atan2 (rel_sound_pos.Y, rel_sound_pos.X);
+		CustomFloat pan	= -WWMath::Fast_Sin (angle);
 		pan			= (pan / 2.0F) + 0.5F;
 
 		//

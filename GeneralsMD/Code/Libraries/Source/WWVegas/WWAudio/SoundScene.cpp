@@ -191,9 +191,9 @@ SoundSceneClass::Collect_Logical_Sounds (int listener_count)
 			//
 			const Vector3 &sound_pos	= cull_obj->Get_Bounding_Box ().Center;
 			Vector3 listener_pos			= listener->Get_Position ();
-			float dropoff_radius			= sound_obj->Get_DropOff_Radius ();
-			float scale						= listener->Get_Effective_Scale ();
-			float test_radius2			= (dropoff_radius * scale) * (dropoff_radius * scale);
+			CustomFloat dropoff_radius			= sound_obj->Get_DropOff_Radius ();
+			CustomFloat scale						= listener->Get_Effective_Scale ();
+			CustomFloat test_radius2			= (dropoff_radius * scale) * (dropoff_radius * scale);
 			if ((listener_pos - sound_pos).Length2 () <= test_radius2) {
 				
 				//
@@ -271,9 +271,9 @@ SoundSceneClass::Collect_Audible_Sounds
 		// Perform a quick sphere-cull check to make sure this
 		// sound should really be audible
 		Vector3 pos = sound_obj->Get_Position ();
-		float radius = sound_obj->Get_DropOff_Radius ();
-		float radius2 = radius * radius;
-		float length2 = (pos - listener_pos).Length2 ();
+		CustomFloat radius = sound_obj->Get_DropOff_Radius ();
+		CustomFloat radius2 = radius * radius;
+		CustomFloat length2 = (pos - listener_pos).Length2 ();
 		if (length2 <= radius2) {
 			
 			AudibleInfoClass *audible_info = W3DNEW AudibleInfoClass (sound_obj, length2);
@@ -283,8 +283,8 @@ SoundSceneClass::Collect_Audible_Sounds
 			// Update this sound's runtime priority based on its distance			
 			// from the sound emitter.
 			//
-			float length	= (pos - listener_pos).Quick_Length ();
-			float priority	= (length > 0) ? 1 - (length / radius) : 1.0F;
+			CustomFloat length	= (pos - listener_pos).Quick_Length ();
+			CustomFloat priority	= (length > 0) ? (CustomFloat)1 - (length / radius) : (CustomFloat)1.0F;
 			sound_obj->Set_Runtime_Priority (priority);
 		}
 	}
@@ -303,9 +303,9 @@ SoundSceneClass::Collect_Audible_Sounds
 		// Perform a quick sphere-cull check to make sure this
 		// sound should really be audible
 		Vector3 pos = sound_obj->Get_Position ();
-		float radius = sound_obj->Get_DropOff_Radius ();
-		float radius2 = radius * radius;
-		float length2 = (pos - listener_pos).Length2 ();
+		CustomFloat radius = sound_obj->Get_DropOff_Radius ();
+		CustomFloat radius2 = radius * radius;
+		CustomFloat length2 = (pos - listener_pos).Length2 ();
 		if (length2 <= radius2) {
 			
 			AudibleInfoClass *audible_info = W3DNEW AudibleInfoClass (sound_obj, length2);
@@ -315,8 +315,8 @@ SoundSceneClass::Collect_Audible_Sounds
 			// Update this sound's runtime priority based on its distance
 			// from the sound emitter.
 			//
-			float length	= (pos - listener_pos).Quick_Length ();
-			float priority	= (length > 0) ? 1 - (length / radius) : 1.0F;
+			CustomFloat length	= (pos - listener_pos).Quick_Length ();
+			CustomFloat priority	= (length > 0) ? (CustomFloat)1 - (length / radius) : (CustomFloat)1.0F;
 			sound_obj->Set_Runtime_Priority (priority);
 		}
 	}
@@ -551,8 +551,8 @@ SoundSceneClass::Add_Sound
 
 			Vector3 listener_pos		= m_Listener->Get_Position ();
 			Vector3 sound_pos			= sound_obj->Get_Position ();
-			float radius				= sound_obj->Get_DropOff_Radius ();
-			float radius2				= radius * radius;
+			CustomFloat radius				= sound_obj->Get_DropOff_Radius ();
+			CustomFloat radius2				= radius * radius;
 
 			if (((listener_pos - sound_pos).Length2 ()) < radius2) {
 				cull_sound = false;
@@ -688,8 +688,8 @@ SoundSceneClass::Add_Static_Sound
 
 				Vector3 listener_pos		= m_Listener->Get_Position ();
 				Vector3 sound_pos			= sound_obj->Get_Position ();
-				float radius				= sound_obj->Get_DropOff_Radius ();
-				float radius2				= radius * radius;
+				CustomFloat radius				= sound_obj->Get_DropOff_Radius ();
+				CustomFloat radius2				= radius * radius;
 
 				if (((listener_pos - sound_pos).Length2 ()) < radius2) {
 					cull_sound = false;

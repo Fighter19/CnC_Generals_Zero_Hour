@@ -50,7 +50,6 @@
 #include "aaplane.h"
 #include "bittype.h"
 #include "meshgeometry.h"
-#include <float.h>
 
 class AABTreeClass;
 class ChunkSaveClass;
@@ -126,7 +125,7 @@ private:
 		{
 		}
 		
-		float						Cost;				// try to minimize this!
+		CustomFloat						Cost;				// try to minimize this!
 		int						FrontCount;		// number of polys in front of the plane
 		int						BackCount;		// number of polys behind the plane
 		Vector3					BMin;				// min of the bounding box of the "back" child

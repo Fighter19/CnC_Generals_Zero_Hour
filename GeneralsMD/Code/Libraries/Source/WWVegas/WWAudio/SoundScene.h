@@ -185,12 +185,12 @@ class SoundSceneClass
 				:	sound_obj (NULL),
 					distance2 (0) { }
 
-			AudibleInfoClass (AudibleSoundClass *obj, float dist2)
+			AudibleInfoClass (AudibleSoundClass *obj, CustomFloat dist2)
 				:	sound_obj (obj),
 					distance2 (dist2) { }
 
 			AudibleSoundClass *	sound_obj;
-			float						distance2;
+			CustomFloat						distance2;
 		};
 
 		typedef MultiListClass<AudibleInfoClass>	COLLECTED_SOUNDS;

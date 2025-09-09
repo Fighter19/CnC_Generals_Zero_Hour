@@ -10,4 +10,4 @@ target_include_directories(
                      ${CMAKE_CURRENT_SOURCE_DIR}/../
                      ${CMAKE_CURRENT_SOURCE_DIR}/../../Include)
 
-target_link_libraries(Compression PRIVATE LZHL::LZHL ZLIB::ZLIB)
+target_link_libraries(Compression PRIVATE LZHL::LZHL ZLIB::ZLIB WWMath)

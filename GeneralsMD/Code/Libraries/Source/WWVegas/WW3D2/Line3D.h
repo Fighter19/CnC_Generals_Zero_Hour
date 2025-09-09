@@ -63,8 +63,8 @@ class Line3DClass : public W3DMPO, public RenderObjClass
 
 	public:
 
-		Line3DClass (const Vector3 & start, const Vector3 & end, float width,
-			float r, float g, float b, float opacity = 1.0f);
+		Line3DClass (const Vector3 & start, const Vector3 & end, CustomFloat width,
+			CustomFloat r, CustomFloat g, CustomFloat b, CustomFloat opacity = 1.0f);
 		Line3DClass(const Line3DClass & src);
 		Line3DClass & operator = (const Line3DClass & that);
 		virtual ~Line3DClass(void);
@@ -76,8 +76,8 @@ class Line3DClass : public W3DMPO, public RenderObjClass
 		virtual void		Render(RenderInfoClass & rfinfo);
 
 		// scale the 3D line symmetrically about its center.
-		virtual void		Scale(float scale);
-		virtual void		Scale(float scalex, float scaley, float scalez);
+		virtual void		Scale(CustomFloat scale);
+		virtual void		Scale(CustomFloat scalex, CustomFloat scaley, CustomFloat scalez);
 
 		// returns the number of polygons in the render object
 		virtual int Get_Num_Polys(void) const;
@@ -92,13 +92,13 @@ class Line3DClass : public W3DMPO, public RenderObjClass
 		void Reset(const Vector3 & new_start, const Vector3 & new_end);
 
 		// Reset line start and end points, and the line width
-		void Reset(const Vector3 & new_start, const Vector3 & new_end, float new_width);
+		void Reset(const Vector3 & new_start, const Vector3 & new_end, CustomFloat new_width);
 
 		// Reset the line color
-		void Re_Color(float r, float g, float b);
+		void Re_Color(CustomFloat r, CustomFloat g, CustomFloat b);
 
 		// Reset the line opacity
-		void Set_Opacity(float opacity);
+		void Set_Opacity(CustomFloat opacity);
 
 		// For non-opaque lines, allow them to render last.
 		void							Set_Sort_Level(int level)									{ SortLevel = level; }
@@ -107,10 +107,10 @@ class Line3DClass : public W3DMPO, public RenderObjClass
 	protected:		
 
 		// This is kept to facilitate changing the line endpoints.
-		float Length;
+		CustomFloat Length;
 
 		// This is kept to facilitate changing the line width.
-		float Width;
+		CustomFloat Width;
 		
 		// shader
 		ShaderClass				Shader;

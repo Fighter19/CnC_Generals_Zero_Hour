@@ -134,7 +134,7 @@ protected:
 	/// factory for creating the snow manager
 	virtual SnowManager *createSnowManager( void ) { return NEW W3DSnowManager; }
 
-	virtual void setFrameRate(Real msecsPerFrame) { TheW3DFrameLengthInMsec = msecsPerFrame; }
+	virtual void setFrameRate(Real msecsPerFrame) { TheW3DFrameLengthInMsec = (Int)msecsPerFrame; }
 
 };  // end class W3DGameClient
 

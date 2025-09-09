@@ -77,8 +77,8 @@ class LogicalSoundClass : public SoundSceneObjClass
 		virtual void			Set_Type_Mask (uint32 mask = 0)	{ m_TypeMask = mask; }
 		virtual uint32			Get_Type_Mask (void) const			{ return m_TypeMask; }
 
-		virtual float			Get_Notify_Delay (void) const		{ return (float)m_NotifyDelayInMS / 1000.0F; }
-		virtual void			Set_Notify_Delay (float secs)		{ m_NotifyDelayInMS = uint32(secs * 1000.0F); }
+		virtual CustomFloat			Get_Notify_Delay (void) const		{ return (CustomFloat)m_NotifyDelayInMS / 1000.0F; }
+		virtual void			Set_Notify_Delay (CustomFloat secs)		{ m_NotifyDelayInMS = uint32(secs * 1000.0F); }
 		virtual bool			Allow_Notify (uint32 timestamp);
 
 		virtual uint32			Get_Listener_Timestamp (void) const		{ return m_OldestListenerTimestamp; }
@@ -117,8 +117,8 @@ class LogicalSoundClass : public SoundSceneObjClass
 		//
 		//	This is the distance where the sound can not be heard any longer.  (its vol is 0)
 		//
-		virtual void			Set_DropOff_Radius (float radius = 1)	{ m_DropOffRadius = radius; }
-		virtual float			Get_DropOff_Radius (void) const			{ return m_DropOffRadius; }
+		virtual void			Set_DropOff_Radius (CustomFloat radius = 1)	{ m_DropOffRadius = radius; }
+		virtual CustomFloat			Get_DropOff_Radius (void) const			{ return m_DropOffRadius; }
 
 		//////////////////////////////////////////////////////////////////////
 		//	From PersistClass
@@ -138,7 +138,7 @@ class LogicalSoundClass : public SoundSceneObjClass
 		//////////////////////////////////////////////////////////////////////
 		//	Private member data
 		//////////////////////////////////////////////////////////////////////
-		float					m_DropOffRadius;
+		CustomFloat					m_DropOffRadius;
 		bool					m_IsSingleShot;
 		uint32					m_TypeMask;
 		Vector3					m_Position;

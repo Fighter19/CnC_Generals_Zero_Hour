@@ -272,7 +272,7 @@ protected:
 inline Bool WaterRenderObjClass::worldToGridSpace(Real worldX, Real worldY, Real &gridX, Real &gridY)
 {
 	Real dx,dy;
-	Real ooGridCellSize = 1.0f/m_gridCellSize;
+	Real ooGridCellSize = (Real)1.0f/m_gridCellSize;
 
 	dx=worldX - m_gridOrigin.X;
 	dy=worldY - m_gridOrigin.Y;

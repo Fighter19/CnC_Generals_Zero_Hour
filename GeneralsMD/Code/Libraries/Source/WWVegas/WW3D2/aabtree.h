@@ -56,7 +56,6 @@
 #include "aabtreebuilder.h"
 #include "obbox.h"
 #include <tri.h>
-#include <float.h>
 
 
 class MeshClass;
@@ -98,7 +97,7 @@ public:
 	void						Load_W3D(ChunkLoadClass & cload);
 
 	// Uniformly scale the AABTree
-	void						Scale(float scale);
+	void						Scale(CustomFloat scale);
 
 	int						Get_Node_Count(void) { return NodeCount; }
 	int						Get_Poly_Count(void) { return PolyCount; }

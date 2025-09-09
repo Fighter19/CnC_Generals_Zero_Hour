@@ -354,7 +354,7 @@ AudibleSoundClass::Play (bool alloc_handle)
 			m_SoundHandle->Start_Sample ();
 		}
 
-		m_CurrentPosition	= m_StartOffset * m_Length;
+		m_CurrentPosition	= (unsigned long)(m_StartOffset * (CustomFloat)m_Length);
 		if (m_CurrentPosition > 0) {
 			Seek (m_CurrentPosition);
 		}
@@ -632,7 +632,7 @@ AudibleSoundClass::Initialize_Miles_Handle (void)
 		//
 		// Pass the 'real' volume onto miles
 		//
-		float real_volume = Determine_Real_Volume ();
+		CustomFloat real_volume = Determine_Real_Volume ();
 		m_SoundHandle->Set_Sample_Volume (int(real_volume * 127.0F));
 
 		//
@@ -685,7 +685,7 @@ AudibleSoundClass::Free_Miles_Handle (void)
 //	Get_Pan
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////
-float
+CustomFloat
 AudibleSoundClass::Get_Pan (void)
 {
 	MMSLockClass lock;
@@ -694,7 +694,7 @@ AudibleSoundClass::Get_Pan (void)
 	// Do we have a valid sample handle from miles?
 	//
 	if (m_SoundHandle != NULL) {
-		m_Pan = ((float)m_SoundHandle->Get_Sample_Pan ()) / 127.0F;
+		m_Pan = ((CustomFloat)m_SoundHandle->Get_Sample_Pan ()) / 127.0F;
 	}
 		
 	return m_Pan;
@@ -707,7 +707,7 @@ AudibleSoundClass::Get_Pan (void)
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void
-AudibleSoundClass::Set_Pan (float pan)
+AudibleSoundClass::Set_Pan (CustomFloat pan)
 {
 	MMSLockClass lock;
 
@@ -734,7 +734,7 @@ AudibleSoundClass::Set_Pan (float pan)
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void
-AudibleSoundClass::Set_Pitch_Factor (float factor)
+AudibleSoundClass::Set_Pitch_Factor (CustomFloat factor)
 {
 	MMSLockClass lock;
 
@@ -752,7 +752,7 @@ AudibleSoundClass::Set_Pitch_Factor (float factor)
 			// based on the factor
 			//
 			int base_rate	= m_Buffer->Get_Rate ();
-			int new_rate	= base_rate * m_PitchFactor;
+			int new_rate	= (int)((CustomFloat)base_rate * m_PitchFactor);
 			m_SoundHandle->Set_Sample_Playback_Rate (new_rate);
 		}
 	}
@@ -805,14 +805,14 @@ AudibleSoundClass::Set_Playback_Rate (int rate_in_hz)
 //	Get_Volume
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////
-float
+CustomFloat
 AudibleSoundClass::Get_Volume (void)
 {
 	MMSLockClass lock;
 
 	// Do we have a valid sample handle from miles?
 	if (m_SoundHandle != NULL) {
-		m_Volume = ((float)m_SoundHandle->Get_Sample_Volume ()) / 127.0F;
+		m_Volume = ((CustomFloat)m_SoundHandle->Get_Sample_Volume ()) / 127.0F;
 	}
 		
 	// Return the current pan value
@@ -826,20 +826,20 @@ AudibleSoundClass::Get_Volume (void)
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void
-AudibleSoundClass::Set_Volume (float volume)
+AudibleSoundClass::Set_Volume (CustomFloat volume)
 {
 	MMSLockClass lock;
 
 	// Cache the normalized volume value
-	m_Volume = min (volume, 1.0F);
-	m_Volume = max (m_Volume, 0.0F);
+	m_Volume = min (volume, (CustomFloat)1.0F);
+	m_Volume = max (m_Volume, (CustomFloat)0.0F);
 
 	// Do we have a valid sample handle from miles?
 	if (m_SoundHandle != NULL) {
 
 		// Calculate the 'real' volume to set based on the global volume and the sound
 		// effect volume.
-		float real_volume = Determine_Real_Volume ();
+		CustomFloat real_volume = Determine_Real_Volume ();
 		m_SoundHandle->Set_Sample_Volume (int(real_volume * 127.0F));
 	}
 		
@@ -887,13 +887,13 @@ AudibleSoundClass::Set_Loop_Count (int count)
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void
-AudibleSoundClass::Set_Priority (float priority)
+AudibleSoundClass::Set_Priority (CustomFloat priority)
 {
 	MMSLockClass lock;
 
 	// Cache the normalized priority
-	m_Priority = min (priority, 1.0F);
-	m_Priority = max (m_Priority, 0.0F);
+	m_Priority = min (priority, (CustomFloat)1.0F);
+	m_Priority = max (m_Priority, (CustomFloat)0.0F);
 	return ;
 }
 
@@ -1015,10 +1015,10 @@ AudibleSoundClass::On_Loop_End (void)
 //	Determine_Real_Volume
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////
-float
+CustomFloat
 AudibleSoundClass::Determine_Real_Volume (void) const
 {
-	float volume = m_Volume;
+	CustomFloat volume = m_Volume;
 
 	// Is this a piece of music or is it a sound effect?
 	if (m_Type == TYPE_MUSIC) {
@@ -1160,7 +1160,7 @@ AudibleSoundClass::Remove_From_Scene (void)
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void
-AudibleSoundClass::Set_DropOff_Radius (float radius)
+AudibleSoundClass::Set_DropOff_Radius (CustomFloat radius)
 {
 	m_DropOffRadius = radius;
 	Set_Dirty ();

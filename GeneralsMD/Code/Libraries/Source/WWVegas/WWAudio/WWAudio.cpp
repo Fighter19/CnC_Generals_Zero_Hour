@@ -1303,7 +1303,7 @@ void
 WWAudioClass::Reprioritize_Playlist (void)
 {
 	AudibleSoundClass *sound_to_get_handle = NULL;
-	float hightest_priority = 0;
+	CustomFloat hightest_priority = 0;
 
 	// Loop through all the entries in the playlist
 	for (int index = 0; index < m_Playlist.Count (); index ++) {
@@ -1441,8 +1441,8 @@ WWAudioClass::Get_2D_Sample (const AudibleSoundClass &sound_obj)
 
 	MMSLockClass lock;
 
-	float lowest_priority					= sound_obj.Get_Priority ();
-	float lowest_runtime_priority			= sound_obj.Get_Runtime_Priority ();
+	CustomFloat lowest_priority					= sound_obj.Get_Priority ();
+	CustomFloat lowest_runtime_priority			= sound_obj.Get_Runtime_Priority ();
 	AudibleSoundClass *lowest_pri_sound = NULL;
 	HSAMPLE lowest_pri_sample				= NULL;
 	HSAMPLE free_sample						= (HSAMPLE)INVALID_MILES_HANDLE;
@@ -1469,8 +1469,8 @@ WWAudioClass::Get_2D_Sample (const AudibleSoundClass &sound_obj)
 				// This is done by comparing both the designer-specified priority and the current
 				// runtime priority (which is calculated by distance to the listener).
 				//
-				float priority				= sound_obj->Get_Priority ();
-				float runtime_priority	= sound_obj->Get_Runtime_Priority ();
+				CustomFloat priority				= sound_obj->Get_Priority ();
+				CustomFloat runtime_priority	= sound_obj->Get_Runtime_Priority ();
 				if (	(priority < lowest_priority) ||
 						(priority == lowest_priority && runtime_priority <= lowest_runtime_priority))
 				{
@@ -1509,8 +1509,8 @@ WWAudioClass::Get_3D_Sample (const Sound3DClass &sound_obj)
 
 	MMSLockClass lock;
 
-	float lowest_priority					= sound_obj.Get_Priority ();
-	float lowest_runtime_priority			= sound_obj.Get_Runtime_Priority ();
+	CustomFloat lowest_priority					= sound_obj.Get_Priority ();
+	CustomFloat lowest_runtime_priority			= sound_obj.Get_Runtime_Priority ();
 	AudibleSoundClass *lowest_pri_sound = NULL;
 	H3DSAMPLE lowest_pri_sample			= NULL;
 	H3DSAMPLE free_sample					= (H3DSAMPLE)INVALID_MILES_HANDLE;
@@ -1538,8 +1538,8 @@ WWAudioClass::Get_3D_Sample (const Sound3DClass &sound_obj)
 				// This is done by comparing both the designer-specified priority and the current
 				// runtime priority (which is calculated by distance to the listener).
 				//
-				float priority				= sound_obj->Get_Priority ();
-				float runtime_priority	= sound_obj->Get_Runtime_Priority ();
+				CustomFloat priority				= sound_obj->Get_Priority ();
+				CustomFloat runtime_priority	= sound_obj->Get_Runtime_Priority ();
 				if (	(priority < lowest_priority) ||
 						(priority == lowest_priority && runtime_priority <= lowest_runtime_priority))
 				{
@@ -2026,11 +2026,11 @@ WWAudioClass::Remove_3D_Sound_Handles (void)
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void
-WWAudioClass::Set_Sound_Effects_Volume (float volume)
+WWAudioClass::Set_Sound_Effects_Volume (CustomFloat volume)
 {
 	m_SoundVolume = volume;
-	m_SoundVolume = min (1.0F, m_SoundVolume);
-	m_SoundVolume = max (0.0F, m_SoundVolume);
+	m_SoundVolume = min ((CustomFloat)1.0F, m_SoundVolume);
+	m_SoundVolume = max ((CustomFloat)0.0F, m_SoundVolume);
 
 	// Update all the currently playing 'Sound Effects' to
 	// reflect this new volume
@@ -2051,11 +2051,11 @@ WWAudioClass::Set_Sound_Effects_Volume (float volume)
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void
-WWAudioClass::Set_Music_Volume (float volume)
+WWAudioClass::Set_Music_Volume (CustomFloat volume)
 {
 	m_MusicVolume = volume;
-	m_MusicVolume = min (1.0F, m_MusicVolume);
-	m_MusicVolume = max (0.0F, m_MusicVolume);
+	m_MusicVolume = min ((CustomFloat)1.0F, m_MusicVolume);
+	m_MusicVolume = max ((CustomFloat)0.0F, m_MusicVolume);
 
 	// Update all currently playing music to
 	// reflect this new volume
@@ -2409,8 +2409,8 @@ bool
 WWAudioClass::Simple_Play_2D_Sound_Effect
 (
 	const char *filename,
-	float priority,
-	float volume
+	CustomFloat priority,
+	CustomFloat volume
 )
 {
 	bool retval = false;
@@ -2438,8 +2438,8 @@ bool
 WWAudioClass::Simple_Play_2D_Sound_Effect
 (
 	FileClass &file,
-	float priority,
-	float volume
+	CustomFloat priority,
+	CustomFloat volume
 )
 {
 	bool retval = false;
@@ -2647,8 +2647,8 @@ WWAudioClass::Load_From_Registry
 	int &				hertz,
 	bool &			sound_enabled,
 	bool &			music_enabled,
-	float &			sound_volume,
-	float &			music_volume
+	CustomFloat &			sound_volume,
+	CustomFloat &			music_volume
 )
 {
 	bool retval = false;
@@ -2742,8 +2742,8 @@ WWAudioClass::Save_To_Registry
 	int						hertz,
 	bool						sound_enabled,
 	bool						music_enabled,
-	float						sound_volume,
-	float						music_volume
+	CustomFloat						sound_volume,
+	CustomFloat						music_volume
 
 )
 {
@@ -2764,8 +2764,8 @@ WWAudioClass::Save_To_Registry
 		registry.Set_Int (VALUE_NAME_HERTZ, hertz);
 		registry.Set_Int (VALUE_NAME_MUSIC_ENABLED,	music_enabled);
 		registry.Set_Int (VALUE_NAME_SOUND_ENABLED,	sound_enabled);
-		registry.Set_Int (VALUE_NAME_MUSIC_VOL,		music_volume * 100);
-		registry.Set_Int (VALUE_NAME_SOUND_VOL,		sound_volume * 100);
+		registry.Set_Int (VALUE_NAME_MUSIC_VOL,		(Int)(music_volume * 100));
+		registry.Set_Int (VALUE_NAME_SOUND_VOL,		(Int)(sound_volume * 100));
 
 		retval = true;
 	}

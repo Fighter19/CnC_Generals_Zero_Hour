@@ -42,6 +42,7 @@
 #define BITTYPE_H
 
 #include <stdint.h>
+#include "../WWMath/CustomFloat.h"
 
 typedef unsigned char	uint8;
 typedef unsigned short	uint16;
@@ -53,7 +54,7 @@ typedef signed short		sint16;
 typedef int32_t	        sint32;
 typedef signed int      sint;
 
-typedef float				float32;
+typedef CustomFloat		float32;
 typedef double				float64;
 
 #ifdef _WIN32

@@ -139,7 +139,7 @@ typedef bool							Bool;							//
 typedef int64_t						Int64;							// 8 bytes 
 typedef uint64_t	UnsignedInt64;	  	// 8 bytes
 
-#include "Lib/CustomFloat.h"
+#include "CustomFloat.h"
 typedef CustomFloat				Real;							// 4 bytes
 
 #include "Lib/Trig.h"
@@ -187,12 +187,12 @@ inline Real deg2rad(Real rad) { return rad * (PI/180); }
 // note, this function depends on the cpu rounding mode, which we set to CHOP every frame, 
 // but apparently tends to be left in unpredictable modes by various system bits of
 // code, so use this function with caution -- it might not round in the way you want.
-__forceinline long fast_float2long_round(float f)
+__forceinline long fast_float2long_round(Real f)
 {
 	long i;
 
 	// Use simple C code instead of inline assembly
-	i = lroundf(f);
+	i = lroundf((float)f);
 	
 	return i;
 }

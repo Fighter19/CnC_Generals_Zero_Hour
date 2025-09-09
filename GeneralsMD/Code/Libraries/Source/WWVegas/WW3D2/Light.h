@@ -104,8 +104,8 @@ public:
 	/////////////////////////////////////////////////////////////////////////////
 	LightType				Get_Type() {return (Type);}
 	
-	void						Set_Intensity(float inten) { Intensity = inten; }
-	float						Get_Intensity(void) const { return Intensity; }
+	void						Set_Intensity(CustomFloat inten) { Intensity = inten; }
+	CustomFloat						Get_Intensity(void) const { return Intensity; }
 
 	void						Set_Ambient(const Vector3 & color) { Ambient = color; }
 	void						Get_Ambient(Vector3 * set_c) const { if (set_c) { *set_c = Ambient; } }
@@ -117,12 +117,12 @@ public:
 	void						Get_Specular(Vector3 * set_c) const { if (set_c) { *set_c = Specular; } }
 
 	void						Set_Far_Attenuation_Range(double fStart, double fEnd)				{ FarAttenStart = fStart; FarAttenEnd = fEnd; }
-	void						Get_Far_Attenuation_Range(double& fStart, double& fEnd) const	{ fStart = FarAttenStart; fEnd = FarAttenEnd; }
-	void						Get_Far_Attenuation_Range(float & fStart, float & fEnd) const	{ fStart = FarAttenStart; fEnd = FarAttenEnd; }
+	void						Get_Far_Attenuation_Range(double& fStart, double& fEnd) const	{ fStart = (float)FarAttenStart; fEnd = (float)FarAttenEnd; }
+	void						Get_Far_Attenuation_Range(CustomFloat & fStart, CustomFloat & fEnd) const	{ fStart = (float)FarAttenStart; fEnd = (float)FarAttenEnd; }
 	void						Set_Near_Attenuation_Range(double nStart, double nEnd)			{ NearAttenStart = nStart; NearAttenEnd = nEnd; }
-	void						Get_Near_Attenuation_Range(double& nStart, double& nEnd)	const	{ nStart = NearAttenStart; nEnd = NearAttenEnd; }
-	float						Get_Attenuation_Range(void) const										{ return FarAttenEnd; } 
-	
+	void						Get_Near_Attenuation_Range(double& nStart, double& nEnd)	const	{ nStart = (float)NearAttenStart; nEnd = (float)NearAttenEnd; }
+	CustomFloat						Get_Attenuation_Range(void) const										{ return (float)FarAttenEnd; }
+
 	/////////////////////////////////////////////////////////////////////////////
 	// Control over the light flags
 	/////////////////////////////////////////////////////////////////////////////
@@ -135,13 +135,13 @@ public:
 	/////////////////////////////////////////////////////////////////////////////
 	// Spotlight controls:
 	/////////////////////////////////////////////////////////////////////////////
-	void						Set_Spot_Angle(float a)							{ SpotAngle = a; SpotAngleCos = WWMath::Fast_Cos(a); }
-	float						Get_Spot_Angle(void)	const						{ return SpotAngle; }
-	float						Get_Spot_Angle_Cos(void) const				{ return SpotAngleCos; }
+	void						Set_Spot_Angle(CustomFloat a)							{ SpotAngle = a; SpotAngleCos = WWMath::Fast_Cos(a); }
+	CustomFloat						Get_Spot_Angle(void)	const						{ return SpotAngle; }
+	CustomFloat						Get_Spot_Angle_Cos(void) const				{ return SpotAngleCos; }
 	void						Set_Spot_Direction(const Vector3 & dir)	{ SpotDirection = dir; }
 	void						Get_Spot_Direction(Vector3 & dir) const	{ dir = SpotDirection; }
-	void						Set_Spot_Exponent(float k)						{ SpotExponent = k; }
-	float						Get_Spot_Exponent(void) const					{ return SpotExponent; }
+	void						Set_Spot_Exponent(CustomFloat k)						{ SpotExponent = k; }
+	CustomFloat						Get_Spot_Exponent(void) const					{ return SpotExponent; }
 
 	/////////////////////////////////////////////////////////////////////////////
 	// Save/Load
@@ -164,19 +164,19 @@ protected:
 	unsigned int			Flags;
 	bool						CastShadows;
 
-	float						Intensity;
+	CustomFloat						Intensity;
 	Vector3					Ambient;
 	Vector3					Diffuse;
 	Vector3					Specular;
 	
-	float						NearAttenStart;
-	float						NearAttenEnd;
-	float						FarAttenStart;
-	float						FarAttenEnd;
+	CustomFloat						NearAttenStart;
+	CustomFloat						NearAttenEnd;
+	CustomFloat						FarAttenStart;
+	CustomFloat						FarAttenEnd;
 	
-	float						SpotAngle;
-	float						SpotAngleCos;
-	float						SpotExponent;
+	CustomFloat						SpotAngle;
+	CustomFloat						SpotAngleCos;
+	CustomFloat						SpotExponent;
 	Vector3					SpotDirection;
 	//bool						Donut; ///does this light only apply at edges
 };

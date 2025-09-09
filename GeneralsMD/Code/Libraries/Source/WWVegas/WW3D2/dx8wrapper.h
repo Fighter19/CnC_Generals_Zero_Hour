@@ -283,7 +283,7 @@ public:
 	// Flip until the primary buffer is visible.
 	static void Flip_To_Primary(void);
 
-	static void Clear(bool clear_color, bool clear_z_stencil, const Vector3 &color, float dest_alpha=0.0f, float z=1.0f, unsigned int stencil=0);
+	static void Clear(bool clear_color, bool clear_z_stencil, const Vector3 &color, CustomFloat dest_alpha=0.0f, CustomFloat z=1.0f, unsigned int stencil=0);
 
 	static void	Set_Viewport(CONST D3DVIEWPORT8* pViewport);
 
@@ -299,12 +299,12 @@ public:
 
 	static void Set_DX8_Material(const D3DMATERIAL8* mat);
 
-	static void Set_Gamma(float gamma,float bright,float contrast,bool calibrate=true,bool uselimit=true);
+	static void Set_Gamma(CustomFloat gamma,CustomFloat bright,CustomFloat contrast,bool calibrate=true,bool uselimit=true);
 
 	// Set_ and Get_Transform() functions take the matrix in Westwood convention format.
 
 	static void Set_DX8_ZBias(int zbias);
-	static void Set_Projection_Transform_With_Z_Bias(const Matrix4x4& matrix,float znear, float zfar);	// pointer to 16 matrices
+	static void Set_Projection_Transform_With_Z_Bias(const Matrix4x4& matrix,CustomFloat znear, CustomFloat zfar);	// pointer to 16 matrices
 
 	static void Set_Transform(D3DTRANSFORMSTATETYPE transform,const Matrix4x4& m);
 	static void Set_Transform(D3DTRANSFORMSTATETYPE transform,const Matrix3D& m);
@@ -322,12 +322,12 @@ public:
 
 	static void Set_DX8_Light(int index,D3DLIGHT8* light);
 	static void Set_DX8_Render_State(D3DRENDERSTATETYPE state, unsigned value);
-	static void Set_DX8_Clip_Plane(DWORD Index, CONST float* pPlane);
+	static void Set_DX8_Clip_Plane(DWORD Index, CONST CustomFloat* pPlane);
 	static void Set_DX8_Texture_Stage_State(unsigned stage, D3DTEXTURESTAGESTATETYPE state, unsigned value);
 	static void Set_DX8_Texture(unsigned int stage, IDirect3DBaseTexture8* texture);
 	static void Set_Light_Environment(LightEnvironmentClass* light_env);
 	static LightEnvironmentClass* Get_Light_Environment() { return Light_Environment; }
-	static void Set_Fog(bool enable, const Vector3 &color, float start, float end);
+	static void Set_Fog(bool enable, const Vector3 &color, CustomFloat start, CustomFloat end);
 
 	static WWINLINE const D3DLIGHT8& Peek_Light(unsigned index);
 	static WWINLINE bool Is_Light_Enabled(unsigned index);
@@ -454,11 +454,11 @@ public:
 	// Utilities
 	static Vector4 Convert_Color(unsigned color);
 	static unsigned int Convert_Color(const Vector4& color);
-	static unsigned int Convert_Color(const Vector3& color, const float alpha);
+	static unsigned int Convert_Color(const Vector3& color, const CustomFloat alpha);
 	static void Clamp_Color(Vector4& color);
 	static unsigned int Convert_Color_Clamp(const Vector4& color);
 
-	static void			  Set_Alpha (const float alpha, unsigned int &color);
+	static void			  Set_Alpha (const CustomFloat alpha, unsigned int &color);
 
 	static void _Enable_Triangle_Draw(bool enable) { _EnableTriangleDraw=enable; }
 	static bool _Is_Triangle_Draw_Enabled() { return _EnableTriangleDraw; }
@@ -707,8 +707,8 @@ protected:
 	static bool								IsRenderToTexture;
 
 	static int								ZBias;
-	static float							ZNear;
-	static float							ZFar;
+	static CustomFloat							ZNear;
+	static CustomFloat							ZFar;
 	static Matrix4x4						ProjectionMatrix;
 
 	friend void DX8_Assert();
@@ -818,7 +818,7 @@ WWINLINE void DX8Wrapper::Set_Index_Buffer_Index_Offset(unsigned offset)
 // This function should be called rarely - once per scene would be appropriate.
 // ----------------------------------------------------------------------------
 
-WWINLINE void DX8Wrapper::Set_Fog(bool enable, const Vector3 &color, float start, float end)
+WWINLINE void DX8Wrapper::Set_Fog(bool enable, const Vector3 &color, CustomFloat start, CustomFloat end)
 {
 	// Set global states
 	FogEnable = enable;
@@ -893,9 +893,9 @@ WWINLINE void DX8Wrapper::Set_DX8_Render_State(D3DRENDERSTATETYPE state, unsigne
 	DX8_RECORD_RENDER_STATE_CHANGE();
 }
 
-WWINLINE void DX8Wrapper::Set_DX8_Clip_Plane(DWORD Index, CONST float* pPlane)
+WWINLINE void DX8Wrapper::Set_DX8_Clip_Plane(DWORD Index, CONST CustomFloat* pPlane)
 {
-	DX8CALL(SetClipPlane( Index, pPlane ));
+	DX8CALL(SetClipPlane( Index, reinterpret_cast<const float*>(pPlane) ));
 }
 
 WWINLINE void DX8Wrapper::Set_DX8_Texture_Stage_State(unsigned stage, D3DTEXTURESTAGESTATETYPE state, unsigned value)
@@ -969,7 +969,7 @@ WWINLINE Vector4 DX8Wrapper::Convert_Color(unsigned color)
 }
 
 #if 0
-WWINLINE unsigned int DX8Wrapper::Convert_Color(const Vector3& color, const float alpha)
+WWINLINE unsigned int DX8Wrapper::Convert_Color(const Vector3& color, const CustomFloat alpha)
 {
 	WWASSERT(color.X<=1.0f);
 	WWASSERT(color.Y<=1.0f);
@@ -999,25 +999,25 @@ WWINLINE unsigned int DX8Wrapper::Convert_Color(const Vector4& color)
 
 // ----------------------------------------------------------------------------
 //
-// Convert RGBA color from float vector to 32 bit integer
+// Convert RGBA color from CustomFloat vector to 32 bit integer
 // Note: Color vector needs to be clamped to [0...1] range!
 //
 // ----------------------------------------------------------------------------
-WWINLINE unsigned int DX8Wrapper::Convert_Color(const Vector3& color,float alpha)
+WWINLINE unsigned int DX8Wrapper::Convert_Color(const Vector3& color,CustomFloat alpha)
 {
-	const float scale = 255.0;
+	const CustomFloat scale = 255.0;
 	unsigned int col;
 	// Multiply r, g, b and a components (0.0,...,1.0) by 255 and convert to integer. Or the integer values togerher
 	// such that 32 bit ingeger has AAAAAAAARRRRRRRRGGGGGGGGBBBBBBBB.
 
 	// a
-	col = (unsigned int)(alpha * scale) << 24;
+	col = (unsigned int)(CustomFloat)(alpha * scale) << 24;
 	// r
-	col |= (unsigned int)(color.X * scale) << 16;
+	col |= (unsigned int)(CustomFloat)(color.X * scale) << 16;
 	// g
-	col |= (unsigned int)(color.Y * scale) << 8;
+	col |= (unsigned int)(CustomFloat)(color.Y * scale) << 8;
 	// b
-	col |= (unsigned int)(color.Z * scale);
+	col |= (unsigned int)(CustomFloat)(color.Z * scale);
 	return col;
 }
 
@@ -1030,7 +1030,7 @@ WWINLINE unsigned int DX8Wrapper::Convert_Color(const Vector3& color,float alpha
 WWINLINE void DX8Wrapper::Clamp_Color(Vector4& color)
 {
 	for (int i=0;i<4;++i) {
-		float f=(color[i]<0.0f) ? 0.0f : color[i];
+		CustomFloat f=(color[i]<0.0f) ? 0.0f : color[i];
 		color[i]=(f>1.0f) ? 1.0f : f;
 	}
 	return;
@@ -1038,7 +1038,7 @@ WWINLINE void DX8Wrapper::Clamp_Color(Vector4& color)
 
 // ----------------------------------------------------------------------------
 //
-// Convert RGBA color from float vector to 32 bit integer
+// Convert RGBA color from CustomFloat vector to 32 bit integer
 //
 // ----------------------------------------------------------------------------
 
@@ -1057,11 +1057,11 @@ WWINLINE unsigned int DX8Wrapper::Convert_Color_Clamp(const Vector4& color)
 #endif
 
 
-WWINLINE void DX8Wrapper::Set_Alpha (const float alpha, unsigned int &color)
+WWINLINE void DX8Wrapper::Set_Alpha (const CustomFloat alpha, unsigned int &color)
 {
 	unsigned char *component = (unsigned char*) &color;
 
-	component [3] = 255.0f * alpha;
+	component [3] = (unsigned int)((CustomFloat)255.0f * alpha);
 }
 
 WWINLINE void DX8Wrapper::Get_Render_State(RenderStateStruct& state)
@@ -1111,7 +1111,7 @@ WWINLINE void DX8Wrapper::Set_Shader(const ShaderClass& shader)
 	SNAPSHOT_SAY(("DX8Wrapper::Set_Shader(%s)\n",shader.Get_Description(str).Peek_Buffer()));
 }
 
-WWINLINE void DX8Wrapper::Set_Projection_Transform_With_Z_Bias(const Matrix4x4& matrix, float znear, float zfar)
+WWINLINE void DX8Wrapper::Set_Projection_Transform_With_Z_Bias(const Matrix4x4& matrix, CustomFloat znear, CustomFloat zfar)
 {
 	ZFar=zfar;
 	ZNear=znear;
@@ -1119,9 +1119,9 @@ WWINLINE void DX8Wrapper::Set_Projection_Transform_With_Z_Bias(const Matrix4x4& 
 
 	if (!Get_Current_Caps()->Support_ZBias() && ZNear!=ZFar) {
 		Matrix4x4 tmp=ProjectionMatrix;
-		float tmp_zbias=ZBias;
-		tmp_zbias*=(1.0f/16.0f);
-		tmp_zbias*=1.0f / (ZFar - ZNear);
+		CustomFloat tmp_zbias=ZBias;
+		tmp_zbias*=(CustomFloat)(1.0f/16.0f);
+		tmp_zbias*=(CustomFloat)1.0f / (ZFar - ZNear);
 		tmp[2][2]-=tmp_zbias*tmp[3][2];
 		DX8CALL(SetTransform(D3DTS_PROJECTION,(D3DMATRIX*)&tmp));
 	}
@@ -1139,9 +1139,9 @@ WWINLINE void DX8Wrapper::Set_DX8_ZBias(int zbias)
 
 	if (!Get_Current_Caps()->Support_ZBias() && ZNear!=ZFar) {
 		Matrix4x4 tmp=ProjectionMatrix;
-		float tmp_zbias=ZBias;
-		tmp_zbias*=(1.0f/16.0f);
-		tmp_zbias*=1.0f / (ZFar - ZNear);
+		CustomFloat tmp_zbias=ZBias;
+		tmp_zbias*=(CustomFloat)(1.0f/16.0f);
+		tmp_zbias*=(CustomFloat)1.0f / (ZFar - ZNear);
 		tmp[2][2]-=tmp_zbias*tmp[3][2];
 		DX8CALL(SetTransform(D3DTS_PROJECTION,(D3DMATRIX*)&tmp));
 	}

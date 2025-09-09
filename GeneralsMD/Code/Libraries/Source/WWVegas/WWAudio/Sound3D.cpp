@@ -203,7 +203,7 @@ Sound3DClass::On_Frame_Update (unsigned int milliseconds)
 			//	Extrapolate our current velocity given the last time slice and the distance
 			// we moved.
 			//
-			float secs_since_last_update = (::GetTickCount () - m_LastUpdate);
+			CustomFloat secs_since_last_update = (::GetTickCount () - m_LastUpdate);
 			if (secs_since_last_update > 0) {
 				curr_vel = ((curr_pos - last_pos) / secs_since_last_update);
 			} else {
@@ -307,7 +307,7 @@ Sound3DClass::Update_Miles_Transform (void)
 		// Pass the sound's position onto miles
 		//
 		Vector3 position = listener_space_tm.Get_Translation ();
-		::AIL_set_3D_position (m_SoundHandle->Get_H3DSAMPLE (), -position.Y, position.Z, position.X);
+		::AIL_set_3D_position (m_SoundHandle->Get_H3DSAMPLE (), (float)-position.Y, (float)position.Z, (float)position.X);
 
 		//
 		// Pass the sound's orientation (facing) onto miles
@@ -316,12 +316,12 @@ Sound3DClass::Update_Miles_Transform (void)
 		Vector3 up		= listener_space_tm.Get_Z_Vector ();
 		
 		::AIL_set_3D_orientation (m_SoundHandle->Get_H3DSAMPLE (),
-										  -facing.Y,
-										  facing.Z,
-										  facing.X,
-										  -up.Y,
-										  up.Z,
-										  up.X);
+										  (float)-facing.Y,
+										  (float)facing.Z,
+										  (float)facing.X,
+										  (float)-up.Y,
+										  (float)up.Z,
+										  (float)up.X);
 	}
 
 	return ;
@@ -368,8 +368,8 @@ Sound3DClass::Set_Position (const Vector3 &position)
 			//
 			//	Update the object's position inside of Miles
 			//
-			::AIL_set_3D_position (m_SoundHandle->Get_H3DSAMPLE (), -listener_space_pos.Y,
-					listener_space_pos.Z, listener_space_pos.X);
+			::AIL_set_3D_position (m_SoundHandle->Get_H3DSAMPLE (), (float)-listener_space_pos.Y,
+					(float)listener_space_pos.Z, (float)listener_space_pos.X);
 		}
 	}
 	
@@ -397,9 +397,9 @@ Sound3DClass::Set_Velocity (const Vector3 &velocity)
 		
 		//WWDEBUG_SAY (("Current Velocity: %.2f %.2f %.2f\n", m_CurrentVelocity.X, m_CurrentVelocity.Y, m_CurrentVelocity.Z));
 		::AIL_set_3D_velocity_vector (m_SoundHandle->Get_H3DSAMPLE (),
-												-m_CurrentVelocity.Y,
-												m_CurrentVelocity.Z,
-												m_CurrentVelocity.X);
+												(float)-m_CurrentVelocity.Y,
+												(float)m_CurrentVelocity.Z,
+												(float)m_CurrentVelocity.X);
 	}
 
 	return ;
@@ -412,7 +412,7 @@ Sound3DClass::Set_Velocity (const Vector3 &velocity)
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void
-Sound3DClass::Set_DropOff_Radius (float radius)
+Sound3DClass::Set_DropOff_Radius (CustomFloat radius)
 {
 	//MMSLockClass lock;
 
@@ -422,8 +422,8 @@ Sound3DClass::Set_DropOff_Radius (float radius)
 	// Pass attenuation settings onto miles
 	if (m_SoundHandle != NULL) {
 		::AIL_set_3D_sample_distances (	m_SoundHandle->Get_H3DSAMPLE (),
-													m_DropOffRadius,
-													(m_MaxVolRadius > 1.0F) ? m_MaxVolRadius : 1.0F);
+													(float)m_DropOffRadius,
+													(m_MaxVolRadius > 1.0F) ? (float)m_MaxVolRadius : 1.0F);
 	}
 
 	return ;
@@ -436,7 +436,7 @@ Sound3DClass::Set_DropOff_Radius (float radius)
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void
-Sound3DClass::Set_Max_Vol_Radius (float radius)
+Sound3DClass::Set_Max_Vol_Radius (CustomFloat radius)
 {
 	m_MaxVolRadius = radius;
 	Set_Dirty ();
@@ -444,8 +444,8 @@ Sound3DClass::Set_Max_Vol_Radius (float radius)
 	// Pass attenuation settings onto miles
 	if (m_SoundHandle != NULL) {
 		::AIL_set_3D_sample_distances (	m_SoundHandle->Get_H3DSAMPLE (),
-													m_DropOffRadius,
-													(m_MaxVolRadius > 1.0F) ? m_MaxVolRadius : 1.0F);
+													(float)m_DropOffRadius,
+													(m_MaxVolRadius > 1.0F) ? (float)m_MaxVolRadius : 1.0F);
 	}
 
 	return ;
@@ -485,7 +485,7 @@ Sound3DClass::Initialize_Miles_Handle (void)
 		//
 		// Pass our cached settings onto miles
 		//
-		float real_volume = Determine_Real_Volume ();
+		CustomFloat real_volume = Determine_Real_Volume ();
 		m_SoundHandle->Set_Sample_Volume (int(real_volume * 127.0F));
 		m_SoundHandle->Set_Sample_Pan (int(m_Pan * 127.0F));
 		m_SoundHandle->Set_Sample_Loop_Count (m_LoopCount);
@@ -494,8 +494,8 @@ Sound3DClass::Initialize_Miles_Handle (void)
 		// Pass attenuation settings onto miles
 		//
 		::AIL_set_3D_sample_distances (	m_SoundHandle->Get_H3DSAMPLE (),
-													m_DropOffRadius,
-													(m_MaxVolRadius > 1.0F) ? m_MaxVolRadius : 1.0F);
+													(float)m_DropOffRadius,
+													(m_MaxVolRadius > 1.0F) ? (float)m_MaxVolRadius : 1.0F);
 
 		
 		//

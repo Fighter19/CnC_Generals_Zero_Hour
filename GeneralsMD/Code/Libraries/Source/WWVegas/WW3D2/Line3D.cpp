@@ -80,9 +80,9 @@ const unsigned short Indices[]=
  * Line3DClass::Line3DClass -- Constructor                                * 
  *                                                                        * 
  * INPUT:	Vector3 start, end - start, end points of line (world coords).* 
- *       	float width - width of line (in world units).                 * 
- *       	float r, g, b - R, G, B components of line color.             * 
- *       	float opacity - opacity of line.                              * 
+ *       	CustomFloat width - width of line (in world units).                 * 
+ *       	CustomFloat r, g, b - R, G, B components of line color.             * 
+ *       	CustomFloat opacity - opacity of line.                              * 
  *                                                                        * 
  * OUTPUT:	none.                                                         * 
  *                                                                        * 
@@ -94,7 +94,7 @@ const unsigned short Indices[]=
  *	  02/16/2001 HY  : Ported to DX8													  *
  *========================================================================*/
 Line3DClass::Line3DClass (const Vector3 & start, const Vector3 & end,
-	float width, float r, float g, float b, float opacity)
+	CustomFloat width, CustomFloat r, CustomFloat g, CustomFloat b, CustomFloat opacity)
 {
 	Length = (end - start).Length();
    Width = width;
@@ -102,7 +102,7 @@ Line3DClass::Line3DClass (const Vector3 & start, const Vector3 & end,
 	// Create box model with origin at start point (X is major axis).	
 
 	// 8 Vertices	
-	float halfw = Width * 0.5f;
+	CustomFloat halfw = Width * 0.5f;
 
 	vert[0].X = 0.0f;
 	vert[0].Y = -halfw;
@@ -312,7 +312,7 @@ void Line3DClass::Render(RenderInfoClass & rinfo)
 /************************************************************************** 
  * Line3DClass::Scale -- Scale object                                     * 
  *                                                                        * 
- * INPUT:	float scale - uniform scale factor.                           * 
+ * INPUT:	CustomFloat scale - uniform scale factor.                           * 
  *                                                                        * 
  * OUTPUT:	none.                                                         * 
  *                                                                        * 
@@ -323,7 +323,7 @@ void Line3DClass::Render(RenderInfoClass & rinfo)
  *   04/21/1998 NH  : Ported to SR 1.3.                                   * 
  *	  02/16/2001 HY  : Ported to DX8													  *
  *========================================================================*/
-void Line3DClass::Scale(float scale)
+void Line3DClass::Scale(CustomFloat scale)
 {	
 	for (int i=0; i<8; i++) vert[i]*=scale;
 	Length *= scale;
@@ -340,7 +340,7 @@ void Line3DClass::Scale(float scale)
 /************************************************************************** 
  * Line3DClass::Scale -- Scale object                                     * 
  *                                                                        * 
- * INPUT:	float scalex, scaley, scalez - axis scale factors.            * 
+ * INPUT:	CustomFloat scalex, scaley, scalez - axis scale factors.            * 
  *                                                                        * 
  * OUTPUT:	none.                                                         * 
  *                                                                        * 
@@ -351,7 +351,7 @@ void Line3DClass::Scale(float scale)
  *   04/21/1998 NH  : Ported to SR 1.3.                                   *
  *	  02/16/2001 HY  : Ported to DX8													  *
  *========================================================================*/
-void Line3DClass::Scale(float scalex, float scaley, float scalez)
+void Line3DClass::Scale(CustomFloat scalex, CustomFloat scaley, CustomFloat scalez)
 {
 	// The line width is always the same in the y and z axes (the line
 	// approximates a cylinder).
@@ -370,7 +370,7 @@ void Line3DClass::Scale(float scalex, float scaley, float scalez)
 
 void Line3DClass::Get_Obj_Space_Bounding_Sphere(SphereClass & sphere) const
 {
-	float half_l = Length * 0.5f;
+	CustomFloat half_l = Length * 0.5f;
 	sphere.Center.Set(half_l, 0.0f, 0.0f);
 	sphere.Radius = half_l;
 }
@@ -378,7 +378,7 @@ void Line3DClass::Get_Obj_Space_Bounding_Sphere(SphereClass & sphere) const
 
 void Line3DClass::Get_Obj_Space_Bounding_Box(AABoxClass & box) const
 {
-	float half_l = Length * 0.5f;
+	CustomFloat half_l = Length * 0.5f;
 	box.Center.Set(half_l, 0.0f, 0.0f);
 	box.Extent.Set(half_l, 0.0f, 0.0f);
 }
@@ -399,7 +399,7 @@ void Line3DClass::Get_Obj_Space_Bounding_Box(AABoxClass & box) const
 void Line3DClass::Reset(const Vector3 & new_start, const Vector3 & new_end)
 {
 	// Adjust length of line:
-	float new_length = (new_end - new_start).Length();
+	CustomFloat new_length = (new_end - new_start).Length();
 	if (new_length == 0) {
 		new_length = 0.001f;			// make sure we don't have a zero length BMG
 	}
@@ -432,14 +432,14 @@ void Line3DClass::Reset(const Vector3 & new_start, const Vector3 & new_end)
  *   01/19/1998 NH  : Created.                                            * 
  *   04/21/1998 NH  : Ported to SR 1.3.                                   * 
  *========================================================================*/
-void Line3DClass::Reset(const Vector3 & new_start, const Vector3 & new_end, float new_width)
+void Line3DClass::Reset(const Vector3 & new_start, const Vector3 & new_end, CustomFloat new_width)
 {
 	// Adjust length and width of line:
-	float new_length = (new_end - new_start).Length();
+	CustomFloat new_length = (new_end - new_start).Length();
 	if (new_length == 0) {
 		new_length = 0.001f;			// make sure we don't have a zero length BMG
 	}
-   float width_scale = new_width / Width;
+   CustomFloat width_scale = new_width / Width;
 	Scale((new_length / Length), width_scale, width_scale);
 	Length = new_length;
    Width = new_width;
@@ -468,7 +468,7 @@ void Line3DClass::Reset(const Vector3 & new_start, const Vector3 & new_end, floa
 /************************************************************************** 
  * Re_Color -- Reset the line color.                                      * 
  *                                                                        * 
- * INPUT:	float r, g, b - components of the new color.                  * 
+ * INPUT:	CustomFloat r, g, b - components of the new color.                  * 
  *                                                                        * 
  * OUTPUT:	none.                                                         * 
  *                                                                        * 
@@ -478,7 +478,7 @@ void Line3DClass::Reset(const Vector3 & new_start, const Vector3 & new_end, floa
  *   01/26/1998 NH  : Created.                                            * 
  *   04/21/1998 NH  : Ported to SR 1.3.                                   * 
  *========================================================================*/
-void Line3DClass::Re_Color(float r, float g, float b)
+void Line3DClass::Re_Color(CustomFloat r, CustomFloat g, CustomFloat b)
 {
 	Color=Vector4(r,g,b,Color.W);
 }
@@ -487,7 +487,7 @@ void Line3DClass::Re_Color(float r, float g, float b)
 /************************************************************************** 
  * Set_Opacity -- Reset the line opacity.                                 * 
  *                                                                        * 
- * INPUT:	float opacity - new opacity.                                  * 
+ * INPUT:	CustomFloat opacity - new opacity.                                  * 
  *                                                                        * 
  * OUTPUT:	none.                                                         * 
  *                                                                        * 
@@ -496,7 +496,7 @@ void Line3DClass::Re_Color(float r, float g, float b)
  * HISTORY:                                                               * 
  *   11/03/1998 NH  : Created.                                            * 
  *========================================================================*/
-void Line3DClass::Set_Opacity(float opacity)
+void Line3DClass::Set_Opacity(CustomFloat opacity)
 {
 	if (opacity < 1.0f)
 	{	Shader=ShaderClass::_PresetAlphaSolidShader;

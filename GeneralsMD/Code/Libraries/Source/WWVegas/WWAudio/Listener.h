@@ -98,10 +98,10 @@ class Listener3DClass : public Sound3DClass
 		//////////////////////////////////////////////////////////////////////
 		//	Attenuation settings
 		//////////////////////////////////////////////////////////////////////
-		virtual void			Set_Max_Vol_Radius (float radius = 0)			{ }
-		virtual float			Get_Max_Vol_Radius (void) const					{ return 0; }
-		virtual void			Set_DropOff_Radius (float radius = 1)			{ }
-		virtual float			Get_DropOff_Radius (void) const					{ return 0; }
+		virtual void			Set_Max_Vol_Radius (CustomFloat radius = 0)			{ }
+		virtual CustomFloat			Get_Max_Vol_Radius (void) const					{ return 0; }
+		virtual void			Set_DropOff_Radius (CustomFloat radius = 1)			{ }
+		virtual CustomFloat			Get_DropOff_Radius (void) const					{ return 0; }
 
 		//////////////////////////////////////////////////////////////////////
 		//	Velocity methods

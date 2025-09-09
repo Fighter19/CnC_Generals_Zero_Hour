@@ -112,20 +112,20 @@ class SoundPseudo3DClass : public Sound3DClass
 		// distance. For some objects (like an airplane) the max-vol distance is
 		// not 0, but would be 100 or so meters away.
 		//
-		virtual void			Set_Max_Vol_Radius (float radius = 0)			{ m_MaxVolRadius = radius; }
-		virtual float			Get_Max_Vol_Radius (void) const					{ return m_MaxVolRadius; }
+		virtual void			Set_Max_Vol_Radius (CustomFloat radius = 0)			{ m_MaxVolRadius = radius; }
+		virtual CustomFloat			Get_Max_Vol_Radius (void) const					{ return m_MaxVolRadius; }
 
 		//
 		//	This is the distance where the sound can not be heard any longer.  (its vol is 0)
 		//
-		virtual void			Set_DropOff_Radius (float radius = 1)			{ m_DropOffRadius = radius; }
-		virtual float			Get_DropOff_Radius (void) const					{ return m_DropOffRadius; }
+		virtual void			Set_DropOff_Radius (CustomFloat radius = 1)			{ m_DropOffRadius = radius; }
+		virtual CustomFloat			Get_DropOff_Radius (void) const					{ return m_DropOffRadius; }
 
 		//////////////////////////////////////////////////////////////////////
 		//	Volume control
 		//////////////////////////////////////////////////////////////////////
 		virtual void			Update_Pseudo_Volume (void);
-		virtual void			Update_Pseudo_Volume (float distance);
+		virtual void			Update_Pseudo_Volume (CustomFloat distance);
 
 		//////////////////////////////////////////////////////////////////////
 		//	Pan control

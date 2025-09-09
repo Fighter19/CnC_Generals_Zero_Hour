@@ -302,7 +302,7 @@ void LightClass::Get_Obj_Space_Bounding_Sphere(SphereClass & sphere) const
  *=============================================================================================*/
 void LightClass::Get_Obj_Space_Bounding_Box(AABoxClass & box) const
 {
-	float r = Get_Attenuation_Range();
+	CustomFloat r = Get_Attenuation_Range();
 	box.Center.Set(0,0,0);
 	box.Extent.Set(r,r,r);
 }
@@ -371,13 +371,13 @@ WW3DErrorType LightClass::Load_W3D(ChunkLoadClass & cload)
 		case W3D_CHUNK_NEAR_ATTENUATION:
 			cload.Read(&atteninfo,sizeof(atteninfo));
 			Set_Flag(NEAR_ATTENUATION,true);
-			Set_Near_Attenuation_Range(atteninfo.Start,atteninfo.End);
+			Set_Near_Attenuation_Range((float)atteninfo.Start,(float)atteninfo.End);
 			break;
 
 		case W3D_CHUNK_FAR_ATTENUATION:
 			cload.Read(&atteninfo,sizeof(atteninfo));
 			Set_Flag(FAR_ATTENUATION,true);
-			Set_Far_Attenuation_Range(atteninfo.Start,atteninfo.End);
+			Set_Far_Attenuation_Range((float)atteninfo.Start,(float)atteninfo.End);
 			break;
 		}
 		cload.Close_Chunk();

@@ -237,7 +237,7 @@ void AABTreeClass::Reset(void)
  * HISTORY:                                                                                    *
  *   6/17/02    Jani : Created.                                                                *
  *=============================================================================================*/
-void AABTreeClass::Scale(float f)
+void AABTreeClass::Scale(CustomFloat f)
 {
 	for (int i=0;i<NodeCount;++i) {
 		Nodes[i].Min*=f;
@@ -581,8 +581,8 @@ int AABTreeClass::Cast_Semi_Infinite_Axis_Aligned_Ray_Recursive(CullNodeStruct *
 	** depending on the direction of the ray - we do this in a branchless fashion by turning
 	** (start < min) into (-start > -min). Then we can use tables to perform the correct check.
 	*/
-	static const float sign[2] = { -1.0f, 1.0f };
-	float bounds[2], start[2];
+	static const CustomFloat sign[2] = { -1.0f, 1.0f };
+	CustomFloat bounds[2], start[2];
 	bounds[0] = -node->Min[axis_r];
 	bounds[1] = node->Max[axis_r];
 	start[0] = -start_point[axis_r];

@@ -141,6 +141,8 @@ class CustomFloat
 
 		// Int cast
 		explicit operator Int() const;
+		explicit operator unsigned int() const;
+		explicit operator unsigned long() const;
     explicit operator long() const;
     explicit operator bool() const;
     explicit operator float() const;

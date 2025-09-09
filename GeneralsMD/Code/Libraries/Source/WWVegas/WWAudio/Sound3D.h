@@ -99,7 +99,7 @@ class Sound3DClass : public AudibleSoundClass
 		//////////////////////////////////////////////////////////////////////
 		//	Priority control
 		//////////////////////////////////////////////////////////////////////
-		virtual float			Get_Priority (void) const			{ if (m_IsCulled) return 0; return m_Priority; }
+		virtual CustomFloat			Get_Priority (void) const			{ if (m_IsCulled) return 0; return m_Priority; }
 
 		//////////////////////////////////////////////////////////////////////
 		//	Scene integration
@@ -143,14 +143,14 @@ class Sound3DClass : public AudibleSoundClass
 		// distance. For some objects (like an airplane) the max-vol distance is
 		// not 0, but would be 100 or so meters away.
 		//
-		virtual void			Set_Max_Vol_Radius (float radius = 0);
-		virtual float			Get_Max_Vol_Radius (void) const					{ return m_MaxVolRadius; }
+		virtual void			Set_Max_Vol_Radius (CustomFloat radius = 0);
+		virtual CustomFloat			Get_Max_Vol_Radius (void) const					{ return m_MaxVolRadius; }
 
 		//
 		//	This is the distance where the sound can not be heard any longer.  (its vol is 0)
 		//
-		virtual void			Set_DropOff_Radius (float radius = 1);
-		virtual float			Get_DropOff_Radius ()  {return(m_DropOffRadius);}
+		virtual void			Set_DropOff_Radius (CustomFloat radius = 1);
+		virtual CustomFloat			Get_DropOff_Radius ()  {return(m_DropOffRadius);}
 
 		// From PersistClass
 		const PersistFactoryClass &	Get_Factory (void) const;
@@ -192,7 +192,7 @@ class Sound3DClass : public AudibleSoundClass
 		bool						m_IsTransformInitted;
 		bool						m_bAutoCalcVel;
 		Vector3					m_CurrentVelocity;		
-		float						m_MaxVolRadius;		
+		CustomFloat						m_MaxVolRadius;		
 		bool						m_IsStatic;
 		unsigned int			m_LastUpdate;
 };

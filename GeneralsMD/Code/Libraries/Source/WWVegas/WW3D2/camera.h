@@ -74,8 +74,8 @@ public:
 	ViewportClass(const Vector2 & min,const Vector2 & max) : Min(min), Max(max)	{ }
 	ViewportClass(const ViewportClass & vp) : Min(vp.Min), Max(vp.Max)				{ }
 	
-	float	Width(void)	const																			{ return Max.X - Min.X; }
-	float Height(void) const																		{ return Max.Y - Min.Y; }
+	CustomFloat	Width(void)	const																			{ return Max.X - Min.X; }
+	CustomFloat Height(void) const																		{ return Max.Y - Min.Y; }
 
 	Vector2 Min;
 	Vector2 Max;
@@ -152,31 +152,31 @@ public:
 	// Camera parameter control
 	///////////////////////////////////////////////////////////////////////////
 	// Depth of the scene.
-	float								Get_Depth(void) const;
+	CustomFloat								Get_Depth(void) const;
 
 	// Setting the projection type
 	void								Set_Projection_Type(ProjectionType ptype);
 	ProjectionType					Get_Projection_Type(void);
 	
 	// Setting the clipping ranges in world space distances
-	void								Set_Clip_Planes(float znear,float zfar);
-	void								Get_Clip_Planes(float & znear,float & zfar) const;
+	void								Set_Clip_Planes(CustomFloat znear,CustomFloat zfar);
+	void								Get_Clip_Planes(CustomFloat & znear,CustomFloat & zfar) const;
 
 	// Setting the zbuffer range used during rendering. (Added to allow subdividing the z-buffer. -MW).
-	void								Set_Zbuffer_Range(float znear,float zfar) {ZBufferMin = znear;ZBufferMax=zfar;}
-	void								Get_Zbuffer_Range(float & znear,float & zfar) const {znear=ZBufferMin;zfar=ZBufferMax;}
+	void								Set_Zbuffer_Range(CustomFloat znear,CustomFloat zfar) {ZBufferMin = znear;ZBufferMax=zfar;}
+	void								Get_Zbuffer_Range(CustomFloat & znear,CustomFloat & zfar) const {znear=ZBufferMin;zfar=ZBufferMax;}
 
 	// Methods for setting the View Plane.  
 	// NOTE: View plane is always at a distance of 1.0 from the eye.
 	void								Set_View_Plane(const Vector2 & min,const Vector2 & max);
-	void								Set_View_Plane(float hfov,float vfov = -1);
-	void								Set_Aspect_Ratio(float width_to_height);
+	void								Set_View_Plane(CustomFloat hfov,CustomFloat vfov = -1);
+	void								Set_Aspect_Ratio(CustomFloat width_to_height);
 
 	// Methods for querying the View Plane settings.		
 	void								Get_View_Plane(Vector2 & set_min,Vector2 & set_max) const;
-	float								Get_Horizontal_FOV(void) const;
-	float								Get_Vertical_FOV(void) const;
-	float								Get_Aspect_Ratio(void) const;
+	CustomFloat								Get_Horizontal_FOV(void) const;
+	CustomFloat								Get_Vertical_FOV(void) const;
+	CustomFloat								Get_Aspect_Ratio(void) const;
 
 	// Access to the projection matrices for this camera
 	void								Get_Projection_Matrix(Matrix4x4 * set_tm);
@@ -197,8 +197,8 @@ public:
 	void								Get_Viewport(Vector2 & set_min,Vector2 & set_max) const;
 	const ViewportClass &		Get_Viewport(void) const;
 	
-	void								Set_Depth_Range(float zstart = 0.0f,float zend = 1.0f);
-	void								Get_Depth_Range(float * set_zstart,float * set_zend) const;
+	void								Set_Depth_Range(CustomFloat zstart = 0.0f,CustomFloat zend = 1.0f);
+	void								Get_Depth_Range(CustomFloat * set_zstart,CustomFloat * set_zend) const;
 
 	// Culling for various bounding volumes.  These functions will return true if the 
 	// given primitive is culled (i.e. it is *outside* the view frustum)
@@ -226,7 +226,7 @@ public:
 	// "World Space" - 3D world coordinate system.
 	void								Device_To_View_Space(const Vector2 & device_coord,Vector3 * view_coord);
 	void								Device_To_World_Space(const Vector2 & device_coord,Vector3 * world_coord);
-	float								Compute_Projected_Sphere_Radius(float dist,float radius);
+	CustomFloat								Compute_Projected_Sphere_Radius(CustomFloat dist,CustomFloat radius);
 
 	// apply this camera's settings into d3d.
 	void								Apply(void);
@@ -241,11 +241,11 @@ protected:
 	ProjectionType					Projection;		// projection type, orthographic or perspective
 	ViewportClass					Viewport;		// pixel viewport to render into
 	ViewportClass					ViewPlane;		// corners of a slice through the frustum at z=-1.0
-	float								AspectRatio;	// aspect ratio of the camera, width / height
-	float								ZNear;			// near clip plane distance
-	float								ZFar;				// far clip plane distance
-	float								ZBufferMin;		// smallest value we'll write into the z-buffer (usually 0.0)
-	float								ZBufferMax;		// largest value we'll write into the z-buffer (usually 1.0)
+	CustomFloat								AspectRatio;	// aspect ratio of the camera, width / height
+	CustomFloat								ZNear;			// near clip plane distance
+	CustomFloat								ZFar;				// far clip plane distance
+	CustomFloat								ZBufferMin;		// smallest value we'll write into the z-buffer (usually 0.0)
+	CustomFloat								ZBufferMax;		// largest value we'll write into the z-buffer (usually 1.0)
 
 	mutable bool					FrustumValid;
 	mutable FrustumClass			Frustum;							// world-space frustum and clip planes
@@ -256,7 +256,7 @@ protected:
 };
 
 
-inline float CameraClass::Get_Depth(void) const 
+inline CustomFloat CameraClass::Get_Depth(void) const 
 { 
 	return ZFar;
 }
@@ -284,13 +284,13 @@ inline void	CameraClass::Get_Viewport(Vector2 & set_min,Vector2 & set_max) const
 	set_max = Viewport.Max; 
 }
 
-inline void	CameraClass::Set_Depth_Range(float zmin,float zmax)
+inline void	CameraClass::Set_Depth_Range(CustomFloat zmin,CustomFloat zmax)
 {
 	ZBufferMin = zmin;
 	ZBufferMax = zmax;
 }
 
-inline void	CameraClass::Get_Depth_Range(float * set_zmin,float * set_zmax) const
+inline void	CameraClass::Get_Depth_Range(CustomFloat * set_zmin,CustomFloat * set_zmax) const
 {
 	if (set_zmin != NULL) {
 		*set_zmin = ZBufferMin;

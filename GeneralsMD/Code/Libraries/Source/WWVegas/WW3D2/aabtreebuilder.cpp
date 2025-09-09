@@ -66,7 +66,7 @@
 
 #undef WWASSERT
 #define WWASSERT	assert					// can't use WWASSERT because we use this module in the MAX plugin...
-const float COINCIDENCE_EPSILON = 0.001f;
+const CustomFloat COINCIDENCE_EPSILON = 0.001f;
 
 
 /***********************************************************************************************
@@ -474,8 +474,8 @@ AABTreeBuilderClass::Compute_Plane_Score(int polycount,int * polyindices,const A
 	/*
 	** Compute the cost.
 	*/
-	float back_cost = (sc.BMax.X - sc.BMin.X) * (sc.BMax.Y - sc.BMin.Y) * (sc.BMax.Z - sc.BMin.Z) * sc.BackCount;
-	float front_cost = (sc.FMax.X - sc.FMin.X) * (sc.FMax.Y - sc.FMin.Y) * (sc.FMax.Z - sc.FMin.Z) * sc.FrontCount;
+	CustomFloat back_cost = (sc.BMax.X - sc.BMin.X) * (sc.BMax.Y - sc.BMin.Y) * (sc.BMax.Z - sc.BMin.Z) * sc.BackCount;
+	CustomFloat front_cost = (sc.FMax.X - sc.FMin.X) * (sc.FMax.Y - sc.FMin.Y) * (sc.FMax.Z - sc.FMin.Z) * sc.FrontCount;
 	sc.Cost = front_cost + back_cost;
 	
 	if ((sc.FrontCount == 0) || (sc.BackCount == 0)) {
@@ -508,7 +508,7 @@ AABTreeBuilderClass::Which_Side(const AAPlaneClass & plane,int poly_index)
 	for (int vi=0; vi<3; vi++) {
 		
 		const Vector3 & point = Verts[ Polys[poly_index][vi] ];
-		float delta = point[plane.Normal] - plane.Dist;
+		CustomFloat delta = point[plane.Normal] - plane.Dist;
 		
 		if (delta > COINCIDENCE_EPSILON) {
 			mask |= POS;
@@ -639,7 +639,7 @@ void AABTreeBuilderClass::Compute_Bounding_Box(CullNodeStruct * node)
 	/*
 	** compute bounding volume for the polys in this node
 	*/
-	const float really_big=WWMATH_FLOAT_MAX;
+	const CustomFloat really_big=WWMATH_FLOAT_MAX;
 	node->Min.Set(really_big,really_big,really_big);
 	node->Max.Set(-really_big,-really_big,-really_big);
 

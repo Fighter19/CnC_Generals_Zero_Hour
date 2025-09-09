@@ -98,15 +98,15 @@ class LogicalListenerClass : public SoundSceneObjClass
 		//
 		//	This is the distance where the listener can no longer hear sounds.
 		//
-		virtual void			Set_Scale (float scale = 1.0F)	{ m_Scale = scale; }
-		virtual float			Get_Scale (void) const				{ return m_Scale; }
-		virtual float			Get_Effective_Scale (void) const	{ return m_Scale * m_GlobalScale; }
+		virtual void			Set_Scale (CustomFloat scale = 1.0F)	{ m_Scale = scale; }
+		virtual CustomFloat			Get_Scale (void) const				{ return m_Scale; }
+		virtual CustomFloat			Get_Effective_Scale (void) const	{ return m_Scale * m_GlobalScale; }
 
-		static float			Get_Global_Scale (void)				{ return m_GlobalScale; }
-		static void				Set_Global_Scale (float scale)	{ m_GlobalScale = scale; }
+		static CustomFloat			Get_Global_Scale (void)				{ return m_GlobalScale; }
+		static void				Set_Global_Scale (CustomFloat scale)	{ m_GlobalScale = scale; }
 
-		virtual void			Set_DropOff_Radius (float radius = 1)	{}
-		virtual float			Get_DropOff_Radius (void) const			{ return 1.0F; }
+		virtual void			Set_DropOff_Radius (CustomFloat radius = 1)	{}
+		virtual CustomFloat			Get_DropOff_Radius (void) const			{ return 1.0F; }
 
 		//////////////////////////////////////////////////////////////////////
 		//	From PersistClass
@@ -139,8 +139,8 @@ class LogicalListenerClass : public SoundSceneObjClass
 		//////////////////////////////////////////////////////////////////////
 		//	Private member data
 		//////////////////////////////////////////////////////////////////////
-		static float			m_GlobalScale;
-		float						m_Scale;
+		static CustomFloat			m_GlobalScale;
+		CustomFloat						m_Scale;
 		uint32					m_TypeMask;
 		Vector3					m_Position;
 		uint32					m_Timestamp;

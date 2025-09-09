@@ -162,7 +162,7 @@ FilteredSoundClass::Update_Volume (void)
 			Vector3 sound_pos = m_Transform.Get_Translation ();
 
 			// Determine a normalized volume from the position
-			float distance = (sound_pos - listener_pos).Quick_Length ();
+			float distance = (float)(sound_pos - listener_pos).Quick_Length ();
 			Update_Pseudo_Volume (distance);
 		}
 	}

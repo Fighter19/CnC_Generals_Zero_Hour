@@ -182,14 +182,14 @@ class AudibleSoundClass : public SoundSceneObjClass
 		//	Note:  Pan values are normalized values from 0 (hard left) to
 		// 1.0F (hard right).  Dead center is 0.5F.
 		//
-		virtual float				Get_Pan (void);
-		virtual void				Set_Pan (float pan = 0.5F);
+		virtual CustomFloat				Get_Pan (void);
+		virtual void				Set_Pan (CustomFloat pan = 0.5F);
 
 		//////////////////////////////////////////////////////////////////////
 		//	Volume control
 		//////////////////////////////////////////////////////////////////////
-		virtual float				Get_Volume (void);
-		virtual void				Set_Volume (float volume = 1.0F);
+		virtual CustomFloat				Get_Volume (void);
+		virtual void				Set_Volume (CustomFloat volume = 1.0F);
 		virtual void				Update_Volume (void)						{ Set_Volume (m_Volume); }
 
 		//////////////////////////////////////////////////////////////////////
@@ -204,12 +204,12 @@ class AudibleSoundClass : public SoundSceneObjClass
 		//////////////////////////////////////////////////////////////////////
 		//	Priority control
 		//////////////////////////////////////////////////////////////////////
-		virtual float				Get_Priority (void) const					{ return m_Priority; }
-		virtual float				Peek_Priority (void) const					{ return m_Priority; }
-		virtual void				Set_Priority (float priority = 0.5F);
+		virtual CustomFloat				Get_Priority (void) const					{ return m_Priority; }
+		virtual CustomFloat				Peek_Priority (void) const					{ return m_Priority; }
+		virtual void				Set_Priority (CustomFloat priority = 0.5F);
 
-		virtual float				Get_Runtime_Priority (void) const		{ return m_RuntimePriority; }
-		virtual void				Set_Runtime_Priority (float priority)	{ m_RuntimePriority = priority; }
+		virtual CustomFloat				Get_Runtime_Priority (void) const		{ return m_RuntimePriority; }
+		virtual void				Set_Runtime_Priority (CustomFloat priority)	{ m_RuntimePriority = priority; }
 
 		//////////////////////////////////////////////////////////////////////
 		//	Playback rate control
@@ -217,8 +217,8 @@ class AudibleSoundClass : public SoundSceneObjClass
 		virtual int					Get_Playback_Rate (void);
 		virtual void				Set_Playback_Rate (int rate_in_hz);
 		
-		virtual float				Get_Pitch_Factor (void)						{ return m_PitchFactor; }
-		virtual void				Set_Pitch_Factor (float factor);
+		virtual CustomFloat				Get_Pitch_Factor (void)						{ return m_PitchFactor; }
+		virtual void				Set_Pitch_Factor (CustomFloat factor);
 
 		//////////////////////////////////////////////////////////////////////
 		//	Buffer position manipulation
@@ -231,11 +231,11 @@ class AudibleSoundClass : public SoundSceneObjClass
 		//
 		virtual unsigned long	Get_Duration (void) const								{ return m_Length; }
 		virtual unsigned long	Get_Play_Position (void) const						{ return m_CurrentPosition; }
-		virtual void				Set_Play_Position (float position)					{ Seek (position * m_Length); }
+		virtual void				Set_Play_Position (CustomFloat position)					{ Seek ((Int)(position * (CustomFloat)m_Length)); }
 		virtual void				Set_Play_Position (unsigned long milliseconds)	{ Seek (milliseconds); }
 
-		virtual void				Set_Start_Offset (float offset)						{ m_StartOffset = offset; }
-		virtual float				Get_Start_Offset (void) const							{ return m_StartOffset; }
+		virtual void				Set_Start_Offset (CustomFloat offset)						{ m_StartOffset = offset; }
+		virtual CustomFloat				Get_Start_Offset (void) const							{ return m_StartOffset; }
 
 		//////////////////////////////////////////////////////////////////////
 		//	Position/direction methods
@@ -266,8 +266,8 @@ class AudibleSoundClass : public SoundSceneObjClass
 		//
 		//	This is the distance where the sound can not be heard any longer.  (its vol is 0)
 		//
-		virtual void			Set_DropOff_Radius (float radius = 1);
-		virtual float			Get_DropOff_Radius (void) const	{ return m_DropOffRadius; }
+		virtual void			Set_DropOff_Radius (CustomFloat radius = 1);
+		virtual CustomFloat			Get_DropOff_Radius (void) const	{ return m_DropOffRadius; }
 
 		//////////////////////////////////////////////////////////////////////
 		//	Update methods
@@ -301,7 +301,7 @@ class AudibleSoundClass : public SoundSceneObjClass
 		//////////////////////////////////////////////////////////////////////
 		//	Protected methods
 		//////////////////////////////////////////////////////////////////////
-		virtual float				Determine_Real_Volume (void) const;
+		virtual CustomFloat				Determine_Real_Volume (void) const;
 
 		//////////////////////////////////////////////////////////////////////
 		//	Handle information
@@ -342,18 +342,18 @@ class AudibleSoundClass : public SoundSceneObjClass
 		SoundBufferClass *	m_Buffer;
 
 		// Cached settings
-		float						m_RuntimePriority;
-		float						m_Priority;
-		float						m_Volume;
-		float						m_Pan;
+		CustomFloat						m_RuntimePriority;
+		CustomFloat						m_Priority;
+		CustomFloat						m_Volume;
+		CustomFloat						m_Pan;
 		int						m_LoopCount;
 		int						m_LoopsLeft;
 
 		// Offset and length information (in milliseconds)
 		unsigned long			m_Length;
 		unsigned long			m_CurrentPosition;
-		float						m_StartOffset;
-		float						m_PitchFactor;
+		CustomFloat						m_StartOffset;
+		CustomFloat						m_PitchFactor;
 
 		// 3D scene information
 		Matrix3D					m_ListenerTransform;
@@ -361,7 +361,7 @@ class AudibleSoundClass : public SoundSceneObjClass
 		Matrix3D					m_PrevTransform;
 		bool						m_IsCulled;
 		bool						m_bDirty;
-		float						m_DropOffRadius;
+		CustomFloat						m_DropOffRadius;
 
 		// Conversion data
 		AudibleSoundClass *	m_pConvertedFormat;
@@ -411,18 +411,18 @@ public:
 	// Accessors
 	virtual const StringClass &			Get_Filename (void) const			{ return m_Filename; }
 	virtual const StringClass &			Get_Display_Text (void) const		{ return m_DisplayText; }
-	virtual float								Get_Max_Vol_Radius (void) const	{ return m_MaxVolRadius; }
-	virtual float								Get_DropOff_Radius (void) const	{ return m_DropOffRadius; }
+	virtual CustomFloat								Get_Max_Vol_Radius (void) const	{ return m_MaxVolRadius; }
+	virtual CustomFloat								Get_DropOff_Radius (void) const	{ return m_DropOffRadius; }
 	virtual const Vector3 &					Get_Sphere_Color (void) const		{ return m_AttenuationSphereColor; }
-	virtual float								Get_Volume (void) const				{ return m_Volume; }
-	virtual float								Get_Start_Offset (void) const		{ return m_StartOffset; }
-	virtual float								Get_Pitch_Factor (void) const		{ return m_PitchFactor; }	
+	virtual CustomFloat								Get_Volume (void) const				{ return m_Volume; }
+	virtual CustomFloat								Get_Start_Offset (void) const		{ return m_StartOffset; }
+	virtual CustomFloat								Get_Pitch_Factor (void) const		{ return m_PitchFactor; }	
 
-	virtual void								Set_Volume (float volume)			{ m_Volume = volume; }
-	virtual void								Set_Max_Vol_Radius (float radius){ m_MaxVolRadius = radius; }
-	virtual void								Set_DropOff_Radius (float radius){ m_DropOffRadius = radius; }
-	virtual void								Set_Start_Offset (float offset)	{ m_StartOffset = offset; }
-	virtual void								Set_Pitch_Factor (float factor)	{ m_PitchFactor = factor; }	
+	virtual void								Set_Volume (CustomFloat volume)			{ m_Volume = volume; }
+	virtual void								Set_Max_Vol_Radius (CustomFloat radius){ m_MaxVolRadius = radius; }
+	virtual void								Set_DropOff_Radius (CustomFloat radius){ m_DropOffRadius = radius; }
+	virtual void								Set_Start_Offset (CustomFloat offset)	{ m_StartOffset = offset; }
+	virtual void								Set_Pitch_Factor (CustomFloat factor)	{ m_PitchFactor = factor; }	
 
 	// Logical sound creation
 	virtual LogicalSoundClass *			Create_Logical (void);
@@ -438,22 +438,22 @@ protected:
 	//////////////////////////////////////////////////////////////
 	//	Private member data
 	//////////////////////////////////////////////////////////////
-	float					m_Priority;
-	float					m_Volume;
-	float					m_Pan;
+	CustomFloat					m_Priority;
+	CustomFloat					m_Volume;
+	CustomFloat					m_Pan;
 	int					m_LoopCount;
-	float					m_DropOffRadius;
-	float					m_MaxVolRadius;
+	CustomFloat					m_DropOffRadius;
+	CustomFloat					m_MaxVolRadius;
 	bool					m_Is3D;
 	StringClass			m_Filename;
 	int					m_Type;
 	StringClass			m_DisplayText;
-	float					m_StartOffset;
-	float					m_PitchFactor;
+	CustomFloat					m_StartOffset;
+	CustomFloat					m_PitchFactor;
 
 	int					m_LogicalTypeMask;
-	float					m_LogicalNotifyDelay;
-	float					m_LogicalDropOffRadius;
+	CustomFloat					m_LogicalNotifyDelay;
+	CustomFloat					m_LogicalDropOffRadius;
 	bool					m_CreateLogical;
 
 	// Misc UI info

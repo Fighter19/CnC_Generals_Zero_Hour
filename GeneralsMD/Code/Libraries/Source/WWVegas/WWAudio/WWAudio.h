@@ -89,8 +89,8 @@ typedef enum
 /////////////////////////////////////////////////////////////////////////////////
 const int DEF_2D_SAMPLE_COUNT		= 16;
 const int DEF_3D_SAMPLE_COUNT		= 16;
-const float DEF_MUSIC_VOL			= 1.0F;
-const float DEF_SFX_VOL				= 1.0F;
+const CustomFloat DEF_MUSIC_VOL			= 1.0F;
+const CustomFloat DEF_SFX_VOL				= 1.0F;
 const int DEF_CACHE_SIZE			= 1024;
 const int DEF_MAX_2D_BUFFER_SIZE	= 20000;
 const int DEF_MAX_3D_BUFFER_SIZE	= 100000;
@@ -228,9 +228,9 @@ public:
 	//	Registry settings
 	//////////////////////////////////////////////////////////////////////
 	bool					Load_From_Registry (const char *subkey_name);
-	bool					Load_From_Registry (const char *subkey_name, StringClass &device_name, bool &is_stereo, int &bits, int &hertz, bool &sound_enabled, bool &music_enabled, float &sound_volume, float &music_volume);
+	bool					Load_From_Registry (const char *subkey_name, StringClass &device_name, bool &is_stereo, int &bits, int &hertz, bool &sound_enabled, bool &music_enabled, CustomFloat &sound_volume, CustomFloat &music_volume);
 	bool					Save_To_Registry (const char *subkey_name);
-	bool					Save_To_Registry (const char *subkey_name, const StringClass &device_name, bool is_stereo, int bits, int hertz, bool sound_enabled, bool music_enabled, float sound_volume, float music_volume);
+	bool					Save_To_Registry (const char *subkey_name, const StringClass &device_name, bool is_stereo, int bits, int hertz, bool sound_enabled, bool music_enabled, CustomFloat sound_volume, CustomFloat music_volume);
 
 	//////////////////////////////////////////////////////////////////////
 	//	File interface methods
@@ -256,7 +256,7 @@ public:
 	//
 	//	Reverb Support:  Only works with Create Labs EAX chipset.
 	//
-	float					Get_Effects_Level (void)	{ return m_EffectsLevel; }
+	CustomFloat					Get_Effects_Level (void)	{ return m_EffectsLevel; }
 
 	//	See ENVIRONMENT_ defines in MSS.H for a list of possible values.
 	int					Get_Reverb_Room_Type (void)		{ return m_ReverbRoomType; }
@@ -265,11 +265,11 @@ public:
 	//////////////////////////////////////////////////////////////////////
 	//	Volume methods
 	//////////////////////////////////////////////////////////////////////
-	void					Set_Sound_Effects_Volume (float volume = DEF_SFX_VOL);
-	float					Get_Sound_Effects_Volume (void) const						{ return m_SoundVolume; }
+	void					Set_Sound_Effects_Volume (CustomFloat volume = DEF_SFX_VOL);
+	CustomFloat					Get_Sound_Effects_Volume (void) const						{ return m_SoundVolume; }
 
-	void					Set_Music_Volume (float volume = DEF_MUSIC_VOL);
-	float					Get_Music_Volume (void) const									{ return m_MusicVolume; }
+	void					Set_Music_Volume (CustomFloat volume = DEF_MUSIC_VOL);
+	CustomFloat					Get_Music_Volume (void) const									{ return m_MusicVolume; }
 
 	void					Allow_Sound_Effects (bool onoff = true);
 	bool					Are_Sound_Effects_On (void) const							{ return m_AreSoundEffectsEnabled; }
@@ -404,8 +404,8 @@ public:
 	//////////////////////////////////////////////////////////////////////
 	//	Play control methods
 	//////////////////////////////////////////////////////////////////////
-	bool					Simple_Play_2D_Sound_Effect (const char *filename, float priority = 1.0F, float volume = DEF_SFX_VOL);
-	bool					Simple_Play_2D_Sound_Effect (FileClass &file, float priority = 1.0F, float volume = DEF_SFX_VOL);
+	bool					Simple_Play_2D_Sound_Effect (const char *filename, CustomFloat priority = 1.0F, CustomFloat volume = DEF_SFX_VOL);
+	bool					Simple_Play_2D_Sound_Effect (FileClass &file, CustomFloat priority = 1.0F, CustomFloat volume = DEF_SFX_VOL);
 
 	//////////////////////////////////////////////////////////////////////
 	//	Playlist methods
@@ -429,7 +429,7 @@ public:
 	//		ADPCM or MP3 decompression
 	//		System buffer fills
 	//
-	float					Get_Digital_CPU_Percent (void) const;
+	CustomFloat					Get_Digital_CPU_Percent (void) const;
 
 	//////////////////////////////////////////////////////////////////////
 	//	Debug methods
@@ -536,8 +536,8 @@ private:
 	int													m_PlaybackRate;
 	int													m_PlaybackBits;
 	bool													m_PlaybackStereo;
-	float													m_MusicVolume;
-	float													m_SoundVolume;
+	CustomFloat													m_MusicVolume;
+	CustomFloat													m_SoundVolume;
 	int													m_Max2DSamples;
 	int													m_Max3DSamples;
 	int													m_Max2DBufferSize;
@@ -578,7 +578,7 @@ private:
 	DynamicVectorClass<LOGICAL_TYPE_STRUCT>	m_LogicalTypes;
 
 	//	Reverb support
-	float													m_EffectsLevel;
+	CustomFloat													m_EffectsLevel;
 	int													m_ReverbRoomType;
 };
 

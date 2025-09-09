@@ -45,6 +45,7 @@
 #include "persist.h"
 #include "multilist.h"
 #include "mutex.h"
+#include "CustomFloat.h"
 
 /////////////////////////////////////////////////////////////////////////////////
 // Forward declarations
@@ -177,8 +178,8 @@ class SoundSceneObjClass : public MultiListObjectClass, public PersistClass, pub
 		//
 		//	This is the distance where the sound can not be heard any longer.  (its vol is 0)
 		//
-		virtual void			Set_DropOff_Radius (float radius = 1) = 0;
-		virtual float			Get_DropOff_Radius (void) const = 0;
+		virtual void			Set_DropOff_Radius (CustomFloat radius = 1) = 0;
+		virtual CustomFloat			Get_DropOff_Radius (void) const = 0;
 
 		//////////////////////////////////////////////////////////////////////
 		//	From PersistClass

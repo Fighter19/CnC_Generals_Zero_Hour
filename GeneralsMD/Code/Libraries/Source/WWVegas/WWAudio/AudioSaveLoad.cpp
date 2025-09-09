@@ -205,7 +205,7 @@ DynamicAudioSaveLoadClass::Save (ChunkSaveClass &csave)
 	if (scene != NULL) {
 		
 		csave.Begin_Chunk (CHUNKID_DYNAMIC_VARIABLES);
-			float global_scale = LogicalListenerClass::Get_Global_Scale ();
+			CustomFloat global_scale = LogicalListenerClass::Get_Global_Scale ();
 			WRITE_MICRO_CHUNK (csave, VARID_LOGICAL_LISTENER_GLOBAL_SCALE, global_scale);
 		csave.End_Chunk ();
 		
@@ -243,7 +243,7 @@ DynamicAudioSaveLoadClass::Load (ChunkLoadClass &cload)
 						//
 						case VARID_LOGICAL_LISTENER_GLOBAL_SCALE:
 						{
-							float global_scale = 1.0F;
+							CustomFloat global_scale = 1.0F;
 							LOAD_MICRO_CHUNK (cload, global_scale);
 							LogicalListenerClass::Set_Global_Scale (global_scale);
 							break;
