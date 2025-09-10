@@ -9,6 +9,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 add_executable(SageTests
+  TestMatrix.cpp
   TestMain.cpp
   TestString.cpp
   FastFloatTest.cpp
