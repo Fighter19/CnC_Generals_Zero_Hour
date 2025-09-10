@@ -19,7 +19,7 @@ Original matrix of object
 $1 = {Row = {{X = 1, Y = 0, Z = 0, W = -209.418137}, {X = 0, Y = 1, Z = 0, W = 1604.44214}, {X = 0, Y = 0, Z = 1, W = 18.75}}}
 */
 
-TEST(Matrix, CRC)
+TEST(CRC, Matrix)
 {
   Matrix3D mtxObj;
   mtxObj.Set(1,0,0,-209.418137f,
@@ -44,4 +44,13 @@ TEST(Matrix, CRC)
   XferCRC crc;
   crc.xferMatrix3D(&mtx);
   EXPECT_EQ(crc.getCRC(), 0xC9515EA7);
+}
+
+TEST(CRC, atan2)
+{
+  Real a = atan2(-112.772949f, 100.69194f);
+  
+  XferCRC crc;
+  crc.xferReal(&a);
+  EXPECT_EQ(crc.getCRC(), 0xBF5788E7);
 }
