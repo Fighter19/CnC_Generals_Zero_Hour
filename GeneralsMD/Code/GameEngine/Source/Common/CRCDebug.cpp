@@ -187,7 +187,11 @@ void outputCRCDumpLines( void )
 
 static AsciiString getFname(AsciiString path)
 {
+#ifdef _WIN32
 	return path.reverseFind('\\') + 1;
+#else
+	return path.reverseFind('/') + 1;
+#endif
 }
 
 static void addCRCDebugLineInternal(bool count, const char *fmt, va_list args)
