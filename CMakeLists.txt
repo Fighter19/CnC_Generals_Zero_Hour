@@ -140,6 +140,10 @@ if(NOT MSVC)
   set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG" )
 endif()
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  add_compile_options(-ffp-model=strict)
+endif()
+
 if(SAGE_BUILD_GENERALS)
   add_subdirectory(Generals/Code)
 endif()
