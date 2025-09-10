@@ -32,6 +32,7 @@
 #include "GameClient/InGameUI.h"
 #include "GameNetwork/IPEnumeration.h"
 #include <cstdarg>
+#include <filesystem>
 
 #ifdef _INTERNAL
 // for occasional debugging...
@@ -123,7 +124,7 @@ void CRCDebugStartNewGame()
 	if (g_saveDebugCRCPerFrame)
 	{
 		// Create folder for frame data, if it doesn't exist yet.
-		CreateDirectory(g_saveDebugCRCPerFrameDir.str(), NULL);
+		std::filesystem::create_directories(g_saveDebugCRCPerFrameDir.str());
 
 		// Delete existing files
 		FilenameList files;
@@ -133,7 +134,7 @@ void CRCDebugStartNewGame()
 		FilenameList::iterator it;
 		for (it = files.begin(); it != files.end(); ++it)
 		{
-			DeleteFile(it->str());
+			std::filesystem::remove(it->str());
 		}
 	}
 	nextDebugString = 0;
