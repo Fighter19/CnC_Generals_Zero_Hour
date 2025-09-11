@@ -10,9 +10,7 @@ char* itoa(int value, char* str, int base)
   std::stringbuf buf;
   buf.pubsetbuf(str, 33);
   std::ostream os(&buf);
-  os << value;
-  // Null terminate, just in case
-  str[32] = '\0';
+  os << value << '\0';
   return str;
 }
 
