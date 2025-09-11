@@ -48,8 +48,14 @@ TEST(CRC, Matrix)
 
 TEST(CRC, atan2)
 {
-  Real a = atan2(-112.772949f, 100.69194f);
-  
+  // Volatile to prevent compiler optimizations that hide the issue
+  // This test currently fails with Clang 18.1.3 and 19.1.1 on x86_64
+  // but succeeds on ARM64 with Clang 19.1.7
+  volatile Real x = -112.772949f;
+  volatile Real y = 100.69194f;
+  // This is actually std::atan2(y, x); and uses atan2f behind the scenes
+  Real a = atan2(x, y);
+
   XferCRC crc;
   crc.xferReal(&a);
   EXPECT_EQ(crc.getCRC(), 0xBF5788E7);
