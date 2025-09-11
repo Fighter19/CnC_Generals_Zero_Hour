@@ -221,6 +221,14 @@ void setFPMode( void )
 #endif
 }
 
+#ifndef _WIN32
+// Define custom atan2f, because x86-64 one on Linux is broken
+extern "C" float atan2f(float y, float x)
+{
+	return (float)atan2((double)y, (double)x);
+}
+#endif
+
 // ------------------------------------------------------------------------------------------------
 /** GameLogic class constructor */
 // ------------------------------------------------------------------------------------------------
