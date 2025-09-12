@@ -674,7 +674,7 @@ DWORD WINAPI asyncGethostbynameThreadFunc( void * szName )
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
-int asyncGethostbyname(char * szName)
+int asyncGethostbyname(const char * szName)
 {
 	static int            stat = 0;
 	static unsigned long  threadid;
@@ -683,7 +683,7 @@ int asyncGethostbyname(char * szName)
 	{
 		/* Kick off gethostname thread */
 		s_asyncDNSThreadDone = FALSE;
-		s_asyncDNSThreadHandle = CreateThread( NULL, 0, asyncGethostbynameThreadFunc, szName, 0, &threadid );
+		s_asyncDNSThreadHandle = CreateThread( NULL, 0, asyncGethostbynameThreadFunc, (void *)szName, 0, &threadid );
 
 		if( s_asyncDNSThreadHandle == NULL )
 		{

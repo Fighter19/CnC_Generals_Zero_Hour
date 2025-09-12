@@ -157,7 +157,7 @@ class WebBrowser
 		void update( void ) {}
 
 		// Create an instance of the embedded browser
-		virtual Bool createBrowserWindow(char *tag, GameWindow *win) { return FALSE; }
+		virtual Bool createBrowserWindow(const char *tag, GameWindow *win) { return FALSE; }
 		virtual void closeBrowserWindow(GameWindow *win) {}
 
 		WebBrowserURL *makeNewURL(AsciiString tag) { return NULL; }

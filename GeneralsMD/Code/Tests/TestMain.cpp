@@ -70,7 +70,7 @@ DWORD TheMessageTime = 0;	///< For getting the time that a message was posted fr
 
 const Char *g_strFile = "data\\Generals.str";
 const Char *g_csfFile = "data\\%s\\Generals.csf";
-char *gAppPrefix = ""; /// So WB can have a different debug log file name.
+const char *gAppPrefix = ""; /// So WB can have a different debug log file name.
 
 static Bool gInitializing = false;
 static Bool gDoPaint = true;

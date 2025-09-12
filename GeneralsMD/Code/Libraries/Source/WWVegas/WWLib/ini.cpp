@@ -471,14 +471,15 @@ int INIClass::Load(Straw & ffile)
 				if (!strlen(buffer)) continue;
 
 				strtrim(divider);
+				const char *entry = divider;
 				if (!strlen(divider)) {
 					if (KeepBlankEntries)
-						divider = " ";
+						entry = " ";
 					else
 						continue;
 				}
 
-				if (Put_String(section, buffer, divider) == false) {
+				if (Put_String(section, buffer, entry) == false) {
 					return(false);
 				}
 			}
@@ -537,15 +538,16 @@ int INIClass::Load(Straw & ffile)
 				if (!strlen(buffer)) continue;
 
 				strtrim(divider);
+				const char *entry = divider;
 				if (!strlen(divider)) {
 					if (KeepBlankEntries)
-						divider = " ";
+						entry = " ";
 					else
 						continue;
 				}
 
 
-				INIEntry * entryptr = W3DNEW INIEntry(strdup(buffer), strdup(divider));
+				INIEntry * entryptr = W3DNEW INIEntry(strdup(buffer), strdup(entry));
 				if (entryptr == NULL) {
 					delete secptr;
 					Clear();
