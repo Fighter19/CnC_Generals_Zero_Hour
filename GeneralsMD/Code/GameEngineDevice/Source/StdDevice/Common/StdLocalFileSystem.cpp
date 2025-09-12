@@ -70,7 +70,7 @@ static std::filesystem::path fixFilenameFromWindowsPath(const Char *filename, In
 
 		std::filesystem::path pathFixed;
 		std::filesystem::path pathCurrent;
-		for (auto& p : path)
+		for (const auto& p : path)
 		{
 			std::filesystem::path pathFixedPart;
 			if (pathCurrent.empty())
