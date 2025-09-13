@@ -2910,48 +2910,12 @@ IDirect3DSurface8 * DX8Wrapper::_Create_DX8_Surface(const char *filename_)
 	DX8_THREAD_ASSERT();
 	DX8_Assert();
 
-	// Note: Since there is no "D3DXCreateSurfaceFromFile" and no "GetSurfaceInfoFromFile" (the
-	// latter is supposed to be added to D3DX in a future version), we create a texture from the
-	// file (w/o mipmaps), check that its surface is equal to the original file data (which it
-	// will not be if the file is not in a texture-supported format or size). If so, copy its
-	// surface (we might be able to just get its surface and add a ref to it but I'm not sure so
-	// I'm not going to risk it) and release the texture. If not, create a surface according to
-	// the file data and use D3DXLoadSurfaceFromFile. This is a horrible hack, but it saves us
-	// having to write file loaders. Will fix this when D3DX provides us with the right functions.
-	// Create a surface the size of the file image data
-	IDirect3DSurface8 *surface = NULL;
+	// TODO: Remove the whole function, unused in this game
+	// Potentially referenced through Font3D
 
-	{
+	WWASSERT(false);
 
-		file_auto_ptr myfile(_TheFileFactory,filename_);
-		// If file not found, create a surface with missing texture in it
-
-		if (!myfile->Is_Available()) {
-			// If file not found, try the dds format
-			// else create a surface with missing texture in it
-			char compressed_name[200];
-			strncpy(compressed_name,filename_, 200);
-			char *ext = strstr(compressed_name, ".");
-			if ( (strlen(ext)==4) && 
-				  ( (ext[1] == 't') || (ext[1] == 'T') ) && 
-				  ( (ext[2] == 'g') || (ext[2] == 'G') ) && 
-				  ( (ext[3] == 'a') || (ext[3] == 'A') ) ) {
-				ext[1]='d';
-				ext[2]='d';
-				ext[3]='s';
-			}
-			file_auto_ptr myfile2(_TheFileFactory,compressed_name);
-			if (!myfile2->Is_Available())
-				return MissingTexture::_Create_Missing_Surface();
-		}
-	}
-
-	StringClass filename_string(filename_,true);
-	surface=TextureLoader::Load_Surface_Immediate(
-		filename_string,
-		WW3D_FORMAT_UNKNOWN,
-		true);
-	return surface;
+	return NULL;
 }
 
 
