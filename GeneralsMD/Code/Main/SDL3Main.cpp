@@ -24,6 +24,8 @@
 // #include "GeneratedVersion.h"
 #include <rts/profile.h>
 
+#include <filesystem>
+
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 #include <SDL3_image/SDL_image.h>
@@ -220,8 +222,23 @@ int main(int argc, char *argv[]) {
     token = nextParam(NULL, "\" ");
   }
 
+  // Check if Install_Final.bmp exists, if not, print an error and exit
+  if (!std::filesystem::exists("Install_Final.bmp")) {
+    std::string errorMessage = "Error: Install_Final.bmp not found. Make sure you are running the game from the correct directory.\n";
+    fprintf(stderr, "%s", errorMessage.c_str());
+    // Attempt to print using a message box as well
+    bool bSuccess = SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", errorMessage.c_str(), NULL);
+    if(!bSuccess)
+      fprintf(stderr, "Failed to show SDL message box: %s\n", SDL_GetError());
+    return 1;
+  }
+
   if(ShowSplashScreen) {
     SplashSurface = SDL_LoadBMP("Install_Final.bmp");
+    if (!SplashSurface) {
+      fprintf(stderr, "Failed to load splash screen image Install_Final.bmp: %s\n", SDL_GetError());
+      ShowSplashScreen = false;
+    }
   }
 
   // register windows class and create application window
