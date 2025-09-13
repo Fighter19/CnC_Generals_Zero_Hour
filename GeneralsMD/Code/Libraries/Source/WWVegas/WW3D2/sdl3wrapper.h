@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "rect.h"
+#include "vector3.h"
 
 namespace Rendering {
 // Implementation defined opaque types
@@ -33,6 +34,7 @@ public:
   virtual void EndScene(void) = 0;
 
   virtual void SetViewport(const Viewport* pViewport) = 0;
+  virtual void Clear(bool clear_color, bool clear_z_stencil, const Vector3 &color, float dest_alpha, float z, unsigned int stencil) = 0;
 
   virtual std::unique_ptr<ISurface> CreateSurface(int width, int height, int format) = 0;
 };
@@ -48,6 +50,7 @@ public:
   void EndScene(void) override;
 
   void SetViewport(const Viewport* pViewport) override;
+  void Clear(bool clear_color, bool clear_z_stencil, const Vector3 &color, float dest_alpha = 0.0f, float z = 1.0f, unsigned int stencil = 0) override;
 
   std::unique_ptr<ISurface> CreateSurface(int width, int height, int format) override;
 
@@ -62,6 +65,9 @@ private:
   SDL_GPUGraphicsPipeline *DefaultPipeline = NULL;
 
   SDL_GPUCommandBuffer *CurrentGPUCommandBuffer = NULL;
+
+  SDL_GPUColorTargetInfo ColorTargetInfo = {};
+  SDL_GPUDepthStencilTargetInfo DepthStencilTargetInfo = {};
 
   SDL_GPUBuffer *DefaultVertexBuffer = NULL;
   SDL_GPURenderPass *CurrentGPUPass = NULL;

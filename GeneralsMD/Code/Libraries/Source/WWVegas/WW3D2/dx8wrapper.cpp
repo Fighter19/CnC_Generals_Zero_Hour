@@ -1817,6 +1817,7 @@ void DX8Wrapper::Flip_To_Primary(void)
 */
 void DX8Wrapper::Clear(bool clear_color, bool clear_z_stencil, const Vector3 &color, float dest_alpha, float z, unsigned int stencil)
 {
+	TheSDL3Wrapper.Clear(clear_color, clear_z_stencil, color, dest_alpha, z, stencil);
 	DX8_THREAD_ASSERT();
 
 	// If we try to clear a stencil buffer which is not there, the entire call will fail

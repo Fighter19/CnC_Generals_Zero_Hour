@@ -6,7 +6,15 @@
 #include "vector4.h"
 #include "matrix4.h"
 
+#include "vector2i.h"
+
 using namespace Rendering;
+
+/* TODOs:
+
+  * Track MSAA settings
+  * Add support for resizing (recreating the depth stencil texture and properly updating the viewport)
+*/
 
 extern SDL_Window* TheSDL3WindowVulkan;
 SDL_GPUDevice *SDLGPUDevice = NULL;
@@ -33,9 +41,33 @@ void SDL3Wrapper::Shutdown(void)
   // Cleanup resources if needed
   if (SDLGPUDevice)
   {
+    SDL_ReleaseGPUGraphicsPipeline(SDLGPUDevice, DefaultPipeline);
+    SDL_ReleaseGPUTexture(SDLGPUDevice, ColorTargetInfo.texture);
+    SDL_ReleaseGPUTexture(SDLGPUDevice, DepthStencilTargetInfo.texture);
+    SDL_ReleaseGPUBuffer(SDLGPUDevice, DefaultVertexBuffer);
+
     SDL_DestroyGPUDevice(SDLGPUDevice);
     SDLGPUDevice = NULL;
   }
+}
+
+static SDL_GPUTexture *CreateDepthStencilTexture(Vector2i size)
+{
+  SDL_GPUTextureCreateInfo textureCreateInfo = {};
+  textureCreateInfo.type = SDL_GPU_TEXTURETYPE_2D;
+  textureCreateInfo.format = SDL_GPU_TEXTUREFORMAT_D24_UNORM_S8_UINT;
+  textureCreateInfo.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
+  textureCreateInfo.width = size.I;
+  textureCreateInfo.height = size.J;
+  textureCreateInfo.layer_count_or_depth = 1;
+  textureCreateInfo.num_levels = 1;
+  // MSAA setup (none)
+  textureCreateInfo.sample_count = SDL_GPU_SAMPLECOUNT_1;
+
+  textureCreateInfo.props = 0;
+
+  SDL_GPUTexture *depthTexture = SDL_CreateGPUTexture(SDLGPUDevice, &textureCreateInfo);
+  return depthTexture;
 }
 
 bool SDL3Wrapper::CreateDevice(void)
@@ -135,6 +167,7 @@ bool SDL3Wrapper::CreateDevice(void)
   // End of uploading a quad to the GPU
 
   DefaultPipeline = CreateDefaultPipeline();
+  DepthStencilTargetInfo.texture = CreateDepthStencilTexture(Vector2i(800, 600));
 
   return true;
 }
@@ -166,32 +199,11 @@ void SDL3Wrapper::BeginScene()
     return;
   }
 
-  SDL_GPUColorTargetInfo colorTargetInfo = {};
-  colorTargetInfo.clear_color.a = 1.0f;
-  colorTargetInfo.clear_color.r = 1.0f;
-  colorTargetInfo.clear_color.g = 0.0f;
-  colorTargetInfo.clear_color.b = 1.0f;
-  colorTargetInfo.load_op = SDL_GPU_LOADOP_CLEAR;
-  colorTargetInfo.store_op = SDL_GPU_STOREOP_STORE;
-  colorTargetInfo.texture = swapChainTexture;
+  // If "Clear" turns out to actually require creating new render passes,
+  // it might be necessary to pass other TargetInfos here
+  ColorTargetInfo.texture = swapChainTexture;
 
-  SDL_GPUDepthStencilTargetInfo depthTargetInfo = {};
-  depthTargetInfo.clear_depth = 1.0f;
-  depthTargetInfo.load_op = SDL_GPU_LOADOP_CLEAR;
-  depthTargetInfo.store_op = SDL_GPU_STOREOP_DONT_CARE;
-  depthTargetInfo.stencil_load_op = SDL_GPU_LOADOP_DONT_CARE;
-  depthTargetInfo.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
-  // TODO: Create depth buffer texture and pass
-  depthTargetInfo.texture = NULL; // No depth buffer for now
-  depthTargetInfo.cycle = false;
-
-  D3D9FixedFunctionVS vsConstants = {};
-  vsConstants.ViewportInfo_InverseOffset = Vector4(-1.0,1.0,0.0,0.0);
-  vsConstants.ViewportInfo_InverseExtent = Vector4(2.0 / 800, -2.0 / 600, 1.0, 1.0);
-
-  SDL_PushGPUVertexUniformData(CurrentGPUCommandBuffer, 0, &vsConstants, sizeof(vsConstants));
-
-  CurrentGPUPass = SDL_BeginGPURenderPass(CurrentGPUCommandBuffer, &colorTargetInfo, 1, NULL /*&depthTargetInfo*/);
+  CurrentGPUPass = SDL_BeginGPURenderPass(CurrentGPUCommandBuffer, &ColorTargetInfo, 1, &DepthStencilTargetInfo);
   if (!CurrentGPUPass)
   {
     WWDEBUG_SAY(("Failed to begin GPU render pass for DX8Wrapper::Begin_Scene()"));
@@ -200,6 +212,12 @@ void SDL3Wrapper::BeginScene()
   }
 
   SDL_BindGPUGraphicsPipeline(CurrentGPUPass, DefaultPipeline);
+
+  D3D9FixedFunctionVS vsConstants = {};
+  vsConstants.ViewportInfo_InverseOffset = Vector4(-1.0,1.0,0.0,0.0);
+  vsConstants.ViewportInfo_InverseExtent = Vector4(2.0 / 800, -2.0 / 600, 1.0, 1.0);
+
+  SDL_PushGPUVertexUniformData(CurrentGPUCommandBuffer, 0, &vsConstants, sizeof(vsConstants));
 
   SDL_GPUBufferBinding vertexBinding;
   // Currently the viewport quad
@@ -226,8 +244,48 @@ void SDL3Wrapper::SetViewport(const Viewport *pViewport)
   viewport.y = pViewport->y;
   viewport.w = pViewport->w;
   viewport.h = pViewport->h;
+  viewport.min_depth = pViewport->min_depth;
+  viewport.max_depth = pViewport->max_depth;
 
   SDL_SetGPUViewport(CurrentGPUPass, &viewport);
+}
+
+void Rendering::SDL3Wrapper::Clear(bool clear_color, bool clear_z_stencil, const Vector3 &color,
+                                   float dest_alpha, float z, unsigned int stencil)
+{
+  // If this assertion is hit, it means that clear has been used inside a BeginScene/EndScene block,
+  // which we currently didn't expect.
+  DEBUG_ASSERTCRASH(CurrentGPUPass == NULL, ("SDL3Wrapper::Clear() called inside BeginScene/EndScene block"));
+  ColorTargetInfo = {};
+  ColorTargetInfo.load_op = SDL_GPU_LOADOP_LOAD;
+  ColorTargetInfo.store_op = SDL_GPU_STOREOP_STORE;
+  if (clear_color)
+  {
+    ColorTargetInfo.clear_color.r = color.X;
+    ColorTargetInfo.clear_color.g = color.Y;
+    ColorTargetInfo.clear_color.b = color.Z;
+    ColorTargetInfo.clear_color.a = dest_alpha;
+    ColorTargetInfo.load_op = SDL_GPU_LOADOP_CLEAR;
+  }
+
+  DepthStencilTargetInfo.cycle = false;
+
+  // TODO: Test if DONT_CARE is better here, I don't think the stencil or depth of a render pass is ever shared between passes
+  DepthStencilTargetInfo.load_op = SDL_GPU_LOADOP_LOAD;
+  DepthStencilTargetInfo.store_op = SDL_GPU_STOREOP_STORE;
+
+  DepthStencilTargetInfo.stencil_load_op = SDL_GPU_LOADOP_LOAD;
+  DepthStencilTargetInfo.stencil_store_op = SDL_GPU_STOREOP_STORE;
+  if (clear_z_stencil)
+  {
+    DepthStencilTargetInfo.load_op = SDL_GPU_LOADOP_CLEAR;
+    DepthStencilTargetInfo.stencil_load_op = SDL_GPU_LOADOP_CLEAR;
+    DepthStencilTargetInfo.clear_depth = z;
+    DepthStencilTargetInfo.clear_stencil = stencil;
+  }
+
+  // TODO: Consider creating a new pass, if clearing inside a BeginScene/EndScene block is needed
+  // CurrentGPUPass = SDL_BeginGPURenderPass(CurrentGPUCommandBuffer, &ColorTargetInfo, 1, &DepthStencilTargetInfo);
 }
 
 // Private functions
@@ -258,6 +316,9 @@ SDL_GPUGraphicsPipeline *SDL3Wrapper::CreateDefaultPipeline()
   SDL_GPUGraphicsPipelineCreateInfo pipelineCreateInfo = {0};
 
   pipelineCreateInfo.target_info.num_color_targets = 1;
+  pipelineCreateInfo.target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D24_UNORM_S8_UINT;
+  pipelineCreateInfo.target_info.has_depth_stencil_target = true;
+
   static const SDL_GPUColorTargetDescription colorTargetDescription = {
       .format = SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM,
       .blend_state = {
@@ -306,7 +367,11 @@ SDL_GPUGraphicsPipeline *SDL3Wrapper::CreateDefaultPipeline()
   pipelineCreateInfo.vertex_shader = LoadDefaultShader(true);
   pipelineCreateInfo.fragment_shader = LoadDefaultShader(false);
 
-  return SDL_CreateGPUGraphicsPipeline(SDLGPUDevice, &pipelineCreateInfo);
+  SDL_GPUGraphicsPipeline *pPipeline = SDL_CreateGPUGraphicsPipeline(SDLGPUDevice, &pipelineCreateInfo);
+  SDL_ReleaseGPUShader(SDLGPUDevice, pipelineCreateInfo.vertex_shader);
+  SDL_ReleaseGPUShader(SDLGPUDevice, pipelineCreateInfo.fragment_shader);
+
+  return pPipeline;
 }
 
 class SDL3Surface: public ISurface
