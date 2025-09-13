@@ -38,25 +38,6 @@ IDirect3DTexture8* MissingTexture::_Get_Missing_Texture()
 	return _MissingTexture;
 }
 
-IDirect3DSurface8* MissingTexture::_Create_Missing_Surface()
-{
-	IDirect3DSurface8 *texture_surface = NULL;
-	DX8_ErrorCode(_MissingTexture->GetSurfaceLevel(0, &texture_surface));
-	D3DSURFACE_DESC texture_surface_desc;
-	::ZeroMemory(&texture_surface_desc, sizeof(D3DSURFACE_DESC));
-	DX8_ErrorCode(texture_surface->GetDesc(&texture_surface_desc));
-	
-	IDirect3DSurface8 *surface = NULL;	
-	DX8CALL(CreateImageSurface(
-		texture_surface_desc.Width, 
-		texture_surface_desc.Height, 
-		texture_surface_desc.Format, 
-		&surface));
-	DX8CALL(CopyRects(texture_surface, NULL, 0, surface, NULL));
-	texture_surface->Release();
-	return surface;
-}
-
 void MissingTexture::_Init()
 {
 	WWASSERT(!_MissingTexture);
