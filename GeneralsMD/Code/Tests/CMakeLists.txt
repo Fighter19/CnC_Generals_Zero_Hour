@@ -28,3 +28,16 @@ endif()
 
 include(GoogleTest)
 gtest_discover_tests(SageTests)
+
+add_executable(TestGraphics
+  TestGraphics.cpp
+)
+
+target_link_libraries(TestGraphics
+  GameEngine
+  GameEngineDevice
+)
+
+if(WIN32)
+  target_link_libraries(TestGraphics winmm Imm32 vfw32)
+endif()

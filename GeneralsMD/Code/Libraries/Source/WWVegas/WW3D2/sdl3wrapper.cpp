@@ -292,3 +292,35 @@ SDL_GPUGraphicsPipeline *SDL3Wrapper::CreateDefaultPipeline()
 
   return SDL_CreateGPUGraphicsPipeline(SDLGPUDevice, &pipelineCreateInfo);
 }
+
+class SDL3Surface: public ISurface
+{
+public:
+  SDL3Surface(SDL_GPUTexture *texture) : texture(texture) {}
+  ~SDL3Surface() override
+  {
+    if (texture)
+    {
+      SDL_ReleaseGPUTexture(SDLGPUDevice, texture);
+    }
+  }
+
+private:
+  SDL_GPUTexture *texture;
+};
+
+std::unique_ptr<ISurface> SDL3Wrapper::CreateSurface(int width, int height, int format)
+{
+  SDL_GPUTextureCreateInfo textureCreateInfo = {};
+  textureCreateInfo.type = SDL_GPU_TEXTURETYPE_2D;
+  textureCreateInfo.width = width;
+  textureCreateInfo.height = height;
+  // TODO: Convert WW3DFormat to SDL_GPUTextureFormat
+  WWASSERT_PRINT(false, ("Not yet supported"));
+  textureCreateInfo.format = static_cast<SDL_GPUTextureFormat>(format);
+  textureCreateInfo.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER;
+  textureCreateInfo.num_levels = 1; // No mipmaps for now
+  textureCreateInfo.props = 0;
+
+  return std::make_unique<SDL3Surface>(SDL_CreateGPUTexture(SDLGPUDevice, &textureCreateInfo));
+}

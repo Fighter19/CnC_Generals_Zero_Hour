@@ -28,6 +28,8 @@
 struct IDirect3DTexture8;
 struct IDirect3DSurface8;
 
+#include "sdl3wrapper.h"
+
 class MissingTexture
 {
 public:

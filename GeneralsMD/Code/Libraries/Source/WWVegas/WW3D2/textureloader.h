@@ -48,6 +48,8 @@
 #include "always.h"
 #include "texture.h"
 
+#include "sdl3wrapper.h"
+
 class StringClass;
 struct IDirect3DTexture8;
 class TextureLoadTaskClass;

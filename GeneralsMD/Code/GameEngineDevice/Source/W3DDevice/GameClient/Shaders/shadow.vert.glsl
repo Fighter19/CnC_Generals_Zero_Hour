@@ -1,5 +1,6 @@
 #version 460
 // Compatible with DXVK layout (set changed from 2 to 1, for SDL)
+// Optimization potential: Pass color via uniform
 
 invariant gl_Position;
 
