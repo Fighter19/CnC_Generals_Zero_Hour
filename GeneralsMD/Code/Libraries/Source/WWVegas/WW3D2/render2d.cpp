@@ -620,13 +620,13 @@ void Render2DClass::Render(void)
 	int width, height, bits;
 	bool windowed;
 	WW3D::Get_Device_Resolution( width, height, bits, windowed );
-	D3DVIEWPORT8 vp = { 0 };
-	vp.X			= 0;
-	vp.Y			= 0;
-	vp.Width		= width;
-	vp.Height	= height;
-	vp.MinZ		= 0;
-	vp.MaxZ		= 1;
+	Rendering::Viewport vp = { 0 };
+	vp.x			= 0;
+	vp.y			= 0;
+	vp.w			= width;
+	vp.h			= height;
+	vp.min_depth	= 0;
+	vp.max_depth	= 1;
 	DX8Wrapper::Set_Viewport(&vp);
 	DX8Wrapper::Set_Texture(0,Texture);
 

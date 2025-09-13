@@ -64,6 +64,7 @@
 #include "vertmaterial.h"
 
 #include "SDL3/SDL.h"
+#include "sdl3wrapper.h"
 
 /*
 ** Registry value names
@@ -287,7 +288,7 @@ public:
 
 	static void Clear(bool clear_color, bool clear_z_stencil, const Vector3 &color, float dest_alpha=0.0f, float z=1.0f, unsigned int stencil=0);
 
-	static void	Set_Viewport(CONST D3DVIEWPORT8* pViewport);
+	static void	Set_Viewport(const Rendering::Viewport* pViewport);
 
 	static void Set_Vertex_Buffer(const VertexBufferClass* vb, unsigned stream=0);
 	static void Set_Vertex_Buffer(const DynamicVBAccessClass& vba);

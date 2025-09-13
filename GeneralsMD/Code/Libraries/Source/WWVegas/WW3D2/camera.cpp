@@ -724,13 +724,13 @@ void CameraClass::Apply(void)
 	bool windowed;
 	WW3D::Get_Render_Target_Resolution(width,height,bits,windowed);
 	
-	D3DVIEWPORT8 vp;
-	vp.X = (DWORD)(Viewport.Min.X * (float)width);
-	vp.Y = (DWORD)(Viewport.Min.Y * (float)height);
-	vp.Width = (DWORD)((Viewport.Max.X - Viewport.Min.X) * (float)width);
-	vp.Height = (DWORD)((Viewport.Max.Y - Viewport.Min.Y) * (float)height);
-	vp.MinZ = ZBufferMin;
-	vp.MaxZ = ZBufferMax;
+	Rendering::Viewport vp;
+	vp.x = (DWORD)(Viewport.Min.X * (float)width);
+	vp.y = (DWORD)(Viewport.Min.Y * (float)height);
+	vp.w = (DWORD)((Viewport.Max.X - Viewport.Min.X) * (float)width);
+	vp.h = (DWORD)((Viewport.Max.Y - Viewport.Min.Y) * (float)height);
+	vp.min_depth = ZBufferMin;
+	vp.max_depth = ZBufferMax;
 	DX8Wrapper::Set_Viewport(&vp);
 
 	Matrix4x4 d3dprojection;

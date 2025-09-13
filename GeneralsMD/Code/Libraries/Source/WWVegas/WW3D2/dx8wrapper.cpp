@@ -1855,10 +1855,18 @@ void DX8Wrapper::Clear(bool clear_color, bool clear_z_stencil, const Vector3 &co
 	}
 }
 
-void DX8Wrapper::Set_Viewport(CONST D3DVIEWPORT8* pViewport)
+void DX8Wrapper::Set_Viewport(const Rendering::Viewport* pViewport)
 {
+	TheSDL3Wrapper.SetViewport(pViewport);
+	D3DVIEWPORT8 vp;
+	vp.X = pViewport->x;
+	vp.Y = pViewport->y;
+	vp.Width = pViewport->w;
+	vp.Height = pViewport->h;
+	vp.MinZ = pViewport->min_depth;
+	vp.MaxZ = pViewport->max_depth;
 	DX8_THREAD_ASSERT();
-	DX8CALL(SetViewport(pViewport));
+	DX8CALL(SetViewport(&vp));
 }
 
 // ----------------------------------------------------------------------------

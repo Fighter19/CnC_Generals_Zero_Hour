@@ -6,6 +6,8 @@
 #include "vector4.h"
 #include "matrix4.h"
 
+using namespace Rendering;
+
 extern SDL_Window* TheSDL3WindowVulkan;
 SDL_GPUDevice *SDLGPUDevice = NULL;
 SDL3Wrapper TheSDL3Wrapper;
@@ -212,6 +214,20 @@ void SDL3Wrapper::EndScene()
   SDL_EndGPURenderPass(CurrentGPUPass);
   SDL_SubmitGPUCommandBuffer(CurrentGPUCommandBuffer);
   CurrentGPUPass = NULL;
+}
+
+void SDL3Wrapper::SetViewport(const Viewport *pViewport)
+{
+  if (!pViewport)
+    return;
+
+  SDL_GPUViewport viewport;
+  viewport.x = pViewport->x;
+  viewport.y = pViewport->y;
+  viewport.w = pViewport->w;
+  viewport.h = pViewport->h;
+
+  SDL_SetGPUViewport(CurrentGPUPass, &viewport);
 }
 
 // Private functions

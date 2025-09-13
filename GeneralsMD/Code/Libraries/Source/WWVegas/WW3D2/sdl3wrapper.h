@@ -4,6 +4,7 @@
 
 #include "rect.h"
 
+namespace Rendering {
 // Implementation defined opaque types
 class ISurface
 {
@@ -17,6 +18,8 @@ public:
   virtual ~ITexture() = default;
 };
 
+typedef SDL_GPUViewport Viewport;
+
 class IRenderDevice
 {
 public:
@@ -28,6 +31,8 @@ public:
 
   virtual void BeginScene(void) = 0;
   virtual void EndScene(void) = 0;
+
+  virtual void SetViewport(const Viewport* pViewport) = 0;
 
   virtual std::unique_ptr<ISurface> CreateSurface(int width, int height, int format) = 0;
 };
@@ -41,6 +46,8 @@ public:
 
   void BeginScene(void) override;
   void EndScene(void) override;
+
+  void SetViewport(const Viewport* pViewport) override;
 
   std::unique_ptr<ISurface> CreateSurface(int width, int height, int format) override;
 
@@ -60,4 +67,6 @@ private:
   SDL_GPURenderPass *CurrentGPUPass = NULL;
 };
 
-extern SDL3Wrapper TheSDL3Wrapper;
+} // namespace Rendering
+
+extern Rendering::SDL3Wrapper TheSDL3Wrapper;

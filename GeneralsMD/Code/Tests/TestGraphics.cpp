@@ -264,9 +264,11 @@ int main(int argc, char **argv)
     bool bRunning = true;
     while (bRunning)
     {
+      // Start rendering with a green clear color
       WW3D::Begin_Render(true, true, Vector3(0.0f, 1.0f, 0.0f), 0.5f);
       TheDisplay->drawImage(&image, 0, 0, size.x, size.y);
-      TheDisplay->drawFillRect(200, 200, 64, 64, 0xFF000000);
+      // Color format is ARGB
+      TheDisplay->drawFillRect(200, 200, 64, 64, 0x7F0000FF);
       //TheDisplay->draw();
       WW3D::End_Render();
 
