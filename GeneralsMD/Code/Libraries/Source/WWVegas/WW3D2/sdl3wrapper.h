@@ -4,22 +4,75 @@
 
 #include "rect.h"
 #include "vector3.h"
+#include "texturefilter.h"
+#include "wwdebug.h"
+#include "ww3dformat.h"
 
 namespace Rendering {
-// Implementation defined opaque types
-class ISurface
+
+WWINLINE void CheckForError(bool hr)
 {
-public:
-  virtual ~ISurface() = default;
+  if (!hr)
+  {
+    WWDEBUG_SAY(("Rendering error!\n"));
+    WWASSERT(false);
+  }
+}
+
+typedef SDL_GPUViewport Viewport;
+
+struct LockedRect
+{
+  // Length of a line in bytes
+  unsigned int nPitch;
+  // Pointer to the locked data
+  void* pBits;
+};
+
+enum ResourceLocation
+{
+  // Determines the best location for the resource
+  // Prefers video memory if available
+  RESOURCE_LOCATION_UNSPECIFIED = 0,
+  RESOURCE_LOCATION_VIDEO_MEMORY,
+  RESOURCE_LOCATION_SYSTEM_MEMORY,
+};
+
+// These match the flags from SDL3
+enum TextureUsage
+{
+  TEXTUREUSAGE_SAMPLER = 1 << 0,
+  TEXTUREUSAGE_COLOR_TARGET = 1 << 1,
+  TEXTUREUSAGE_DEPTH_STENCIL_TARGET = 1 << 2,
+  TEXTUREUSAGE_GRAPHICS_STORAGE_READ = 1 << 3,
+  TEXTUREUSAGE_COMPUTE_STORAGE_READ = 1 << 4,
+  TEXTUREUSAGE_COMPUTE_STORAGE_WRITE = 1 << 5,
+  TEXTUREUSAGE_COMPUTE_STORAGE_SIMULTANEOUS_READ_WRITE = 1 << 6,
 };
 
 class ITexture
 {
 public:
   virtual ~ITexture() = default;
-};
 
-typedef SDL_GPUViewport Viewport;
+  /** Lock rectangle area of a texture to allow direct memory access.
+   * @param level Mipmap level to lock.
+   * @param pLockedRect Pointer to a LockedRect structure to receive the locked data.
+   * @param pRect Pointer to a RectClass structure that specifies the area to lock.
+   *             If NULL is passed, the entire level will be locked.
+   * @param flags Locking flags (e.g. read-only/don't upload after unlock)
+   */
+  virtual bool LockRect(unsigned int level, LockedRect *pLockedRect, const RectClass* pRect=NULL, unsigned int flags=0) = 0;
+  /** Unlock a previously locked texture level.
+   * @param level Mipmap level to unlock.
+   */
+  virtual void UnlockRect(unsigned int level) = 0;
+
+  /** Get the number of mipmap levels in the texture.
+   * @return Number of mipmap levels.
+   */
+  virtual int GetLevelCount() const = 0;
+};
 
 class IRenderDevice
 {
@@ -36,11 +89,23 @@ public:
   virtual void SetViewport(const Viewport* pViewport) = 0;
   virtual void Clear(bool clear_color, bool clear_z_stencil, const Vector3 &color, float dest_alpha, float z, unsigned int stencil) = 0;
 
-  virtual std::unique_ptr<ISurface> CreateSurface(int width, int height, int format) = 0;
+  /** Create a texture.
+   * @param width Width of the texture in pixels.
+   * @param height Height of the texture in pixels.
+   * @param mip_count Number of mipmap levels. Use MIP_LEVELS_ALL to generate full mipmap chain.
+   * @param usage Texture usage flags (see TextureUsage enum).
+   * @param format Texture format (see WW3DFormat enum).
+   * @param location Preferred resource location (see ResourceLocation enum).
+   * @return Pointer to the created texture, or nullptr if creation failed.
+   */
+  virtual std::unique_ptr<ITexture> CreateTexture(int width, int height, MipCountType mip_count, int usage, WW3DFormat format, ResourceLocation location) = 0;
 };
+
+class SDL3Texture;
 
 class SDL3Wrapper : public IRenderDevice
 {
+  friend SDL3Texture;
 public:
   bool Init(void *hwnd, bool lite = false) override;
   void Shutdown(void) override;
@@ -52,7 +117,7 @@ public:
   void SetViewport(const Viewport* pViewport) override;
   void Clear(bool clear_color, bool clear_z_stencil, const Vector3 &color, float dest_alpha = 0.0f, float z = 1.0f, unsigned int stencil = 0) override;
 
-  std::unique_ptr<ISurface> CreateSurface(int width, int height, int format) override;
+  std::unique_ptr<ITexture> CreateTexture(int width, int height, MipCountType mip_count, int usage, WW3DFormat format, ResourceLocation location) override;
 
 private:
   SDL_GPUShader *LoadDefaultShader(bool bIsVertex);
@@ -72,6 +137,8 @@ private:
   SDL_GPUBuffer *DefaultVertexBuffer = NULL;
   SDL_GPURenderPass *CurrentGPUPass = NULL;
 };
+
+Rendering::IRenderDevice* GetRenderDevice();
 
 } // namespace Rendering
 

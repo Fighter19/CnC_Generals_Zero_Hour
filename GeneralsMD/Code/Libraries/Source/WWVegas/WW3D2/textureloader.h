@@ -230,6 +230,7 @@ class TextureLoadTaskClass : public TextureLoadTaskListNodeClass
 
 		TextureBaseClass *	Peek_Texture				(void)				{ return Texture;			}
 		IDirect3DTexture8	*	Peek_D3D_Texture			(void)				{ return (IDirect3DTexture8*)D3DTexture;		}
+		Rendering::ITexture*	Peek_Rendering_Texture	(void)				{ return RenderingTexture.get();	}
 
 		void						Set_Type						(TaskType t)		{ Type		= t;			}
 		void						Set_Priority				(PriorityType p)	{ Priority	= p;			}
@@ -255,6 +256,7 @@ class TextureLoadTaskClass : public TextureLoadTaskListNodeClass
 		
 		TextureBaseClass*		Texture;
 		IDirect3DBaseTexture8*	D3DTexture;
+		std::unique_ptr<Rendering::ITexture>	RenderingTexture;
 		WW3DFormat				Format;
 
 		unsigned int			Width;
@@ -265,6 +267,9 @@ class TextureLoadTaskClass : public TextureLoadTaskListNodeClass
 
 		unsigned char *		LockedSurfacePtr[MIP_LEVELS_MAX];
 		unsigned	int			LockedSurfacePitch[MIP_LEVELS_MAX];
+
+		unsigned char *		LockedSurfacePtrNew[MIP_LEVELS_MAX];
+		unsigned	int			LockedSurfacePitchNew[MIP_LEVELS_MAX];
 
 		TaskType					Type;
 		PriorityType			Priority;

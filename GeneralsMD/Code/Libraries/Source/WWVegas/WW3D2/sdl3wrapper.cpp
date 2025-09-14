@@ -374,34 +374,148 @@ SDL_GPUGraphicsPipeline *SDL3Wrapper::CreateDefaultPipeline()
   return pPipeline;
 }
 
-class SDL3Surface: public ISurface
+class Rendering::SDL3Texture : public ITexture
 {
 public:
-  SDL3Surface(SDL_GPUTexture *texture) : texture(texture) {}
-  ~SDL3Surface() override
+  SDL3Texture(SDL_GPUTexture *texture, const SDL_GPUTextureCreateInfo &createInfo)
+    : texture(texture), createInfo(createInfo)
+  {
+
+  }
+
+  ~SDL3Texture() override
   {
     if (texture)
     {
       SDL_ReleaseGPUTexture(SDLGPUDevice, texture);
     }
+    if (m_pTransferBuffer)
+    {
+      SDL_ReleaseGPUTransferBuffer(SDLGPUDevice, m_pTransferBuffer);
+    }
   }
 
+  bool LockRect(unsigned int level, LockedRect *pLockedRect, const RectClass* pRect=NULL, unsigned int flags=0) override
+  {
+    *pLockedRect = {};
+
+    if (!texture)
+      return false;
+
+    // Get dimensions of the texture
+    Uint32 textureSizeBytes = SDL_CalculateGPUTextureFormatSize(createInfo.format, createInfo.width, createInfo.height, createInfo.layer_count_or_depth);
+
+    // Create a transfer buffer and map it
+    SDL_GPUTransferBufferCreateInfo transferBufferCreateInfo = {};
+    transferBufferCreateInfo.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+    transferBufferCreateInfo.size = textureSizeBytes;
+
+    transferBufferCreateInfo.props = 0;
+    m_pTransferBuffer = SDL_CreateGPUTransferBuffer(SDLGPUDevice, &transferBufferCreateInfo);
+    if (!m_pTransferBuffer)
+    {
+      WWDEBUG_SAY(("Failed to create transfer buffer for SDL GPU device: %s\n", SDL_GetError()));
+      return false;
+    }
+
+    // Map the transfer buffer
+    void *pBits = SDL_MapGPUTransferBuffer(SDLGPUDevice, m_pTransferBuffer, false);
+    if (!pBits)
+    {
+      WWDEBUG_SAY(("Failed to map transfer buffer for SDL GPU device: %s\n", SDL_GetError()));
+      SDL_ReleaseGPUTransferBuffer(SDLGPUDevice, m_pTransferBuffer);
+      return false;
+    }
+
+    pLockedRect->nPitch = textureSizeBytes / createInfo.height;
+    pLockedRect->pBits = pBits;
+
+    return true;
+  }
+
+  void UnlockRect(unsigned int level) override
+  {
+    if (!texture || !m_pTransferBuffer)
+      return;
+
+    SDL_GPUCopyPass *pCopyPass = SDL_BeginGPUCopyPass(TheSDL3Wrapper.CurrentGPUCommandBuffer);
+    if (!pCopyPass)
+    {
+      WWDEBUG_SAY(("Failed to begin GPU copy pass for SDL GPU device: %s\n", SDL_GetError()));
+      return;
+    }
+
+    SDL_GPUTransferBufferLocation srcLocation = {};
+    srcLocation.transfer_buffer = m_pTransferBuffer;
+    srcLocation.offset = 0;
+
+    SDL_GPUTextureTransferInfo transferInfo = {};
+    transferInfo.transfer_buffer = m_pTransferBuffer;
+    transferInfo.offset = 0;
+    transferInfo.pixels_per_row = createInfo.width;
+    transferInfo.rows_per_layer = createInfo.height;
+
+    SDL_GPUTextureRegion dstRegion = {};
+    dstRegion.texture = texture;
+    dstRegion.x = 0;
+    dstRegion.y = 0;
+    dstRegion.z = 0;
+    dstRegion.w = createInfo.width;
+    dstRegion.h = createInfo.height;
+    dstRegion.d = createInfo.layer_count_or_depth;
+    dstRegion.mip_level = level;
+
+    SDL_UploadToGPUTexture(pCopyPass, &transferInfo, &dstRegion, false);
+    SDL_EndGPUCopyPass(pCopyPass);
+    SDL_SubmitGPUCommandBuffer(TheSDL3Wrapper.CurrentGPUCommandBuffer);
+
+    SDL_ReleaseGPUTransferBuffer(SDLGPUDevice, m_pTransferBuffer);
+    m_pTransferBuffer = NULL;
+  }
+  int GetLevelCount() const override
+  {
+    return createInfo.num_levels;
+  }
 private:
-  SDL_GPUTexture *texture;
+  SDL_GPUTexture *texture = NULL;
+  SDL_GPUTextureCreateInfo createInfo;
+  SDL_GPUTransferBuffer *m_pTransferBuffer = NULL;
 };
 
-std::unique_ptr<ISurface> SDL3Wrapper::CreateSurface(int width, int height, int format)
+std::unique_ptr<ITexture> Rendering::SDL3Wrapper::CreateTexture(int width, int height, MipCountType mip_count, int usage, WW3DFormat format, ResourceLocation location)
 {
   SDL_GPUTextureCreateInfo textureCreateInfo = {};
   textureCreateInfo.type = SDL_GPU_TEXTURETYPE_2D;
+  // TODO: Convert WW3DFormat to SDL_GPUTextureFormat
+  //WWASSERT_PRINT(false, ("Not yet supported"));
+  //textureCreateInfo.format = static_cast<SDL_GPUTextureFormat>(format);
+  switch (format)
+  {
+    case WW3D_FORMAT_DXT5:
+      textureCreateInfo.format = SDL_GPU_TEXTUREFORMAT_BC3_RGBA_UNORM;
+      break;
+    default:
+      WWASSERT_PRINT(false, ("Unsupported texture format %d", format));
+      return nullptr;
+  }
+  if (usage == 0)
+  {
+    textureCreateInfo.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER;
+  }
+  textureCreateInfo.usage = usage;
   textureCreateInfo.width = width;
   textureCreateInfo.height = height;
-  // TODO: Convert WW3DFormat to SDL_GPUTextureFormat
-  WWASSERT_PRINT(false, ("Not yet supported"));
-  textureCreateInfo.format = static_cast<SDL_GPUTextureFormat>(format);
-  textureCreateInfo.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER;
-  textureCreateInfo.num_levels = 1; // No mipmaps for now
+  // For 2D textures, this specifies the layer count
+  textureCreateInfo.layer_count_or_depth = 1;
+  textureCreateInfo.num_levels = mip_count;
+  textureCreateInfo.sample_count = SDL_GPU_SAMPLECOUNT_1; // No MSAA for now
+
   textureCreateInfo.props = 0;
 
-  return std::make_unique<SDL3Surface>(SDL_CreateGPUTexture(SDLGPUDevice, &textureCreateInfo));
+  return std::make_unique<SDL3Texture>(SDL_CreateGPUTexture(SDLGPUDevice, &textureCreateInfo), textureCreateInfo);
+}
+
+Rendering::IRenderDevice *Rendering::GetRenderDevice()
+{
+  return &TheSDL3Wrapper;
 }

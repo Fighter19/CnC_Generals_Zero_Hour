@@ -1420,6 +1420,22 @@ bool TextureLoadTaskClass::Begin_Compressed_Load(void)
 #endif
 	);
 
+	RenderingTexture = Rendering::GetRenderDevice()->CreateTexture
+	(
+		reducedWidth,
+		reducedHeight,
+		(MipCountType)mip_level_count,
+		// Textures created here are never used as a render target
+		// This also wouldn't work, with formats such as DXT5/BC3
+		Rendering::TextureUsage::TEXTUREUSAGE_SAMPLER,
+		Format,
+#ifdef USE_MANAGED_TEXTURES
+		Rendering::RESOURCE_LOCATION_VIDEO_MEMORY
+#else
+		Rendering::RESOURCE_LOCATION_SYSTEM_MEMORY
+#endif
+	);
+
 	MipLevelCount = mip_level_count;
 
 	return true;
@@ -1682,6 +1698,14 @@ void TextureLoadTaskClass::Lock_Surfaces(void)
 		);
 		LockedSurfacePtr[i]		= (unsigned char *)locked_rect.pBits;
 		LockedSurfacePitch[i]	= locked_rect.Pitch;
+	}
+
+	for (unsigned int i = 0; i < MipLevelCount; ++i) 
+	{
+		Rendering::LockedRect lr;
+		Rendering::CheckForError(Peek_Rendering_Texture()->LockRect(i,&lr));
+		LockedSurfacePtrNew[i]		= (unsigned char *)lr.pBits;
+		LockedSurfacePitchNew[i]	= lr.nPitch;
 	}
 }
 
