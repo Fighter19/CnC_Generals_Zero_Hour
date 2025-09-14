@@ -56,6 +56,8 @@
 #include "vector3.h"
 #include "texturefilter.h"
 
+#include <memory>
+
 struct IDirect3DBaseTexture8;
 struct IDirect3DTexture8;
 struct IDirect3DCubeTexture8;
@@ -68,6 +70,10 @@ class TextureLoadTaskClass;
 class TextureClass;
 class CubeTextureClass;
 class VolumeTextureClass;
+
+namespace Rendering {
+	class ITexture;
+}
 
 class TextureBaseClass : public RefCountClass
 {
@@ -166,6 +172,10 @@ public:
 	IDirect3DBaseTexture8 *Peek_D3D_Base_Texture() const;
 	void Set_D3D_Base_Texture(IDirect3DBaseTexture8* tex);
 
+	// texture accessors (Rendering)
+	Rendering::ITexture* Peek_Rendering_Texture() const;
+	void Set_Rendering_Texture(std::unique_ptr<class Rendering::ITexture> tex);
+
 	PoolType Get_Pool() const { return Pool; }
 
 	bool Is_Missing_Texture();
@@ -184,6 +194,7 @@ public:
 
 	// Background texture loader will call this when texture has been loaded
 	virtual void Apply_New_Surface(IDirect3DBaseTexture8* tex, bool initialized, bool disable_auto_invalidation = false)=0;	// If the parameter is true, the texture will be flagged as initialised
+	virtual void Apply_New_Surface(std::unique_ptr<class Rendering::ITexture> tex, bool initialized, bool disable_auto_invalidation = false)=0;
 
 	MipCountType MipLevelCount;
 
@@ -211,6 +222,7 @@ protected:
 
 	void Load_Locked_Surface();
 	void Poke_Texture(IDirect3DBaseTexture8* tex) { D3DTexture = tex; }
+	void Poke_Texture(std::unique_ptr<class Rendering::ITexture> tex);
 
 	bool Initialized;
 
@@ -238,6 +250,8 @@ private:
 
 	// Direct3D texture object
 	IDirect3DBaseTexture8 *D3DTexture;
+	// Rendering engine texture object
+	std::unique_ptr<Rendering::ITexture> RenderingTexture;
 
 	// Name
 	StringClass Name;
@@ -328,6 +342,7 @@ public:
 
 	// Background texture loader will call this when texture has been loaded
 	virtual void Apply_New_Surface(IDirect3DBaseTexture8* tex, bool initialized, bool disable_auto_invalidation = false);	// If the parameter is true, the texture will be flagged as initialised
+	virtual void Apply_New_Surface(std::unique_ptr<class Rendering::ITexture> tex, bool initialized, bool disable_auto_invalidation = false);	// If the parameter is true, the texture will be flagged as initialised
 
 	// Get the surface of one of the mipmap levels (defaults to highest-resolution one)
 	SurfaceClass *Get_Surface_Level(unsigned int level = 0);
@@ -373,6 +388,7 @@ public:
 
 	// Background texture loader will call this when texture has been loaded
 	virtual void Apply_New_Surface(IDirect3DBaseTexture8* tex, bool initialized, bool disable_auto_invalidation = false);	// If the parameter is true, the texture will be flagged as initialised
+	virtual void Apply_New_Surface(std::unique_ptr<class Rendering::ITexture> tex, bool initialized, bool disable_auto_invalidation = false);	// If the parameter is true, the texture will be flagged as initialised
 
 	virtual void Apply(unsigned int stage);
 
@@ -422,6 +438,7 @@ public:
 	CubeTextureClass(IDirect3DBaseTexture8* d3d_texture);
 
 	virtual void Apply_New_Surface(IDirect3DBaseTexture8* tex, bool initialized, bool disable_auto_invalidation = false);	// If the parameter is true, the texture will be flagged as initialised
+	virtual void Apply_New_Surface(std::unique_ptr<class Rendering::ITexture> tex, bool initialized, bool disable_auto_invalidation = false);	// If the parameter is true, the texture will be flagged as initialised
 
 	virtual TexAssetType Get_Asset_Type() const { return TEX_CUBEMAP; }
 
@@ -468,6 +485,7 @@ public:
 	VolumeTextureClass(IDirect3DBaseTexture8* d3d_texture);
 
 	virtual void Apply_New_Surface(IDirect3DBaseTexture8* tex, bool initialized, bool disable_auto_invalidation = false);	// If the parameter is true, the texture will be flagged as initialised
+	virtual void Apply_New_Surface(std::unique_ptr<class Rendering::ITexture> tex, bool initialized, bool disable_auto_invalidation = false);	// If the parameter is true, the texture will be flagged as initialised
 
 	virtual TexAssetType Get_Asset_Type() const { return TEX_VOLUME; }
 

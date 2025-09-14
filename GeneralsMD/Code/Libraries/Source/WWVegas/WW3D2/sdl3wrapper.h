@@ -10,11 +10,11 @@
 
 namespace Rendering {
 
-WWINLINE void CheckForError(bool hr)
+WWINLINE void CheckForError(bool hr, char const* msg = nullptr)
 {
   if (!hr)
   {
-    WWDEBUG_SAY(("Rendering error!\n"));
+    WWDEBUG_SAY(("Rendering error! %s\n", msg ? msg : ""));
     WWASSERT(false);
   }
 }
@@ -27,6 +27,19 @@ struct LockedRect
   unsigned int nPitch;
   // Pointer to the locked data
   void* pBits;
+};
+
+/** Information about a certain Mip level of a texture. */
+struct LevelInfo
+{
+  union
+  {
+    WW3DFormat Format;
+    WW3DZFormat DepthStencilFormat;
+  };
+  int Width;
+  int Height;
+  int Depth; // For volume textures
 };
 
 enum ResourceLocation
@@ -66,12 +79,18 @@ public:
   /** Unlock a previously locked texture level.
    * @param level Mipmap level to unlock.
    */
-  virtual void UnlockRect(unsigned int level) = 0;
+  virtual bool UnlockRect(unsigned int level) = 0;
 
   /** Get the number of mipmap levels in the texture.
    * @return Number of mipmap levels.
    */
   virtual int GetLevelCount() const = 0;
+
+  /** Get information about a certain mip level of the texture.
+   * @param level Mipmap level to query.
+   * @return LevelInfo structure containing information about the specified level.
+   */
+  virtual bool GetLevelInfo(unsigned int level, LevelInfo& outInfo) const = 0;
 };
 
 class IRenderDevice
@@ -130,6 +149,7 @@ private:
   SDL_GPUGraphicsPipeline *DefaultPipeline = NULL;
 
   SDL_GPUCommandBuffer *CurrentGPUCommandBuffer = NULL;
+  SDL_GPUCommandBuffer *CurrentGPUCopyCommandBuffer = NULL;
 
   SDL_GPUColorTargetInfo ColorTargetInfo = {};
   SDL_GPUDepthStencilTargetInfo DepthStencilTargetInfo = {};

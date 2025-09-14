@@ -915,6 +915,9 @@ TextureLoadTaskClass::TextureLoadTaskClass()
 	for (int i = 0; i < MIP_LEVELS_MAX; ++i) {
 		LockedSurfacePtr[i]		= NULL;
 		LockedSurfacePitch[i]	= 0;
+
+		LockedSurfacePtrNew[i]		= NULL;
+		LockedSurfacePitchNew[i]	= 0;
 	}
 }
 
@@ -995,6 +998,7 @@ void TextureLoadTaskClass::Init(TextureBaseClass* tc, TaskType type, PriorityTyp
 	State				= STATE_NONE;
 
 	D3DTexture		= 0;
+	WWASSERT(!RenderingTexture);
 
 	TextureClass* tex=Texture->As_TextureClass();
 
@@ -1018,6 +1022,9 @@ void TextureLoadTaskClass::Init(TextureBaseClass* tc, TaskType type, PriorityTyp
 	{
 		LockedSurfacePtr[i]		= NULL;
 		LockedSurfacePitch[i]	= 0;
+
+		LockedSurfacePtrNew[i]		= NULL;
+		LockedSurfacePitchNew[i]	= 0;
 	}
 
 	switch (Type) 
@@ -1045,6 +1052,7 @@ void TextureLoadTaskClass::Deinit()
 
 	for (int i = 0; i < MIP_LEVELS_MAX; ++i) {
 		WWASSERT(LockedSurfacePtr[i] == NULL);
+		WWASSERT(LockedSurfacePtrNew[i] == NULL);
 	}
 
 	if (Texture) {
@@ -1178,12 +1186,16 @@ void TextureLoadTaskClass::Apply(bool initialize)
 	// Verify that none of the mip levels are locked
 	for (unsigned i=0;i<MipLevelCount;++i) {
 		WWASSERT(LockedSurfacePtr[i]==NULL);
+		WWASSERT(LockedSurfacePtrNew[i]==NULL);
 	}
 
 	Texture->Apply_New_Surface(D3DTexture, initialize);
+	Texture->Apply_New_Surface(std::move(RenderingTexture), initialize);
 
 	D3DTexture->Release();
 	D3DTexture = NULL;
+	// Not required for RenderingTexture, because it's a unique_ptr
+	// The move operator called above already set it to null.
 }
 
 static bool	Get_Texture_Information
@@ -1531,6 +1543,22 @@ bool TextureLoadTaskClass::Begin_Uncompressed_Load(void)
 #endif
 	);
 
+	RenderingTexture = Rendering::GetRenderDevice()->CreateTexture
+	(
+		reducedWidth,
+		reducedHeight,
+		(MipCountType)reducedMipCount,
+		// Textures created here are never used as a render target
+		// This also wouldn't work, with formats such as DXT5/BC3
+		Rendering::TextureUsage::TEXTUREUSAGE_SAMPLER,
+		Format,
+#ifdef USE_MANAGED_TEXTURES
+		Rendering::RESOURCE_LOCATION_VIDEO_MEMORY
+#else
+		Rendering::RESOURCE_LOCATION_SYSTEM_MEMORY
+#endif
+	);
+
 	return true;
 }
 
@@ -1700,6 +1728,7 @@ void TextureLoadTaskClass::Lock_Surfaces(void)
 		LockedSurfacePitch[i]	= locked_rect.Pitch;
 	}
 
+	WWASSERT_PRINT(RenderingTexture->GetLevelCount()==MipLevelCount,("New \"rendering\" texture has different number of mip levels than D3D texture!"));
 	for (unsigned int i = 0; i < MipLevelCount; ++i) 
 	{
 		Rendering::LockedRect lr;
@@ -1720,6 +1749,16 @@ void TextureLoadTaskClass::Unlock_Surfaces(void)
 			DX8_ErrorCode(Peek_D3D_Texture()->UnlockRect(i));
 		}
 		LockedSurfacePtr[i] = NULL;
+	}
+
+	for (unsigned int i = 0; i < MipLevelCount; ++i) 
+	{
+		if (LockedSurfacePtrNew[i]) 
+		{
+			WWASSERT(ThreadClass::_Get_Current_Thread_ID() == DX8Wrapper::_Get_Main_Thread_ID());
+			Rendering::CheckForError(Peek_Rendering_Texture()->UnlockRect(i), __FUNCTION__);
+		}
+		LockedSurfacePtrNew[i] = NULL;
 	}
 
 #ifndef USE_MANAGED_TEXTURES
@@ -1924,6 +1963,7 @@ unsigned char * TextureLoadTaskClass::Get_Locked_Surface_Ptr(unsigned int level)
 {
 	WWASSERT(level<MipLevelCount);
 	WWASSERT(LockedSurfacePtr[level]);
+	WWASSERT(LockedSurfacePtrNew[level]);
 	return LockedSurfacePtr[level];
 }
 
@@ -1939,6 +1979,7 @@ unsigned int TextureLoadTaskClass::Get_Locked_Surface_Pitch(unsigned int level) 
 {
 	WWASSERT(level<MipLevelCount);
 	WWASSERT(LockedSurfacePtr[level]);
+	WWASSERT(LockedSurfacePtrNew[level]);
 	return LockedSurfacePitch[level];
 }
 
@@ -2373,6 +2414,10 @@ VolumeTextureLoadTaskClass::VolumeTextureLoadTaskClass()
 		LockedSurfacePtr[i]			= NULL;
 		LockedSurfacePitch[i]		= 0;
 		LockedSurfaceSlicePitch[i]	= 0;
+
+		LockedSurfacePtrNew[i]		= NULL;
+		LockedSurfacePitchNew[i]	= 0;
+		LockedSurfaceSlicePitchNew[i]= 0;
 	}
 }
 
@@ -2424,6 +2469,10 @@ void VolumeTextureLoadTaskClass::Init(TextureBaseClass* tc, TaskType type, Prior
 		LockedSurfacePtr[i]			= NULL;
 		LockedSurfacePitch[i]		= 0;
 		LockedSurfaceSlicePitch[i]	= 0;
+
+		LockedSurfacePtrNew[i]		= NULL;
+		LockedSurfacePitchNew[i]	= 0;
+		LockedSurfaceSlicePitchNew[i]= 0;
 	}
 
 	switch (Type) 
@@ -2459,6 +2508,8 @@ void VolumeTextureLoadTaskClass::Lock_Surfaces()
 		LockedSurfacePitch[i]		= locked_box.RowPitch;
 		LockedSurfaceSlicePitch[i]	= locked_box.SlicePitch;
 	}
+
+	WWASSERT_PRINT(false, ("Volume textures not supported in rendering engine yet!\n"));
 }
 
 
@@ -2717,6 +2768,7 @@ unsigned char* VolumeTextureLoadTaskClass::Get_Locked_Volume_Pointer(unsigned in
 {
 	WWASSERT(level<MipLevelCount);
 	WWASSERT(LockedSurfacePtr[level]);
+	WWASSERT(LockedSurfacePtrNew[level]);
 	return LockedSurfacePtr[level];
 }
 
@@ -2724,6 +2776,7 @@ unsigned int VolumeTextureLoadTaskClass::Get_Locked_Volume_Row_Pitch(unsigned in
 {
 	WWASSERT(level<MipLevelCount);
 	WWASSERT(LockedSurfacePtr[level]);
+	WWASSERT(LockedSurfacePtrNew[level]);
 	return LockedSurfacePitch[level];
 }
 
@@ -2731,5 +2784,6 @@ unsigned int VolumeTextureLoadTaskClass::Get_Locked_Volume_Slice_Pitch(unsigned 
 {
 	WWASSERT(level<MipLevelCount);
 	WWASSERT(LockedSurfacePtr[level]);
+	WWASSERT(LockedSurfacePtrNew[level]);
 	return LockedSurfaceSlicePitch[level];
 }

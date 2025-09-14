@@ -280,6 +280,19 @@ void TextureBaseClass::Set_D3D_Base_Texture(IDirect3DBaseTexture8* tex)
 	}
 }
 
+Rendering::ITexture *TextureBaseClass::Peek_Rendering_Texture() const
+{
+  return RenderingTexture.get();
+}
+
+void TextureBaseClass::Set_Rendering_Texture(std::unique_ptr<class Rendering::ITexture> tex)
+{
+	// (gth) Generals does stuff directly with the D3DTexture pointer so let's
+	// reset the access timer whenever someone messes with this pointer.
+	LastAccessed=WW3D::Get_Sync_Time();
+
+	RenderingTexture = std::move(tex);
+}
 
 //**********************************************************************************************
 //! Load locked surface
@@ -294,6 +307,13 @@ void TextureBaseClass::Load_Locked_Surface()
 	Initialized=false;
 }
 
+void TextureBaseClass::Poke_Texture(std::unique_ptr<class Rendering::ITexture> tex)
+{
+	// This is the equivalent to Poke_Texture for D3D textures.
+	// However LastAccessed is not updated here.
+	// Consider using just "Set_Rendering_Texture" instead.
+	RenderingTexture = std::move(tex);
+}
 
 //**********************************************************************************************
 //! Is missing texture
@@ -924,6 +944,32 @@ void TextureClass::Apply_New_Surface
 
 }
 
+/** Moves ownership of the texture to this object. */
+void TextureClass::Apply_New_Surface
+(
+	std::unique_ptr<Rendering::ITexture> tex,
+	bool initialized,
+	bool disable_auto_invalidation
+)
+{
+	Poke_Texture(std::move(tex));
+
+	if (initialized) Initialized=true;
+	if (disable_auto_invalidation) InactivationTime = 0;
+
+	WWASSERT(Peek_Rendering_Texture());
+	Rendering::ITexture* texture=Peek_Rendering_Texture();
+
+	Rendering::LevelInfo info;
+	Rendering::CheckForError(texture->GetLevelInfo(0, info));
+	if (initialized) 
+	{
+		TextureFormat=info.Format;
+		Width=info.Width;
+		Height=info.Height;
+	}
+}
+
 
 //**********************************************************************************************
 //! Apply texture states
@@ -1304,6 +1350,27 @@ void ZTextureClass::Apply_New_Surface
 	surface->Release();
 }
 
+/** Moves ownership of the texture to this object. */
+void ZTextureClass::Apply_New_Surface(std::unique_ptr<class Rendering::ITexture> tex, bool initialized, bool disable_auto_invalidation)
+{
+	Poke_Texture(std::move(tex));
+
+	if (initialized) Initialized=true;
+	if (disable_auto_invalidation) InactivationTime = 0;
+
+	WWASSERT(Peek_Rendering_Texture());
+	Rendering::ITexture* texture=Peek_Rendering_Texture();
+
+	Rendering::LevelInfo info;
+	Rendering::CheckForError(texture->GetLevelInfo(0, info));
+	if (initialized) 
+	{
+		DepthStencilTextureFormat=info.DepthStencilFormat;
+		Width=info.Width;
+		Height=info.Height;
+	}
+}
+
 //**********************************************************************************************
 //! Get D3D surface from mip level
 /*! 
@@ -1621,6 +1688,27 @@ void CubeTextureClass::Apply_New_Surface
 	}
 }
 
+/** Moves ownership of the texture to this object. */
+void CubeTextureClass::Apply_New_Surface(std::unique_ptr<class Rendering::ITexture> tex, bool initialized, bool disable_auto_invalidation)
+{
+	Poke_Texture(std::move(tex));
+
+	if (initialized) Initialized=true;
+	if (disable_auto_invalidation) InactivationTime = 0;
+
+	WWASSERT(Peek_Rendering_Texture());
+	Rendering::ITexture* texture=Peek_Rendering_Texture();
+
+	Rendering::LevelInfo info;
+	Rendering::CheckForError(texture->GetLevelInfo(0, info));
+	if (initialized) 
+	{
+		TextureFormat=info.Format;
+		Width=info.Width;
+		Height=info.Height;
+	}
+}
+
 
 /*************************************************************************
 **                             VolumeTextureClass
@@ -1908,5 +1996,27 @@ void VolumeTextureClass::Apply_New_Surface
 		Width=d3d_desc.Width;
 		Height=d3d_desc.Height;
 		Depth=d3d_desc.Depth;
+	}
+}
+
+/** Moves ownership of the texture to this object. */
+void VolumeTextureClass::Apply_New_Surface(std::unique_ptr<class Rendering::ITexture> tex, bool initialized, bool disable_auto_invalidation)
+{
+	Poke_Texture(std::move(tex));
+
+	if (initialized) Initialized=true;
+	if (disable_auto_invalidation) InactivationTime = 0;
+
+	WWASSERT(Peek_Rendering_Texture());
+	Rendering::ITexture* texture=Peek_Rendering_Texture();
+
+	Rendering::LevelInfo info;
+	Rendering::CheckForError(texture->GetLevelInfo(0, info));
+	if (initialized) 
+	{
+		TextureFormat=info.Format;
+		Width=info.Width;
+		Height=info.Height;
+		Depth=info.Depth;
 	}
 }

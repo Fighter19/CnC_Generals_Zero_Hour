@@ -162,6 +162,7 @@ bool SDL3Wrapper::CreateDevice(void)
   SDL_UploadToGPUBuffer(pCopyPass, &srcLocation, &dstRegion, false);
   SDL_EndGPUCopyPass(pCopyPass);
   SDL_SubmitGPUCommandBuffer(CurrentGPUCommandBuffer);
+  CurrentGPUCommandBuffer = NULL;
 
   SDL_ReleaseGPUTransferBuffer(SDLGPUDevice, pTransferBuffer);
   // End of uploading a quad to the GPU
@@ -230,8 +231,9 @@ void SDL3Wrapper::BeginScene()
 void SDL3Wrapper::EndScene()
 {
   SDL_EndGPURenderPass(CurrentGPUPass);
-  SDL_SubmitGPUCommandBuffer(CurrentGPUCommandBuffer);
   CurrentGPUPass = NULL;
+  SDL_SubmitGPUCommandBuffer(CurrentGPUCommandBuffer);
+  CurrentGPUCommandBuffer = NULL;
 }
 
 void SDL3Wrapper::SetViewport(const Viewport *pViewport)
@@ -377,8 +379,8 @@ SDL_GPUGraphicsPipeline *SDL3Wrapper::CreateDefaultPipeline()
 class Rendering::SDL3Texture : public ITexture
 {
 public:
-  SDL3Texture(SDL_GPUTexture *texture, const SDL_GPUTextureCreateInfo &createInfo)
-    : texture(texture), createInfo(createInfo)
+  SDL3Texture(SDL_GPUTexture *texture, const SDL_GPUTextureCreateInfo &createInfo, WW3DFormat originalFormat)
+    : texture(texture), createInfo(createInfo), originalFormat(originalFormat)
   {
 
   }
@@ -389,9 +391,12 @@ public:
     {
       SDL_ReleaseGPUTexture(SDLGPUDevice, texture);
     }
-    if (m_pTransferBuffer)
+    for (unsigned int level = 0; level < createInfo.num_levels; ++level)
     {
-      SDL_ReleaseGPUTransferBuffer(SDLGPUDevice, m_pTransferBuffer);
+      if (m_pTransferBuffer[level])
+      {
+        SDL_ReleaseGPUTransferBuffer(SDLGPUDevice, m_pTransferBuffer[level]);
+      }
     }
   }
 
@@ -411,19 +416,20 @@ public:
     transferBufferCreateInfo.size = textureSizeBytes;
 
     transferBufferCreateInfo.props = 0;
-    m_pTransferBuffer = SDL_CreateGPUTransferBuffer(SDLGPUDevice, &transferBufferCreateInfo);
-    if (!m_pTransferBuffer)
+    SDL_GPUTransferBuffer *&pCurrentTransferBuffer = m_pTransferBuffer[level];
+    pCurrentTransferBuffer = SDL_CreateGPUTransferBuffer(SDLGPUDevice, &transferBufferCreateInfo);
+    if (!pCurrentTransferBuffer)
     {
       WWDEBUG_SAY(("Failed to create transfer buffer for SDL GPU device: %s\n", SDL_GetError()));
       return false;
     }
 
     // Map the transfer buffer
-    void *pBits = SDL_MapGPUTransferBuffer(SDLGPUDevice, m_pTransferBuffer, false);
+    void *pBits = SDL_MapGPUTransferBuffer(SDLGPUDevice, pCurrentTransferBuffer, false);
     if (!pBits)
     {
       WWDEBUG_SAY(("Failed to map transfer buffer for SDL GPU device: %s\n", SDL_GetError()));
-      SDL_ReleaseGPUTransferBuffer(SDLGPUDevice, m_pTransferBuffer);
+      SDL_ReleaseGPUTransferBuffer(SDLGPUDevice, pCurrentTransferBuffer);
       return false;
     }
 
@@ -433,24 +439,40 @@ public:
     return true;
   }
 
-  void UnlockRect(unsigned int level) override
+  bool UnlockRect(unsigned int level) override
   {
-    if (!texture || !m_pTransferBuffer)
-      return;
+    SDL_GPUTransferBuffer *&pCurrentTransferBuffer = m_pTransferBuffer[level];
+    if (!texture || !pCurrentTransferBuffer)
+      return false;
 
-    SDL_GPUCopyPass *pCopyPass = SDL_BeginGPUCopyPass(TheSDL3Wrapper.CurrentGPUCommandBuffer);
+    bool bCreatedCommandBuffer = false;
+    if (!TheSDL3Wrapper.CurrentGPUCopyCommandBuffer)
+    {
+      // While this is true, it's currently the simpler implementation
+      // WWDEBUG_SAY(("SDL3Texture::UnlockRect called without active command buffer\n"));
+      // WWDEBUG_SAY(("This is inefficient, try to unlock all textures at once\n"));
+      TheSDL3Wrapper.CurrentGPUCopyCommandBuffer = SDL_AcquireGPUCommandBuffer(SDLGPUDevice);
+      if (!TheSDL3Wrapper.CurrentGPUCopyCommandBuffer)
+      {
+        WWDEBUG_SAY(("Failed to acquire GPU command buffer for SDL3Texture::UnlockRect()\n"));
+        return false;
+      }
+      bCreatedCommandBuffer = true;
+    }
+
+    SDL_GPUCopyPass *pCopyPass = SDL_BeginGPUCopyPass(TheSDL3Wrapper.CurrentGPUCopyCommandBuffer);
     if (!pCopyPass)
     {
       WWDEBUG_SAY(("Failed to begin GPU copy pass for SDL GPU device: %s\n", SDL_GetError()));
-      return;
+      return false;
     }
 
     SDL_GPUTransferBufferLocation srcLocation = {};
-    srcLocation.transfer_buffer = m_pTransferBuffer;
+    srcLocation.transfer_buffer = pCurrentTransferBuffer;
     srcLocation.offset = 0;
 
     SDL_GPUTextureTransferInfo transferInfo = {};
-    transferInfo.transfer_buffer = m_pTransferBuffer;
+    transferInfo.transfer_buffer = pCurrentTransferBuffer;
     transferInfo.offset = 0;
     transferInfo.pixels_per_row = createInfo.width;
     transferInfo.rows_per_layer = createInfo.height;
@@ -460,26 +482,48 @@ public:
     dstRegion.x = 0;
     dstRegion.y = 0;
     dstRegion.z = 0;
-    dstRegion.w = createInfo.width;
-    dstRegion.h = createInfo.height;
+    dstRegion.w = createInfo.width >> level;
+    dstRegion.h = createInfo.height >> level;
     dstRegion.d = createInfo.layer_count_or_depth;
     dstRegion.mip_level = level;
 
     SDL_UploadToGPUTexture(pCopyPass, &transferInfo, &dstRegion, false);
     SDL_EndGPUCopyPass(pCopyPass);
-    SDL_SubmitGPUCommandBuffer(TheSDL3Wrapper.CurrentGPUCommandBuffer);
+    if (bCreatedCommandBuffer)
+    {
+      SDL_SubmitGPUCommandBuffer(TheSDL3Wrapper.CurrentGPUCopyCommandBuffer);
+      TheSDL3Wrapper.CurrentGPUCopyCommandBuffer = NULL;
+    }
 
-    SDL_ReleaseGPUTransferBuffer(SDLGPUDevice, m_pTransferBuffer);
-    m_pTransferBuffer = NULL;
+    SDL_ReleaseGPUTransferBuffer(SDLGPUDevice, pCurrentTransferBuffer);
+    pCurrentTransferBuffer = NULL;
+    return true;
   }
   int GetLevelCount() const override
   {
     return createInfo.num_levels;
   }
+  bool GetLevelInfo(unsigned int level, LevelInfo& info) const override
+  {
+    info = {};
+    if (level >= static_cast<unsigned int>(createInfo.num_levels))
+    {
+      WWDEBUG_SAY(("GetLevelInfo: Requested level %u out of range (max %u)\n", level, createInfo.num_levels - 1));
+      return false;
+    }
+    info.Format = originalFormat;
+    info.Width = createInfo.width >> level;
+    info.Height = createInfo.height >> level;
+    if (info.Width < 1) info.Width = 1;
+    if (info.Height < 1) info.Height = 1;
+    return true;
+  }
 private:
   SDL_GPUTexture *texture = NULL;
   SDL_GPUTextureCreateInfo createInfo;
-  SDL_GPUTransferBuffer *m_pTransferBuffer = NULL;
+  // This could be reduced in size, because most of the time only one mip level is locked at a time
+  SDL_GPUTransferBuffer *m_pTransferBuffer[MipCountType::MIP_LEVELS_MAX] = { NULL };
+  WW3DFormat originalFormat;
 };
 
 std::unique_ptr<ITexture> Rendering::SDL3Wrapper::CreateTexture(int width, int height, MipCountType mip_count, int usage, WW3DFormat format, ResourceLocation location)
@@ -493,6 +537,9 @@ std::unique_ptr<ITexture> Rendering::SDL3Wrapper::CreateTexture(int width, int h
   {
     case WW3D_FORMAT_DXT5:
       textureCreateInfo.format = SDL_GPU_TEXTUREFORMAT_BC3_RGBA_UNORM;
+      break;
+    case WW3D_FORMAT_X8R8G8B8:
+      textureCreateInfo.format = SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM;
       break;
     default:
       WWASSERT_PRINT(false, ("Unsupported texture format %d", format));
@@ -512,7 +559,7 @@ std::unique_ptr<ITexture> Rendering::SDL3Wrapper::CreateTexture(int width, int h
 
   textureCreateInfo.props = 0;
 
-  return std::make_unique<SDL3Texture>(SDL_CreateGPUTexture(SDLGPUDevice, &textureCreateInfo), textureCreateInfo);
+  return std::make_unique<SDL3Texture>(SDL_CreateGPUTexture(SDLGPUDevice, &textureCreateInfo), textureCreateInfo, format);
 }
 
 Rendering::IRenderDevice *Rendering::GetRenderDevice()

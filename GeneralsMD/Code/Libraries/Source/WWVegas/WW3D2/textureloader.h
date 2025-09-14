@@ -331,6 +331,7 @@ private:
 	IDirect3DVolumeTexture8*	Peek_D3D_Volume_Texture(void)				{ return (IDirect3DVolumeTexture8*)D3DTexture;		}
 
 	unsigned	int			LockedSurfaceSlicePitch[MIP_LEVELS_MAX];
+	unsigned	int			LockedSurfaceSlicePitchNew[MIP_LEVELS_MAX];
 
 	unsigned int		Depth;
 };
