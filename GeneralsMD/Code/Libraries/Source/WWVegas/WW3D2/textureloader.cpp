@@ -1793,6 +1793,10 @@ bool TextureLoadTaskClass::Load_Compressed_Mipmap(void)
 		}
 	}
 
+	// Backup values to use in "new" implementation
+	unsigned int width_new = width;
+	unsigned int height_new = height;
+
 	for (unsigned int level = 0; level < Get_Mip_Level_Count(); ++level) 
 	{
 		WWASSERT(width && height);
@@ -1805,6 +1809,26 @@ bool TextureLoadTaskClass::Load_Compressed_Mipmap(void)
 			Get_Locked_Surface_Ptr(level),
 			Get_Locked_Surface_Pitch(level),
 			HSVShift
+		);
+
+		width		>>= 1;
+		height	>>= 1;
+	}
+
+	width = width_new;
+	height = height_new;
+	for (unsigned int level = 0; level < Get_Mip_Level_Count(); ++level) 
+	{
+		WWASSERT(width && height);
+		dds_file.Copy_Level_To_Surface
+		(
+			level,
+			Get_Format(),
+			width,
+			height,
+			Get_Locked_Surface_PtrNew(level),
+			Get_Locked_Surface_PitchNew(level),
+			Vector3(0.0f,0.0f,0.0f)	//no HSV shift for second texture
 		);
 
 		width		>>= 1;
@@ -1922,6 +1946,10 @@ bool TextureLoadTaskClass::Load_Uncompressed_Mipmap(void)
 		delete [] destination_surface;
 	}
 
+	// Backup values to use in "new" implementation
+	unsigned int width_new = width;
+	unsigned int height_new = height;
+
 	for (unsigned int level = 0; level < Get_Mip_Level_Count(); ++level) {
 		WWASSERT(Get_Locked_Surface_Ptr(level));
 		BitmapHandlerClass::Copy_Image(
@@ -1929,6 +1957,37 @@ bool TextureLoadTaskClass::Load_Uncompressed_Mipmap(void)
 			width,
 			height,
 			Get_Locked_Surface_Pitch(level),
+			Get_Format(),
+			src_surface,
+			src_width,
+			src_height,
+			src_pitch,
+			src_format,
+			NULL,
+			0,
+			true,
+			hsv_shift);
+		hsv_shift=Vector3(0.0f,0.0f,0.0f);
+
+		width			>>= 1;
+		height		>>= 1;
+		src_width	>>= 1;
+		src_height	>>= 1;
+
+		if (!width || !height || !src_width || !src_height) {
+			break;
+		}
+	}
+
+	width = width_new;
+	height = height_new;
+	for (unsigned int level = 0; level < Get_Mip_Level_Count(); ++level) {
+		WWASSERT(Get_Locked_Surface_PtrNew(level));
+		BitmapHandlerClass::Copy_Image(
+			Get_Locked_Surface_PtrNew(level),
+			width,
+			height,
+			Get_Locked_Surface_PitchNew(level),
 			Get_Format(),
 			src_surface,
 			src_width,
@@ -1967,6 +2026,13 @@ unsigned char * TextureLoadTaskClass::Get_Locked_Surface_Ptr(unsigned int level)
 	return LockedSurfacePtr[level];
 }
 
+unsigned char *TextureLoadTaskClass::Get_Locked_Surface_PtrNew(unsigned int level)
+{
+	WWASSERT(level<MipLevelCount);
+	WWASSERT(LockedSurfacePtrNew[level]);
+  return LockedSurfacePtrNew[level];
+}
+
 // ----------------------------------------------------------------------------
 //
 // Return locked surface pitch (in bytes) at a specific level. The call will
@@ -1983,9 +2049,12 @@ unsigned int TextureLoadTaskClass::Get_Locked_Surface_Pitch(unsigned int level) 
 	return LockedSurfacePitch[level];
 }
 
-
-
-
+unsigned int TextureLoadTaskClass::Get_Locked_Surface_PitchNew(unsigned int level) const
+{
+	WWASSERT(level<MipLevelCount);
+	WWASSERT(LockedSurfacePtrNew[level]);
+	return LockedSurfacePitchNew[level];
+}
 
 // CubeTextureLoadTaskClass
 CubeTextureLoadTaskClass::CubeTextureLoadTaskClass()
@@ -2003,6 +2072,8 @@ CubeTextureLoadTaskClass::CubeTextureLoadTaskClass()
 			LockedCubeSurfacePitch[f][i]	= 0;
 		}
 	}
+
+	WWASSERT_PRINT(false, ("CubeTextureLoadTaskClass not implemented yet!"));
 }
 
 void CubeTextureLoadTaskClass::Destroy(void)
@@ -2015,6 +2086,7 @@ void CubeTextureLoadTaskClass::Destroy(void)
 
 void CubeTextureLoadTaskClass::Init(TextureBaseClass* tc, TaskType type, PriorityType priority)
 {
+	WWASSERT_PRINT(false, ("Cube textures not supported in rendering engine yet!\n"));
 	WWASSERT(tc);
 
 	// NOTE: we must be in the main thread to avoid corrupting the texture's refcount.
@@ -2268,6 +2340,25 @@ bool CubeTextureLoadTaskClass::Begin_Compressed_Load()
 #endif
 	);
 
+	WWASSERT_PRINT(false, ("CubeTextureLoadTaskClass::Begin_Compressed_Load not implemented yet!"));
+/*
+	RenderingTexture = Rendering::GetRenderDevice()->CreateCubeTexture
+	(
+		Width,
+		Height,
+		(MipCountType)mip_level_count,
+		// Textures created here are never used as a render target
+		// This also wouldn't work, with formats such as DXT5/BC3
+		Rendering::TextureUsage::TEXTUREUSAGE_SAMPLER,
+		Format,
+#ifdef USE_MANAGED_TEXTURES
+		Rendering::RESOURCE_LOCATION_VIDEO_MEMORY
+#else
+		Rendering::RESOURCE_LOCATION_SYSTEM_MEMORY
+#endif
+	);
+*/
+
 	MipLevelCount = mip_level_count;
 	return true;
 }
@@ -2337,6 +2428,25 @@ bool CubeTextureLoadTaskClass::Begin_Uncompressed_Load(void)
 #endif
 	);
 
+	WWASSERT_PRINT(false, ("CubeTextureLoadTaskClass::Begin_Uncompressed_Load not implemented yet!"));
+/*
+	RenderingTexture = Rendering::GetRenderDevice()->CreateCubeTexture
+	(
+		Width,
+		Height,
+		(MipCountType)mip_level_count,
+		// Textures created here are never used as a render target
+		// This also wouldn't work, with formats such as DXT5/BC3
+		Rendering::TextureUsage::TEXTUREUSAGE_SAMPLER,
+		Format,
+#ifdef USE_MANAGED_TEXTURES
+		Rendering::RESOURCE_LOCATION_VIDEO_MEMORY
+#else
+		Rendering::RESOURCE_LOCATION_SYSTEM_MEMORY
+#endif
+	);
+*/
+
 	return true;
 }
 
@@ -2378,6 +2488,8 @@ bool CubeTextureLoadTaskClass::Load_Compressed_Mipmap(void)
 		}
 	}
 
+	WWASSERT_PRINT(false, ("CubeTextureLoadTaskClass::Load_Compressed_Mipmap not implemented yet!"));
+
 	return true;
 }
 
@@ -2405,6 +2517,7 @@ unsigned int CubeTextureLoadTaskClass::Get_Locked_CubeMap_Surface_Pitch(unsigned
 VolumeTextureLoadTaskClass::VolumeTextureLoadTaskClass()
 :	TextureLoadTaskClass()
 {
+	WWASSERT_PRINT(false, ("Volume textures not supported in rendering engine yet!\n"));
 	// because texture load tasks are pooled, the constructor and destructor
 	// don't need to do much. The work of attaching a task to a texture is
 	// is done by Init() and Deinit().
@@ -2430,6 +2543,7 @@ void VolumeTextureLoadTaskClass::Destroy(void)
 
 void VolumeTextureLoadTaskClass::Init(TextureBaseClass* tc, TaskType type, PriorityType priority)
 {
+	WWASSERT_PRINT(false, ("Volume textures not supported in rendering engine yet!\n"));
 	WWASSERT(tc);
 
 	// NOTE: we must be in the main thread to avoid corrupting the texture's refcount.

@@ -225,9 +225,6 @@ class TextureLoadTaskClass : public TextureLoadTaskListNodeClass
 		unsigned int			Get_Mip_Level_Count		(void) const		{ return MipLevelCount; }
 		unsigned int			Get_Reduction				(void) const		{ return Reduction;		}
 
-		unsigned char *		Get_Locked_Surface_Ptr	(unsigned int level);
-		unsigned int			Get_Locked_Surface_Pitch(unsigned int level) const;
-
 		TextureBaseClass *	Peek_Texture				(void)				{ return Texture;			}
 		IDirect3DTexture8	*	Peek_D3D_Texture			(void)				{ return (IDirect3DTexture8*)D3DTexture;		}
 		Rendering::ITexture*	Peek_Rendering_Texture	(void)				{ return RenderingTexture.get();	}
@@ -253,6 +250,11 @@ class TextureLoadTaskClass : public TextureLoadTaskListNodeClass
 		virtual void			Unlock_Surfaces			(void);
 
 		void						Apply							(bool initialize);
+
+		unsigned char *		Get_Locked_Surface_Ptr	(unsigned int level);
+		unsigned char *		Get_Locked_Surface_PtrNew(unsigned int level);
+		unsigned int			Get_Locked_Surface_Pitch(unsigned int level) const;
+		unsigned int			Get_Locked_Surface_PitchNew(unsigned int level) const;
 		
 		TextureBaseClass*		Texture;
 		IDirect3DBaseTexture8*	D3DTexture;
