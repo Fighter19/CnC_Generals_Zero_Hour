@@ -1949,6 +1949,8 @@ bool TextureLoadTaskClass::Load_Uncompressed_Mipmap(void)
 	// Backup values to use in "new" implementation
 	unsigned int width_new = width;
 	unsigned int height_new = height;
+	unsigned int src_width_new = src_width;
+	unsigned int src_height_new = src_height;
 
 	for (unsigned int level = 0; level < Get_Mip_Level_Count(); ++level) {
 		WWASSERT(Get_Locked_Surface_Ptr(level));
@@ -1965,14 +1967,15 @@ bool TextureLoadTaskClass::Load_Uncompressed_Mipmap(void)
 			src_format,
 			NULL,
 			0,
-			true,
+			false, // <-- true seems like an optimization to operate on the smaller image for each level
 			hsv_shift);
 		hsv_shift=Vector3(0.0f,0.0f,0.0f);
 
 		width			>>= 1;
 		height		>>= 1;
-		src_width	>>= 1;
-		src_height	>>= 1;
+		// generate_mip_level modifies src_format in place and halfs the size
+		//src_width	>>= 1;
+		//src_height	>>= 1;
 
 		if (!width || !height || !src_width || !src_height) {
 			break;
@@ -1981,6 +1984,8 @@ bool TextureLoadTaskClass::Load_Uncompressed_Mipmap(void)
 
 	width = width_new;
 	height = height_new;
+	src_width = src_width_new;
+	src_height = src_height_new;
 	for (unsigned int level = 0; level < Get_Mip_Level_Count(); ++level) {
 		WWASSERT(Get_Locked_Surface_PtrNew(level));
 		BitmapHandlerClass::Copy_Image(
