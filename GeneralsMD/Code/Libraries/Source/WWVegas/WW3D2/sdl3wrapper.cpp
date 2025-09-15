@@ -16,6 +16,15 @@ using namespace Rendering;
   * Add support for resizing (recreating the depth stencil texture and properly updating the viewport)
 */
 
+// Check https://wiki.libsdl.org/SDL3/SDL_CreateGPUShader for the ids of resource sets:
+// Vertex shader resource sets:
+// 0: Sampled textures, then storage textures, then storage buffers
+// 1: Uniform buffers
+// Fragment shader resource sets:
+// 2: Sampled textures, then storage textures, then storage buffers
+// 3: Uniform buffers
+
+
 extern SDL_Window* TheSDL3WindowVulkan;
 SDL_GPUDevice *SDLGPUDevice = NULL;
 SDL3Wrapper TheSDL3Wrapper;
@@ -70,6 +79,8 @@ static SDL_GPUTexture *CreateDepthStencilTexture(Vector2i size)
   return depthTexture;
 }
 
+static SDL_GPUSampler *DefaultSampler = NULL;
+
 bool SDL3Wrapper::CreateDevice(void)
 {
   SDLGPUDevice = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV, false, NULL);
@@ -99,7 +110,7 @@ bool SDL3Wrapper::CreateDevice(void)
   // Create a default vertex buffer for rendering a viewport quad
   SDL_GPUBufferCreateInfo vertexBufferCreateInfo = {};
   vertexBufferCreateInfo.usage = SDL_GPU_BUFFERUSAGE_VERTEX;
-  vertexBufferCreateInfo.size = 4 * sizeof(float) * 8; // 4 vertices, each with 8 floats (x, y, z, w, r, g, b, a)
+  vertexBufferCreateInfo.size = 4 * sizeof(float) * 10; // 4 vertices, each with 10 floats (x, y, z, w, r, g, b, a, u, v)
   // vertexBufferCreateInfo.props = SDL_CreateProperties();
   DefaultVertexBuffer = SDL_CreateGPUBuffer(SDLGPUDevice, &vertexBufferCreateInfo);
 
@@ -108,7 +119,7 @@ bool SDL3Wrapper::CreateDevice(void)
   // Start of uploading a quad to the GPU
   SDL_GPUTransferBufferCreateInfo transferBufferCreateInfo = {};
   transferBufferCreateInfo.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
-  transferBufferCreateInfo.size = 4 * sizeof(float) * 8; // 4 vertices, each with 4 floats (x, y, z, w)
+  transferBufferCreateInfo.size = 4 * sizeof(float) * 10; // 4 vertices, each with 10 floats (x, y, z, w, r, g, b, a, u, v)
   SDL_GPUTransferBuffer *pTransferBuffer = SDL_CreateGPUTransferBuffer(SDLGPUDevice, &transferBufferCreateInfo);
   if (!pTransferBuffer)
   {
@@ -128,13 +139,16 @@ bool SDL3Wrapper::CreateDevice(void)
     return false;
   }
 
-    float quadVertices[] = {
-      // x, y, z, w, r, g, b, a
-      800, 600, 0.0, 1.0, 0.63, 0.63, 0.63, 1.0,
-      800, 0.0, 0.0, 1.0, 0.63, 0.63, 0.63, 1.0,
-      0.0, 600, 0.0, 1.0, 0.63, 0.63, 0.63, 1.0,
-      0.0, 0.0, 0.0, 1.0, 0.63, 0.63, 0.63, 1.0,
-    };
+  float quadVertices[] = {
+    // x, y, z, w, r, g, b, a, u, v
+    800, 600, 0.0, 1.0, 0.63, 0.63, 0.63, 1.0, 1.0, 1.0,
+    800, 0.0, 0.0, 1.0, 0.63, 0.63, 0.63, 1.0, 1.0, 0.0,
+    0.0, 600, 0.0, 1.0, 0.63, 0.63, 0.63, 1.0, 0.0, 1.0,
+    0.0, 0.0, 0.0, 1.0, 0.63, 0.63, 0.63, 1.0, 0.0, 0.0,
+  };
+
+  WWASSERT(transferBufferCreateInfo.size == vertexBufferCreateInfo.size);
+  WWASSERT(sizeof(quadVertices) == transferBufferCreateInfo.size);
 
   memcpy(data, quadVertices, sizeof(quadVertices));
   SDL_UnmapGPUTransferBuffer(SDLGPUDevice, pTransferBuffer);
@@ -156,8 +170,8 @@ bool SDL3Wrapper::CreateDevice(void)
   SDL_GPUBufferRegion dstRegion = {};
   dstRegion.buffer = DefaultVertexBuffer;
   dstRegion.offset = 0;
-  dstRegion.size = 4 * sizeof(float) * 8; // 4 vertices, each with 8 floats (x, y, z, w, r, g, b, a)
-  static_assert(4 * sizeof(float) * 8 == sizeof(quadVertices), "Size mismatch for quad vertices");
+  dstRegion.size = 4 * sizeof(float) * 10; // 4 vertices, each with 10 floats (x, y, z, w, r, g, b, a, u, v)
+  static_assert(4 * sizeof(float) * 10 == sizeof(quadVertices), "Size mismatch for quad vertices");
 
   SDL_UploadToGPUBuffer(pCopyPass, &srcLocation, &dstRegion, false);
   SDL_EndGPUCopyPass(pCopyPass);
@@ -170,8 +184,29 @@ bool SDL3Wrapper::CreateDevice(void)
   DefaultPipeline = CreateDefaultPipeline();
   DepthStencilTargetInfo.texture = CreateDepthStencilTexture(Vector2i(800, 600));
 
+  SDL_GPUSamplerCreateInfo samplerCreateInfo = {};
+  samplerCreateInfo.min_filter = SDL_GPU_FILTER_LINEAR;
+  samplerCreateInfo.mag_filter = SDL_GPU_FILTER_LINEAR;
+  samplerCreateInfo.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
+  samplerCreateInfo.address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+  samplerCreateInfo.address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+  samplerCreateInfo.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+  // samplerCreateInfo.mip_lod_bias = 0.0f;
+  // samplerCreateInfo.max_anisotropy = 0.0f;
+  // samplerCreateInfo.compare_op = SDL_GPU_COMPAREOP_NEVER;
+  // samplerCreateInfo.min_lod = 0.0f;
+  // samplerCreateInfo.max_lod = 0.0f;
+  samplerCreateInfo.enable_anisotropy = false;
+  samplerCreateInfo.enable_compare = false;
+
+  samplerCreateInfo.props = 0;
+  DefaultSampler = SDL_CreateGPUSampler(SDLGPUDevice, &samplerCreateInfo);
+
   return true;
 }
+
+// Temporary static, for testing. Last texture loaded
+static SDL_GPUTexture *s_TestTexture = NULL;
 
 void SDL3Wrapper::BeginScene()
 {
@@ -225,6 +260,13 @@ void SDL3Wrapper::BeginScene()
   vertexBinding.buffer = DefaultVertexBuffer;
   vertexBinding.offset = 0;
   SDL_BindGPUVertexBuffers(CurrentGPUPass, 0, &vertexBinding, 1);
+
+  SDL_GPUTextureSamplerBinding samplerBinding = {};
+  samplerBinding.texture = s_TestTexture; 
+  samplerBinding.sampler = DefaultSampler; // Use default sampler
+
+  //SDL_BindGPUVertexSamplers(CurrentGPUPass, SDL3WRAPPER_VERTEX_SAMPLER_TEXTURE0_BINDING, &samplerBinding, 1);
+  SDL_BindGPUFragmentSamplers(CurrentGPUPass, 0, &samplerBinding, 1);
   SDL_DrawGPUPrimitives(CurrentGPUPass, 4, 1, 0, 0);
 }
 
@@ -294,7 +336,7 @@ void Rendering::SDL3Wrapper::Clear(bool clear_color, bool clear_z_stencil, const
 SDL_GPUShader *SDL3Wrapper::LoadDefaultShader(bool bIsVertex)
 {
   SDL_GPUShaderCreateInfo createInfo;
-  createInfo.num_samplers = 0;
+  createInfo.num_samplers = 1;
   createInfo.num_uniform_buffers = 0;
   createInfo.num_storage_buffers = 0;
   createInfo.num_storage_textures = 0;
@@ -303,6 +345,10 @@ SDL_GPUShader *SDL3Wrapper::LoadDefaultShader(bool bIsVertex)
   if (bIsVertex)
   {
     // Used to pass window size
+
+    // If textures are ever required to be used in the vertex shader,
+    // for example for GPU skinning, this needs to be updated
+    createInfo.num_samplers = 0;
     createInfo.num_uniform_buffers = 1;
     createInfo.stage = SDL_GPU_SHADERSTAGE_VERTEX;
   }
@@ -342,12 +388,12 @@ SDL_GPUGraphicsPipeline *SDL3Wrapper::CreateDefaultPipeline()
   pipelineCreateInfo.target_info.color_target_descriptions = &colorTargetDescription;
 
   SDL_GPUVertexBufferDescription vertexBufferDescription = {};
-  vertexBufferDescription.pitch = 8 * sizeof(float); // 4 floats per vertex
+  vertexBufferDescription.pitch = 10 * sizeof(float); // size of one vertex
   vertexBufferDescription.slot = 0;
   vertexBufferDescription.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
   vertexBufferDescription.instance_step_rate = 0;
   
-  SDL_GPUVertexAttribute vertexAttributes[2] = {};
+  SDL_GPUVertexAttribute vertexAttributes[3] = {};
   vertexAttributes[0].location = 0; // Position
   vertexAttributes[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4;
   vertexAttributes[0].offset = 0;
@@ -358,10 +404,15 @@ SDL_GPUGraphicsPipeline *SDL3Wrapper::CreateDefaultPipeline()
   vertexAttributes[1].offset = 4 * sizeof(float); // After position
   vertexAttributes[1].buffer_slot = 0;
 
+  vertexAttributes[2].location = 4; // Texcoord0
+  vertexAttributes[2].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;
+  vertexAttributes[2].offset = 8 * sizeof(float); // After position and color
+  vertexAttributes[2].buffer_slot = 0;
+
   pipelineCreateInfo.vertex_input_state = {};
   pipelineCreateInfo.vertex_input_state.num_vertex_buffers = 1;
   pipelineCreateInfo.vertex_input_state.vertex_buffer_descriptions = &vertexBufferDescription;
-  pipelineCreateInfo.vertex_input_state.num_vertex_attributes = 2;
+  pipelineCreateInfo.vertex_input_state.num_vertex_attributes = 3;
   pipelineCreateInfo.vertex_input_state.vertex_attributes = vertexAttributes; 
 
   pipelineCreateInfo.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLESTRIP;
@@ -382,7 +433,7 @@ public:
   SDL3Texture(SDL_GPUTexture *texture, const SDL_GPUTextureCreateInfo &createInfo, WW3DFormat originalFormat)
     : texture(texture), createInfo(createInfo), originalFormat(originalFormat)
   {
-
+    s_TestTexture = texture;
   }
 
   ~SDL3Texture() override
