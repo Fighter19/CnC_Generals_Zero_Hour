@@ -1,12 +1,13 @@
 #include "sdl3wrapper.h"
 
-#include "default_shader.h"
-
 #include "wwdebug.h"
 #include "vector4.h"
 #include "matrix4.h"
 
 #include "vector2i.h"
+
+#include "simple2d_viewport.vert.h"
+#include "simple2d_textured.frag.h"
 
 using namespace Rendering;
 
@@ -351,10 +352,15 @@ SDL_GPUShader *SDL3Wrapper::LoadDefaultShader(bool bIsVertex)
     createInfo.num_samplers = 0;
     createInfo.num_uniform_buffers = 1;
     createInfo.stage = SDL_GPU_SHADERSTAGE_VERTEX;
-  }
 
-  createInfo.code = defaultShaderCode;
-  createInfo.code_size = sizeof(defaultShaderCode);
+    createInfo.code = simple2d_viewport_vert_spv;
+    createInfo.code_size = sizeof(simple2d_viewport_vert_spv);
+  }
+  else
+  {
+    createInfo.code = simple2d_textured_frag_spv;
+    createInfo.code_size = sizeof(simple2d_textured_frag_spv);
+  }
 
   return SDL_CreateGPUShader(SDLGPUDevice, &createInfo);
 }

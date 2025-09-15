@@ -96,3 +96,46 @@ if(WIN32)
         ${CMAKE_CURRENT_SOURCE_DIR}/Source/Win32Device/GameClient/Win32Mouse.cpp
     )
 endif()
+
+set(SHADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Source/W3DDevice/GameClient/Shaders)
+set(SHADER_OUTPUT_DIR ${CMAKE_BINARY_DIR}/shaders)
+
+file(MAKE_DIRECTORY ${SHADER_OUTPUT_DIR})
+
+set(SHADERS
+    shadow.vert.glsl
+    shadow.frag.glsl
+    simple2d_viewport.vert.glsl
+    simple2d_textured.frag.glsl
+)
+
+set(SPIRV_SHADERS)
+set(SPIRV_SHADERS_HEADERS)
+
+foreach(SHADER ${SHADERS})
+    string(REPLACE ".glsl" ".spv" SPIRV_NAME ${SHADER})
+    set(SPIRV_OUT ${SHADER_OUTPUT_DIR}/${SPIRV_NAME})
+    add_custom_command(
+        OUTPUT ${SPIRV_OUT}
+        COMMAND glslang -V ${SHADER_DIR}/${SHADER} -o ${SPIRV_OUT}
+        DEPENDS ${SHADER_DIR}/${SHADER}
+        COMMENT "Compiling GLSL shader ${SHADER} to SPIR-V"
+        VERBATIM
+    )
+    list(APPEND SPIRV_SHADERS ${SPIRV_OUT})
+    # Also generate header files for embedding shaders
+    string(REPLACE ".glsl" ".h" HEADER_NAME ${SHADER})
+    set(HEADER_OUT ${SHADER_OUTPUT_DIR}/${HEADER_NAME})
+    add_custom_command(
+        OUTPUT ${HEADER_OUT}
+        WORKING_DIRECTORY ${SHADER_OUTPUT_DIR}
+        COMMAND xxd -i ${SPIRV_NAME} > ${HEADER_OUT}
+        DEPENDS ${SPIRV_OUT}
+        COMMENT "Generating header file ${HEADER_NAME} from SPIR-V shader"
+        VERBATIM
+    )
+    list(APPEND SPIRV_SHADERS_HEADERS ${HEADER_OUT})
+endforeach()
+
+add_custom_target(ShadersSPV ALL DEPENDS ${SPIRV_SHADERS} ${SPIRV_SHADERS_HEADERS})
+add_dependencies(GameEngineDevice ShadersSPV)

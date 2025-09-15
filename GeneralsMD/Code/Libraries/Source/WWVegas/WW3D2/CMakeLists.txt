@@ -33,3 +33,6 @@ if(SAGE_USE_FONTCONFIG)
     )
     target_compile_definitions(WW3D2 PUBLIC -DSAGE_USE_FONTCONFIG)
 endif()
+
+# Add include directory to shaders for sdl3wrapper.cpp
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/sdl3wrapper.cpp PROPERTIES INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/shaders")
