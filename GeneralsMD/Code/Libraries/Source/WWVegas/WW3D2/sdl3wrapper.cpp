@@ -9,7 +9,11 @@
 #include "simple2d_viewport.vert.h"
 #include "simple2d_textured.frag.h"
 
-using namespace Rendering;
+#include <vector>
+
+extern SDL_Window* TheSDL3WindowVulkan;
+
+namespace Rendering {
 
 /* TODOs:
 
@@ -26,9 +30,7 @@ using namespace Rendering;
 // 3: Uniform buffers
 
 
-extern SDL_Window* TheSDL3WindowVulkan;
-SDL_GPUDevice *SDLGPUDevice = NULL;
-SDL3Wrapper TheSDL3Wrapper;
+static SDL_GPUDevice *SDLGPUDevice = NULL;
 
 struct D3D9FixedFunctionVS
 {
@@ -40,6 +42,55 @@ struct D3D9FixedFunctionVS
   Vector4 ViewportInfo_InverseOffset;
   Vector4 ViewportInfo_InverseExtent;
 };
+
+class SDL3Texture;
+
+class SDL3Wrapper : public IRenderDevice
+{
+  friend SDL3Texture;
+public:
+  bool Init(void *hwnd, bool lite = false) override;
+  void Shutdown(void) override;
+  bool CreateDevice(void) override;
+
+  void BeginScene(void) override;
+  void EndScene(void) override;
+
+  void SetViewport(const Viewport* pViewport) override;
+  void Clear(bool clear_color, bool clear_z_stencil, const Vector3 &color, float dest_alpha = 0.0f, float z = 1.0f, unsigned int stencil = 0) override;
+
+  std::unique_ptr<ITexture> CreateTexture(int width, int height, MipCountType mip_count, int usage, WW3DFormat format, ResourceLocation location) override;
+
+  void GetTransform(TransformType type, Matrix4x4 &matrix) override;
+
+private:
+  SDL_GPUShader *LoadDefaultShader(bool bIsVertex);
+
+  SDL_GPUGraphicsPipeline *CreateDefaultPipeline();
+
+
+  //SDL_GPUShader *DefaultFragmentShader = NULL;
+  //SDL_GPUShader *DefaultVertexShader = NULL;
+  SDL_GPUGraphicsPipeline *DefaultPipeline = NULL;
+
+  SDL_GPUCommandBuffer *CurrentGPUCommandBuffer = NULL;
+  SDL_GPUCommandBuffer *CurrentGPUCopyCommandBuffer = NULL;
+
+  SDL_GPUColorTargetInfo ColorTargetInfo = {};
+  SDL_GPUDepthStencilTargetInfo DepthStencilTargetInfo = {};
+
+  SDL_GPUBuffer *DefaultVertexBuffer = NULL;
+  SDL_GPURenderPass *CurrentGPUPass = NULL;
+
+  std::vector<Matrix4x4> TransformMatrices;
+};
+
+static SDL3Wrapper TheSDL3Wrapper;
+
+Rendering::IRenderDevice *GetRenderDevice()
+{
+  return &TheSDL3Wrapper;
+}
 
 bool SDL3Wrapper::Init(void *hwnd, bool lite)
 {
@@ -433,7 +484,7 @@ SDL_GPUGraphicsPipeline *SDL3Wrapper::CreateDefaultPipeline()
   return pPipeline;
 }
 
-class Rendering::SDL3Texture : public ITexture
+class SDL3Texture : public ITexture
 {
 public:
   SDL3Texture(SDL_GPUTexture *texture, const SDL_GPUTextureCreateInfo &createInfo, WW3DFormat originalFormat)
@@ -619,7 +670,8 @@ std::unique_ptr<ITexture> Rendering::SDL3Wrapper::CreateTexture(int width, int h
   return std::make_unique<SDL3Texture>(SDL_CreateGPUTexture(SDLGPUDevice, &textureCreateInfo), textureCreateInfo, format);
 }
 
-Rendering::IRenderDevice *Rendering::GetRenderDevice()
+void SDL3Wrapper::GetTransform(TransformType type, Matrix4x4 &matrix)
 {
-  return &TheSDL3Wrapper;
+  matrix = TransformMatrices[type];
 }
+} // namespace Rendering

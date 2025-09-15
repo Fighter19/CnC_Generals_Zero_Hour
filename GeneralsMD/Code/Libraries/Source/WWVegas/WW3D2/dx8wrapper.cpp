@@ -289,7 +289,7 @@ bool DX8Wrapper::Init(void * hwnd, bool lite)
 
 	D3DInterface = NULL;
 	D3DDevice = NULL;
-	TheSDL3Wrapper.Init(hwnd, lite);
+	Rendering::GetRenderDevice()->Init(hwnd, lite);
 
 	WWDEBUG_SAY(("Reset DX8Wrapper statistics\n"));
 	Reset_Statistics();
@@ -337,7 +337,7 @@ void DX8Wrapper::Shutdown(void)
 		Release_Device();
 	}
 
-	TheSDL3Wrapper.Shutdown();
+	Rendering::GetRenderDevice()->Shutdown();
 
 	if (D3DInterface) {
 		D3DInterface->Release();
@@ -619,7 +619,7 @@ bool DX8Wrapper::Create_Device(void)
 		}
 	}
 
-	TheSDL3Wrapper.CreateDevice();
+	Rendering::GetRenderDevice()->CreateDevice();
 
 	/*
 	** Initialize all subsystems
@@ -1698,7 +1698,7 @@ void DX8Wrapper::Begin_Scene(void)
 #endif
 	
 	DX8CALL(BeginScene());
-	TheSDL3Wrapper.BeginScene();
+	Rendering::GetRenderDevice()->BeginScene();
 
 	DX8WebBrowser::Update();
 }
@@ -1749,7 +1749,7 @@ void DX8Wrapper::End_Scene(bool flip_frames)
 		}
 	}
 
-	TheSDL3Wrapper.EndScene();
+	Rendering::GetRenderDevice()->EndScene();
 
 	// Each frame, release all of the buffers and textures.
 	Set_Vertex_Buffer(NULL);
@@ -1817,7 +1817,7 @@ void DX8Wrapper::Flip_To_Primary(void)
 */
 void DX8Wrapper::Clear(bool clear_color, bool clear_z_stencil, const Vector3 &color, float dest_alpha, float z, unsigned int stencil)
 {
-	TheSDL3Wrapper.Clear(clear_color, clear_z_stencil, color, dest_alpha, z, stencil);
+	Rendering::GetRenderDevice()->Clear(clear_color, clear_z_stencil, color, dest_alpha, z, stencil);
 	DX8_THREAD_ASSERT();
 
 	// If we try to clear a stencil buffer which is not there, the entire call will fail
@@ -1858,7 +1858,7 @@ void DX8Wrapper::Clear(bool clear_color, bool clear_z_stencil, const Vector3 &co
 
 void DX8Wrapper::Set_Viewport(const Rendering::Viewport* pViewport)
 {
-	TheSDL3Wrapper.SetViewport(pViewport);
+	Rendering::GetRenderDevice()->SetViewport(pViewport);
 	D3DVIEWPORT8 vp;
 	vp.X = pViewport->x;
 	vp.Y = pViewport->y;

@@ -4,6 +4,7 @@
 
 #include "rect.h"
 #include "vector3.h"
+#include "matrix4.h"
 #include "texturefilter.h"
 #include "wwdebug.h"
 #include "ww3dformat.h"
@@ -49,6 +50,22 @@ enum ResourceLocation
   RESOURCE_LOCATION_UNSPECIFIED = 0,
   RESOURCE_LOCATION_VIDEO_MEMORY,
   RESOURCE_LOCATION_SYSTEM_MEMORY,
+};
+
+enum TransformType
+{
+  TRANSFORM_TYPE_WORLD,
+  TRANSFORM_TYPE_VIEW,
+  TRANSFORM_TYPE_PROJECTION,
+
+  TRANSFORM_TYPE_TEXTURE0,
+  TRANSFORM_TYPE_TEXTURE1,
+  TRANSFORM_TYPE_TEXTURE2,
+  TRANSFORM_TYPE_TEXTURE3,
+  TRANSFORM_TYPE_TEXTURE4,
+  TRANSFORM_TYPE_TEXTURE5,
+  TRANSFORM_TYPE_TEXTURE6,
+  TRANSFORM_TYPE_TEXTURE7,
 };
 
 // These match the flags from SDL3
@@ -118,48 +135,10 @@ public:
    * @return Pointer to the created texture, or nullptr if creation failed.
    */
   virtual std::unique_ptr<ITexture> CreateTexture(int width, int height, MipCountType mip_count, int usage, WW3DFormat format, ResourceLocation location) = 0;
-};
 
-class SDL3Texture;
-
-class SDL3Wrapper : public IRenderDevice
-{
-  friend SDL3Texture;
-public:
-  bool Init(void *hwnd, bool lite = false) override;
-  void Shutdown(void) override;
-  bool CreateDevice(void) override;
-
-  void BeginScene(void) override;
-  void EndScene(void) override;
-
-  void SetViewport(const Viewport* pViewport) override;
-  void Clear(bool clear_color, bool clear_z_stencil, const Vector3 &color, float dest_alpha = 0.0f, float z = 1.0f, unsigned int stencil = 0) override;
-
-  std::unique_ptr<ITexture> CreateTexture(int width, int height, MipCountType mip_count, int usage, WW3DFormat format, ResourceLocation location) override;
-
-private:
-  SDL_GPUShader *LoadDefaultShader(bool bIsVertex);
-
-  SDL_GPUGraphicsPipeline *CreateDefaultPipeline();
-
-
-  //SDL_GPUShader *DefaultFragmentShader = NULL;
-  //SDL_GPUShader *DefaultVertexShader = NULL;
-  SDL_GPUGraphicsPipeline *DefaultPipeline = NULL;
-
-  SDL_GPUCommandBuffer *CurrentGPUCommandBuffer = NULL;
-  SDL_GPUCommandBuffer *CurrentGPUCopyCommandBuffer = NULL;
-
-  SDL_GPUColorTargetInfo ColorTargetInfo = {};
-  SDL_GPUDepthStencilTargetInfo DepthStencilTargetInfo = {};
-
-  SDL_GPUBuffer *DefaultVertexBuffer = NULL;
-  SDL_GPURenderPass *CurrentGPUPass = NULL;
+  virtual void GetTransform(TransformType type, Matrix4x4 &matrix) = 0;
 };
 
 Rendering::IRenderDevice* GetRenderDevice();
 
 } // namespace Rendering
-
-extern Rendering::SDL3Wrapper TheSDL3Wrapper;
