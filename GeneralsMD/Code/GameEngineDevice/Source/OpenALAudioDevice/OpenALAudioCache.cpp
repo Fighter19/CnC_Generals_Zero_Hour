@@ -271,7 +271,7 @@ Bool OpenALAudioFileCache::freeEnoughSpaceForSample(const OpenAudioFile& sampleT
 	if (runningTotal < spaceRequired) {
 		for (it = m_openFiles.begin(); it != m_openFiles.end(); ++it) {
 			if (it->second.m_openCount > 0) {
-				if (it->second.m_eventInfo->m_priority < sampleThatNeedsSpace.m_eventInfo->m_priority) {
+				if (it->second.m_eventInfo != NULL && it->second.m_eventInfo->m_priority < sampleThatNeedsSpace.m_eventInfo->m_priority) {
 					filesToClose.push_back(it->first);
 					runningTotal += it->second.m_fileSize;
 
