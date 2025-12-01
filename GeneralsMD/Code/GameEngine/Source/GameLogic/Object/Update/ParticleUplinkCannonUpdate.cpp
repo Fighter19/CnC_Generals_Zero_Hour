@@ -577,7 +577,7 @@ UpdateSleepTime ParticleUplinkCannonUpdate::update()
 					if( m_scriptedWaypointMode )
 					{
 						Waypoint *way = TheTerrainLogic->getWaypointByID( m_nextDestWaypointID );
-						if( way )
+						if( way && way->getNumLinks() )
 						{
 							//Advance to the next waypoint.
 							Int linkCount = way->getNumLinks();
