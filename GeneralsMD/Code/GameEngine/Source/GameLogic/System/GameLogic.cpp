@@ -3878,6 +3878,11 @@ void GameLogic::addObjectToLookupTable( Object *obj )
 	// add to lookup
 //	m_objHash[ obj->getID() ] = obj;
 	ObjectID newID = obj->getID();
+
+	if (newID == INVALID_ID) {
+		return;
+	}
+
 	while( newID >= m_objVector.size() ) // Fail case is hella rare, so faster to double up on size() call
 		m_objVector.resize(m_objVector.size() * 2, NULL);
 
@@ -3897,7 +3902,15 @@ void GameLogic::removeObjectFromLookupTable( Object *obj )
 
 	// remove from lookup table
 //	m_objHash.erase( obj->getID() );
-	m_objVector[ obj->getID() ] = NULL;
+	ObjectID id = obj->getID();
+
+	if (id == INVALID_ID) {
+		return;
+	}
+
+	if (id < m_objVector.size() && m_objVector[ id ] == obj) {
+		m_objVector[ id ] = NULL;
+	}
 
 }  // end removeObjectFromLookupTable
 
