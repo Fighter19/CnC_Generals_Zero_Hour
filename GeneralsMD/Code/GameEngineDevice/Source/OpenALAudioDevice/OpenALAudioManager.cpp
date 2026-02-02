@@ -444,6 +444,8 @@ void OpenALAudioManager::audioDebugDisplay(DebugDisplayInterface* dd, void*, FIL
 }
 #endif
 
+#ifdef AL_API_NOEXCEPT17
+
 // Debug callback for OpenAL errors
 static void AL_APIENTRY debugCallbackAL(ALenum source, ALenum type, ALuint id,
 	ALenum severity, ALsizei length, const ALchar* message, void* userParam ) AL_API_NOEXCEPT17
@@ -465,6 +467,7 @@ static void AL_APIENTRY debugCallbackAL(ALenum source, ALenum type, ALuint id,
 	}
 
 }
+#endif
 
 ALenum OpenALAudioManager::getALFormat(uint8_t channels, uint8_t bitsPerSample)
 {
@@ -787,11 +790,17 @@ void OpenALAudioManager::playAudioEvent(AudioEventRTS* event)
 
 				DEBUG_LOG(("Received audio frame\n"));
 
+#if LIBAVCODEC_VERSION_MAJOR < 61
+				const int channels = frame->channels;
+#else
+				const int channels = frame->ch_layout.nb_channels;
+#endif
+
 				AVSampleFormat sampleFmt = static_cast<AVSampleFormat>(frame->format);
 				const int bytesPerSample = av_get_bytes_per_sample(sampleFmt);
-				ALenum format = OpenALAudioManager::getALFormat(frame->ch_layout.nb_channels, bytesPerSample * 8);
+				ALenum format = OpenALAudioManager::getALFormat(channels, bytesPerSample * 8);
 				const int frameSize =
-					av_samples_get_buffer_size(NULL, frame->ch_layout.nb_channels, frame->nb_samples, sampleFmt, 1);
+					av_samples_get_buffer_size(NULL, channels, frame->nb_samples, sampleFmt, 1);
 				uint8_t* frameData = frame->data[0];
 
 				// We need to interleave the samples if the format is planar
@@ -802,9 +811,9 @@ void OpenALAudioManager::playAudioEvent(AudioEventRTS* event)
 					for (int sample_idx = 0; sample_idx < frame->nb_samples; sample_idx++)
 					{
 						int byte_offset = sample_idx * bytesPerSample;
-						for (int channel_idx = 0; channel_idx < frame->ch_layout.nb_channels; channel_idx++)
+						for (int channel_idx = 0; channel_idx < channels; channel_idx++)
 						{
-							uint8_t* dst = &audioBuffer[byte_offset * frame->ch_layout.nb_channels + channel_idx * bytesPerSample];
+							uint8_t* dst = &audioBuffer[byte_offset * channels + channel_idx * bytesPerSample];
 							uint8_t* src = &frame->data[channel_idx][byte_offset];
 							memcpy(dst, src, bytesPerSample);
 						}
@@ -1528,12 +1537,14 @@ void OpenALAudioManager::openDevice(void)
 		return;
 	}
 
+#ifdef AL_API_NOEXCEPT17
 	if (alcIsExtensionPresent(m_alcDevice, "ALC_EXT_debug")) {
 		auto alDebugMessageCallbackEXT = LPALDEBUGMESSAGECALLBACKEXT{};
 		LOAD_ALC_PROC(alDebugMessageCallbackEXT);
 		alEnable(AL_DEBUG_OUTPUT_EXT);
 		alDebugMessageCallbackEXT(debugCallbackAL, nullptr);
 	}
+#endif
 
 	selectProvider(TheAudio->getProviderIndex(m_pref3DProvider));
 

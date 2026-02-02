@@ -297,7 +297,7 @@ bool DX8Wrapper::Init(void * hwnd, bool lite)
 	#ifdef _WIN32
 		D3D8Lib = LoadLibrary("D3D8.DLL");
 	#else
-		D3D8Lib = LoadLibrary("libdxvk_d3d8.so");
+		D3D8Lib = LoadLibrary("libd3d8-native.so");
 	#endif
 
 		if (D3D8Lib == NULL) return false;	// Return false at this point if init failed

@@ -368,8 +368,13 @@ void FFmpegVideoStream::onFrame(AVFrame *frame, int stream_idx, int stream_type,
         audioStream->update();
         AVSampleFormat sampleFmt = static_cast<AVSampleFormat>(frame->format);
         const int bytesPerSample = av_get_bytes_per_sample(sampleFmt);
+#if LIBAVCODEC_VERSION_MAJOR < 61
+        const int channels = frame->channels;
+#else
+        const int channels = frame->ch_layout.nb_channels;
+#endif
         const int frameSize =
-            av_samples_get_buffer_size(NULL, frame->ch_layout.nb_channels, frame->nb_samples, sampleFmt, 1);
+            av_samples_get_buffer_size(NULL, channels, frame->nb_samples, sampleFmt, 1);
         uint8_t* frameData = frame->data[0];
         // The format is planar - convert it to interleaved
         if (av_sample_fmt_is_planar(sampleFmt))
@@ -385,11 +390,11 @@ void FFmpegVideoStream::onFrame(AVFrame *frame, int stream_idx, int stream_type,
             for (int sample_idx = 0; sample_idx < frame->nb_samples; sample_idx++)
             {
                 int byte_offset = sample_idx * bytesPerSample;
-                for (int channel_idx = 0; channel_idx < frame->ch_layout.nb_channels; channel_idx++)
+                for (int channel_idx = 0; channel_idx < channels; channel_idx++)
                 {
                     uint8_t* dst =
                         &videoStream
-                             ->m_audioBuffer[byte_offset * frame->ch_layout.nb_channels + channel_idx * bytesPerSample];
+                             ->m_audioBuffer[byte_offset * channels + channel_idx * bytesPerSample];
                     uint8_t* src = &frame->data[channel_idx][byte_offset];
                     memcpy(dst, src, bytesPerSample);
                 }
@@ -397,7 +402,7 @@ void FFmpegVideoStream::onFrame(AVFrame *frame, int stream_idx, int stream_type,
             frameData = videoStream->m_audioBuffer;
         }
 
-        ALenum format = OpenALAudioManager::getALFormat(frame->ch_layout.nb_channels, bytesPerSample * 8);
+        ALenum format = OpenALAudioManager::getALFormat(channels, bytesPerSample * 8);
         audioStream->bufferData(frameData, frameSize, format, frame->sample_rate);
     }
 #endif
