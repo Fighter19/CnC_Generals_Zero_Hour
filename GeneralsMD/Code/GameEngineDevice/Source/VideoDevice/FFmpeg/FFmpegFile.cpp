@@ -263,7 +263,11 @@ int FFmpegFile::getNumChannels() const
     if (stream == nullptr)
         return 0;
 
+#if LIBAVCODEC_VERSION_MAJOR < 61
+    return stream->codec_ctx->channels;
+#else
     return stream->codec_ctx->ch_layout.nb_channels;
+#endif
 }
 
 int FFmpegFile::getSampleRate() const
@@ -290,7 +294,11 @@ int FFmpegFile::getSizeForSamples(int numSamples) const
     if (stream == nullptr)
         return 0;
 
+#if LIBAVCODEC_VERSION_MAJOR < 61
+    return av_samples_get_buffer_size(NULL, stream->codec_ctx->channels, numSamples, stream->codec_ctx->sample_fmt, 1);
+#else
     return av_samples_get_buffer_size(NULL, stream->codec_ctx->ch_layout.nb_channels, numSamples, stream->codec_ctx->sample_fmt, 1);
+#endif
 }
 
 int FFmpegFile::getHeight() const
@@ -325,7 +333,11 @@ int FFmpegFile::getCurrentFrame() const
     const FFmpegStream *stream = findMatch(AVMEDIA_TYPE_VIDEO);
     if (m_fmtCtx == nullptr || stream == nullptr)
         return 0;
+#if LIBAVCODEC_VERSION_MAJOR < 61
+    return stream->codec_ctx->frame_number;
+#else
     return stream->codec_ctx->frame_num;
+#endif
 }
 
 int FFmpegFile::getPixelFormat() const

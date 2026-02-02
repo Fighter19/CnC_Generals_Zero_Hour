@@ -34,9 +34,11 @@ elseif(SAGE_USE_SDL3)
 
     find_package(SDL3 REQUIRED)
     target_link_libraries(RTS GameEngine GameEngineDevice SDL3::SDL3 milesstub)
-    install(TARGETS RTS RUNTIME_DEPENDENCIES 
-        DIRECTORIES ${dxvk_SOURCE_DIR}/lib
-        RUNTIME DESTINATION .)
+    if(NOT CMAKE_CROSSCOMPILING)
+        install(TARGETS RTS RUNTIME_DEPENDENCIES
+            DIRECTORIES ${dxvk_SOURCE_DIR}/lib
+            RUNTIME DESTINATION .)
+    endif()
 endif()
 
 if(SAGE_BUILD_TOOLS)

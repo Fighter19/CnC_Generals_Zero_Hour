@@ -53,8 +53,10 @@ target_include_directories(CompatLib PUBLIC
 # Add an empty library and link it to libdxvk_d3d8.so.0
 add_library(d3d8lib INTERFACE)
 find_package(glm REQUIRED)
+# This gets loaded via dlopen, thus it's not necessary to link,
+# Just link d3dx8 compat instead
 target_link_libraries(d3d8lib INTERFACE
-    dxvk_d3d8 d3dx8 dxvk_d3d9
+    d3dx8
 )
 
 target_include_directories(d3d8lib INTERFACE
