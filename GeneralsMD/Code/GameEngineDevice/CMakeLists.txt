@@ -51,7 +51,20 @@ if(SAGE_USE_FFMPEG)
         ${CMAKE_CURRENT_SOURCE_DIR}/Source/VideoDevice/FFmpeg/FFmpegFile.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Source/VideoDevice/FFmpeg/FFmpegVideoPlayer.cpp
     )
-    find_package(FFMPEG REQUIRED)
+    find_package(FFMPEG QUIET)
+    if (NOT FFMPEG_FOUND)
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET
+            libswscale
+            libswresample
+            libavutil
+            libavresample
+            libavformat
+            libavfilter
+            libavdevice
+            libavcodec)
+        add_library(Freetype::Freetype ALIAS PkgConfig::FFMPEG)
+    endif()
     target_include_directories(GameEngineDevice PRIVATE ${FFMPEG_INCLUDE_DIRS})
     target_link_libraries(GameEngineDevice PRIVATE ${FFMPEG_LIBRARIES})
     target_compile_definitions(GameEngineDevice PUBLIC SAGE_USE_FFMPEG)

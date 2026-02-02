@@ -19,7 +19,12 @@ target_include_directories(WW3D2 PUBLIC
 )
 
 if(SAGE_USE_FREETYPE)
-    find_package(freetype REQUIRED)
+    find_package(freetype QUIET)
+    if (NOT freetype_FOUND)
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(freetype REQUIRED IMPORTED_TARGET freetype2)
+        add_library(Freetype::Freetype ALIAS PkgConfig::freetype)
+    endif()
     target_link_libraries(WW3D2 PRIVATE
         Freetype::Freetype
     )
