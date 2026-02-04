@@ -88,6 +88,16 @@
         "VCPKG_TARGET_TRIPLET": "x64-linux-dynamic",
         "SAGE_USE_SDL3": "ON"
       }
+    },
+    {
+      "name": "wasm-debug",
+      "inherits": "testing",
+      "displayName": "Wasm Debug Config",
+      "cacheVariables": {
+        "VCPKG_INSTALL_OPTIONS": "--debug",
+        "VCPKG_TARGET_TRIPLET": "wasm32-emscripten",
+        "SAGE_USE_SDL3": "ON"
+      }
     }
   ],
   "buildPresets": [
@@ -136,6 +146,12 @@
       "name": "linux64-testing",
       "configurePreset": "linux64-testing",
       "description": "Build the linux testing configuration",
+      "configuration": "Debug"
+    },
+    {
+      "name": "wasm-debug",
+      "configurePreset": "wasm-debug",
+      "description": "Build the WebAssembly debug configuration",
       "configuration": "Debug"
     }
   ],
