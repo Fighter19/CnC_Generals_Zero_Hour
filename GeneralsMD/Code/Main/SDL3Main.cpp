@@ -125,8 +125,8 @@ char *nextParam(char *newSource, const char *seps)
 static Bool initializeAppWindows(Bool runWindowed, Bool runSplash) {
   Int startWidth = DEFAULT_XRESOLUTION, startHeight = DEFAULT_YRESOLUTION;
   SDL_InitSubSystem(SDL_INIT_VIDEO);
-  if (!SDL_Vulkan_LoadLibrary(nullptr)) {
-    DEBUG_LOG(("Failed to load Vulkan library"));
+  if (!SDL_GL_LoadLibrary(nullptr)) {
+    DEBUG_LOG(("Failed to load GL library"));
     return false;
   }
 
@@ -138,7 +138,7 @@ static Bool initializeAppWindows(Bool runWindowed, Bool runSplash) {
 
   TheSDL3Window = SDL_CreateWindow(
       "Command and Conquer Generals", startWidth, startHeight,
-      SDL_WINDOW_VULKAN | SDL_WINDOW_HIDDEN);
+      SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
   if(!TheSDL3Window) {
     DEBUG_LOG(("Failed to create window"));
     return false;
