@@ -24,12 +24,29 @@ HMODULE LoadLibrary(const char* lpFileName)
   if (pathFile.extension() == ".dll")
   {
     // Remove extension
-    std::string pathCurrent = pathFile.replace_extension().string();
-
-    return dlopen(pathCurrent.c_str(), RTLD_LAZY);
+    pathFile = pathFile.replace_extension().string();
   }
 
-  return dlopen(lpFileName, RTLD_LAZY);
+  void *handle = dlopen(pathFile.c_str(), RTLD_LAZY);
+  if (!handle)
+  {
+    return NULL;
+  }
+
+  // Find DllMain and call it if applicable
+  typedef BOOL (*DllMainFunc)(HINSTANCE, DWORD, LPVOID);
+  DllMainFunc DllMain = (DllMainFunc)dlsym(handle, "DllMain");
+  if (DllMain)
+  {
+    const DWORD DLL_PROCESS_ATTACH = 1;
+    if (!DllMain((HINSTANCE)handle, DLL_PROCESS_ATTACH, NULL))
+    {
+      dlclose(handle);
+      return NULL;
+    }
+  }
+
+  return (HMODULE)handle;
 }
 
 FARPROC GetProcAddress(HMODULE hModule, const char* lpProcName)
