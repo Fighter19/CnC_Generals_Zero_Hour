@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "sage",
   "version": "0.1.0",
-  "builtin-baseline": "533a5fda5c0646d1771345fb572e759283444d5f",
+  "builtin-baseline": "a30ac1bd011913356d31c5c97dd836d63e9c92cf",
   "dependencies": [
     "zlib",
     "glm",
@@ -18,5 +18,12 @@
       ]
     },
     "sdl3-image"
+  ],
+  "overrides": [
+    { 
+        "name": "glm", 
+        "version": "1.0.1",
+        "port-version": 3
+    }
   ]
 }
