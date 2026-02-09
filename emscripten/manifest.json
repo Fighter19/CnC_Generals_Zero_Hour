@@ -1,0 +1,16 @@
+{
+  "background_color": "#0000ff",
+  "description": "SAGE Description",
+  "display": "fullscreen",
+  "icons": [
+    {
+      "src": "SAGE.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    }
+  ],
+  "name": "SAGE",
+  "short_name": "SAGE",
+  "start_url": "."
+}
+

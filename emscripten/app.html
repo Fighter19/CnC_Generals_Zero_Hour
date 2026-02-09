@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  		<link rel="manifest" href="manifest.json" />
+  </meta>
+  <title>RTS</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: #eee;
+      font-family: sans-serif;
+    }
+
+    #topbar {
+      padding: 8px;
+      background: #222;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    #status {
+      flex: 1;
+      opacity: 0.9;
+    }
+
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background: black;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="topbar">
+    <input
+      type="file"
+      id="folderPicker"
+      webkitdirectory
+    />
+    <div id="status">Bitte Spieldaten-Ordner auswählen</div>
+
+    <button id="startButton">Starten</button>
+  </div>
+
+  <canvas id="canvas" width="1280" height="720"></canvas>
+
+<script>
+    //if ("serviceWorker" in navigator) {
+    // Register a service worker hosted at the root of the
+    // site using the default scope.
+    //   navigator.serviceWorker.register("/sw.js").then(
+    //     (registration) => {
+    //       console.log("Service worker registration succeeded:", registration);
+    //     },
+    //     (error) => {
+    //       console.error(`Service worker registration failed: ${error}`);
+    //     },
+    //   );
+    // } else {
+    //   console.error("Service workers are not supported.");
+    // }
+
+  const startButton = document.getElementById("startButton");
+  startButton.addEventListener("click", () => {
+    if (!FS.analyzePath('/idbfs').exists) {
+      FS.mkdir('/idbfs');
+    }
+
+    ret = FS.mount(IDBFS, {}, '/idbfs');
+    
+        FS.syncfs(true, function(err) {
+      if (err) {
+      console.error('IDBFS populate sync error:', err);
+      } else {
+      console.log('IDBFS populate sync complete');
+          FS.chdir("/idbfs/cnc_zh");
+          callMain();
+      }
+    });
+  });
+
+  const statusEl = document.getElementById("status");
+  const folderPicker = document.getElementById("folderPicker");
+
+  // const worker = new Worker('worker.js');
+
+  //   folderPicker.addEventListener("change", () => {
+  //       if (!folderPicker.files.length) {
+  //           statusEl.textContent = "Kein Ordner ausgewählt";
+  //           return;
+  //       }
+
+  //       // Iterate through all files and create new File objects with the relative path,
+  //       // baked in
+
+  //       var files_new = [];
+  //       for (var i = 0; i < folderPicker.files.length; i++) {
+  //           var file = folderPicker.files[i];
+  //           if (!file.webkitRelativePath) {
+  //             throw new Error("webkitRelativePath is not supported in this browser, cannot determine relative paths of files");
+  //           }
+  //           var relativePath = file.webkitRelativePath;
+  //           var newFile = new File([file], relativePath, { type: file.type });
+  //           files_new.push(newFile);
+  //       }
+
+  //       worker.postMessage({type: 'mount', files: files_new})
+  //   });
+
+  // // Caveat, this is the lambda for the message handler in THIS context (not the worker)
+  // worker.onmessage = function(e) {
+  //   console.log("Message received on main:");
+  //   console.log(e);
+  // };
+  // worker.postMessage({type: 'init'})
+
+  var Module = {
+    canvas: document.getElementById("canvas"),
+
+    onRuntimeInitialized() {
+      statusEl.textContent = "Engine geladen – bitte Spieldaten auswählen";
+
+
+    }
+  };
+</script>
+
+  <!-- Emscripten Output -->
+  <script src="RTS.js"></script>
+
+</body>
+</html>
