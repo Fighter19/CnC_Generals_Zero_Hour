@@ -1,5 +1,5 @@
 # On 64-bit Windows or Unix, use our d3dx8 implementation
-if (UNIX OR WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+if (UNIX OR (WIN32 AND (CMAKE_SIZEOF_VOID_P EQUAL 8)))
 list(APPEND SOURCE_D3DX_COMPAT
     d3dx8_compat.cpp
     d3dx8math.cpp
