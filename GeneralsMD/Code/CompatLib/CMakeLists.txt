@@ -13,6 +13,8 @@ if(NOT SAGE_USE_GLM)
     message(FATAL_ERROR "GLM is required for d3dx8 compatibility layer")
 endif()
 
+message(STATUS "Building d3dx8 compatibility layer")
+
 find_package(glm REQUIRED)
 target_link_libraries(d3dx8 PUBLIC glm::glm)
 
@@ -45,6 +47,9 @@ set(SOURCE_COMPAT
 list(TRANSFORM SOURCE_COMPAT PREPEND "Source/")
 
 add_library(CompatLib STATIC ${SOURCE_COMPAT})
+find_package(SDL3 CONFIG REQUIRED)
+# Required for window compatibility functions
+target_link_libraries(CompatLib PRIVATE SDL3::SDL3)
 
 target_include_directories(CompatLib PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/Include
@@ -55,9 +60,7 @@ add_library(d3d8lib INTERFACE)
 find_package(glm REQUIRED)
 # This gets loaded via dlopen, thus it's not necessary to link,
 # Just link d3dx8 compat instead
-target_link_libraries(d3d8lib INTERFACE
-    d3dx8
-)
+target_link_libraries(d3d8lib INTERFACE)
 
 target_include_directories(d3d8lib INTERFACE
     ${dxvk_SOURCE_DIR}/include/dxvk
@@ -68,6 +71,6 @@ target_link_directories(d3d8lib INTERFACE
     ${dxvk_SOURCE_DIR}/lib
 )
 
-target_link_libraries(CompatLib PUBLIC d3d8lib)
+target_link_libraries(CompatLib PUBLIC d3d8lib d3dx8)
 
 endif()
