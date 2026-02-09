@@ -501,7 +501,7 @@ void FFmpegVideoStream::frameRender( VideoBuffer *buffer )
     }
 
     int dst_strides[] = { (int)buffer->pitch() };
-    uint8_t *dst_data[] = { buffer_data };
+    uint8_t *dst_data[4] = { buffer_data };
     [[maybe_unused]] int result =
         sws_scale(m_swsContext, m_frame->data, m_frame->linesize, 0, height(), dst_data, dst_strides);
     DEBUG_ASSERTLOG(result >= 0, ("Failed to scale frame"));
