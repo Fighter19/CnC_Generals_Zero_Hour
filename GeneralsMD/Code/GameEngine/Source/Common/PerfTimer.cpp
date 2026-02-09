@@ -71,6 +71,12 @@ void GetPrecisionTimerTicksPerSec(Int64* t)
 //-------------------------------------------------------------------------------------------------
 void InitPrecisionTimer()
 {
+#ifdef EMSCRIPTEN
+	s_ticksPerSec = 3399871576;
+	s_ticksPerMSec = s_ticksPerSec / 1000.0f;
+	s_ticksPerUSec = s_ticksPerSec / 1000000.0f;
+	return;
+#endif
 #ifdef HOFFESOMMER_REPLACEMENT_CODE
 
   // measure clock cycles 3 times for 20 msec each
