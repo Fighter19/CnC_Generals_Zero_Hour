@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "sage",
   "version": "0.1.0",
-  "builtin-baseline": "a30ac1bd011913356d31c5c97dd836d63e9c92cf",
+  "builtin-baseline": "48cfad97648ce5aa68f1ee832616a5e6abcd6288",
   "dependencies": [
     "zlib",
     "glm",
@@ -14,7 +14,8 @@
     {
       "name": "sdl3",
       "features": [
-        "vulkan"
+        "vulkan",
+        "emscripten-pthreads"
       ]
     },
     "sdl3-image"
