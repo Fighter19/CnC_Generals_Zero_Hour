@@ -27,7 +27,11 @@
 #include <stdio.h>
 #ifdef _UNIX
 #include "osdep.h"
+#define _USE_DEV_RANDOM
+#ifdef __linux__
 #include <linux/kernel.h>
+#undef _USE_DEV_RANDOM
+#endif
 #include <unistd.h>
 #include <sys/types.h>
 
