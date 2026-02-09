@@ -21,6 +21,7 @@ typedef wchar_t WCHAR;
 #define _vsnprintf vsnprintf
 #define _snprintf snprintf
 
+#if !defined(EMSCRIPTEN)
 static char *strupr(char *str)
 {
     for (int i = 0; i < strlen(str); i++)
@@ -28,6 +29,7 @@ static char *strupr(char *str)
 
     return str;
 }
+#endif
 
 static char *strrev(char *str)
 {
