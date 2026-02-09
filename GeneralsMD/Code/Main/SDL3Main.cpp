@@ -163,6 +163,12 @@ static Bool initializeAppWindows(Bool runWindowed, Bool runSplash) {
 
   setenv("DXVK_WSI_DRIVER", "SDL3", 1);
 
+#ifdef EMSCRIPTEN
+  // Emscripten SDL doesn't yet support multiple windows or is broken,
+  // so skip the splash screen for now.
+  runSplash = false;
+#endif
+
   if (runSplash) {
     SplashWindow =
       SDL_CreateWindow("Splash", SplashSurface->w, SplashSurface->h,
