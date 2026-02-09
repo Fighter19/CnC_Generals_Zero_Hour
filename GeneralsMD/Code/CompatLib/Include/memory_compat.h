@@ -6,6 +6,8 @@
 #include <malloc.h>
 #elif __APPLE__
 #include <malloc/malloc.h>
+#elif defined(EMSCRIPTEN)
+#include <emscripten/emmalloc.h>
 #endif
 
 #define GMEM_FIXED 0
@@ -22,7 +24,7 @@ static void GlobalFree(void *ptr)
 
 static size_t GlobalSize(void *ptr)
 {
-#ifdef __linux__
+#ifdef _LINUX
   return malloc_usable_size(ptr);
 #elif defined(__APPLE__)
   return malloc_size(ptr);
