@@ -49,6 +49,35 @@ message(STATUS "Using FontConfig: ${SAGE_USE_FONTCONFIG}")
 message(STATUS "Using UBSan: ${SAGE_USE_UBSAN}")
 message(STATUS "Using ASan: ${SAGE_USE_ASAN}")
 
+if(EMSCRIPTEN)
+add_compile_options(-pthread)
+add_link_options(-pthread)
+
+# add_compile_options(-fsanitize=address)
+# add_link_options(-fsanitize=address)
+
+add_compile_options("SHELL:-s USE_PTHREADS")
+add_link_options("SHELL:-s USE_PTHREADS -s INITIAL_MEMORY=512MB")
+add_link_options("SHELL:-sINVOKE_RUN=0")
+add_link_options("SHELL:-sFORCE_FILESYSTEM=1")
+# add_link_options("SHELL:-sALLOW_MEMORY_GROWTH=1")
+#-sERROR_ON_WASM_CHANGES_AFTER_LINK -sWASM_BIGINT -O1
+add_link_options("SHELL:-sWASM_BIGINT")
+add_link_options("SHELL:-sASSERTIONS=2")
+add_link_options("-lworkerfs.js")
+add_link_options("-lidbfs.js")
+# This is slow, but doing so will prevent deadlocks, when not using sASSERTIONS=2
+#add_link_options("SHELL:-sPROXY_TO_PTHREAD=1")
+# This is important! It will crash after some time without it, without any error message.
+add_link_options("SHELL:-sSTACK_SIZE=1MB")
+# add_link_options("SHELL:-sSAFE_HEAP=1")
+
+# Add lto for emscripten builds
+add_compile_options(-O1)
+add_link_options(-O1 -g0 -gsource-map)
+#add_link_options(-O1 -g0)
+endif()
+
 if(SAGE_USE_ASAN)
   if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fsanitize=address")
