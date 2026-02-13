@@ -111,6 +111,10 @@
 #include <filesystem>
 #endif
 
+#ifdef EMSCRIPTEN
+#include <emscripten.h>
+#endif
+
 #ifdef _INTERNAL
 // for occasional debugging...
 //#pragma optimize("", off)
@@ -797,16 +801,28 @@ extern HWND ApplicationHWnd;
  */
 void GameEngine::execute( void )
 {
-	
-	DWORD prevTime = timeGetTime();
+	prevTime = timeGetTime();
 #if defined(_DEBUG) || defined(_INTERNAL)
-	DWORD startTime = timeGetTime() / 1000;
+	startTime = timeGetTime() / 1000;
+#endif
+
+#ifdef EMSCRIPTEN
+	// Won't get past this in Emscripten
+	emscripten_set_main_loop_arg([](void* arg) {
+		GameEngine* engine = static_cast<GameEngine*>(arg);
+		engine->run_once();
+	}, this, 0, 1);
 #endif
 
 	// pretty basic for now
 	while( !m_quitting )
 	{
+		run_once();
+	}
+}
 
+void GameEngine::run_once( void )
+{
 		//if (TheGlobalData->m_vTune)
 		{
 #ifdef PERF_TIMERS
@@ -913,9 +929,6 @@ void GameEngine::execute( void )
 			PerfGather::resetAll();
 		}
 #endif
-
-	}
-
 }
 
 /** -----------------------------------------------------------------------------------------------

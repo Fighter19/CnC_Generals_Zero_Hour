@@ -72,6 +72,7 @@ public:
 
 	virtual void execute( void );											/**< The "main loop" of the game engine.
 																								 It will not return until the game exits. */
+	virtual void run_once( void);
 	virtual void setFramesPerSecondLimit( Int fps );	///< Set the maximum rate engine updates are allowed to occur
 	virtual Int  getFramesPerSecondLimit( void );			///< Get maxFPS.  Not inline since it is called from another lib.
 	virtual void setQuitting( Bool quitting );				///< set quitting status
@@ -100,6 +101,10 @@ protected:
 	Int m_maxFPS;																									///< Maximum frames per second allowed
   Bool m_quitting;  ///< true when we need to quit the game
 	Bool m_isActive;	///< app has OS focus.
+	DWORD prevTime = timeGetTime();
+#if defined(_DEBUG) || defined(_INTERNAL)
+	DWORD startTime = timeGetTime() / 1000;
+#endif
 
 };
 inline void GameEngine::setQuitting( Bool quitting ) { m_quitting = quitting; }
