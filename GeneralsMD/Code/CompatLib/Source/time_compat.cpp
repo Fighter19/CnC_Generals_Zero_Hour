@@ -8,7 +8,12 @@ DWORD timeGetTime(void)
 {
   // Boost could be used but is slow
   struct timespec ts;
+#ifdef EMSCRIPTEN
+  // Emscripten doesn't support BOOTTIME, so use REALTIME instead. 
+  clock_gettime(CLOCK_REALTIME, &ts);
+#else
   clock_gettime(CLOCK_BOOTTIME, &ts);
+#endif
   DWORD diff = ts.tv_sec * 1000 + ts.tv_nsec / 1000000;
   return diff;
 }
