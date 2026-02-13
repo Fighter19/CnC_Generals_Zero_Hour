@@ -24,6 +24,7 @@ option(SAGE_USE_STDFS "Use std::filesystem" ON)
 cmake_dependent_option(SAGE_USE_OPENAL "Use OpenAL" OFF "SAGE_USE_FFMPEG" OFF)
 cmake_dependent_option(SAGE_USE_BINK "Use Bink Video Library" ON "WIN32" OFF)
 cmake_dependent_option(SAGE_USE_DX8 "Use DirectX 8" ON "WIN32" OFF)
+cmake_dependent_option(SAGE_USE_WINED3D8 "Use WineD3D DirectX 8" ON "EMSCRIPTEN" OFF)
 cmake_dependent_option(SAGE_USE_FREETYPE "Use FreeType" ON "NOT WIN32" OFF)
 cmake_dependent_option(SAGE_USE_FONTCONFIG "Use FontConfig" ON "NOT WIN32" OFF)
 option(SAGE_USE_UBSAN "Use UBSan" OFF)
@@ -37,6 +38,7 @@ message(STATUS "Using Bink: ${SAGE_USE_BINK}")
 message(STATUS "Using GameSpy: ${SAGE_USE_GAMESPY}")
 message(STATUS "Using Miles: ${SAGE_USE_MILES}")
 message(STATUS "Using DirectX 8: ${SAGE_USE_DX8}")
+message(STATUS "Using WineD3D DirectX 8: ${SAGE_USE_WINED3D8}")
 message(STATUS "Using ZLib: ${SAGE_USE_ZLIB}")
 message(STATUS "Using LZH-Light: ${SAGE_USE_LZHL}")
 message(STATUS "Using FFmpeg: ${SAGE_USE_FFMPEG}")
@@ -71,6 +73,7 @@ add_link_options("-lidbfs.js")
 # This is important! It will crash after some time without it, without any error message.
 add_link_options("SHELL:-sSTACK_SIZE=1MB")
 # add_link_options("SHELL:-sSAFE_HEAP=1")
+add_link_options("SHELL:-sFULL_ES2=1")
 
 # Add lto for emscripten builds
 add_compile_options(-O1)
@@ -154,6 +157,14 @@ else()
   )
   FetchContent_MakeAvailable(dxvk)
   message(STATUS "DXVK source directory: ${dxvk_SOURCE_DIR}")
+endif()
+
+if(SAGE_USE_WINED3D8)
+  FetchContent_Declare(
+    wined3d
+    GIT_REPOSITORY https://github.com/fighter19/d3d8-native.git
+    GIT_TAG        d460058387a050eda6f06bb8872bff69649e9468)
+  FetchContent_MakeAvailable(wined3d)
 endif()
 
 if(SAGE_USE_LZHL)

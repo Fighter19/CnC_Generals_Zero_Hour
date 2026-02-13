@@ -242,7 +242,12 @@ void Non_Fatal_Log_DX8_ErrorCode(unsigned res,const char * file,int line)
 	}
 }
 
-
+#ifdef EMSCRIPTEN
+extern "C" IDirect3D8 *Direct3DCreate8(UINT SDKVersion);
+// Currently this is the only DllMain we have, and it's only used for Emscripten.
+// If we end up with more than one, we'll need to think of some mechanism to rename them.
+extern "C" BOOL DllMain(HINSTANCE, DWORD, LPVOID);
+#endif
 
 bool DX8Wrapper::Init(void * hwnd, bool lite)
 {
@@ -294,6 +299,7 @@ bool DX8Wrapper::Init(void * hwnd, bool lite)
 	Invalidate_Cached_Render_States();
 
 	if (!lite) {
+#ifndef EMSCRIPTEN
 	#ifdef _WIN32
 		D3D8Lib = LoadLibrary("D3D8.DLL");
 	#else
@@ -304,6 +310,16 @@ bool DX8Wrapper::Init(void * hwnd, bool lite)
 
 		Direct3DCreate8Ptr = (Direct3DCreate8Type) GetProcAddress(D3D8Lib, "Direct3DCreate8");
 		if (Direct3DCreate8Ptr == NULL) return false;
+#else
+		#ifndef DLL_PROCESS_ATTACH
+			#define DLL_PROCESS_ATTACH 1
+		#endif
+		if (!DllMain((HINSTANCE)-1, DLL_PROCESS_ATTACH, NULL))
+		{
+			WWRELEASE_ERROR(("Failed to initialize D3D8 library"));
+		}
+		Direct3DCreate8Ptr = Direct3DCreate8;
+#endif
 
 		/*
 		** Create the D3D interface object

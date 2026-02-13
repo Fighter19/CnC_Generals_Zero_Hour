@@ -14,6 +14,10 @@ target_link_libraries(WW3D2 PUBLIC
     WWMath d3d8lib
 )
 
+if(SAGE_USE_WINED3D8)
+    target_link_libraries(WW3D2 PRIVATE d3d8-native)
+endif()
+
 target_include_directories(WW3D2 PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )

@@ -122,6 +122,11 @@ char *nextParam(char *newSource, const char *seps)
   return first;
 }
 
+#ifdef EMSCRIPTEN
+extern "C" void initialize_gl4es();
+extern "C" void set_getprocaddress(void *(*new_proc_address)(const char *));
+#endif
+
 static Bool initializeAppWindows(Bool runWindowed, Bool runSplash) {
   Int startWidth = DEFAULT_XRESOLUTION, startHeight = DEFAULT_YRESOLUTION;
   SDL_InitSubSystem(SDL_INIT_VIDEO);
@@ -144,6 +149,25 @@ static Bool initializeAppWindows(Bool runWindowed, Bool runSplash) {
     return false;
   }
 
+#ifdef EMSCRIPTEN
+  set_getprocaddress(reinterpret_cast<void*(*)(const char*)>(SDL_GL_GetProcAddress));
+  // For probing using a temporary context should be fine
+  SDL_GLContext sdlGlContext = SDL_GL_CreateContext(TheSDL3Window);
+  if (sdlGlContext == NULL)
+  {
+    assert(false && "SDL_GL_CreateContext failed for temporary context in initializeAppWindows");
+    fprintf(stderr, "SDL_GL_CreateContext failed: %s\n", SDL_GetError());
+    return NULL;
+  }
+  SDL_GL_MakeCurrent(TheSDL3Window, sdlGlContext);
+  printf("About to initialize GL4ES\n");
+  initialize_gl4es();
+  printf("GL4ES initialization done\n");
+  SDL_GL_MakeCurrent(TheSDL3Window, NULL);
+  SDL_GL_DestroyContext(sdlGlContext);
+  printf("Temporary GL context destroyed\n");
+#endif
+
   SDL_IOStream* icoStream = SDL_IOFromFile("GeneralsZH.ico", "rb");
   if (icoStream) {
     SDL_Surface* icon = IMG_LoadICO_IO(icoStream);
@@ -162,12 +186,6 @@ static Bool initializeAppWindows(Bool runWindowed, Bool runSplash) {
                         SDL_WINDOWPOS_CENTERED);
 
   setenv("DXVK_WSI_DRIVER", "SDL3", 1);
-
-#ifdef EMSCRIPTEN
-  // Emscripten SDL doesn't yet support multiple windows or is broken,
-  // so skip the splash screen for now.
-  runSplash = false;
-#endif
 
   if (runSplash) {
     SplashWindow =
@@ -196,6 +214,20 @@ static Bool initializeAppWindows(Bool runWindowed, Bool runSplash) {
 int main(int argc, char *argv[]) {
 #ifdef _PROFILE
   Profile::StartRange("init");
+#endif
+
+#ifdef EMSCRIPTEN
+  // Emscripten SDL doesn't yet support multiple windows or is broken,
+  // so skip the splash screen for now.
+  // runSplash = false;
+  // runWindowed = true;
+
+  argc = 3;
+  char *argv_new[3];
+  argv = argv_new;
+  argv[0] = "RTS"; // dummy argv[0]
+  argv[1] = "-nosplash";
+  argv[2] = "-win";
 #endif
 
   // This is similar to WinMain, where it looked up a few cmd line arguments before using the CommandLine module
