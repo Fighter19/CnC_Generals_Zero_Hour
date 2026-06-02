@@ -13,7 +13,9 @@
 #include "W3DDevice/Common/W3DRadar.h"
 #include "W3DDevice/Common/W3DFunctionLexicon.h"
 #include "W3DDevice/Common/W3DThingFactory.h"
-#if defined(SAGE_USE_OPENAL)
+#if defined(SAGE_USE_MINIAUDIO)
+#include "MiniAudioDevice/MiniAudioManager.h"
+#elif defined(SAGE_USE_OPENAL)
 #include "OpenALDevice/OpenALAudioManager.h"
 #elif defined(SAGE_USE_MILES)
 #include "MilesAudioDevice/MilesAudioManager.h"
@@ -64,7 +66,9 @@ inline ParticleSystemManager* SDL3GameEngine::createParticleSystemManager( void 
 
 inline NetworkInterface *SDL3GameEngine::createNetwork( void ) { return NetworkInterface::createNetwork(); }
 inline Radar *SDL3GameEngine::createRadar( void ) { return NEW W3DRadar; }
-#if defined(SAGE_USE_OPENAL)
+#if defined(SAGE_USE_MINIAUDIO)
+inline AudioManager *SDL3GameEngine::createAudioManager( void ) { return NEW MiniAudioManager; }
+#elif defined(SAGE_USE_OPENAL)
 inline AudioManager *SDL3GameEngine::createAudioManager( void ) { return NEW OpenALAudioManager; }
 #elif defined(SAGE_USE_MILES)
 inline AudioManager* SDL3GameEngine::createAudioManager(void) { return NEW MilesAudioManager; }

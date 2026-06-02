@@ -212,6 +212,14 @@ if(SAGE_USE_FFMPEG)
   target_compile_definitions(g_gameenginedevice PRIVATE SAGE_USE_FFMPEG)
 endif()
 
+if(SAGE_USE_MINIAUDIO)
+  target_sources(
+    g_gameenginedevice PRIVATE Include/MiniAudioDevice/MiniAudioManager.h
+                               Source/MiniAudioDevice/MiniAudioManager.cpp)
+
+  target_compile_definitions(g_gameenginedevice PRIVATE SAGE_USE_MINIAUDIO)
+endif()
+
 if(SAGE_USE_OPENAL)
   if(NOT SAGE_USE_FFMPEG)
     message(FATAL_ERROR "OpenAL support requires FFmpeg support to be enabled.")

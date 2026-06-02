@@ -71,7 +71,7 @@ unsigned long __cdecl Uncompress_Data(void const *src, void *dst)
 	CompressionType	method;		// Compression method used.
 	unsigned long					uncomp_size;
 
-	if (!src || !dst) return(NULL);
+	if (!src || !dst) return(0);
 
 	/*
 	**	Interpret the data block header structure to determine
