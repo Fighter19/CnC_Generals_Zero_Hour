@@ -1455,10 +1455,13 @@ const FontCharsClassCharDataStruct *FontCharsClass::Store_Freetype_Char(WCHAR ch
 			y_offset = 0;
 
     // Render the bitmap
-    for (unsigned int row = 0; row < FtFace->glyph->bitmap.rows; row++) {
+    // The valid cell is only char_width * CharHeight, ensure we don't write outside of it
+    int cols_to_render = min(FtFace->glyph->bitmap.width + x_offset, char_width) - x_offset;
+    int rows_to_render = min(FtFace->glyph->bitmap.rows + y_offset, (unsigned int)CharHeight) - y_offset;
+    for (unsigned int row = 0; row < rows_to_render; row++) {
         int index = row * FtFace->glyph->bitmap.pitch;
         int dst_index = (y_offset + row) * char_width;
-        for (unsigned int col = 0u; col < FtFace->glyph->bitmap.width; col++) {
+        for (unsigned int col = 0u; col < cols_to_render; col++) {
             uint8_t pixel_value = FtFace->glyph->bitmap.buffer[index + col];
             uint16_t pixel_color = 0;
 
