@@ -191,7 +191,7 @@ static void renderLoadingScreen(void)
 
 static Bool initializeAppWindow(Bool runWindowed)
 {
-	SDL_WindowFlags windowFlags = SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE;
+	SDL_WindowFlags windowFlags = SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 
 	if (!runWindowed)
 	{
