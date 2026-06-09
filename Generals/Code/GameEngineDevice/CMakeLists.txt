@@ -206,7 +206,19 @@ if(SAGE_USE_FFMPEG)
                                Include/VideoDevice/FFmpeg/FFmpegVideoPlayer.h
                                Source/VideoDevice/FFmpeg/FFmpegFile.cpp
                                Source/VideoDevice/FFmpeg/FFmpegVideoPlayer.cpp)
-  find_package(FFMPEG REQUIRED)
+    find_package(FFMPEG QUIET)
+    if (NOT FFMPEG_FOUND)
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET
+            libswscale
+            libswresample
+            libavutil
+            libavformat
+            libavfilter
+            libavdevice
+            libavcodec)
+        add_library(FFMPEG ALIAS PkgConfig::FFMPEG)
+    endif()
   target_include_directories(g_gameenginedevice PRIVATE ${FFMPEG_INCLUDE_DIRS})
   target_link_libraries(g_gameenginedevice PRIVATE ${FFMPEG_LIBRARIES})
   target_compile_definitions(g_gameenginedevice PRIVATE SAGE_USE_FFMPEG)

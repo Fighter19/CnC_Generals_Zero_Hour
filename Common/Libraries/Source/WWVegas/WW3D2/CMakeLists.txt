@@ -238,9 +238,11 @@ set_target_properties(c_ww3d2 PROPERTIES OUTPUT_NAME "WW3D2")
 
 target_include_directories(c_ww3d2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-find_package(DXVK CONFIG REQUIRED)
+target_link_libraries(c_ww3d2 PUBLIC c_wwlib c_wwmath c_wwsaveload)
 
-target_link_libraries(c_ww3d2 PUBLIC c_wwlib c_wwmath c_wwsaveload DXVK::d3d8)
+# DXVK
+find_package(DXVK CONFIG REQUIRED)
+target_link_libraries(c_ww3d2 PUBLIC DXVK::d3d8)
 
 # SDL3
 find_package(SDL3 CONFIG REQUIRED)
@@ -258,7 +260,14 @@ if(SAGE_USE_FONTCONFIG)
 endif()
 
 if(SAGE_USE_FREETYPE)
-  find_package(Freetype CONFIG REQUIRED)
-  target_link_libraries(c_ww3d2 PRIVATE Freetype::Freetype)
+    find_package(freetype QUIET)
+    if (NOT freetype_FOUND)
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(freetype REQUIRED IMPORTED_TARGET freetype2)
+        add_library(Freetype::Freetype ALIAS PkgConfig::freetype)
+    endif()
+    target_link_libraries(c_ww3d2 PRIVATE
+        Freetype::Freetype
+    )
   target_compile_definitions(c_ww3d2 PUBLIC SAGE_USE_FREETYPE)
 endif()
