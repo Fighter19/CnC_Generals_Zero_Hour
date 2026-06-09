@@ -157,6 +157,11 @@ static DynamicVectorClass<StringClass>					_RenderDeviceNameTable;
 static DynamicVectorClass<StringClass>					_RenderDeviceShortNameTable;
 static DynamicVectorClass<RenderDeviceDescClass>	_RenderDeviceDescriptionTable;
 
+
+typedef IDirect3D8* (WINAPI *Direct3DCreate8Type) (UINT SDKVersion);
+Direct3DCreate8Type	Direct3DCreate8Ptr = NULL;
+HINSTANCE D3D8Lib = NULL;
+
 /*
 ** Registry value names
 */
@@ -171,6 +176,50 @@ DX8_CleanupHook	 *DX8Wrapper::m_pCleanupHook=NULL;
 #ifdef EXTENDED_STATS
 DX8_Stats	 DX8Wrapper::stats;
 #endif
+
+#ifndef _WIN32
+#include <dlfcn.h>
+#include <filesystem>
+typedef uintptr_t (*FARPROC)();
+typedef HANDLE HMODULE;
+
+HMODULE LoadLibrary(const char* lpFileName)
+{
+	std::filesystem::path pathFile(lpFileName);
+	if (pathFile.extension() == ".dll")
+	{
+		// Remove extension
+		pathFile = pathFile.replace_extension().string();
+	}
+
+	void *handle = dlopen(pathFile.c_str(), RTLD_LAZY);
+	if (!handle)
+	{
+		return NULL;
+	}
+
+	// Find DllMain and call it if applicable
+	typedef BOOL (*DllMainFunc)(HINSTANCE, DWORD, LPVOID);
+	DllMainFunc DllMain = (DllMainFunc)dlsym(handle, "DllMain");
+	if (DllMain)
+	{
+		const DWORD DLL_PROCESS_ATTACH = 1;
+		if (!DllMain((HINSTANCE)handle, DLL_PROCESS_ATTACH, NULL))
+		{
+			dlclose(handle);
+			return NULL;
+		}
+	}
+
+	return (HMODULE)handle;
+}
+
+FARPROC GetProcAddress(HMODULE hModule, const char* lpProcName)
+{
+	return (FARPROC)dlsym(hModule, lpProcName);
+}
+#endif
+
 /***********************************************************************************
 **
 ** DX8Wrapper Implementation
@@ -246,10 +295,22 @@ bool DX8Wrapper::Init(void * window)
 	
 	Invalidate_Cached_Render_States();
 	
+	#ifdef _WIN32
+	D3D8Lib = LoadLibrary("D3D8.DLL");
+	#else
+	D3D8Lib = LoadLibrary("libd3d8-native.so");
+	#endif
+
+	if (D3D8Lib == NULL) return false;	// Return false at this point if init failed
+
+	Direct3DCreate8Ptr = (Direct3DCreate8Type) GetProcAddress(D3D8Lib, "Direct3DCreate8");
+	if (Direct3DCreate8Ptr == NULL) return false;
+
 	/*
-	** Create the D3D interface object
-	*/
-	D3DInterface = Direct3DCreate8(D3D_SDK_VERSION);		// TODO: handle failure cases...
+	 * * Create the D3D interface object
+	 */
+	WWDEBUG_SAY(("Create Direct3D8\n"));
+	D3DInterface = Direct3DCreate8Ptr(D3D_SDK_VERSION);		// TODO: handle failure cases...
 	if (!D3DInterface)
 		return false;
 	IsInitted = true;	
