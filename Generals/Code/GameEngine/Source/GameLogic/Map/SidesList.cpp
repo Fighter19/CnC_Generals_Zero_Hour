@@ -506,7 +506,7 @@ void SidesList::prepareForMP_or_Skirmish(void)
 		}
 	}
 	if (!gotScripts) {
-		AsciiString path = "data\\Scripts\\SkirmishScripts.scb";
+		AsciiString path = "Data/Scripts/SkirmishScripts.scb";
 		DEBUG_LOG(("Skirmish map using standard scripts\n"));
 		m_skirmishTeamrec.clear();
 		CachedFileInputStream theInputStream;
