@@ -59,9 +59,12 @@
 #include "GameLogic/SidesList.h"
 #include "GameLogic/TerrainLogic.h"
 
+#include <sysprof-6/sysprof-capture.h>
+
 #ifndef _WIN32
 #include <filesystem>
 #endif
+#include <csignal>
 
 #ifdef _INTERNAL
 // for occasional debugging...
@@ -592,6 +595,49 @@ AsciiString GameState::findNextSaveFilename( UnicodeString desc )
 
 }  // end findNextSaveFilename
 
+class CProfilerCapture
+{
+public:
+	CProfilerCapture()
+	{
+		// Stupid shit somehow stopped working as it should.
+		// Either Canonical or GNOME's fault. Eitherway the correct FD isn't the one reported by sysprof.
+		// But 3.
+		m_pCapture = sysprof_capture_writer_new_from_fd(3, 0);
+		if (!m_pCapture)
+		{
+			// Print result of ls -la /proc/self/fd
+			system("ls -la /proc/self/fd");
+
+			raise(SIGABRT);
+		}
+	}
+	~CProfilerCapture()
+	{
+		if (m_pCapture)
+			sysprof_capture_writer_unref(m_pCapture);
+	}
+	SysprofCaptureWriter *getCapture() { return m_pCapture; }
+
+	void Start()
+	{
+		m_startTime = SYSPROF_CAPTURE_CURRENT_TIME;
+	}
+
+	void Stop()
+	{
+		m_endTime = SYSPROF_CAPTURE_CURRENT_TIME;
+		sysprof_capture_writer_add_mark(m_pCapture, m_startTime, -1, getpid(), m_endTime - m_startTime, "GameEngine", "SaveGame", "ExtraSaveGameData");
+	}
+
+private:
+	SysprofCaptureWriter *m_pCapture = nullptr;
+	SysprofTimeStamp m_startTime;
+	SysprofTimeStamp m_endTime;
+};
+
+static CProfilerCapture g_profilerCapture;
+
 // ------------------------------------------------------------------------------------------------
 /** Save the current state of the engine in a save file
 	* NOTE: filename is a *filename only* */
@@ -649,6 +695,10 @@ SaveCode GameState::saveGame( AsciiString filename, UnicodeString desc,
 	// this is now done during startNewGame()
 //	gameInfo->pristineMapName = TheCampaignManager->getCurrentMap();
 
+	Int startTimeMS = ::GetTickCount();
+
+	g_profilerCapture.Start();
+
 	// write the save file
 	try
 	{
@@ -673,6 +723,12 @@ SaveCode GameState::saveGame( AsciiString filename, UnicodeString desc,
 		return SC_ERROR;
 		
 	}  // end catch
+
+	Int endTimeMS = ::GetTickCount();
+	Int deltaTimeMS = endTimeMS - startTimeMS;
+	DEBUG_LOG(( "GameState::saveGame - Save game took %d ms\n", deltaTimeMS ));
+	printf( "GameState::saveGame - Save game took %d ms\n", deltaTimeMS );
+	g_profilerCapture.Stop();
 
 	// close the file
 	xferSave.close();

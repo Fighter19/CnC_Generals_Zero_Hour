@@ -42,6 +42,8 @@ target_include_directories(GameEngine PRIVATE
 target_link_libraries(GameEngine PUBLIC WWLib WWMath WWDownload)
 target_link_libraries(GameEngine PRIVATE Compression)
 
+target_link_libraries(GameEngine PRIVATE sysprof-capture-4)
+
 if(WIN32)
     target_link_libraries(GameEngine PRIVATE d3d8lib gamespy BrowserDispatch)
 else()
