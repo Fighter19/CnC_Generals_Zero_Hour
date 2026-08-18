@@ -53,26 +53,6 @@ enum NameKeyType : int
 	FORCE_NAMEKEYTYPE_LONG = 0x7fffffff	// a trick to ensure the NameKeyType is a 32-bit int
 };
 
-//-------------------------------------------------------------------------------------------------
-/** A bucket entry for the name key generator */
-//-------------------------------------------------------------------------------------------------
-class Bucket : public MemoryPoolObject
-{
-
-	MEMORY_POOL_GLUE_WITH_USERLOOKUP_CREATE( Bucket, "NameKeyBucketPool" );
-
-public:
-	
-	Bucket();
-//~Bucket();
-
-	Bucket				*m_nextInSocket;
-	NameKeyType		m_key;
-	AsciiString		m_nameString;
-};
-
-inline Bucket::Bucket() : m_nextInSocket(NULL), m_key(NAMEKEY_INVALID) { }
-inline Bucket::~Bucket() { }
 
 //------------------------------------------------------------------------------------------------- 
 /** This class implements the conversion of an arbitrary string into a unique
@@ -123,7 +103,9 @@ private:
 
 	void freeSockets();
 
-	Bucket*				m_sockets[SOCKET_COUNT];			///< Catalog of all Buckets already generated
+	typedef std::unordered_map<AsciiString, NameKeyType, rts::hash<AsciiString>, rts::equal_to<AsciiString>> NameToKeyMap;
+	NameToKeyMap m_nameToKeyMap; ///< Maps the hash to the NameKeyType (index into m_vecIdxToName)
+	std::vector<AsciiString> m_vecIdxToName; ///< Maps the index into the NameKeyType to the name string (used for keyToName)
 	UnsignedInt		m_nextID;											///< Next available ID
 
 };  // end class NameKeyGenerator
