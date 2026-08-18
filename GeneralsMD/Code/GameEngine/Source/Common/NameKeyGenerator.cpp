@@ -118,23 +118,23 @@ NameKeyType NameKeyGenerator::nameToKey(const char* nameString)
 NameKeyType NameKeyGenerator::nameToLowercaseKey(const char* nameString)
 {
 	// Make lowercase copy of the string
-	std::string lowerNameString(nameString);
-	std::transform(lowerNameString.begin(), lowerNameString.end(), lowerNameString.begin(), [](unsigned char c) { return std::tolower(c); });
+	AsciiString lowerNameString(nameString);
+	lowerNameString.toLower();
 
 	// hmm, do we have it already?
-	NameToKeyMap::const_iterator it = m_nameToKeyMap.find(lowerNameString.c_str());
+	NameToKeyMap::const_iterator it = m_nameToKeyMap.find(lowerNameString);
 	if (it != m_nameToKeyMap.end())
 	{
 		return it->second;
 	}
 
 	NameKeyType result = (NameKeyType)m_nextID++;
-	m_nameToKeyMap[lowerNameString.c_str()] = result;
+	m_nameToKeyMap[lowerNameString] = result;
 	if (result >= m_vecIdxToName.size())
 	{
 		m_vecIdxToName.resize(result + 1);
 	}
-	m_vecIdxToName[result] = lowerNameString.c_str();
+	m_vecIdxToName[result] = lowerNameString;
 
 	return result;
 
